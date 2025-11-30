@@ -1,0 +1,176 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", Arial, sans-serif;
+  background: #050814;
+  color: #f9fafb;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 32px;
+  gap: 40px;
+}
+
+.auth-left {
+  flex: 1.2;
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-left h1 {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #9ca3af;
+  margin-bottom: 24px;
+}
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.feature-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #d1d5db;
+}
+
+.icon-square,
+.icon-search,
+.icon-chat {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: #111827;
+  display: inline-block;
+}
+
+.icon-search::before {
+  content: '🔍';
+  display: block;
+  text-align: center;
+  line-height: 30px;
+}
+
+.icon-chat::before {
+  content: '💬';
+  display: block;
+  text-align: center;
+  line-height: 30px;
+}
+
+.auth-right {
+  flex: 0.9;
+  max-width: 420px;
+  background: #050816;
+  border-radius: 24px;
+  padding: 24px 24px 20px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.switch-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.switch {
+  border-radius: 999px;
+  border: none;
+  padding: 12px 16px;
+  font-size: 15px;
+  cursor: pointer;
+  background: #0ea5e9;
+  color: #fff;
+}
+
+.switch.active {
+  background: #0ea5e9;
+}
+
+.switch:not(.active) {
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.terms {
+  font-size: 11px;
+  color: #9ca3af;
+  line-height: 1.5;
+}
+
+.terms span {
+  color: #e5e7eb;
+  font-weight: 500;
+}
+
+.auth-box {
+  margin-top: 4px;
+}
+
+/* Supabase Auth UI overrides */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-button {
+  border-radius: 999px !important;
+  font-size: 14px !important;
+  padding: 10px 14px !important;
+}
+
+.auth-input {
+  border-radius: 999px !important;
+  background: #020617 !important;
+  border-color: #1f2937 !important;
+  color: #e5e7eb !important;
+  font-size: 14px !important;
+}
+
+.logged-in-info {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 6px;
+}
+
+@media (max-width: 900px) {
+  .auth-layout {
+    flex-direction: column;
+    padding: 18px;
+  }
+  .auth-left {
+    max-width: none;
+  }
+  .auth-right {
+    max-width: none;
+  }
+}
