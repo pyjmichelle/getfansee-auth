@@ -90,17 +90,30 @@ const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL
 const SUPABASE_ANON_KEY = env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const SUPABASE_SERVICE_ROLE_KEY = env.SUPABASE_SERVICE_ROLE_KEY
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !SUPABASE_SERVICE_ROLE_KEY) {
+// 检测是否在 CI 环境
+const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true'
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   error('缺少必需的环境变量')
   error('请在 .env.local 中配置：')
   error('  NEXT_PUBLIC_SUPABASE_URL')
   error('  NEXT_PUBLIC_SUPABASE_ANON_KEY')
-  error('  SUPABASE_SERVICE_ROLE_KEY')
   process.exit(1)
 }
 
+if (!SUPABASE_SERVICE_ROLE_KEY) {
+  if (isCI) {
+    warning('⚠️  SUPABASE_SERVICE_ROLE_KEY 未设置 - 将跳过需要 admin 权限的清理步骤')
+  } else {
+    error('缺少必需的环境变量')
+    error('请在 .env.local 中配置：')
+    error('  SUPABASE_SERVICE_ROLE_KEY')
+    process.exit(1)
+  }
+}
+
 const anonClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-const serviceClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+const serviceClient = SUPABASE_SERVICE_ROLE_KEY ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) : null
 
 let totalTests = 0
 let passedTests = 0
@@ -348,29 +361,36 @@ async function main() {
     error(`测试过程中发生错误: ${err.message}`)
     console.error(err)
   } finally {
-    // 清理测试数据
-    info('\n清理测试数据...')
-    try {
-      if (mediaId1) {
-        await serviceClient.from('post_media').delete().eq('id', mediaId1)
+    // 清理测试数据（需要 service_role）
+    if (serviceClient) {
+      info('\n清理测试数据...')
+      try {
+        if (mediaId1) {
+          await serviceClient.from('post_media').delete().eq('id', mediaId1)
+        }
+        if (mediaId2) {
+          await serviceClient.from('post_media').delete().eq('id', mediaId2)
+        }
+        if (postId1) {
+          await serviceClient.from('posts').delete().eq('id', postId1)
+        }
+        if (postId2) {
+          await serviceClient.from('posts').delete().eq('id', postId2)
+        }
+        if (creatorId) {
+          await serviceClient.from('profiles').delete().eq('id', creatorId)
+          // 注意：auth.users 需要手动删除或使用 Supabase Admin API
+          warning('auth.users 记录需要手动删除（或等待自动清理）')
+        }
+        success('测试数据清理完成')
+      } catch (cleanupErr) {
+        warning(`清理数据时出错: ${cleanupErr.message}`)
       }
-      if (mediaId2) {
-        await serviceClient.from('post_media').delete().eq('id', mediaId2)
-      }
-      if (postId1) {
-        await serviceClient.from('posts').delete().eq('id', postId1)
-      }
-      if (postId2) {
-        await serviceClient.from('posts').delete().eq('id', postId2)
-      }
+    } else {
+      warning('⚠️  无法清理测试数据（需要 SERVICE_ROLE_KEY）')
       if (creatorId) {
-        await serviceClient.from('profiles').delete().eq('id', creatorId)
-        // 注意：auth.users 需要手动删除或使用 Supabase Admin API
-        warning('auth.users 记录需要手动删除（或等待自动清理）')
+        warning(`  需要手动清理: creatorId=${creatorId}, postId1=${postId1}, postId2=${postId2}`)
       }
-      success('测试数据清理完成')
-    } catch (cleanupErr) {
-      warning(`清理数据时出错: ${cleanupErr.message}`)
     }
   }
 

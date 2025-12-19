@@ -117,6 +117,9 @@ function initSupabaseClients() {
   const anonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY
   
+  // 检测是否在 CI 环境
+  const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true'
+  
   // 检查必需的环境变量
   if (!supabaseUrl) {
     error('❌ 缺少环境变量：NEXT_PUBLIC_SUPABASE_URL')
@@ -139,16 +142,21 @@ function initSupabaseClients() {
     process.exit(1)
   }
   
+  // 在 CI 环境中，service_role 是可选的
   if (!serviceRoleKey) {
-    error('❌ 缺少环境变量：SUPABASE_SERVICE_ROLE_KEY')
-    printFixSuggestion('配置环境变量', [
-      '打开 .env.local 文件',
-      '添加一行: SUPABASE_SERVICE_ROLE_KEY=你的_service_role_key',
-      '⚠️ 在本地填写，不要粘贴到对话中',
-      '在 Supabase Dashboard → Settings → API 中获取（service_role key）',
-      '保存文件并重新运行测试'
-    ])
-    process.exit(1)
+    if (isCI) {
+      warning('⚠️  SUPABASE_SERVICE_ROLE_KEY 未设置 - 将跳过需要 admin 权限的测试')
+    } else {
+      error('❌ 缺少环境变量：SUPABASE_SERVICE_ROLE_KEY')
+      printFixSuggestion('配置环境变量', [
+        '打开 .env.local 文件',
+        '添加一行: SUPABASE_SERVICE_ROLE_KEY=你的_service_role_key',
+        '⚠️ 在本地填写，不要粘贴到对话中',
+        '在 Supabase Dashboard → Settings → API 中获取（service_role key）',
+        '保存文件并重新运行测试'
+      ])
+      process.exit(1)
+    }
   }
   
   // 检查占位符
@@ -173,8 +181,8 @@ function initSupabaseClients() {
     process.exit(1)
   }
   
-  // 验证 SERVICE_ROLE_KEY 的 role
-  if (!validateJwtRole(serviceRoleKey, 'service_role')) {
+  // 验证 SERVICE_ROLE_KEY 的 role（如果提供了）
+  if (serviceRoleKey && !validateJwtRole(serviceRoleKey, 'service_role')) {
     error('❌ SUPABASE_SERVICE_ROLE_KEY 的 JWT role 不正确')
     printFixSuggestion('修复 SERVICE_ROLE_KEY', [
       '检查 .env.local 中的 SUPABASE_SERVICE_ROLE_KEY',
@@ -202,14 +210,14 @@ function initSupabaseClients() {
   // 1. anonClient - 用于测试正常的用户操作（受 RLS 限制）
   // 2. serviceClient - 用于 schema 校验和插入/查询验收（绕过 RLS）
   const anonClient = createClient(supabaseUrl, anonKey)
-  const serviceClient = createClient(supabaseUrl, serviceRoleKey, {
+  const serviceClient = serviceRoleKey ? createClient(supabaseUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false
     }
-  })
+  }) : null
   
-  return { anonClient, serviceClient, supabaseUrl }
+  return { anonClient, serviceClient, supabaseUrl, hasServiceRole: !!serviceRoleKey }
 }
 
 // 测试结果统计
@@ -789,28 +797,39 @@ async function cleanupTestData(serviceClient, userId, email) {
 async function runTests() {
   log('\n🚀 开始认证流程自动化测试\n', 'blue')
   
-  const { anonClient, serviceClient, supabaseUrl } = initSupabaseClients()
+  const { anonClient, serviceClient, supabaseUrl, hasServiceRole } = initSupabaseClients()
   info(`Supabase URL: ${supabaseUrl.substring(0, 30)}...`)
-  info(`使用 SERVICE_ROLE_KEY 进行 schema 校验和插入/查询验收`)
   
-  // 测试 1: 检查表结构（使用 service role）
-  const tableOk = await testProfilesTableStructure(serviceClient)
-  if (!tableOk) {
-    error('\n❌ 表结构检查失败，请先执行 migrations/004_fix_profiles_final.sql')
-    process.exit(1)
+  if (hasServiceRole) {
+    info(`使用 SERVICE_ROLE_KEY 进行 schema 校验和插入/查询验收`)
+  } else {
+    warning('⚠️  SERVICE_ROLE_KEY 未设置 - 将跳过需要 admin 权限的测试')
   }
   
-  // 测试 2: Schema 验收 - 插入和查询（使用 service role）
-  const env = loadEnv()
-  const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY
-  await testProfilesInsertAndQuery(serviceClient, supabaseUrl, serviceRoleKey)
+  // 测试 1: 检查表结构（使用 service role，如果可用）
+  if (hasServiceRole) {
+    const tableOk = await testProfilesTableStructure(serviceClient)
+    if (!tableOk) {
+      error('\n❌ 表结构检查失败，请先执行 migrations/004_fix_profiles_final.sql')
+      process.exit(1)
+    }
+    
+    // 测试 2: Schema 验收 - 插入和查询（使用 service role）
+    const env = loadEnv()
+    const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY
+    await testProfilesInsertAndQuery(serviceClient, supabaseUrl, serviceRoleKey)
+  } else {
+    info('⏭️  跳过表结构检查和 schema 验收（需要 SERVICE_ROLE_KEY）')
+  }
   
   // 测试 3: 注册（使用 anon key）
   const signUpResult = await testSignUp(anonClient)
   
-  // 测试 4: ensureProfile 逻辑验收（使用 service role）
-  if (signUpResult.success) {
+  // 测试 4: ensureProfile 逻辑验收（使用 service role，如果可用）
+  if (signUpResult.success && hasServiceRole) {
     await testEnsureProfileWithServiceRole(serviceClient, signUpResult.userId, signUpResult.email)
+  } else if (signUpResult.success && !hasServiceRole) {
+    info('⏭️  跳过 ensureProfile 逻辑验收（需要 SERVICE_ROLE_KEY）')
   }
   
   // 测试 5: 登录（使用 anon key）
@@ -822,17 +841,23 @@ async function runTests() {
     
     loginResult = await testSignIn(anonClient, signUpResult.email, signUpResult.password)
     
-    // 测试 6: 登录后 profile 验证（使用 service role）
+    // 测试 6: 登录后 profile 验证（使用 service role，如果可用）
     if (loginResult && loginResult.success) {
-      await testProfileAfterLogin(serviceClient, loginResult.userId, loginResult.email)
+      if (hasServiceRole) {
+        await testProfileAfterLogin(serviceClient, loginResult.userId, loginResult.email)
+      } else {
+        info('⏭️  跳过登录后 profile 验证（需要 SERVICE_ROLE_KEY）')
+      }
     }
   }
   
-  // 测试 7: 清理（使用 service role）
+  // 测试 7: 清理（使用 service role，如果可用）
   const userIdToClean = loginResult?.userId || signUpResult?.userId
   const emailToClean = loginResult?.email || signUpResult?.email
-  if (userIdToClean) {
+  if (userIdToClean && hasServiceRole) {
     await cleanupTestData(serviceClient, userIdToClean, emailToClean)
+  } else if (userIdToClean && !hasServiceRole) {
+    warning(`⚠️  无法清理测试数据（需要 SERVICE_ROLE_KEY）- userId: ${userIdToClean}`)
   }
   
   // 输出测试结果
