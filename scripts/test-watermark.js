@@ -42,34 +42,53 @@ function info(message) {
   log(`ℹ️  ${message}`, 'cyan')
 }
 
-// 加载环境变量
+// 加载环境变量（优先从 process.env，fallback 到 .env.local）
 function loadEnv() {
-  try {
-    const envPath = join(process.cwd(), '.env.local')
-    const envContent = readFileSync(envPath, 'utf-8')
-    const envVars = {}
-    
-    envContent.split('\n').forEach(line => {
-      const trimmed = line.trim()
-      if (trimmed && !trimmed.startsWith('#')) {
-        const [key, ...valueParts] = trimmed.split('=')
-        if (key && valueParts.length > 0) {
-          envVars[key.trim()] = valueParts.join('=').trim().replace(/^["']|["']$/g, '')
-        }
-      }
-    })
-    
-    Object.assign(process.env, envVars)
-  } catch (err) {
-    // .env.local 不存在或读取失败，使用系统环境变量
+  const env = {}
+  
+  // 首先从 process.env 读取（用于 CI/CD）
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    env.NEXT_PUBLIC_SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
   }
+  if (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  }
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    env.SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+  }
+  
+  // 如果 process.env 中没有，尝试从 .env.local 读取（用于本地开发）
+  if (!env.NEXT_PUBLIC_SUPABASE_URL || !env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    try {
+      const envPath = join(__dirname, '..', '.env.local')
+      const envContent = readFileSync(envPath, 'utf-8')
+      
+      envContent.split('\n').forEach(line => {
+        const trimmed = line.trim()
+        if (trimmed && !trimmed.startsWith('#')) {
+          const [key, ...valueParts] = trimmed.split('=')
+          if (key && valueParts.length > 0) {
+            const keyName = key.trim()
+            const value = valueParts.join('=').trim().replace(/^["']|["']$/g, '')
+            // 只在 env 中没有该 key 时才设置
+            if (!env[keyName]) {
+              env[keyName] = value
+            }
+          }
+        }
+      })
+    } catch (err) {
+      // .env.local 不存在，使用 process.env
+    }
+  }
+  
+  return env
 }
 
-loadEnv()
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+const env = loadEnv()
+const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_ANON_KEY = env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const SUPABASE_SERVICE_ROLE_KEY = env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !SUPABASE_SERVICE_ROLE_KEY) {
   error('缺少必需的环境变量')
