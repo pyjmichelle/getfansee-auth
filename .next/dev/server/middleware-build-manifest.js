@@ -1,0 +1,51 @@
+globalThis.__BUILD_MANIFEST = {
+  "pages": {
+    "/_app": [
+      "static/chunks/c14c3_next_dist_compiled_7c9b4daf._.js",
+      "static/chunks/c14c3_next_dist_shared_lib_6e8c2ff8._.js",
+      "static/chunks/c14c3_next_dist_client_05353ae9._.js",
+      "static/chunks/c14c3_next_dist_260488a5._.js",
+      "static/chunks/c14c3_next_app_ee9b0397.js",
+      "static/chunks/[next]_entry_page-loader_ts_4f3234fa._.js",
+      "static/chunks/ef236_react-dom_97a83658._.js",
+      "static/chunks/81bb5__pnpm_3f833906._.js",
+      "static/chunks/[root-of-the-server]__005bce05._.js",
+      "static/chunks/Downloads_authentication-flow-design (1)_pages__app_2da965e7._.js",
+      "static/chunks/turbopack-Downloads_authentication-flow-design (1)_pages__app_3b098d1d._.js"
+    ],
+    "/_error": [
+      "static/chunks/c14c3_next_dist_compiled_7c9b4daf._.js",
+      "static/chunks/c14c3_next_dist_shared_lib_d0b7b69c._.js",
+      "static/chunks/c14c3_next_dist_client_05353ae9._.js",
+      "static/chunks/c14c3_next_dist_40f115a7._.js",
+      "static/chunks/c14c3_next_error_a0370424.js",
+      "static/chunks/[next]_entry_page-loader_ts_9dd82983._.js",
+      "static/chunks/ef236_react-dom_97a83658._.js",
+      "static/chunks/81bb5__pnpm_3f833906._.js",
+      "static/chunks/[root-of-the-server]__35896175._.js",
+      "static/chunks/Downloads_authentication-flow-design (1)_pages__error_2da965e7._.js",
+      "static/chunks/turbopack-Downloads_authentication-flow-design (1)_pages__error_639304a8._.js"
+    ]
+  },
+  "devFiles": [],
+  "polyfillFiles": [
+    "static/chunks/c14c3_next_dist_build_polyfills_polyfill-nomodule.js"
+  ],
+  "lowPriorityFiles": [],
+  "rootMainFiles": [
+    "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_1ef5b791._.js",
+    "static/chunks/c14c3_next_dist_compiled_react-dom_10cca126._.js",
+    "static/chunks/c14c3_next_dist_compiled_react-server-dom-turbopack_b4be43b3._.js",
+    "static/chunks/c14c3_next_dist_compiled_next-devtools_index_ea2e40a5.js",
+    "static/chunks/c14c3_next_dist_compiled_eabe53b0._.js",
+    "static/chunks/c14c3_next_dist_client_afc8685f._.js",
+    "static/chunks/c14c3_next_dist_2e5e8e4a._.js",
+    "static/chunks/d37bf_@swc_helpers_cjs_f0e0e41c._.js",
+    "static/chunks/Downloads_authentication-flow-design (1)_a0ff3932._.js",
+    "static/chunks/turbopack-Downloads_authentication-flow-design (1)_046ba075._.js"
+  ]
+};
+globalThis.__BUILD_MANIFEST.lowPriorityFiles = [
+"/static/" + process.env.__NEXT_BUILD_ID + "/_buildManifest.js",
+"/static/" + process.env.__NEXT_BUILD_ID + "/_ssgManifest.js"
+];
