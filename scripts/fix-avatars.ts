@@ -77,24 +77,37 @@ async function fixAvatars() {
 
     console.log(`找到 ${creators.length} 个 creators\n`)
 
-    // 更新每个 creator 的 profiles.avatar_url
-    for (const creator of creators) {
-      if (!creator.avatar_url) {
-        console.log(`⚠️  Creator ${creator.id} 没有 avatar_url，跳过`)
-        continue
-      }
+      // 更新每个 creator 的 profiles.avatar_url
+      for (const creator of creators) {
+        if (!creator.avatar_url) {
+          console.log(`⚠️  Creator ${creator.id} 没有 avatar_url，跳过`)
+          continue
+        }
 
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: creator.avatar_url })
-        .eq('id', creator.id)
+        // 检查 profiles 表中的当前值
+        const { data: currentProfile } = await supabase
+          .from('profiles')
+          .select('avatar_url')
+          .eq('id', creator.id)
+          .maybeSingle()
 
-      if (updateError) {
-        console.error(`❌ 更新 profile ${creator.id} 失败:`, updateError)
-      } else {
-        console.log(`✅ 已更新 profile ${creator.id} 的头像`)
+        // 如果已经是最新的，跳过
+        if (currentProfile?.avatar_url === creator.avatar_url) {
+          console.log(`✅ Profile ${creator.id} 头像已是最新`)
+          continue
+        }
+
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ avatar_url: creator.avatar_url })
+          .eq('id', creator.id)
+
+        if (updateError) {
+          console.error(`❌ 更新 profile ${creator.id} 失败:`, updateError)
+        } else {
+          console.log(`✅ 已更新 profile ${creator.id} 的头像: ${creator.avatar_url}`)
+        }
       }
-    }
 
     console.log('\n✅ 头像修复完成！')
   } catch (error) {
