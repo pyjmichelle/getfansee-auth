@@ -15,7 +15,8 @@
     "test:watermark": "node scripts/test-watermark.js",
     "test:mvp": "node scripts/test-mvp.js",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "create-test-users": "tsx scripts/create-test-users.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

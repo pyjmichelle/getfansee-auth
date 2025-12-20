@@ -1,15 +1,11 @@
-#!/usr/bin/env tsx
-
 /**
- * 创建测试用户脚本
- * 用于为外部测试人员创建预配置的测试账号
+ * 创建测试账号脚本
  * 
  * 使用方法：
  *   pnpm tsx scripts/create-test-users.ts
  * 
  * 前置条件：
- *   - 需要 SUPABASE_SERVICE_ROLE_KEY（用于绕过 RLS 创建用户）
- *   - 需要 NEXT_PUBLIC_SUPABASE_URL
+ *   - 需要 SUPABASE_SERVICE_ROLE_KEY（在 .env.local 中配置）
  */
 
 import { createClient } from '@supabase/supabase-js'
@@ -20,7 +16,7 @@ import { join } from 'path'
 function loadEnv() {
   const env: Record<string, string> = {}
   
-  // 优先从 process.env 读取（用于 CI/CD）
+  // 优先从 process.env 读取
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     env.NEXT_PUBLIC_SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
   }
@@ -28,10 +24,10 @@ function loadEnv() {
     env.SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
   }
   
-  // 如果 process.env 中没有，尝试从 .env.local 读取
+  // 从 .env.local 读取
   if (!env.NEXT_PUBLIC_SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
     try {
-      const envPath = join(__dirname, '..', '.env.local')
+      const envPath = join(process.cwd(), '.env.local')
       const envContent = readFileSync(envPath, 'utf-8')
       
       envContent.split('\n').forEach(line => {
@@ -39,191 +35,164 @@ function loadEnv() {
         if (trimmed && !trimmed.startsWith('#')) {
           const [key, ...valueParts] = trimmed.split('=')
           if (key && valueParts.length > 0) {
-            const keyTrimmed = key.trim()
-            const valueTrimmed = valueParts.join('=').trim().replace(/^["']|["']$/g, '')
-            if (!env[keyTrimmed]) {
-              env[keyTrimmed] = valueTrimmed
+            const keyName = key.trim()
+            const value = valueParts.join('=').trim().replace(/^["']|["']$/g, '')
+            if (!env[keyName]) {
+              env[keyName] = value
             }
           }
         }
       })
     } catch (err) {
-      // .env.local 不存在或读取失败
+      // .env.local not found
     }
   }
   
   return env
 }
 
+const env = loadEnv()
+const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL
+const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY
+
+if (!supabaseUrl || !serviceKey) {
+  console.error('❌ Missing environment variables:')
+  console.error('   - NEXT_PUBLIC_SUPABASE_URL')
+  console.error('   - SUPABASE_SERVICE_ROLE_KEY')
+  console.error('\n请在 .env.local 中配置这些变量')
+  process.exit(1)
+}
+
+const supabase = createClient(supabaseUrl, serviceKey)
+
+// 测试账号配置
 const testUsers = [
   {
-    email: 'test-fan@getfansee.test',
-    password: 'TestFan123!',
+    email: 'test-fan@example.com',
+    password: 'TestPassword123!',
     role: 'fan' as const,
-    displayName: 'Test Fan User',
+    displayName: 'Test Fan',
   },
   {
-    email: 'test-creator@getfansee.test',
-    password: 'TestCreator123!',
+    email: 'test-creator@example.com',
+    password: 'TestPassword123!',
     role: 'creator' as const,
-    displayName: 'Test Creator User',
+    displayName: 'Test Creator',
   },
 ]
 
-async function main() {
-  console.log('\n🚀 开始创建测试用户...\n')
-  
-  const env = loadEnv()
-  const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY
-  
-  if (!supabaseUrl || !serviceKey) {
-    console.error('❌ 缺少环境变量：')
-    if (!supabaseUrl) console.error('  - NEXT_PUBLIC_SUPABASE_URL')
-    if (!serviceKey) console.error('  - SUPABASE_SERVICE_ROLE_KEY')
-    process.exit(1)
-  }
-  
-  const supabase = createClient(supabaseUrl, serviceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  })
-  
-  for (const user of testUsers) {
-    console.log(`\n📝 创建用户: ${user.email}`)
-    
+async function createTestUsers() {
+  console.log('🔧 开始创建测试账号...\n')
+
+  for (const userConfig of testUsers) {
     try {
+      console.log(`📝 处理账号: ${userConfig.email}`)
+
       // 1. 检查用户是否已存在
       const { data: existingUsers, error: listError } = await supabase.auth.admin.listUsers()
       
       if (listError) {
-        console.error(`  ❌ 无法列出用户: ${listError.message}`)
+        console.error(`❌ 无法列出用户:`, listError)
         continue
       }
-      
-      const existingUser = existingUsers.users.find(u => u.email === user.email)
+
+      const existingUser = existingUsers?.users.find(u => u.email === userConfig.email)
       
       if (existingUser) {
-        console.log(`  ⚠️  用户已存在，跳过创建 (ID: ${existingUser.id})`)
+        console.log(`   ⚠️  用户已存在: ${existingUser.id}`)
         
         // 更新密码（如果需要）
         const { error: updateError } = await supabase.auth.admin.updateUserById(
           existingUser.id,
-          { password: user.password }
+          { password: userConfig.password }
         )
         
         if (updateError) {
-          console.error(`  ⚠️  无法更新密码: ${updateError.message}`)
+          console.error(`   ❌ 更新密码失败:`, updateError)
         } else {
-          console.log(`  ✅ 密码已更新`)
+          console.log(`   ✅ 密码已更新`)
         }
-        
-        // 确保 profile 存在
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: existingUser.id,
-            email: user.email,
-            display_name: user.displayName,
-            role: user.role,
-            age_verified: true,
-          }, { onConflict: 'id' })
-        
-        if (profileError) {
-          console.error(`  ⚠️  无法创建/更新 profile: ${profileError.message}`)
-        } else {
-          console.log(`  ✅ Profile 已创建/更新`)
+      } else {
+        // 2. 创建新用户
+        const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+          email: userConfig.email,
+          password: userConfig.password,
+          email_confirm: true, // 直接确认邮箱，无需验证
+        })
+
+        if (createError) {
+          console.error(`   ❌ 创建用户失败:`, createError)
+          continue
         }
-        
-        // 如果是 creator，确保 creators 表有记录
-        if (user.role === 'creator') {
-          const { error: creatorError } = await supabase
-            .from('creators')
-            .upsert({
-              id: existingUser.id,
-              display_name: user.displayName,
-              bio: 'Test Creator Account',
-            }, { onConflict: 'id' })
-          
-          if (creatorError) {
-            console.error(`  ⚠️  无法创建/更新 creator: ${creatorError.message}`)
-          } else {
-            console.log(`  ✅ Creator 记录已创建/更新`)
-          }
-        }
-        
+
+        console.log(`   ✅ 用户创建成功: ${newUser.user.id}`)
+      }
+
+      // 3. 确保 profile 存在
+      const userId = existingUser?.id || (await supabase.auth.admin.listUsers()).data?.users.find(u => u.email === userConfig.email)?.id
+      
+      if (!userId) {
+        console.error(`   ❌ 无法获取用户 ID`)
         continue
       }
-      
-      // 2. 创建新用户
-      const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
-        email: user.email,
-        password: user.password,
-        email_confirm: true, // 自动确认邮箱，跳过验证
-      })
-      
-      if (createError || !newUser.user) {
-        console.error(`  ❌ 创建用户失败: ${createError?.message || 'Unknown error'}`)
-        continue
-      }
-      
-      console.log(`  ✅ 用户创建成功 (ID: ${newUser.user.id})`)
-      
-      // 3. 创建 profile
+
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert({
-          id: newUser.user.id,
-          email: user.email,
-          display_name: user.displayName,
-          role: user.role,
-          age_verified: true,
+        .upsert({
+          id: userId,
+          email: userConfig.email,
+          display_name: userConfig.displayName,
+          role: userConfig.role,
+          age_verified: true, // 测试账号默认已验证年龄
+        }, {
+          onConflict: 'id'
         })
-      
+
       if (profileError) {
-        console.error(`  ⚠️  创建 profile 失败: ${profileError.message}`)
-      } else {
-        console.log(`  ✅ Profile 创建成功`)
+        console.error(`   ❌ 创建 profile 失败:`, profileError)
+        continue
       }
-      
-      // 4. 如果是 creator，创建 creators 记录
-      if (user.role === 'creator') {
+
+      console.log(`   ✅ Profile 创建/更新成功`)
+
+      // 4. 如果是 creator，确保 creators 表中有记录
+      if (userConfig.role === 'creator') {
         const { error: creatorError } = await supabase
           .from('creators')
-          .insert({
-            id: newUser.user.id,
-            display_name: user.displayName,
-            bio: 'Test Creator Account',
+          .upsert({
+            id: userId,
+            display_name: userConfig.displayName,
+            bio: 'This is a test creator account for external testing.',
+          }, {
+            onConflict: 'id'
           })
-        
+
         if (creatorError) {
-          console.error(`  ⚠️  创建 creator 失败: ${creatorError.message}`)
+          console.error(`   ❌ 创建 creator 记录失败:`, creatorError)
         } else {
-          console.log(`  ✅ Creator 记录创建成功`)
+          console.log(`   ✅ Creator 记录创建/更新成功`)
         }
       }
-      
+
+      console.log(`   ✅ 账号 ${userConfig.email} 准备完成\n`)
+
     } catch (err: any) {
-      console.error(`  ❌ 处理用户时出错: ${err.message}`)
-      console.error(err)
+      console.error(`❌ 处理账号 ${userConfig.email} 时出错:`, err.message)
     }
   }
-  
-  console.log('\n✅ 测试用户创建完成！\n')
-  console.log('📋 测试账号信息：')
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+
+  console.log('✅ 测试账号创建完成！\n')
+  console.log('📋 测试账号信息：\n')
   testUsers.forEach(user => {
-    console.log(`\n${user.role === 'creator' ? '👨‍🎨 Creator' : '👤 Fan'}:`)
-    console.log(`  邮箱: ${user.email}`)
-    console.log(`  密码: ${user.password}`)
+    console.log(`   邮箱: ${user.email}`)
+    console.log(`   密码: ${user.password}`)
+    console.log(`   角色: ${user.role}`)
+    console.log('')
   })
-  console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
+  console.log('⚠️  注意：这些账号的邮箱已自动确认，可以直接登录')
 }
 
-main().catch(err => {
-  console.error('脚本执行失败:', err)
+createTestUsers().catch(err => {
+  console.error('❌ 脚本执行失败:', err)
   process.exit(1)
 })
-
