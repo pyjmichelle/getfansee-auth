@@ -27,19 +27,19 @@ export async function subscribe30d(creatorId: string): Promise<boolean> {
     const now = new Date()
     const currentPeriodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000) // +30 days
 
-    // 使用 upsert（ON CONFLICT subscriber_id, creator_id DO UPDATE）
+    // 使用 upsert（ON CONFLICT fan_id, creator_id DO UPDATE）
     const { error } = await supabase
       .from("subscriptions")
       .upsert(
         {
-          subscriber_id: user.id,
+          fan_id: user.id,
           creator_id: creatorId,
           plan: "monthly",
           status: "active",
           current_period_end: currentPeriodEnd.toISOString(),
         },
         {
-          onConflict: "subscriber_id,creator_id",
+          onConflict: "fan_id,creator_id",
         }
       )
 
@@ -71,7 +71,7 @@ export async function cancelSubscription(creatorId: string): Promise<boolean> {
     const { error } = await supabase
       .from("subscriptions")
       .update({ status: "canceled" })
-      .eq("subscriber_id", user.id)
+      .eq("fan_id", user.id)
       .eq("creator_id", creatorId)
 
     if (error) {
@@ -110,7 +110,7 @@ export async function isActiveSubscriber(fanId: string | null, creatorId: string
     const { data, error } = await supabase
       .from("subscriptions")
       .select("id")
-      .eq("subscriber_id", fanId)
+      .eq("fan_id", fanId)
       .eq("creator_id", creatorId)
       .eq("status", "active")
       .gt("current_period_end", new Date().toISOString())
@@ -279,7 +279,7 @@ export async function getMyPaywallState(userId: string): Promise<PaywallState | 
     const { data: subscriptions, error: subError } = await supabase
       .from("subscriptions")
       .select("creator_id")
-      .eq("subscriber_id", userId)
+      .eq("fan_id", userId)
       .eq("status", "active")
       .gt("current_period_end", new Date().toISOString())
 

@@ -43,12 +43,16 @@ export async function ensureProfile() {
   }
 
   if (!data) {
+    // 生成默认头像 URL（使用 UI Avatars 服务）
+    const defaultAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split("@")[0])}&background=random&color=fff&size=128`
+    
     const { error: insertError } = await supabase.from("profiles").insert({
       id: user.id,
       email: user.email,
       display_name: user.email.split("@")[0],
       role: "fan",
       age_verified: false,
+      avatar_url: defaultAvatarUrl,
     })
     if (insertError) {
       console.error("[auth] ensureProfile insert error", insertError)
