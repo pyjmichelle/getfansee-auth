@@ -65,32 +65,32 @@ if (!supabaseUrl || !serviceKey) {
 
 const supabase = createClient(supabaseUrl, serviceKey)
 
-// 假数据：Creator 信息
+// 假数据：Creator 信息（使用 ui-avatars.com，更可靠）
 const demoCreators = [
   {
     display_name: 'Sophia Creative',
     bio: 'Digital artist and content creator. Sharing my latest works and exclusive content!',
-    avatar_url: 'https://i.pravatar.cc/150?img=1',
+    avatar_url: 'https://ui-avatars.com/api/?name=Sophia+Creative&background=6366f1&color=fff&size=150&bold=true',
   },
   {
     display_name: 'Alex Photography',
     bio: 'Professional photographer. Capturing moments that matter.',
-    avatar_url: 'https://i.pravatar.cc/150?img=12',
+    avatar_url: 'https://ui-avatars.com/api/?name=Alex+Photography&background=ec4899&color=fff&size=150&bold=true',
   },
   {
     display_name: 'Maya Lifestyle',
     bio: 'Lifestyle blogger sharing daily inspiration and tips.',
-    avatar_url: 'https://i.pravatar.cc/150?img=47',
+    avatar_url: 'https://ui-avatars.com/api/?name=Maya+Lifestyle&background=10b981&color=fff&size=150&bold=true',
   },
   {
     display_name: 'Jordan Fitness',
     bio: 'Fitness coach and wellness advocate. Transform your body and mind.',
-    avatar_url: 'https://i.pravatar.cc/150?img=33',
+    avatar_url: 'https://ui-avatars.com/api/?name=Jordan+Fitness&background=f59e0b&color=fff&size=150&bold=true',
   },
   {
     display_name: 'Taylor Music',
     bio: 'Musician and producer. New tracks and behind-the-scenes content.',
-    avatar_url: 'https://i.pravatar.cc/150?img=68',
+    avatar_url: 'https://ui-avatars.com/api/?name=Taylor+Music&background=8b5cf6&color=fff&size=150&bold=true',
   },
 ]
 
