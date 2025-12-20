@@ -95,6 +95,11 @@ export default function HomePage() {
       <NavHeader user={currentUser} notificationCount={0} />
 
       <main className="container max-w-6xl mx-auto px-4 py-8">
+        <div className="mb-4 p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
+          <p className="text-sm font-semibold text-blue-800 dark:text-blue-200">
+            LIVE VERSION: 70a5ada
+          </p>
+        </div>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Creators</h1>
           <p className="text-muted-foreground">Discover and subscribe to your favorite creators</p>
