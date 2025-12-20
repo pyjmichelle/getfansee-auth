@@ -127,7 +127,7 @@ const demoPosts = [
     title: 'Check out my latest work!',
     content: 'More exclusive content coming soon for subscribers. 🎨✨',
     visibility: 'free' as const,
-    price_cents: null,
+    price_cents: 0,
     media_type: 'image' as const,
     media_url: demoImages[0],
   },
@@ -152,7 +152,7 @@ const demoPosts = [
     title: 'Sunset Photography',
     content: 'Captured this beautiful sunset yesterday. Nature never fails to amaze me.',
     visibility: 'free' as const,
-    price_cents: null,
+    price_cents: 0,
     media_type: 'image' as const,
     media_url: demoImages[3],
   },
@@ -179,7 +179,7 @@ const demoPosts = [
     title: 'Morning Routine',
     content: 'Starting the day right with a healthy breakfast and positive mindset!',
     visibility: 'free' as const,
-    price_cents: null,
+    price_cents: 0,
     media_type: 'image' as const,
     media_url: demoImages[4],
   },
@@ -196,7 +196,7 @@ const demoPosts = [
     title: 'Workout Motivation',
     content: 'No excuses! Every rep counts. 💪',
     visibility: 'free' as const,
-    price_cents: null,
+    price_cents: 0,
     media_type: 'image' as const,
     media_url: demoImages[6],
   },
@@ -214,7 +214,7 @@ const demoPosts = [
     title: 'New Track Preview',
     content: 'Preview of my latest track. Full version available for subscribers!',
     visibility: 'free' as const,
-    price_cents: null,
+    price_cents: 0,
     media_type: 'video' as const,
     media_url: demoVideos[3],
     preview_enabled: true,
@@ -249,6 +249,21 @@ async function seedFeedData() {
       if (existing) {
         console.log(`✅ Creator 已存在: ${creatorInfo.display_name} (${existing.id})`)
         creatorIds.push(existing.id)
+        // 更新 creator 信息（确保 bio 和 avatar 是最新的）
+        await supabase
+          .from('creators')
+          .update({
+            bio: creatorInfo.bio,
+            avatar_url: creatorInfo.avatar_url,
+          })
+          .eq('id', existing.id)
+        // 同时更新 profiles 表的 avatar_url（因为 listFeed 从 profiles 获取）
+        await supabase
+          .from('profiles')
+          .update({
+            avatar_url: creatorInfo.avatar_url,
+          })
+          .eq('id', existing.id)
         continue
       }
 
@@ -270,16 +285,18 @@ async function seedFeedData() {
 
       const userId = authData.user.id
 
-      // 创建 profile
+      // 创建 profile（确保 avatar_url 被设置）
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert({
+        .upsert({
           id: userId,
           email,
           display_name: creatorInfo.display_name,
           role: 'creator',
           age_verified: true,
           avatar_url: creatorInfo.avatar_url,
+        }, {
+          onConflict: 'id'
         })
 
       if (profileError) {
@@ -287,18 +304,20 @@ async function seedFeedData() {
         continue
       }
 
-      // 创建 creator 记录
+      // 创建或更新 creator 记录（使用 upsert）
       const { error: creatorError } = await supabase
         .from('creators')
-        .insert({
+        .upsert({
           id: userId,
           display_name: creatorInfo.display_name,
           bio: creatorInfo.bio,
           avatar_url: creatorInfo.avatar_url,
+        }, {
+          onConflict: 'id'
         })
 
       if (creatorError) {
-        console.error(`❌ 创建 creator 记录失败:`, creatorError)
+        console.error(`❌ 创建/更新 creator 记录失败:`, creatorError)
         continue
       }
 
@@ -319,7 +338,7 @@ async function seedFeedData() {
       const creatorId = creatorIds[creatorIndex % creatorIds.length]
       creatorIndex++
 
-      // 创建 post
+      // 创建 post（确保 price_cents 不为 null）
       const { data: post, error: postError } = await supabase
         .from('posts')
         .insert({
@@ -327,7 +346,7 @@ async function seedFeedData() {
           title: postData.title,
           content: postData.content,
           visibility: postData.visibility,
-          price_cents: postData.price_cents,
+          price_cents: postData.price_cents ?? 0, // 如果为 null，使用 0
           preview_enabled: postData.preview_enabled || false,
           watermark_enabled: postData.media_type === 'image',
         })
