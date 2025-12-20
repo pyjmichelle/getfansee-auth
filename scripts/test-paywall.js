@@ -2,14 +2,14 @@
 
 /**
  * Phase 2 Paywall 功能自动化测试脚本
- * 测试 subscriptions 和 post_unlocks 的完整流程
+ * 测试 subscriptions 和 purchases 的完整流程
  * 
  * 使用方法：
  *   pnpm test:paywall
  * 
  * 前置条件：
  *   1. 已配置 .env.local 文件
- *   2. 已执行 migrations/008_phase2_paywall.sql
+ *   2. 已执行 migrations/013_money_access_mvp.sql
  */
 
 const { createClient } = require('@supabase/supabase-js')
@@ -136,27 +136,27 @@ async function getMyPaywallState(supabase, userId) {
       .select('creator_id')
       .eq('subscriber_id', userId)
       .eq('status', 'active')
-      .gt('ends_at', new Date().toISOString())
+      .gt('current_period_end', new Date().toISOString())
     
     if (subError) {
       console.error('[test] getMyPaywallState subscriptions error:', subError)
       return null
     }
     
-    // 查询 unlocked posts
-    const { data: unlocks, error: unlockError } = await supabase
-      .from('post_unlocks')
+    // 查询 purchased posts (PPV unlocks)
+    const { data: purchases, error: purchaseError } = await supabase
+      .from('purchases')
       .select('post_id')
-      .eq('user_id', userId)
+      .eq('fan_id', userId)
     
-    if (unlockError) {
-      console.error('[test] getMyPaywallState post_unlocks error:', unlockError)
+    if (purchaseError) {
+      console.error('[test] getMyPaywallState purchases error:', purchaseError)
       return null
     }
     
     return {
       hasActiveSubscription: (subscriptions?.length || 0) > 0,
-      unlockedPostIds: new Set(unlocks?.map(u => u.post_id) || []),
+      unlockedPostIds: new Set(purchases?.map(p => p.post_id) || []),
     }
   } catch (err) {
     console.error('[test] getMyPaywallState exception:', err)
@@ -470,7 +470,7 @@ async function hasActiveSubscription(supabase, userId, creatorId) {
       .eq('subscriber_id', userId)
       .eq('creator_id', creatorId)
       .eq('status', 'active')
-      .gt('ends_at', new Date().toISOString())
+      .gt('current_period_end', new Date().toISOString())
       .maybeSingle()
     
     if (error) {
@@ -520,19 +520,19 @@ async function canViewPost(supabase, userId, postId, creatorId) {
       return true
     }
     
-    // 6. 检查是否已解锁
-    const { data: unlock, error: unlockError } = await supabase
-      .from('post_unlocks')
+    // 6. 检查是否已购买（PPV unlock）
+    const { data: purchase, error: purchaseError } = await supabase
+      .from('purchases')
       .select('id')
-      .eq('user_id', userId)
+      .eq('fan_id', userId)
       .eq('post_id', postId)
       .maybeSingle()
     
-    if (unlockError) {
+    if (purchaseError) {
       return false
     }
     
-    return !!unlock
+    return !!purchase
   } catch (err) {
     console.error('[test] canViewPost exception:', err)
     return false
@@ -553,16 +553,16 @@ async function subscribe30d(supabase, userId, creatorId) {
     }
     
     const now = new Date()
-    const endsAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+    const currentPeriodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
     
     const { error } = await supabase
       .from('subscriptions')
       .upsert({
         subscriber_id: userId,
         creator_id: creatorId,
+        plan: 'monthly',
         status: 'active',
-        starts_at: now.toISOString(),
-        ends_at: endsAt.toISOString(),
+        current_period_end: currentPeriodEnd.toISOString(),
       }, {
         onConflict: 'subscriber_id,creator_id',
       })
@@ -613,15 +613,28 @@ async function unlockPost(supabase, userId, postId) {
       return false
     }
     
+    // Get post price_cents first
+    const { data: post, error: postError } = await supabase
+      .from('posts')
+      .select('price_cents')
+      .eq('id', postId)
+      .single()
+    
+    if (postError || !post) {
+      console.error('[test] unlockPost: post not found', postError)
+      return false
+    }
+    
     const { error } = await supabase
-      .from('post_unlocks')
+      .from('purchases')
       .insert({
-        user_id: userId,
+        fan_id: userId,
         post_id: postId,
+        paid_amount_cents: post.price_cents || 0,
       })
     
     if (error) {
-      // unique 冲突视为成功
+      // unique 冲突视为成功（已购买）
       if (error.code === '23505') {
         return true
       }
@@ -644,11 +657,11 @@ async function cleanup(supabase, fanUserId, creatorId, postId, serviceSupabase) 
     // 使用 service role 清理（如果有）
     const cleanupSupabase = serviceSupabase || supabase
     
-    // 删除 post_unlocks
+    // 删除 purchases (PPV unlocks)
     await cleanupSupabase
-      .from('post_unlocks')
+      .from('purchases')
       .delete()
-      .eq('user_id', fanUserId)
+      .eq('fan_id', fanUserId)
     
     // 删除 subscriptions
     await cleanupSupabase

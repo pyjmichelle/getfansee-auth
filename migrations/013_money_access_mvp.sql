@@ -23,13 +23,10 @@ ALTER TABLE public.posts
 ADD COLUMN IF NOT EXISTS title text;
 
 -- Drop old constraint that conflicts with new schema
--- Old constraint: visibility='ppv' requires price_cents>0, visibility!='ppv' requires price_cents=NULL
--- New schema: price_cents=0 means subscriber-only, price_cents>0 means PPV
 ALTER TABLE public.posts 
 DROP CONSTRAINT IF EXISTS posts_price_cents_check;
 
 -- Update price_cents: 0 means subscriber-only, >0 means PPV
--- If price_cents is NULL, set to 0 (subscriber-only)
 UPDATE public.posts 
 SET price_cents = 0 
 WHERE price_cents IS NULL;
@@ -39,7 +36,7 @@ ALTER TABLE public.posts
 ALTER COLUMN price_cents SET DEFAULT 0,
 ALTER COLUMN price_cents SET NOT NULL;
 
--- Add new constraint: price_cents must be >= 0 (0 = subscriber-only, >0 = PPV)
+-- Add new constraint: price_cents must be >= 0
 ALTER TABLE public.posts 
 ADD CONSTRAINT posts_price_cents_check 
 CHECK (price_cents >= 0);
@@ -52,16 +49,11 @@ ADD COLUMN IF NOT EXISTS cover_url text;
 ALTER TABLE public.posts 
 ALTER COLUMN content SET NOT NULL;
 
--- Note: posts.creator_id may reference profiles, but we'll use creators table
--- The sync trigger will ensure creators exist when profiles.role='creator'
-
 -- ============================================
--- 3. Ensure creator_id exists in creators table
+-- 3. Sync profiles to creators (trigger function)
 -- ============================================
 
 -- Function to sync profiles to creators
--- Use SECURITY DEFINER to bypass RLS for trigger operations
--- The function will run as the function owner (postgres), which can bypass RLS
 CREATE OR REPLACE FUNCTION sync_profile_to_creator()
 RETURNS TRIGGER 
 SECURITY DEFINER
@@ -82,24 +74,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Grant execute permission to authenticated and anon roles
+-- Grant execute permission
 GRANT EXECUTE ON FUNCTION sync_profile_to_creator() TO authenticated;
 GRANT EXECUTE ON FUNCTION sync_profile_to_creator() TO anon;
-
--- Ensure function owner is postgres (has bypass RLS permission)
--- This allows the SECURITY DEFINER function to bypass RLS
--- Note: In Supabase, functions created by postgres user automatically bypass RLS
--- But we need to ensure the function has the right permissions
-DO $$
-BEGIN
-  -- Try to set owner to postgres (may fail if not superuser, but that's OK)
-  BEGIN
-    ALTER FUNCTION sync_profile_to_creator() OWNER TO postgres;
-  EXCEPTION WHEN OTHERS THEN
-    -- If we can't change owner, that's OK - function should still work
-    NULL;
-  END;
-END $$;
 
 -- Trigger to sync profiles to creators
 DROP TRIGGER IF EXISTS sync_profile_to_creator_trigger ON public.profiles;
@@ -159,7 +136,6 @@ ADD CONSTRAINT subscriptions_status_check
 CHECK (status IN ('active', 'canceled', 'expired'));
 
 -- Update creator_id FK to reference creators table
--- Drop any existing FK constraint on creator_id (may reference profiles or creators)
 DO $$
 DECLARE
   fk_constraint_name text;
@@ -231,24 +207,24 @@ ALTER TABLE public.purchases ENABLE ROW LEVEL SECURITY;
 -- ============================================
 
 -- SELECT: Authenticated users can view creators
-DROP POLICY IF EXISTS "creators_select_all" ON public.creators;
-CREATE POLICY "creators_select_all"
+DROP POLICY IF EXISTS creators_select_all ON public.creators;
+CREATE POLICY creators_select_all
   ON public.creators
   FOR SELECT
   TO authenticated
   USING (true);
 
 -- INSERT: Users can create their own creator profile
-DROP POLICY IF EXISTS "creators_insert_self" ON public.creators;
-CREATE POLICY "creators_insert_self"
+DROP POLICY IF EXISTS creators_insert_self ON public.creators;
+CREATE POLICY creators_insert_self
   ON public.creators
   FOR INSERT
   TO authenticated
   WITH CHECK (id = auth.uid());
 
 -- UPDATE: Users can update their own creator profile
-DROP POLICY IF EXISTS "creators_update_self" ON public.creators;
-CREATE POLICY "creators_update_self"
+DROP POLICY IF EXISTS creators_update_self ON public.creators;
+CREATE POLICY creators_update_self
   ON public.creators
   FOR UPDATE
   TO authenticated
@@ -259,21 +235,16 @@ CREATE POLICY "creators_update_self"
 -- 8. posts RLS policies (update for new schema)
 -- ============================================
 
--- Update posts SELECT policy to use price_cents logic:
--- - price_cents = 0: subscriber-only (need active subscription)
--- - price_cents > 0: PPV (need purchase)
-DROP POLICY IF EXISTS "posts_select_visible" ON public.posts;
+DROP POLICY IF EXISTS posts_select_visible ON public.posts;
 
-CREATE POLICY "posts_select_visible"
+CREATE POLICY posts_select_visible
   ON public.posts
   FOR SELECT
   USING (
     -- Creator can always see their own posts
     creator_id = auth.uid()
     OR
-    -- Free posts (if we keep visibility='free', or price_cents=0 and no subscription required)
-    -- For MVP: price_cents=0 means subscriber-only, so we check subscription
-    -- price_cents > 0 means PPV, so we check purchase
+    -- Subscriber-only posts (price_cents = 0) need active subscription
     (
       price_cents = 0 AND EXISTS (
         SELECT 1 FROM public.subscriptions
@@ -284,6 +255,7 @@ CREATE POLICY "posts_select_visible"
       )
     )
     OR
+    -- PPV posts (price_cents > 0) need purchase
     (
       price_cents > 0 AND EXISTS (
         SELECT 1 FROM public.purchases
@@ -294,34 +266,25 @@ CREATE POLICY "posts_select_visible"
   );
 
 -- ============================================
--- 9. subscriptions RLS policies (keep existing, ensure they work)
--- ============================================
-
--- Policies should already exist from 008_phase2_paywall.sql
--- Verify they allow authenticated users to:
--- - SELECT their own subscriptions
--- - INSERT subscriptions for themselves (fan_id = auth.uid())
-
--- ============================================
--- 10. purchases RLS policies
+-- 9. purchases RLS policies
 -- ============================================
 
 -- SELECT: Users can view their own purchases
-DROP POLICY IF EXISTS "purchases_select_own" ON public.purchases;
-CREATE POLICY "purchases_select_own"
+DROP POLICY IF EXISTS purchases_select_own ON public.purchases;
+CREATE POLICY purchases_select_own
   ON public.purchases
   FOR SELECT
   USING (auth.uid() = fan_id);
 
 -- INSERT: Users can create purchases for themselves
-DROP POLICY IF EXISTS "purchases_insert_own" ON public.purchases;
-CREATE POLICY "purchases_insert_own"
+DROP POLICY IF EXISTS purchases_insert_own ON public.purchases;
+CREATE POLICY purchases_insert_own
   ON public.purchases
   FOR INSERT
   WITH CHECK (auth.uid() = fan_id);
 
 -- ============================================
--- 11. Verify schema
+-- 10. Verify schema
 -- ============================================
 
 -- Verify creators table
@@ -365,4 +328,3 @@ FROM information_schema.columns
 WHERE table_schema = 'public' 
   AND table_name = 'subscriptions'
   AND column_name = 'plan';
-
