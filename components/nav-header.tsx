@@ -119,11 +119,18 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
 
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Menu className="w-5 h-5" />
+                  <Button variant="ghost" className="flex items-center gap-2 px-3">
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={user.avatar || "/placeholder.svg"} />
+                      <AvatarFallback className="text-sm">
+                        {user.username[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="hidden md:inline font-medium text-sm">{user.username}</span>
+                    <Menu className="w-4 h-4 md:hidden" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-80">
+                <SheetContent side="right" className="w-80">
                   <div className="mb-6 pt-4">
                     <div className="flex items-center gap-3 mb-4">
                       <Avatar className="w-12 h-12">
