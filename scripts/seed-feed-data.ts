@@ -96,19 +96,18 @@ const demoCreators = [
 
 // 假数据：图片 URL（使用 Unsplash 和 Picsum）
 const demoImages = [
-  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&h=600&fit=crop',
-  'https://picsum.photos/800/600?random=1',
-  'https://picsum.photos/800/600?random=2',
-  'https://picsum.photos/800/600?random=3',
-  'https://picsum.photos/800/600?random=4',
-  'https://picsum.photos/800/600?random=5',
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop', // 风景
+  'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&h=600&fit=crop', // 艺术
+  'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop', // 咖啡
+  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=600&fit=crop', // 自然
+  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop', // 森林
+  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=600&fit=crop', // 山景
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop', // 重复使用
+  'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop', // 城市夜景
+  'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop', // 食物
+  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop', // 健身
+  'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop', // 健身进度
+  'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop', // 音乐工作室
 ]
 
 // 假数据：视频 URL（使用示例视频）
@@ -122,14 +121,39 @@ const demoVideos = [
 
 // 假数据：Posts
 const demoPosts = [
-  // Creator 1: Sophia Creative
+  // Creator 1: Sophia Creative - 免费内容
+  {
+    title: 'Beautiful Landscape Photography',
+    content: 'Just captured this amazing sunset! Nature never fails to inspire me. 🌅',
+    visibility: 'free' as const,
+    price_cents: 0,
+    media_type: 'image' as const,
+    media_url: demoImages[0],
+  },
+  {
+    title: 'Morning Coffee Vibes',
+    content: 'Starting the day with a perfect cup of coffee and good vibes! ☕',
+    visibility: 'free' as const,
+    price_cents: 0,
+    media_type: 'image' as const,
+    media_url: demoImages[6],
+  },
+  {
+    title: 'Creative Process Video',
+    content: 'Watch me create this digital artwork from scratch! Full process video.',
+    visibility: 'free' as const,
+    price_cents: 0,
+    media_type: 'video' as const,
+    media_url: demoVideos[0],
+    preview_enabled: false,
+  },
   {
     title: 'Check out my latest work!',
     content: 'More exclusive content coming soon for subscribers. 🎨✨',
     visibility: 'free' as const,
     price_cents: 0,
     media_type: 'image' as const,
-    media_url: demoImages[0],
+    media_url: demoImages[1],
   },
   {
     title: 'Exclusive Artwork - Subscribers Only',
@@ -147,7 +171,7 @@ const demoPosts = [
     media_type: 'image' as const,
     media_url: demoImages[2],
   },
-  // Creator 2: Alex Photography
+  // Creator 2: Alex Photography - 免费内容
   {
     title: 'Sunset Photography',
     content: 'Captured this beautiful sunset yesterday. Nature never fails to amaze me.',
@@ -155,6 +179,23 @@ const demoPosts = [
     price_cents: 0,
     media_type: 'image' as const,
     media_url: demoImages[3],
+  },
+  {
+    title: 'City Lights at Night',
+    content: 'The city never sleeps! Captured these amazing city lights during my night walk.',
+    visibility: 'free' as const,
+    price_cents: 0,
+    media_type: 'image' as const,
+    media_url: demoImages[7],
+  },
+  {
+    title: 'Photography Tips Video',
+    content: 'Quick tips for better photography! Hope this helps you improve your skills.',
+    visibility: 'free' as const,
+    price_cents: 0,
+    media_type: 'video' as const,
+    media_url: demoVideos[1],
+    preview_enabled: false,
   },
   {
     title: 'Behind the Scenes - Subscribers',
@@ -174,7 +215,7 @@ const demoPosts = [
     media_url: demoVideos[1],
     preview_enabled: true,
   },
-  // Creator 3: Maya Lifestyle
+  // Creator 3: Maya Lifestyle - 免费内容
   {
     title: 'Morning Routine',
     content: 'Starting the day right with a healthy breakfast and positive mindset!',
@@ -184,6 +225,23 @@ const demoPosts = [
     media_url: demoImages[4],
   },
   {
+    title: 'Healthy Meal Prep',
+    content: 'Prepped my meals for the week! Healthy eating made easy. 🥗',
+    visibility: 'free' as const,
+    price_cents: 0,
+    media_type: 'image' as const,
+    media_url: demoImages[8],
+  },
+  {
+    title: 'Daily Vlog - Day in My Life',
+    content: 'Follow me through a typical day! From morning routine to evening wind-down.',
+    visibility: 'free' as const,
+    price_cents: 0,
+    media_type: 'video' as const,
+    media_url: demoVideos[2],
+    preview_enabled: false,
+  },
+  {
     title: 'Exclusive Recipe - Subscribers',
     content: 'My secret recipe for the perfect smoothie bowl.',
     visibility: 'subscribers' as const,
@@ -191,14 +249,31 @@ const demoPosts = [
     media_type: 'image' as const,
     media_url: demoImages[5],
   },
-  // Creator 4: Jordan Fitness
+  // Creator 4: Jordan Fitness - 免费内容
   {
     title: 'Workout Motivation',
     content: 'No excuses! Every rep counts. 💪',
     visibility: 'free' as const,
     price_cents: 0,
     media_type: 'image' as const,
-    media_url: demoImages[6],
+    media_url: demoImages[9],
+  },
+  {
+    title: 'Quick Home Workout',
+    content: 'No gym? No problem! Here\'s a quick 15-minute home workout you can do anywhere.',
+    visibility: 'free' as const,
+    price_cents: 0,
+    media_type: 'video' as const,
+    media_url: demoVideos[3],
+    preview_enabled: false,
+  },
+  {
+    title: 'Fitness Progress Update',
+    content: '30 days of consistent training! Progress photos and what I learned.',
+    visibility: 'free' as const,
+    price_cents: 0,
+    media_type: 'image' as const,
+    media_url: demoImages[10],
   },
   {
     title: 'Full Workout Video - $6.99',
@@ -209,15 +284,32 @@ const demoPosts = [
     media_url: demoVideos[2],
     preview_enabled: true,
   },
-  // Creator 5: Taylor Music
+  // Creator 5: Taylor Music - 免费内容
   {
     title: 'New Track Preview',
     content: 'Preview of my latest track. Full version available for subscribers!',
     visibility: 'free' as const,
     price_cents: 0,
     media_type: 'video' as const,
-    media_url: demoVideos[3],
-    preview_enabled: true,
+    media_url: demoVideos[4],
+    preview_enabled: false,
+  },
+  {
+    title: 'Behind the Scenes - Studio Session',
+    content: 'Take a look at my creative process in the studio! Making music is my passion.',
+    visibility: 'free' as const,
+    price_cents: 0,
+    media_type: 'image' as const,
+    media_url: demoImages[11],
+  },
+  {
+    title: 'Acoustic Performance',
+    content: 'Performed this song live! Hope you enjoy it. Let me know what you think!',
+    visibility: 'free' as const,
+    price_cents: 0,
+    media_type: 'video' as const,
+    media_url: demoVideos[0],
+    preview_enabled: false,
   },
   {
     title: 'Full Album - $19.99',
