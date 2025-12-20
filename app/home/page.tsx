@@ -196,8 +196,16 @@ export default function HomePage() {
                   <div className="flex items-center gap-3 mb-4">
                     <Link href={`/creator/${post.creator_id}`}>
                       <Avatar className="w-10 h-10 cursor-pointer hover:opacity-80 transition-opacity">
-                        <AvatarImage src={post.creator?.avatar_url || "/placeholder.svg"} />
-                        <AvatarFallback>
+                        <AvatarImage 
+                          src={post.creator?.avatar_url || "/placeholder.svg"} 
+                          alt={post.creator?.display_name || "Creator"}
+                          onError={(e) => {
+                            // 如果图片加载失败，使用 fallback
+                            const target = e.target as HTMLImageElement
+                            target.style.display = 'none'
+                          }}
+                        />
+                        <AvatarFallback className="bg-primary/10 text-primary">
                           {post.creator?.display_name?.[0]?.toUpperCase() || "C"}
                         </AvatarFallback>
                       </Avatar>
