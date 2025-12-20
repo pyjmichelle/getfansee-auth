@@ -117,13 +117,9 @@ export default function VerifyPage() {
 
           if (data?.session?.user) {
             console.log("[verify] Code exchange successful, user:", data.session.user.email)
-            // 获取 user 后立刻 ensureProfile
+            // 获取 user 后立刻 ensureProfile 并重定向 (unconditionally)
             await ensureProfile()
-            setStatus("success")
-            setMessage("Email verified successfully! Redirecting...")
-            setTimeout(() => {
-              router.replace("/home")
-            }, 1500)
+            router.replace("/home")
             return
           } else {
             console.error("[verify] Code exchange succeeded but no session/user")
@@ -184,14 +180,10 @@ export default function VerifyPage() {
             return
           }
 
-          // 有 session，创建 profile
+          // 有 session，创建 profile 并重定向 (unconditionally)
           console.log("[verify] Token verification successful, user:", session.user.email)
           await ensureProfile()
-          setStatus("success")
-          setMessage("Email verified successfully! Redirecting...")
-          setTimeout(() => {
-            router.replace("/home")
-          }, 1500)
+          router.replace("/home")
           return
         }
 
@@ -202,13 +194,9 @@ export default function VerifyPage() {
 
         if (session?.user) {
           console.log("[verify] Already has session, user:", session.user.email)
-          // 已有 session，直接创建 profile 并跳转
+          // 已有 session，直接创建 profile 并跳转 (unconditionally)
           await ensureProfile()
-          setStatus("success")
-          setMessage("You're already verified! Redirecting...")
-          setTimeout(() => {
-            router.replace("/home")
-          }, 1500)
+          router.replace("/home")
           return
         }
 

@@ -51,10 +51,11 @@ export default function AuthPage() {
 
     try {
       const result = await signInWithEmail(loginEmail, loginPassword)
-      // 登录成功后：ensureProfile() → /home
+      // 登录成功后：ensureProfile() → /home (unconditionally)
       if (result?.session) {
         await ensureProfile()
         router.push("/home")
+        return // 立即返回，不执行 finally 中的 setIsLoading(false)
       } else {
         setError("Login successful but no session found. Please try again.")
       }
@@ -94,12 +95,10 @@ export default function AuthPage() {
       if (result?.user) {
         // 如果 Supabase 配置为不需要邮箱验证，立即创建 profile
         if (result.session) {
-          // 有 session 说明不需要邮箱验证，立即创建 profile
+          // 有 session 说明不需要邮箱验证，立即创建 profile 并重定向 (unconditionally)
           await ensureProfile()
-          setInfo("Account created successfully! Redirecting...")
-          setTimeout(() => {
-            router.push("/home")
-          }, 1500)
+          router.push("/home")
+          return // 立即返回，不执行 finally 中的 setIsLoading(false)
         } else {
           // 需要邮箱验证
           setInfo("Check your email for a confirmation link. After confirming, you can log in.")
@@ -404,10 +403,11 @@ export default function AuthPage() {
                       
                       // 按 session 真实状态走
                       if (result?.session) {
-                        // 如果 data.session 存在：立刻 ensureProfile() 然后 router.push('/home')
+                        // 如果 data.session 存在：立刻 ensureProfile() 然后 router.push('/home') (unconditionally)
                         await ensureProfile()
                         localStorage.removeItem("pending_signup_email")
                         router.push("/home")
+                        return // 立即返回，不执行 finally 中的 setIsLoading(false)
                       } else if (result?.user) {
                         // 如果 data.session 不存在：显示 "Check your email…" 卡片，并引导去 /auth/verify（保留但不阻塞）
                         setInfo("Check your email for a confirmation link. After confirming, you can log in.")
