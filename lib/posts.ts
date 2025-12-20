@@ -206,23 +206,36 @@ export async function listFeed(limit: number = 20): Promise<Post[]> {
       return []
     }
 
-    const posts = (data || []).map((item: any) => ({
-      id: item.id,
-      creator_id: item.creator_id,
-      title: item.title,
-      content: item.content,
-      media_url: item.media_url,
-      is_locked: item.is_locked || item.visibility !== 'free',
-      visibility: item.visibility || 'free',
-      price_cents: item.price_cents || null,
-      preview_enabled: item.preview_enabled || false,
-      watermark_enabled: item.watermark_enabled !== undefined ? item.watermark_enabled : true,
-      created_at: item.created_at,
-      creator: {
-        display_name: item.profiles?.display_name,
-        avatar_url: item.profiles?.avatar_url,
-      },
-    }))
+    const posts = (data || []).map((item: any) => {
+      const post = {
+        id: item.id,
+        creator_id: item.creator_id,
+        title: item.title,
+        content: item.content,
+        media_url: item.media_url,
+        is_locked: item.is_locked || item.visibility !== 'free',
+        visibility: item.visibility || 'free',
+        price_cents: item.price_cents || null,
+        preview_enabled: item.preview_enabled || false,
+        watermark_enabled: item.watermark_enabled !== undefined ? item.watermark_enabled : true,
+        created_at: item.created_at,
+        creator: {
+          display_name: item.profiles?.display_name,
+          avatar_url: item.profiles?.avatar_url,
+        },
+      }
+      
+      // 调试：检查头像数据
+      if (process.env.NODE_ENV === 'development' && item.profiles) {
+        console.log('[posts] Post creator data:', {
+          creator_id: item.creator_id,
+          display_name: item.profiles.display_name,
+          avatar_url: item.profiles.avatar_url,
+        })
+      }
+      
+      return post
+    })
 
     // 加载媒体资源
     const postIds = posts.map(p => p.id)

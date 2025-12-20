@@ -42,6 +42,16 @@ export default function HomePage() {
     try {
       setError(null)
       const feedPosts = await listFeed(20)
+      
+      // 调试：检查头像数据
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[home] Feed posts:', feedPosts.map(p => ({
+          id: p.id,
+          creator: p.creator?.display_name,
+          avatar_url: p.creator?.avatar_url,
+        })))
+      }
+      
       setPosts(feedPosts)
 
       // 检查每个 post 的可见性
