@@ -61,9 +61,21 @@ export default function HomePage() {
           // Creator 本人永远可见
           if (post.creator_id === currentUserId) {
             states.set(post.id, true)
+          } else if (post.visibility === 'free') {
+            // 免费内容永远可见
+            states.set(post.id, true)
           } else {
             const canView = await canViewPost(post.id, post.creator_id)
             states.set(post.id, canView)
+          }
+        }
+        setPostViewStates(states)
+      } else {
+        // 如果没有登录用户，免费内容仍然可见
+        const states = new Map<string, boolean>()
+        for (const post of feedPosts) {
+          if (post.visibility === 'free') {
+            states.set(post.id, true)
           }
         }
         setPostViewStates(states)
@@ -195,7 +207,9 @@ export default function HomePage() {
         ) : (
           <div className="space-y-6">
             {posts.map((post) => {
-              const canView = postViewStates.get(post.id) ?? false
+              // 免费内容永远可见
+              const isFree = post.visibility === 'free'
+              const canView = isFree ? true : (postViewStates.get(post.id) ?? false)
               const isCreator = post.creator_id === currentUserId
               const isSubscribing = subscribingCreators.has(post.creator_id)
               const isUnlocking = unlockingPosts.has(post.id)

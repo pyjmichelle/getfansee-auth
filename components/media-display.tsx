@@ -196,23 +196,39 @@ export function MediaDisplay({
   // 显示内容（带水印，如果启用）
   return (
     <div className="space-y-4">
-      {post.media?.map((media) => (
-        <div key={media.id} className="relative rounded-lg overflow-hidden">
-          {media.media_type === 'image' ? (
-            <img
-              src={getMediaUrl(media)}
-              alt={media.file_name || 'Post media'}
-              className="w-full h-auto object-contain"
-            />
-          ) : (
-            <video
-              src={media.media_url}
-              controls
-              className="w-full h-auto"
-            />
-          )}
+      {post.media && post.media.length > 0 ? (
+        post.media.map((media) => (
+          <div key={media.id} className="relative rounded-lg overflow-hidden bg-muted">
+            {media.media_type === 'image' ? (
+              <img
+                src={getMediaUrl(media)}
+                alt={media.file_name || 'Post media'}
+                className="w-full h-auto object-contain max-h-[600px]"
+                onError={(e) => {
+                  console.error('[MediaDisplay] Image load error:', media.media_url)
+                  const target = e.target as HTMLImageElement
+                  target.style.display = 'none'
+                }}
+              />
+            ) : (
+              <video
+                src={media.media_url}
+                controls
+                className="w-full h-auto max-h-[600px]"
+                onError={(e) => {
+                  console.error('[MediaDisplay] Video load error:', media.media_url)
+                }}
+              >
+                Your browser does not support the video tag.
+              </video>
+            )}
+          </div>
+        ))
+      ) : (
+        <div className="text-center py-8 text-muted-foreground">
+          <p>No media available</p>
         </div>
-      ))}
+      )}
     </div>
   )
 }
