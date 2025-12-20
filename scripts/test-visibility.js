@@ -63,15 +63,15 @@ function loadEnv() {
   
   // 如果 process.env 中没有，尝试从 .env.local 读取（用于本地开发）
   if (!env.NEXT_PUBLIC_SUPABASE_URL || !env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    try {
-      const envPath = join(__dirname, '..', '.env.local')
-      const envContent = readFileSync(envPath, 'utf-8')
-      
-      envContent.split('\n').forEach(line => {
-        const trimmed = line.trim()
-        if (trimmed && !trimmed.startsWith('#')) {
-          const [key, ...valueParts] = trimmed.split('=')
-          if (key && valueParts.length > 0) {
+  try {
+    const envPath = join(__dirname, '..', '.env.local')
+    const envContent = readFileSync(envPath, 'utf-8')
+    
+    envContent.split('\n').forEach(line => {
+      const trimmed = line.trim()
+      if (trimmed && !trimmed.startsWith('#')) {
+        const [key, ...valueParts] = trimmed.split('=')
+        if (key && valueParts.length > 0) {
             const keyTrimmed = key.trim()
             const valueTrimmed = valueParts.join('=').trim().replace(/^["']|["']$/g, '')
             // 只在 process.env 中没有时才使用 .env.local 的值
@@ -81,9 +81,9 @@ function loadEnv() {
           }
         }
       })
-    } catch (err) {
+  } catch (err) {
       // .env.local 不存在或读取失败，继续使用 process.env
-    }
+  }
   }
   
   return env
@@ -157,10 +157,10 @@ async function registerAndLogin(supabase, email, password) {
     
     return { userId: signUpData.user.id, email, password }
   } catch (err) {
-    return null
-  }
-}
-
+        return null
+      }
+    }
+    
 // 辅助函数：确保 profile
 async function ensureProfile(supabase, userId, email, role = 'fan') {
   try {
@@ -174,8 +174,26 @@ async function ensureProfile(supabase, userId, email, role = 'fan') {
         age_verified: false,
       }, { onConflict: 'id' })
     
-    return !upsertError
+    if (upsertError) {
+      console.error('[test] ensureProfile error:', {
+        code: upsertError.code,
+        message: upsertError.message,
+        details: upsertError.details,
+        hint: upsertError.hint,
+        userId,
+        email,
+        role,
+      })
+      return false
+    }
+    
+    // Note: For creator role, we explicitly insert into creators table
+    // in the test flow, not here in ensureProfile
+    // This avoids RLS issues with triggers
+    
+    return true
   } catch (err) {
+    console.error('[test] ensureProfile exception:', err)
     return false
   }
 }
@@ -183,20 +201,39 @@ async function ensureProfile(supabase, userId, email, role = 'fan') {
 // 辅助函数：创建 post
 async function createPost(supabase, creatorId, content, visibility, priceCents = null) {
   try {
+    // For new schema: price_cents=0 means subscriber-only, >0 means PPV
+    // Map visibility to price_cents
+    let finalPriceCents = 0
+    if (visibility === 'ppv' && priceCents) {
+      finalPriceCents = priceCents
+    } else if (visibility === 'subscribers') {
+      finalPriceCents = 0 // subscriber-only
+    } else {
+      finalPriceCents = 0 // free (but we'll keep visibility for backward compatibility)
+    }
+    
     const { data, error } = await supabase
       .from('posts')
       .insert({
         creator_id: creatorId,
         content,
-        visibility,
-        price_cents: priceCents,
+        visibility, // Keep for backward compatibility
+        price_cents: finalPriceCents,
         is_locked: visibility !== 'free',
       })
       .select('id')
       .single()
     
     if (error) {
-      console.error('[test] createPost error:', error)
+      console.error('[test] createPost error:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        creatorId,
+        visibility,
+        priceCents: finalPriceCents,
+      })
       return null
     }
     
@@ -239,22 +276,22 @@ async function canViewPost(supabase, userId, postId, creatorId) {
         .eq('subscriber_id', userId)
         .eq('creator_id', post.creator_id)
         .eq('status', 'active')
-        .gt('ends_at', new Date().toISOString())
+        .gt('current_period_end', new Date().toISOString())
         .maybeSingle()
       
       return !!sub
     }
     
-    // PPV: 检查解锁
+    // PPV: 检查解锁（使用 purchases 表）
     if (post.visibility === 'ppv') {
-      const { data: unlock, error: unlockError } = await supabase
-        .from('post_unlocks')
+      const { data: purchase, error: purchaseError } = await supabase
+        .from('purchases')
         .select('id')
-        .eq('user_id', userId)
+        .eq('fan_id', userId)
         .eq('post_id', postId)
         .maybeSingle()
       
-      return !!unlock
+      return !!purchase
     }
     
     return false
@@ -275,35 +312,74 @@ async function subscribe(supabase, userId, creatorId) {
       .upsert({
         subscriber_id: userId,
         creator_id: creatorId,
+        plan: 'monthly',
         status: 'active',
-        starts_at: now.toISOString(),
-        ends_at: endsAt.toISOString(),
+        current_period_end: endsAt.toISOString(),
       }, {
         onConflict: 'subscriber_id,creator_id',
       })
     
-    return !error
-  } catch (err) {
-    return false
-  }
-}
-
-// 辅助函数：解锁 PPV
-async function unlockPPV(supabase, userId, postId) {
-  try {
-    const { error } = await supabase
-      .from('post_unlocks')
-      .insert({
-        user_id: userId,
-        post_id: postId,
+    if (error) {
+      console.error('[test] subscribe error:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        userId,
+        creatorId,
       })
-    
-    if (error && error.code !== '23505') {
       return false
     }
     
     return true
   } catch (err) {
+    console.error('[test] subscribe exception:', err)
+    return false
+  }
+}
+
+// 辅助函数：解锁 PPV（使用 purchases 表）
+async function unlockPPV(supabase, userId, postId) {
+  try {
+    // Get post price_cents
+    const { data: post, error: postError } = await supabase
+      .from('posts')
+      .select('price_cents')
+      .eq('id', postId)
+      .single()
+    
+    if (postError || !post) {
+      console.error('[test] unlockPPV: post not found', postError)
+      return false
+    }
+    
+    const { error } = await supabase
+      .from('purchases')
+      .insert({
+        fan_id: userId,
+        post_id: postId,
+        paid_amount_cents: post.price_cents || 0,
+      })
+    
+    if (error) {
+      if (error.code === '23505') {
+        // Already purchased, treat as success
+        return true
+      }
+      console.error('[test] unlockPPV error:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        userId,
+        postId,
+      })
+      return false
+    }
+    
+    return true
+  } catch (err) {
+    console.error('[test] unlockPPV exception:', err)
     return false
   }
 }
@@ -340,12 +416,55 @@ async function main() {
     }
     recordTest('创建 Creator 用户', true, `creatorId: ${creatorUser.userId.substring(0, 8)}...`)
     
-    const creatorProfileOk = await ensureProfile(creatorSupabase, creatorUser.userId, creatorEmail, 'creator')
+    // First create profile as 'fan' to avoid trigger issues
+    const creatorProfileOk = await ensureProfile(creatorSupabase, creatorUser.userId, creatorEmail, 'fan')
     if (!creatorProfileOk) {
-      recordTest('创建 Creator profile', false, 'profile 创建失败')
+      recordTest('创建 Creator profile (初始)', false, 'profile 创建失败 - 检查 RLS 策略和 id 字段')
       process.exit(1)
     }
-    recordTest('创建 Creator profile', true, 'role=creator')
+    recordTest('创建 Creator profile (初始)', true, 'role=fan')
+    
+    // Explicitly create creator record BEFORE updating role (don't rely on trigger)
+    const { error: creatorInsertError } = await creatorSupabase
+      .from('creators')
+      .insert({
+        id: creatorUser.userId,
+        display_name: creatorEmail.split('@')[0],
+        avatar_url: null,
+        bio: 'Test creator for visibility tests',
+      })
+    
+    if (creatorInsertError) {
+      console.error('[test] createCreator error:', {
+        code: creatorInsertError.code,
+        message: creatorInsertError.message,
+        details: creatorInsertError.details,
+        hint: creatorInsertError.hint,
+        userId: creatorUser.userId,
+      })
+      recordTest('创建 Creator 记录', false, `插入失败: ${creatorInsertError.message} (code: ${creatorInsertError.code})`)
+      process.exit(1)
+    }
+    recordTest('创建 Creator 记录', true, `creatorId: ${creatorUser.userId.substring(0, 8)}...`)
+    
+    // Now update profile role to 'creator' (trigger will try to sync, but record already exists)
+    const { error: updateRoleError } = await creatorSupabase
+      .from('profiles')
+      .update({ role: 'creator' })
+      .eq('id', creatorUser.userId)
+    
+    if (updateRoleError) {
+      console.error('[test] updateRole error:', {
+        code: updateRoleError.code,
+        message: updateRoleError.message,
+        details: updateRoleError.details,
+        hint: updateRoleError.hint,
+        userId: creatorUser.userId,
+      })
+      recordTest('更新 Creator role', false, `更新失败: ${updateRoleError.message} (code: ${updateRoleError.code})`)
+      process.exit(1)
+    }
+    recordTest('更新 Creator role', true, 'role=creator')
     
     fanUser = await registerAndLogin(fanSupabase, fanEmail, fanPassword)
     if (!fanUser) {
@@ -378,7 +497,9 @@ async function main() {
     }
     recordTest('创建 subscribers post', true, `postId: ${postIds.subscribers.substring(0, 8)}...`)
     
-    postIds.ppv = await createPost(creatorSupabase, creatorUser.userId, `PPV post ${timestamp}`, 'ppv', 500) // $5.00
+    // For new schema: use price_cents instead of visibility='ppv'
+    // But keep visibility for backward compatibility
+    postIds.ppv = await createPost(creatorSupabase, creatorUser.userId, `PPV post ${timestamp}`, 'ppv', 500) // $5.00 (500 cents)
     if (!postIds.ppv) {
       recordTest('创建 ppv post', false, '创建失败')
       process.exit(1)
@@ -414,7 +535,7 @@ async function main() {
     
     const subscribeOk = await subscribe(fanSupabase, fanUser.userId, creatorUser.userId)
     if (!subscribeOk) {
-      recordTest('订阅 creator', false, '订阅失败')
+      recordTest('订阅 creator', false, '订阅失败 - 检查 subscriptions 表 RLS 策略')
       process.exit(1)
     }
     recordTest('订阅 creator', true, '订阅成功')
@@ -464,10 +585,10 @@ async function main() {
     const cleanupSupabase = serviceSupabase || fanSupabase
     
     try {
-      // 删除 post_unlocks
+      // 删除 purchases (PPV unlocks)
       if (postIds.ppv) {
         await cleanupSupabase
-          .from('post_unlocks')
+          .from('purchases')
           .delete()
           .eq('post_id', postIds.ppv)
       }

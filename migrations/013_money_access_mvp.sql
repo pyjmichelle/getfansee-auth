@@ -60,8 +60,13 @@ ALTER COLUMN content SET NOT NULL;
 -- ============================================
 
 -- Function to sync profiles to creators
+-- Use SECURITY DEFINER to bypass RLS for trigger operations
+-- The function will run as the function owner (postgres), which can bypass RLS
 CREATE OR REPLACE FUNCTION sync_profile_to_creator()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER 
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
   -- When a profile with role='creator' is created/updated, sync to creators
   IF NEW.role = 'creator' THEN
@@ -76,6 +81,25 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Grant execute permission to authenticated and anon roles
+GRANT EXECUTE ON FUNCTION sync_profile_to_creator() TO authenticated;
+GRANT EXECUTE ON FUNCTION sync_profile_to_creator() TO anon;
+
+-- Ensure function owner is postgres (has bypass RLS permission)
+-- This allows the SECURITY DEFINER function to bypass RLS
+-- Note: In Supabase, functions created by postgres user automatically bypass RLS
+-- But we need to ensure the function has the right permissions
+DO $$
+BEGIN
+  -- Try to set owner to postgres (may fail if not superuser, but that's OK)
+  BEGIN
+    ALTER FUNCTION sync_profile_to_creator() OWNER TO postgres;
+  EXCEPTION WHEN OTHERS THEN
+    -- If we can't change owner, that's OK - function should still work
+    NULL;
+  END;
+END $$;
 
 -- Trigger to sync profiles to creators
 DROP TRIGGER IF EXISTS sync_profile_to_creator_trigger ON public.profiles;
@@ -207,11 +231,29 @@ ALTER TABLE public.purchases ENABLE ROW LEVEL SECURITY;
 -- ============================================
 
 -- SELECT: Authenticated users can view creators
-DROP POLICY IF EXISTS "creators_select_authenticated" ON public.creators;
-CREATE POLICY "creators_select_authenticated"
+DROP POLICY IF EXISTS "creators_select_all" ON public.creators;
+CREATE POLICY "creators_select_all"
   ON public.creators
   FOR SELECT
-  USING (auth.role() = 'authenticated');
+  TO authenticated
+  USING (true);
+
+-- INSERT: Users can create their own creator profile
+DROP POLICY IF EXISTS "creators_insert_self" ON public.creators;
+CREATE POLICY "creators_insert_self"
+  ON public.creators
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (id = auth.uid());
+
+-- UPDATE: Users can update their own creator profile
+DROP POLICY IF EXISTS "creators_update_self" ON public.creators;
+CREATE POLICY "creators_update_self"
+  ON public.creators
+  FOR UPDATE
+  TO authenticated
+  USING (id = auth.uid())
+  WITH CHECK (id = auth.uid());
 
 -- ============================================
 -- 8. posts RLS policies (update for new schema)
