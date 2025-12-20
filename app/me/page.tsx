@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { User, Mail, Camera, Save, LogOut } from "lucide-react"
+import { useState, useEffect } from "react"
+import { User, Mail, Camera, Save, LogOut, Sparkles } from "lucide-react"
 import { NavHeader } from "@/components/nav-header"
 import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -9,39 +9,213 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { supabase } from "@/lib/supabase-client"
+import { ensureProfile, getCurrentUser } from "@/lib/auth"
+import { getProfile, setRoleCreator } from "@/lib/profile"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function ProfilePage() {
+  const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [username, setUsername] = useState("john_doe")
-  const [email, setEmail] = useState("john@example.com")
-  const [bio, setBio] = useState("Fan of amazing creators")
-  const [avatar, setAvatar] = useState("/placeholder.svg?height=200&width=200")
+  const [isCreatingCreator, setIsCreatingCreator] = useState(false)
+  const [isSeeding, setIsSeeding] = useState(false)
+  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
+  const [bio, setBio] = useState("")
+  const [avatar, setAvatar] = useState("")
+  const [currentUser, setCurrentUser] = useState<{
+    username: string
+    role: "fan" | "creator"
+    avatar?: string
+  } | null>(null)
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  const currentUser = {
-    username: "john_doe",
-    role: "fan" as const,
-    avatar: "/placeholder.svg?height=100&width=100",
-  }
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+
+        if (!session) {
+          router.push("/auth")
+          return
+        }
+
+        await ensureProfile()
+        setCurrentUserId(session.user.id)
+        setEmail(session.user.email || "")
+
+        const profile = await getProfile(session.user.id)
+        if (profile) {
+          setUsername(profile.display_name || "")
+          setBio(profile.bio || "")
+          setAvatar(profile.avatar_url || "")
+          setCurrentUser({
+            username: profile.display_name || "user",
+            role: (profile.role || "fan") as "fan" | "creator",
+            avatar: profile.avatar_url || undefined,
+          })
+        }
+      } catch (err) {
+        console.error("[me] loadProfile error:", err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadProfile()
+  }, [router])
 
   const handleSave = async () => {
+    if (!currentUserId) return
+
     setIsSaving(true)
-    // Simulate API call
-    setTimeout(() => {
-      setIsSaving(false)
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          display_name: username,
+          bio: bio,
+          avatar_url: avatar || null,
+        })
+        .eq("id", currentUserId)
+
+      if (error) {
+        console.error("[me] save error:", error)
+        alert("保存失败，请重试")
+        return
+      }
+
       setIsEditing(false)
-    }, 1000)
+      if (currentUser) {
+        setCurrentUser({
+          ...currentUser,
+          username: username,
+          avatar: avatar,
+        })
+      }
+    } catch (err) {
+      console.error("[me] handleSave error:", err)
+      alert("保存失败，请重试")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
-  const handleAvatarUpload = () => {
-    // Simulate file upload
-    console.log("Avatar upload triggered")
+  const handleCreateCreator = async () => {
+    if (!currentUserId || isCreatingCreator) return
+
+    setIsCreatingCreator(true)
+    try {
+      // Set role to creator
+      const success = await setRoleCreator(currentUserId)
+      if (!success) {
+        alert("创建 creator profile 失败，请重试")
+        return
+      }
+
+      // Create creator record
+      const { error: creatorError } = await supabase.from("creators").upsert(
+        {
+          id: currentUserId,
+          display_name: username || email.split("@")[0],
+          bio: bio || null,
+          avatar_url: avatar || null,
+        },
+        { onConflict: "id" }
+      )
+
+      if (creatorError) {
+        console.error("[me] create creator error:", creatorError)
+        alert("创建 creator profile 失败，请重试")
+        return
+      }
+
+      if (currentUser) {
+        setCurrentUser({ ...currentUser, role: "creator" })
+      }
+      alert("Creator profile 创建成功！")
+    } catch (err) {
+      console.error("[me] handleCreateCreator error:", err)
+      alert("创建失败，请重试")
+    } finally {
+      setIsCreatingCreator(false)
+    }
+  }
+
+  const handleSeedPosts = async () => {
+    if (!currentUserId || isSeeding) return
+
+    setIsSeeding(true)
+    try {
+      // Check if user is creator
+      const profile = await getProfile(currentUserId)
+      if (!profile || profile.role !== "creator") {
+        alert("请先创建 creator profile")
+        return
+      }
+
+      const posts = [
+        {
+          creator_id: currentUserId,
+          title: "Subscriber-Only Content",
+          content: "This is exclusive content for subscribers only. Subscribe to unlock!",
+          price_cents: 0, // subscriber-only
+          cover_url: null,
+        },
+        {
+          creator_id: currentUserId,
+          title: "Premium PPV Content - $4.99",
+          content: "This is a premium pay-per-view post. Unlock it for $4.99!",
+          price_cents: 499, // PPV $4.99
+          cover_url: null,
+        },
+        {
+          creator_id: currentUserId,
+          title: "Exclusive PPV Content - $9.99",
+          content: "This is an exclusive premium post. Unlock it for $9.99!",
+          price_cents: 999, // PPV $9.99
+          cover_url: null,
+        },
+      ]
+
+      const { error } = await supabase.from("posts").insert(posts)
+
+      if (error) {
+        console.error("[me] seed posts error:", error)
+        alert("创建 demo posts 失败，请重试")
+        return
+      }
+
+      alert("Demo posts 创建成功！")
+    } catch (err) {
+      console.error("[me] handleSeedPosts error:", err)
+      alert("创建失败，请重试")
+    } finally {
+      setIsSeeding(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push("/auth")
+  }
+
+  if (isLoading || !currentUser) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <NavHeader user={currentUser} notificationCount={3} />
+      <NavHeader user={currentUser} notificationCount={0} />
 
       <main className="container max-w-2xl mx-auto px-4 py-6">
         <div className="mb-6">
@@ -55,13 +229,18 @@ export default function ProfilePage() {
             <div className="relative">
               <Avatar className="w-32 h-32">
                 <AvatarImage src={avatar || "/placeholder.svg"} />
-                <AvatarFallback className="text-2xl">{username[0].toUpperCase()}</AvatarFallback>
+                <AvatarFallback className="text-2xl">
+                  {username[0]?.toUpperCase() || email[0]?.toUpperCase() || "U"}
+                </AvatarFallback>
               </Avatar>
               {isEditing && (
                 <Button
                   size="icon"
                   className="absolute bottom-0 right-0 rounded-full w-10 h-10"
-                  onClick={handleAvatarUpload}
+                  onClick={() => {
+                    // TODO: Implement avatar upload
+                    console.log("Avatar upload triggered")
+                  }}
                 >
                   <Camera className="w-5 h-5" />
                 </Button>
@@ -73,7 +252,7 @@ export default function ProfilePage() {
             <div className="space-y-2">
               <Label htmlFor="username" className="flex items-center gap-2">
                 <User className="w-4 h-4" />
-                Username
+                Display Name
               </Label>
               <Input
                 id="username"
@@ -93,7 +272,6 @@ export default function ProfilePage() {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 disabled
                 className="h-11 bg-muted"
               />
@@ -139,24 +317,38 @@ export default function ProfilePage() {
           </div>
         </Card>
 
-        {/* Settings Card */}
-        <Card className="p-6 mb-6">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Settings</h2>
-          <div className="space-y-3">
-            <Button asChild variant="ghost" className="w-full justify-start">
-              <Link href="/me/security">Security & Password</Link>
+        {/* Creator Actions */}
+        {currentUser.role === "fan" && (
+          <Card className="p-6 mb-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Become a Creator</h2>
+            <Button
+              onClick={handleCreateCreator}
+              disabled={isCreatingCreator}
+              className="w-full"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              {isCreatingCreator ? "Creating..." : "Create my creator profile"}
             </Button>
-            <Button asChild variant="ghost" className="w-full justify-start">
-              <Link href="/me/payment">Payment Methods</Link>
+          </Card>
+        )}
+
+        {currentUser.role === "creator" && (
+          <Card className="p-6 mb-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Creator Tools</h2>
+            <Button
+              onClick={handleSeedPosts}
+              disabled={isSeeding}
+              variant="outline"
+              className="w-full"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              {isSeeding ? "Seeding..." : "Seed demo posts"}
             </Button>
-            <Button asChild variant="ghost" className="w-full justify-start">
-              <Link href="/me/notifications">Notification Preferences</Link>
-            </Button>
-            <Button asChild variant="ghost" className="w-full justify-start">
-              <Link href="/me/privacy">Privacy Settings</Link>
-            </Button>
-          </div>
-        </Card>
+            <p className="text-xs text-muted-foreground mt-2">
+              Creates 3 demo posts: subscriber-only, PPV $4.99, PPV $9.99
+            </p>
+          </Card>
+        )}
 
         {/* Account Actions */}
         <Card className="p-6">
@@ -164,16 +356,11 @@ export default function ProfilePage() {
           <div className="space-y-3">
             <Button
               variant="ghost"
+              onClick={handleLogout}
               className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
             >
               <LogOut className="w-4 h-4 mr-2" />
               Log Out
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
-            >
-              Delete Account
             </Button>
           </div>
         </Card>

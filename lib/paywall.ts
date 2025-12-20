@@ -1,6 +1,6 @@
 /**
  * Paywall 数据访问层
- * Phase 2: 付费墙最小闭环
+ * Money & Access MVP: 订阅和 PPV 解锁
  */
 
 import { supabase } from "./supabase-client"
@@ -25,7 +25,7 @@ export async function subscribe30d(creatorId: string): Promise<boolean> {
     }
 
     const now = new Date()
-    const endsAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000) // +30 days
+    const currentPeriodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000) // +30 days
 
     // 使用 upsert（ON CONFLICT subscriber_id, creator_id DO UPDATE）
     const { error } = await supabase
@@ -34,9 +34,9 @@ export async function subscribe30d(creatorId: string): Promise<boolean> {
         {
           subscriber_id: user.id,
           creator_id: creatorId,
+          plan: "monthly",
           status: "active",
-          starts_at: now.toISOString(),
-          ends_at: endsAt.toISOString(),
+          current_period_end: currentPeriodEnd.toISOString(),
         },
         {
           onConflict: "subscriber_id,creator_id",
@@ -92,39 +92,49 @@ export async function cancelSubscription(creatorId: string): Promise<boolean> {
  * @returns true 有 active subscription，false 没有
  */
 export async function hasActiveSubscription(creatorId: string): Promise<boolean> {
-  try {
-    const user = await getCurrentUser()
-    if (!user) {
-      return false
-    }
+  return isActiveSubscriber(await getCurrentUser()?.id || null, creatorId)
+}
 
+/**
+ * 检查用户是否是活跃订阅者（可复用，不依赖当前用户）
+ * @param fanId Fan user ID
+ * @param creatorId Creator ID
+ * @returns true 是活跃订阅者，false 不是
+ */
+export async function isActiveSubscriber(fanId: string | null, creatorId: string): Promise<boolean> {
+  if (!fanId) {
+    return false
+  }
+
+  try {
     const { data, error } = await supabase
       .from("subscriptions")
       .select("id")
-      .eq("subscriber_id", user.id)
+      .eq("subscriber_id", fanId)
       .eq("creator_id", creatorId)
       .eq("status", "active")
-      .gt("ends_at", new Date().toISOString())
+      .gt("current_period_end", new Date().toISOString())
       .maybeSingle()
 
     if (error) {
-      console.error("[paywall] hasActiveSubscription error:", error)
+      console.error("[paywall] isActiveSubscriber error:", error)
       return false
     }
 
     return !!data
   } catch (err) {
-    console.error("[paywall] hasActiveSubscription exception:", err)
+    console.error("[paywall] isActiveSubscriber exception:", err)
     return false
   }
 }
 
 /**
- * 解锁单个 post（PPV unlock）
+ * 解锁单个 post（PPV unlock - 创建 purchase）
  * @param postId Post ID
+ * @param priceCents Price in cents (from post.price_cents)
  * @returns true 成功，false 失败（unique 冲突视为成功）
  */
-export async function unlockPost(postId: string): Promise<boolean> {
+export async function unlockPost(postId: string, priceCents: number): Promise<boolean> {
   try {
     const user = await getCurrentUser()
     if (!user) {
@@ -132,13 +142,31 @@ export async function unlockPost(postId: string): Promise<boolean> {
       return false
     }
 
-    const { error } = await supabase.from("post_unlocks").insert({
-      user_id: user.id,
+    // Get post price if not provided
+    if (!priceCents) {
+      const { data: post, error: postError } = await supabase
+        .from("posts")
+        .select("price_cents")
+        .eq("id", postId)
+        .single()
+
+      if (postError || !post) {
+        console.error("[paywall] unlockPost: post not found", postError)
+        return false
+      }
+
+      priceCents = post.price_cents || 0
+    }
+
+    // Create purchase record
+    const { error } = await supabase.from("purchases").insert({
+      fan_id: user.id,
       post_id: postId,
+      paid_amount_cents: priceCents,
     })
 
     if (error) {
-      // unique 冲突视为成功（已解锁）
+      // unique 冲突视为成功（已购买）
       if (error.code === "23505") {
         return true
       }
@@ -154,7 +182,39 @@ export async function unlockPost(postId: string): Promise<boolean> {
 }
 
 /**
- * 检查是否可以查看 post（creator 本人 OR active subscription OR post_unlock）
+ * 检查用户是否已购买 post（可复用，不依赖当前用户）
+ * @param fanId Fan user ID
+ * @param postId Post ID
+ * @returns true 已购买，false 未购买
+ */
+export async function hasPurchasedPost(fanId: string | null, postId: string): Promise<boolean> {
+  if (!fanId) {
+    return false
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("purchases")
+      .select("id")
+      .eq("fan_id", fanId)
+      .eq("post_id", postId)
+      .maybeSingle()
+
+    if (error) {
+      console.error("[paywall] hasPurchasedPost error:", error)
+      return false
+    }
+
+    return !!data
+  } catch (err) {
+    console.error("[paywall] hasPurchasedPost exception:", err)
+    return false
+  }
+}
+
+/**
+ * 检查是否可以查看 post（creator 本人 OR active subscription OR purchase）
+ * 使用新的 schema: price_cents=0 表示 subscriber-only, price_cents>0 表示 PPV
  * @param postId Post ID
  * @param creatorId Creator ID（可选，如果提供可以更快判断）
  * @returns true 可以查看，false 不能查看
@@ -171,10 +231,10 @@ export async function canViewPost(postId: string, creatorId?: string): Promise<b
       return true
     }
 
-    // 2. 查询 post 信息（包括 visibility 和 creator_id）
+    // 2. 查询 post 信息（包括 price_cents 和 creator_id）
     const { data: post, error: postError } = await supabase
       .from("posts")
-      .select("id, visibility, creator_id")
+      .select("id, price_cents, creator_id")
       .eq("id", postId)
       .single()
 
@@ -188,35 +248,17 @@ export async function canViewPost(postId: string, creatorId?: string): Promise<b
       return true
     }
 
-    // 4. 根据 visibility 判断
-    const visibility = post.visibility || 'free'
+    // 4. 根据 price_cents 判断
+    const priceCents = post.price_cents || 0
 
-    // free: 所有人可见
-    if (visibility === 'free') {
-      return true
+    // price_cents = 0: subscriber-only，需要订阅
+    if (priceCents === 0) {
+      return await isActiveSubscriber(user.id, post.creator_id)
     }
 
-    // subscribers: 需要订阅
-    if (visibility === 'subscribers') {
-      const hasSub = await hasActiveSubscription(post.creator_id)
-      return hasSub
-    }
-
-    // ppv: 需要单独解锁（订阅不覆盖）
-    if (visibility === 'ppv') {
-      const { data: unlock, error: unlockError } = await supabase
-        .from("post_unlocks")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("post_id", postId)
-        .maybeSingle()
-
-      if (unlockError) {
-        console.error("[paywall] canViewPost: unlock check error", unlockError)
-        return false
-      }
-
-      return !!unlock
+    // price_cents > 0: PPV，需要购买
+    if (priceCents > 0) {
+      return await hasPurchasedPost(user.id, postId)
     }
 
     return false
@@ -239,26 +281,26 @@ export async function getMyPaywallState(userId: string): Promise<PaywallState | 
       .select("creator_id")
       .eq("subscriber_id", userId)
       .eq("status", "active")
-      .gt("ends_at", new Date().toISOString())
+      .gt("current_period_end", new Date().toISOString())
 
     if (subError) {
       console.error("[paywall] getMyPaywallState subscriptions error:", subError)
       return null
     }
 
-    // 2. 查询 unlocked posts
-    const { data: unlocks, error: unlockError } = await supabase
-      .from("post_unlocks")
+    // 2. 查询 purchased posts
+    const { data: purchases, error: purchaseError } = await supabase
+      .from("purchases")
       .select("post_id")
-      .eq("user_id", userId)
+      .eq("fan_id", userId)
 
-    if (unlockError) {
-      console.error("[paywall] getMyPaywallState post_unlocks error:", unlockError)
+    if (purchaseError) {
+      console.error("[paywall] getMyPaywallState purchases error:", purchaseError)
       return null
     }
 
     const unlockedPostIds = new Set<string>(
-      unlocks?.map((u) => u.post_id) || []
+      purchases?.map((p) => p.post_id) || []
     )
 
     return {

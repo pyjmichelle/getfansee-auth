@@ -10,6 +10,7 @@ import { listCreatorPosts, type Post } from "@/lib/posts"
 import { supabase } from "@/lib/supabase-client"
 import { ensureProfile, getCurrentUser } from "@/lib/auth"
 import { subscribe30d, cancelSubscription, hasActiveSubscription, canViewPost } from "@/lib/paywall"
+import { getCreator } from "@/lib/creators"
 import { MediaDisplay } from "@/components/media-display"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -73,18 +74,18 @@ export default function CreatorProfilePage() {
           setIsSubscribed(subscribed)
         }
 
-        // 加载 creator profile
-        const profile = await getProfile(creatorId)
-        if (!profile) {
+        // 加载 creator profile (from creators table)
+        const creator = await getCreator(creatorId)
+        if (!creator) {
           setError("Creator not found")
           return
         }
 
         setCreatorProfile({
-          id: profile.id,
-          display_name: profile.display_name,
-          bio: profile.bio,
-          avatar_url: profile.avatar_url,
+          id: creator.id,
+          display_name: creator.display_name,
+          bio: creator.bio,
+          avatar_url: creator.avatar_url,
         })
 
         // 加载 creator posts
@@ -264,11 +265,11 @@ export default function CreatorProfilePage() {
                     ) : (
                       <div className="bg-muted/50 rounded-lg p-4 text-center mb-3">
                         <p className="text-muted-foreground mb-3">
-                          {post.visibility === 'subscribers' 
+                          {post.price_cents === 0 
                             ? 'This content is for subscribers only'
                             : `Unlock for $${((post.price_cents || 0) / 100).toFixed(2)}`}
                         </p>
-                        {post.visibility === 'subscribers' ? (
+                        {post.price_cents === 0 ? (
                           <Button size="sm" onClick={async () => {
                             try {
                               setIsSubscribing(true)
@@ -303,7 +304,7 @@ export default function CreatorProfilePage() {
                           <Button size="sm" onClick={async () => {
                             const { unlockPost } = await import("@/lib/paywall")
                             try {
-                              const success = await unlockPost(post.id)
+                              const success = await unlockPost(post.id, post.price_cents || 0)
                               if (success && currentUserId) {
                                 const creatorPosts = await listCreatorPosts(creatorId)
                                 setPosts(creatorPosts)
@@ -367,7 +368,7 @@ export default function CreatorProfilePage() {
                           onUnlock={async () => {
                             const { unlockPost } = await import("@/lib/paywall")
                             try {
-                              const success = await unlockPost(post.id)
+                              const success = await unlockPost(post.id, post.price_cents || 0)
                               if (success && currentUserId) {
                                 const creatorPosts = await listCreatorPosts(creatorId)
                                 setPosts(creatorPosts)
