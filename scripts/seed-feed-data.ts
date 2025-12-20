@@ -94,24 +94,29 @@ const demoCreators = [
   },
 ]
 
-// 假数据：图片 URL（使用 Unsplash 和 Picsum）
+// 假数据：图片 URL（使用更可靠的图片服务）
 const demoImages = [
-  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop', // 风景
-  'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&h=600&fit=crop', // 艺术
-  'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop', // 咖啡
-  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=600&fit=crop', // 自然
-  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop', // 森林
-  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=600&fit=crop', // 山景
-  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop', // 重复使用
-  'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600&fit=crop', // 城市夜景
-  'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop', // 食物
-  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop', // 健身
-  'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop', // 健身进度
-  'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop', // 音乐工作室
+  'https://picsum.photos/800/600?random=1', // 风景
+  'https://picsum.photos/800/600?random=2', // 艺术
+  'https://picsum.photos/800/600?random=3', // 咖啡
+  'https://picsum.photos/800/600?random=4', // 自然
+  'https://picsum.photos/800/600?random=5', // 森林
+  'https://picsum.photos/800/600?random=6', // 山景
+  'https://picsum.photos/800/600?random=7', // 城市
+  'https://picsum.photos/800/600?random=8', // 城市夜景
+  'https://picsum.photos/800/600?random=9', // 食物
+  'https://picsum.photos/800/600?random=10', // 健身
+  'https://picsum.photos/800/600?random=11', // 健身进度
+  'https://picsum.photos/800/600?random=12', // 音乐工作室
+  'https://picsum.photos/800/600?random=13', // 额外
+  'https://picsum.photos/800/600?random=14', // 额外
+  'https://picsum.photos/800/600?random=15', // 额外
 ]
 
-// 假数据：视频 URL（使用示例视频）
+// 假数据：视频 URL（使用更可靠的视频服务）
 const demoVideos = [
+  'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4',
+  'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4',
   'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
   'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
   'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
