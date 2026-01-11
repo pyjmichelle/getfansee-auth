@@ -5,6 +5,7 @@
 Next.js 报错：`You cannot use different slug names for the same dynamic path ('id' !== 'username')`
 
 **原因**：`app/creator/` 目录下同时存在：
+
 - `[id]/page.tsx` (Phase 1 需要的)
 - `[username]/page.tsx` (旧的)
 
@@ -40,12 +41,14 @@ rm -rf '[username]'
 ## ✅ 验证修复
 
 删除后，`app/creator/` 目录下应该只有：
+
 - `[id]/page.tsx` ✅
 - `new-post/page.tsx` ✅
 - `onboarding/page.tsx` ✅
 - 其他非动态路由目录 ✅
 
 **不应该有**：
+
 - `[username]/` ❌
 
 ---
@@ -59,6 +62,3 @@ pnpm run dev
 ```
 
 应该可以正常启动了。
-
-
-

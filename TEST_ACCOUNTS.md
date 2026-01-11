@@ -3,6 +3,7 @@
 ## 🌐 测试链接
 
 **生产环境（Vercel）**：
+
 ```
 https://getfansee-auth.vercel.app/auth
 ```
@@ -12,14 +13,17 @@ https://getfansee-auth.vercel.app/auth
 ### 方式 1：使用预创建测试账号
 
 **Fan 测试账号**：
+
 - 邮箱：`test-fan@example.com`
 - 密码：`TestPassword123!`
 
 **Creator 测试账号**：
+
 - 邮箱：`test-creator@example.com`
 - 密码：`TestPassword123!`
 
 **创建测试账号**（如果账号不存在）：
+
 ```bash
 pnpm create-test-users
 ```
@@ -33,29 +37,34 @@ pnpm create-test-users
 5. 点击注册
 
 **注意**：
+
 - 如果 Supabase 配置为需要邮箱验证，需要点击邮件中的验证链接
 - 如果不需要验证，注册后立即可以登录
 
 ## ✅ 可测试功能
 
 ### 1. 用户认证
+
 - ✅ 注册新账号
 - ✅ 登录
 - ✅ 邮箱验证（如果启用）
 - ✅ Google OAuth（如果配置）
 
 ### 2. 浏览和订阅
+
 - ✅ 访问 `/home` 查看 Creators 列表
 - ✅ 点击 Creator 查看详情
 - ✅ 订阅 Creator（解锁 subscriber-only 内容）
 - ✅ 查看 `/subscriptions` 订阅列表
 
 ### 3. PPV 解锁
+
 - ✅ 解锁 PPV 内容（按次付费）
 - ✅ 查看 `/purchases` 购买记录
 - ⚠️ **重要**：订阅不会自动解锁 PPV，需要单独购买
 
 ### 4. Creator 功能
+
 - ✅ 访问 `/me` 转换为 Creator
 - ✅ 填写 Creator 资料（`/creator/onboarding`）
 - ✅ 创建帖子（`/creator/new-post`）
@@ -64,6 +73,7 @@ pnpm create-test-users
   - PPV 帖子（price_cents > 0）
 
 ### 5. 数据持久化
+
 - ✅ 刷新页面保持登录状态
 - ✅ 订阅/购买状态持久化
 - ✅ 多账号数据隔离
@@ -84,6 +94,3 @@ pnpm create-test-users
 - ❌ 没有内容审核
 - ❌ 没有推荐引擎
 - ❌ 没有聊天功能
-
-
-

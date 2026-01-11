@@ -78,7 +78,7 @@ pnpm export
 export default {
   output: "export",
   images: { unoptimized: true },
-}
+};
 ```
 
 - 确认上传时保留了 `/_next/` 等静态资源目录结构
@@ -86,4 +86,3 @@ export default {
 ---
 
 当你完成以上步骤后，一个可通过 FTP 部署的静态站点就准备好了。下一步请根据 `TEST_CHECKLIST.md` 运行完整桌面 + 移动端测试。
-

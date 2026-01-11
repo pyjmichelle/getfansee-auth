@@ -33,6 +33,7 @@
 2. **策略列表**：显示 subscriptions 和 post_unlocks 的所有 RLS 策略（共 8 个策略）
 
 如果看到错误，请检查：
+
 - 是否复制了完整的 SQL（从 CREATE TABLE 开始）
 - 是否跳过了文件开头的注释行
 - 是否有其他 SQL 语句在编辑器中残留
@@ -46,6 +47,7 @@
 **原因**：可能复制了文件开头的注释行，或包含了非 SQL 内容
 
 **解决**：
+
 1. 只复制从 `CREATE TABLE IF NOT EXISTS` 开始的内容
 2. 或使用 `005_paywall_clean.sql`
 
@@ -60,6 +62,3 @@
 **原因**：策略已存在
 
 **解决**：这是正常的，`DROP POLICY IF EXISTS` 会先删除再创建。可以继续执行。
-
-
-

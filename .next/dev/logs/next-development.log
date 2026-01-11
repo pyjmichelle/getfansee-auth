@@ -1,2 +1,1176 @@
-[00:00:00.678] Server  LOG      ✓ Ready in 415ms
-[06:42:30.059] Server  LOG      ○ Compiling /test ...
+[00:00:00.888] Server  LOG      ✓ Ready in 632ms
+[00:00:00.902] Server  WARN     ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[00:00:14.636] Server  LOG      ○ Compiling /auth ...
+[00:00:15.973] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:16.042] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:16.043] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:16.279] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:16.284] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:16.577] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <SegmentViewNode type="page" pagePath="/Downloads...">
+      <SegmentTrieNode>
+      <AuthPage>
+        <AuthPageClient initialMode="signup">
+          <div className="min-h-scre...">
+            ...
+              <Tabs value="signup" onValueChange={function handleTabChange} className="w-full">
+                <Tabs data-slot="tabs" className="flex flex-..." value="signup" onValueChange={function handleTabChange}>
+                  <TabsProvider scope={undefined} baseId="radix-_R_4..." value="signup" ...>
+                    <Primitive.div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ...>
+                      <div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ref={null}>
+                        ...
+                          <div role="tablist" aria-orientation="horizontal" data-slot="tabs-list" ...>
+                            ...
+                              <Slot tabIndex={-1} data-orientation="horizontal" onMouseDown={function handleEvent} ...>
+                                <SlotClone tabIndex={-1} data-orientation="horizontal" onMouseDown={function handleEvent} ...>
+                                  <Primitive.button type="button" role="tab" aria-selected={false} ...>
+                                    <button
+                                      type="button"
+                                      role="tab"
+                                      aria-selected={false}
++                                     aria-controls="radix-_R_4lesndlb_-content-login"
+-                                     aria-controls="radix-_R_j5esndlb_-content-login"
+                                      data-state="inactive"
+                                      data-disabled={undefined}
+                                      disabled={false}
++                                     id="radix-_R_4lesndlb_-trigger-login"
+-                                     id="radix-_R_j5esndlb_-trigger-login"
+                                      data-slot="tabs-trigger"
+                                      className={"dark:data-[state=active]:text-foreground focus-visible:border-ring ..."}
+                                      onMouseDown={function}
+                                      onKeyDown={function}
+                                      onFocus={function}
+                                      tabIndex={-1}
+                                      data-orientation="horizontal"
+                                      data-radix-collection-item=""
+                                      ref={function}
+                                    >
++                                     Log in
+                            ...
+                              <Slot tabIndex={-1} data-orientation="horizontal" onMouseDown={function handleEvent} ...>
+                                <SlotClone tabIndex={-1} data-orientation="horizontal" onMouseDown={function handleEvent} ...>
+                                  <Primitive.button type="button" role="tab" aria-selected={true} ...>
+                                    <button
+                                      type="button"
+                                      role="tab"
+                                      aria-selected={true}
++                                     aria-controls="radix-_R_4lesndlb_-content-signup"
+-                                     aria-controls="radix-_R_j5esndlb_-content-signup"
+                                      data-state="active"
+                                      data-disabled={undefined}
+                                      disabled={false}
++                                     id="radix-_R_4lesndlb_-trigger-signup"
+-                                     id="radix-_R_j5esndlb_-trigger-signup"
+                                      data-slot="tabs-trigger"
+                                      className={"dark:data-[state=active]:text-foreground focus-visible:border-ring ..."}
+                                      onMouseDown={function}
+                                      onKeyDown={function}
+                                      onFocus={function}
+                                      tabIndex={-1}
+                                      data-orientation="horizontal"
+                                      data-radix-collection-item=""
+                                      ref={function}
+                                    >
++                                     Sign up
+                        <TabsContent value="login">
+                          <TabsContent data-slot="tabs-content" className="flex-1 out..." value="login">
+                            <Presence present={false}>
+                              <Primitive.div data-state="inactive" data-orientation="horizontal" role="tabpanel" ...>
+                                <div
+                                  data-state="inactive"
+                                  data-orientation="horizontal"
+                                  role="tabpanel"
++                                 aria-labelledby="radix-_R_4lesndlb_-trigger-login"
+-                                 aria-labelledby="radix-_R_j5esndlb_-trigger-login"
+                                  hidden={true}
++                                 id="radix-_R_4lesndlb_-content-login"
+-                                 id="radix-_R_j5esndlb_-content-login"
+                                  tabIndex={0}
+                                  data-slot="tabs-content"
+                                  className="flex-1 outline-none"
+                                  style={{animationDuration:undefined}}
+                                  ref={function}
+                                >
+                        <TabsContent value="signup">
+                          <TabsContent data-slot="tabs-content" className="flex-1 out..." value="signup">
+                            <Presence present={true}>
+                              <Primitive.div data-state="active" data-orientation="horizontal" role="tabpanel" ...>
+                                <div
+                                  data-state="active"
+                                  data-orientation="horizontal"
+                                  role="tabpanel"
++                                 aria-labelledby="radix-_R_4lesndlb_-trigger-signup"
+-                                 aria-labelledby="radix-_R_j5esndlb_-trigger-signup"
+                                  hidden={false}
++                                 id="radix-_R_4lesndlb_-content-signup"
+-                                 id="radix-_R_j5esndlb_-content-signup"
+                                  tabIndex={0}
+                                  data-slot="tabs-content"
+                                  className="flex-1 outline-none"
+                                  style={{animationDuration:"0s"}}
+                                  ref={function}
+                                >
+            <div className="lg:hidden ...">
+              <div>
+              <Tabs value="signup" onValueChange={function handleTabChange} className="w-full">
+                <Tabs data-slot="tabs" className="flex flex-..." value="signup" onValueChange={function handleTabChange}>
+                  <TabsProvider scope={undefined} baseId="radix-_R_5..." value="signup" ...>
+                    <Primitive.div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ...>
+                      <div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ref={null}>
+                        ...
+                          <div role="tablist" aria-orientation="horizontal" data-slot="tabs-list" ...>
+                            ...
+                              <Slot tabIndex={-1} data-orientation="horizontal" onMouseDown={function handleEvent} ...>
+                                <SlotClone tabIndex={-1} data-orientation="horizontal" onMouseDown={function handleEvent} ...>
+                                  <Primitive.button type="button" role="tab" aria-selected={false} ...>
+                                    <button
+                                      type="button"
+                                      role="tab"
+                                      aria-selected={false}
++                                     aria-controls="radix-_R_55esndlb_-content-login"
+-                                     aria-controls="radix-_R_l5esndlb_-content-login"
+                                      data-state="inactive"
+                                      data-disabled={undefined}
+                                      disabled={false}
++                                     id="radix-_R_55esndlb_-trigger-login"
+-                                     id="radix-_R_l5esndlb_-trigger-login"
+                                      data-slot="tabs-trigger"
+                                      className={"data-[state=active]:bg-background dark:data-[state=active]:text-for..."}
+                                      onMouseDown={function}
+                                      onKeyDown={function}
+                                      onFocus={function}
+                                      tabIndex={-1}
+                                      data-orientation="horizontal"
+                                      data-radix-collection-item=""
+                                      ref={function}
+                                    >
++                                     Log in
+                            ...
+                              <Slot tabIndex={-1} data-orientation="horizontal" onMouseDown={function handleEvent} ...>
+                                <SlotClone tabIndex={-1} data-orientation="horizontal" onMouseDown={function handleEvent} ...>
+                                  <Primitive.button type="button" role="tab" aria-selected={true} ...>
+                                    <button
+                                      type="button"
+                                      role="tab"
+                                      aria-selected={true}
++                                     aria-controls="radix-_R_55esndlb_-content-signup"
+-                                     aria-controls="radix-_R_l5esndlb_-content-signup"
+                                      data-state="active"
+                                      data-disabled={undefined}
+                                      disabled={false}
++                                     id="radix-_R_55esndlb_-trigger-signup"
+-                                     id="radix-_R_l5esndlb_-trigger-signup"
+                                      data-slot="tabs-trigger"
+                                      className={"data-[state=active]:bg-background dark:data-[state=active]:text-for..."}
+                                      onMouseDown={function}
+                                      onKeyDown={function}
+                                      onFocus={function}
+                                      tabIndex={-1}
+                                      data-orientation="horizontal"
+                                      data-radix-collection-item=""
+                                      ref={function}
+                                    >
++                                     Sign up
+                        <TabsContent value="login">
+                          <TabsContent data-slot="tabs-content" className="flex-1 out..." value="login">
+                            <Presence present={false}>
+                              <Primitive.div data-state="inactive" data-orientation="horizontal" role="tabpanel" ...>
+                                <div
+                                  data-state="inactive"
+                                  data-orientation="horizontal"
+                                  role="tabpanel"
++                                 aria-labelledby="radix-_R_55esndlb_-trigger-login"
+-                                 aria-labelledby="radix-_R_l5esndlb_-trigger-login"
+                                  hidden={true}
++                                 id="radix-_R_55esndlb_-content-login"
+-                                 id="radix-_R_l5esndlb_-content-login"
+                                  tabIndex={0}
+                                  data-slot="tabs-content"
+                                  className="flex-1 outline-none"
+                                  style={{animationDuration:undefined}}
+                                  ref={function}
+                                >
+                        <TabsContent value="signup">
+                          <TabsContent data-slot="tabs-content" className="flex-1 out..." value="signup">
+                            <Presence present={true}>
+                              <Primitive.div data-state="active" data-orientation="horizontal" role="tabpanel" ...>
+                                <div
+                                  data-state="active"
+                                  data-orientation="horizontal"
+                                  role="tabpanel"
++                                 aria-labelledby="radix-_R_55esndlb_-trigger-signup"
+-                                 aria-labelledby="radix-_R_l5esndlb_-trigger-signup"
+                                  hidden={false}
++                                 id="radix-_R_55esndlb_-content-signup"
+-                                 id="radix-_R_l5esndlb_-content-signup"
+                                  tabIndex={0}
+                                  data-slot="tabs-content"
+                                  className="flex-1 outline-none"
+                                  style={{animationDuration:"0s"}}
+                                  ref={function}
+                                >
+    ...
+
+[00:00:17.392] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:17.392] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:00:17.392] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768129997938}
+[00:00:17.426] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:17.426] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:00:17.426] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768129997971}
+[00:00:17.460] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:17.460] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:00:17.460] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768129998005}
+[00:00:17.684] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:17.685] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:00:17.685] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768129998230}
+[00:00:18.277] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:00:18.277] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768129991406@example.com"}
+[00:00:18.277] Browser WARN    [auth] After setIsLoading(true)
+[00:00:18.282] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:00:18.282] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768129991405@example.com"}
+[00:00:18.282] Browser WARN    [auth] After setIsLoading(true)
+[00:00:18.318] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:18.318] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:00:18.318] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=login color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768129998863}
+[00:00:18.343] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:00:18.343] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768129991399@example.com"}
+[00:00:18.343] Browser WARN    [auth] After setIsLoading(true)
+[00:00:18.480] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:00:18.480] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768129991406@example.com"}
+[00:00:18.480] Browser WARN    [auth] After setIsLoading(true)
+[00:00:18.978] Browser WARN    [auth] Starting login... {"email":"nonexistent@example.com"}
+[00:00:19.270] Browser LOG     [auth] signUpWithEmail response: {"error":"none","errorCode":"none","hasSession":true,"hasUser":true,"userEmail":"e2e-fan-1768129991405@example.com","userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:19.270] Browser WARN    [auth] Signup result: {"hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:19.270] Browser WARN    [auth] Session exists, redirecting to /home
+[00:00:19.270] Browser WARN    [auth] Setting window.location.href to /home
+[00:00:19.322] Browser LOG     [auth] signUpWithEmail response: {"error":"none","errorCode":"none","hasSession":true,"hasUser":true,"userEmail":"e2e-fan-1768129991399@example.com","userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:19.322] Browser WARN    [auth] Signup result: {"hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:19.322] Browser WARN    [auth] Session exists, redirecting to /home
+[00:00:19.322] Browser WARN    [auth] Setting window.location.href to /home
+[00:00:19.381] Browser WARN    [auth] window.location.href set, waiting for navigation...
+[00:00:19.382] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:19.436] Browser WARN    [auth] window.location.href set, waiting for navigation...
+[00:00:19.436] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:19.527] Browser LOG     [auth] signUpWithEmail response: {"error":"none","errorCode":"none","hasSession":true,"hasUser":true,"userEmail":"e2e-fan-1768129991406@example.com","userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:19.527] Browser WARN    [auth] Signup result: {"hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:19.527] Browser WARN    [auth] Session exists, redirecting to /home
+[00:00:19.527] Browser WARN    [auth] Setting window.location.href to /home
+[00:00:19.635] Browser WARN    [auth] window.location.href set, waiting for navigation...
+[00:00:19.635] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:19.795] Browser LOG     [auth] signUpWithEmail response: {"error":"User already registered","errorCode":422,"hasSession":false,"hasUser":false,"userEmail":"none","userId":"none"}
+[00:00:19.795] Browser ERROR   [auth] signUp error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:00:19.795] Browser ERROR   [auth] Signup error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:00:19.936] Browser WARN    [auth] Login result: {"error":"Invalid login credentials","hasSession":false,"hasUser":false}
+[00:00:19.936] Browser ERROR   [auth] signInWithPassword error: {"__isAuthError":true,"code":"invalid_credentials","name":"AuthApiError","status":400}
+[00:00:20.484] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:20.502] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:20.510] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:20.638] Browser LOG     [auth] ensureProfile: Profile created successfully
+[00:00:20.902] Browser LOG     [auth] ensureProfile: Profile created successfully
+[00:00:21.205] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:21.357] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:21.379] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:21.413] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:21.914] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:22.079] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:22.079] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:00:22.079] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130002624}
+[00:00:22.138] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:22.432] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:22.729] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:00:22.729] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768129991390@example.com"}
+[00:00:22.729] Browser WARN    [auth] After setIsLoading(true)
+[00:00:23.337] Server  LOG     [posts] Post creator data: {}
+[00:00:23.337] Server  LOG     [posts] Post creator data: {}
+[00:00:23.338] Server  LOG     [posts] Post creator data: {}
+[00:00:23.338] Server  LOG     [posts] Post creator data: {}
+[00:00:23.339] Server  LOG     [posts] Post creator data: {}
+[00:00:23.340] Server  LOG     [posts] Post creator data: {}
+[00:00:23.342] Server  LOG     [posts] Post creator data: {}
+[00:00:23.343] Server  LOG     [posts] Post creator data: {}
+[00:00:23.343] Server  LOG     [posts] Post creator data: {}
+[00:00:23.343] Server  LOG     [posts] Post creator data: {}
+[00:00:23.344] Server  LOG     [posts] Post creator data: {}
+[00:00:23.344] Server  LOG     [posts] Post creator data: {}
+[00:00:23.344] Server  LOG     [posts] Post creator data: {}
+[00:00:23.345] Server  LOG     [posts] Post creator data: {}
+[00:00:23.345] Server  LOG     [posts] Post creator data: {}
+[00:00:23.346] Server  LOG     [posts] Post creator data: {}
+[00:00:23.347] Server  LOG     [posts] Post creator data: {}
+[00:00:23.347] Server  LOG     [posts] Post creator data: {}
+[00:00:23.347] Server  LOG     [posts] Post creator data: {}
+[00:00:23.347] Server  LOG     [posts] Post creator data: {}
+[00:00:23.389] Server  LOG     [posts] Post creator data: {}
+[00:00:23.390] Server  LOG     [posts] Post creator data: {}
+[00:00:23.390] Server  LOG     [posts] Post creator data: {}
+[00:00:23.390] Server  LOG     [posts] Post creator data: {}
+[00:00:23.390] Server  LOG     [posts] Post creator data: {}
+[00:00:23.390] Server  LOG     [posts] Post creator data: {}
+[00:00:23.392] Server  LOG     [posts] Post creator data: {}
+[00:00:23.392] Server  LOG     [posts] Post creator data: {}
+[00:00:23.392] Server  LOG     [posts] Post creator data: {}
+[00:00:23.392] Server  LOG     [posts] Post creator data: {}
+[00:00:23.392] Server  LOG     [posts] Post creator data: {}
+[00:00:23.393] Server  LOG     [posts] Post creator data: {}
+[00:00:23.393] Server  LOG     [posts] Post creator data: {}
+[00:00:23.393] Server  LOG     [posts] Post creator data: {}
+[00:00:23.393] Server  LOG     [posts] Post creator data: {}
+[00:00:23.394] Server  LOG     [posts] Post creator data: {}
+[00:00:23.394] Server  LOG     [posts] Post creator data: {}
+[00:00:23.394] Server  LOG     [posts] Post creator data: {}
+[00:00:23.394] Server  LOG     [posts] Post creator data: {}
+[00:00:23.394] Server  LOG     [posts] Post creator data: {}
+[00:00:23.615] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:23.647] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:23.660] Server  LOG     [posts] Post creator data: {}
+[00:00:23.660] Server  LOG     [posts] Post creator data: {}
+[00:00:23.660] Server  LOG     [posts] Post creator data: {}
+[00:00:23.660] Server  LOG     [posts] Post creator data: {}
+[00:00:23.660] Server  LOG     [posts] Post creator data: {}
+[00:00:23.660] Server  LOG     [posts] Post creator data: {}
+[00:00:23.660] Server  LOG     [posts] Post creator data: {}
+[00:00:23.660] Server  LOG     [posts] Post creator data: {}
+[00:00:23.661] Server  LOG     [posts] Post creator data: {}
+[00:00:23.661] Server  LOG     [posts] Post creator data: {}
+[00:00:23.661] Server  LOG     [posts] Post creator data: {}
+[00:00:23.661] Server  LOG     [posts] Post creator data: {}
+[00:00:23.661] Server  LOG     [posts] Post creator data: {}
+[00:00:23.661] Server  LOG     [posts] Post creator data: {}
+[00:00:23.661] Server  LOG     [posts] Post creator data: {}
+[00:00:23.661] Server  LOG     [posts] Post creator data: {}
+[00:00:23.661] Server  LOG     [posts] Post creator data: {}
+[00:00:23.661] Server  LOG     [posts] Post creator data: {}
+[00:00:23.661] Server  LOG     [posts] Post creator data: {}
+[00:00:23.661] Server  LOG     [posts] Post creator data: {}
+[00:00:23.875] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:23.913] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:23.935] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:24.128] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:24.181] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:24.202] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:24.394] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:24.431] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:24.464] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:24.859] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:25.961] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:25.987] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:26.036] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:26.194] Browser LOG     [auth] signUpWithEmail response: {"error":"none","errorCode":"none","hasSession":true,"hasUser":true,"userEmail":"e2e-fan-1768129991390@example.com","userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:26.194] Browser WARN    [auth] Signup result: {"hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:26.194] Browser WARN    [auth] Session exists, redirecting to /home
+[00:00:26.195] Browser WARN    [auth] Setting window.location.href to /home
+[00:00:26.481] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:26.487] Browser WARN    [auth] window.location.href set, waiting for navigation...
+[00:00:26.487] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:26.777] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:26.787] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/home","route":"/home"}
+[00:00:26.787] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/home color: rgb(120, 120, 120) color: inherit {"dp":"/home","o":"http://localhost:3000/home","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130007396}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:26.787] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/home","route":"/home"}
+[00:00:26.787] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/home color: rgb(120, 120, 120) color: inherit {"dp":"/home","o":"http://localhost:3000/home","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130007316}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.787] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991406@example.com","hasSession":true,"hasUser":true,"userId":"484ceaaf-7b71-4214-b261-b75e9032dd36"}
+[00:00:26.936] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991405@example.com","hasSession":true,"hasUser":true,"userId":"6450f9a3-ece0-462c-a6b0-22cbbd48c68c"}
+[00:00:26.948] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:26.948] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/home","route":"/home"}
+[00:00:26.948] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/home color: rgb(120, 120, 120) color: inherit {"dp":"/home","o":"http://localhost:3000/home","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130007493}
+[00:00:27.096] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:27.097] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:00:27.097] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=login color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130007642}
+[00:00:27.540] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:27.696] Browser WARN    [auth] Starting login... {"email":"e2e-fan-1768129991399@example.com"}
+[00:00:27.809] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:28.040] Browser ERROR   [auth] ensureProfile insert error {"code":"23505","details":null,"hint":null,"message":"duplicate key value violates unique constraint \"profiles_pkey\""}
+[00:00:28.111] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:28.216] Browser WARN    [auth] Login result: {"error":"none","hasSession":true,"hasUser":true}
+[00:00:28.216] Browser WARN    [auth] Ensuring profile...
+[00:00:28.216] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:28.613] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:28.785] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.786] Server  LOG     [posts] Post creator data: {}
+[00:00:28.787] Server  LOG     [posts] Post creator data: {}
+[00:00:28.787] Server  LOG     [posts] Post creator data: {}
+[00:00:28.787] Server  LOG     [posts] Post creator data: {}
+[00:00:29.031] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:29.283] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:29.542] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:29.808] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.822] Server  LOG     [posts] Post creator data: {}
+[00:00:29.954] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:30.056] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:30.347] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:30.442] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:30.490] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:30.590] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:30.644] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:30.645] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:30.645] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/home","route":"/home"}
+[00:00:30.645] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/home color: rgb(120, 120, 120) color: inherit {"dp":"/home","o":"http://localhost:3000/home","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130011190}
+[00:00:30.729] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:30.836] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:31.218] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:31.399] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:31.399] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:00:31.399] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130011946}
+[00:00:31.584] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:31.932] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:32.046] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:00:32.046] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768129991406@example.com"}
+[00:00:32.046] Browser WARN    [auth] After setIsLoading(true)
+[00:00:32.453] Server  LOG     [posts] Post creator data: {}
+[00:00:32.453] Server  LOG     [posts] Post creator data: {}
+[00:00:32.453] Server  LOG     [posts] Post creator data: {}
+[00:00:32.453] Server  LOG     [posts] Post creator data: {}
+[00:00:32.453] Server  LOG     [posts] Post creator data: {}
+[00:00:32.454] Server  LOG     [posts] Post creator data: {}
+[00:00:32.454] Server  LOG     [posts] Post creator data: {}
+[00:00:32.454] Server  LOG     [posts] Post creator data: {}
+[00:00:32.454] Server  LOG     [posts] Post creator data: {}
+[00:00:32.454] Server  LOG     [posts] Post creator data: {}
+[00:00:32.454] Server  LOG     [posts] Post creator data: {}
+[00:00:32.454] Server  LOG     [posts] Post creator data: {}
+[00:00:32.454] Server  LOG     [posts] Post creator data: {}
+[00:00:32.454] Server  LOG     [posts] Post creator data: {}
+[00:00:32.454] Server  LOG     [posts] Post creator data: {}
+[00:00:32.455] Server  LOG     [posts] Post creator data: {}
+[00:00:32.455] Server  LOG     [posts] Post creator data: {}
+[00:00:32.455] Server  LOG     [posts] Post creator data: {}
+[00:00:32.455] Server  LOG     [posts] Post creator data: {}
+[00:00:32.455] Server  LOG     [posts] Post creator data: {}
+[00:00:32.819] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:32.819] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:00:32.819] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130013365}
+[00:00:33.013] Browser LOG     [auth] signUpWithEmail response: {"error":"User already registered","errorCode":422,"hasSession":false,"hasUser":false,"userEmail":"none","userId":"none"}
+[00:00:33.013] Browser ERROR   [auth] signUp error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:00:33.013] Browser ERROR   [auth] Signup error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:00:33.185] Browser LOG     [auth] ensureProfile: Profile already exists
+[00:00:33.185] Browser WARN    [auth] Profile ensured, redirecting to /home
+[00:00:33.206] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:33.276] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:33.461] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:00:33.461] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768129991405@example.com"}
+[00:00:33.461] Browser WARN    [auth] After setIsLoading(true)
+[00:00:33.501] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:33.526] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:33.781] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:33.996] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:34.037] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:34.449] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991390@example.com","hasSession":true,"hasUser":true,"userId":"fa6cb474-10ff-4308-99bb-a5e3ecd317ff"}
+[00:00:34.641] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:34.641] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/home","route":"/home"}
+[00:00:34.641] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/home color: rgb(120, 120, 120) color: inherit {"dp":"/home","o":"http://localhost:3000/home","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130015186}
+[00:00:35.433] Server  LOG     [posts] Post creator data: {}
+[00:00:35.433] Server  LOG     [posts] Post creator data: {}
+[00:00:35.433] Server  LOG     [posts] Post creator data: {}
+[00:00:35.433] Server  LOG     [posts] Post creator data: {}
+[00:00:35.433] Server  LOG     [posts] Post creator data: {}
+[00:00:35.433] Server  LOG     [posts] Post creator data: {}
+[00:00:35.433] Server  LOG     [posts] Post creator data: {}
+[00:00:35.433] Server  LOG     [posts] Post creator data: {}
+[00:00:35.433] Server  LOG     [posts] Post creator data: {}
+[00:00:35.433] Server  LOG     [posts] Post creator data: {}
+[00:00:35.433] Server  LOG     [posts] Post creator data: {}
+[00:00:35.434] Server  LOG     [posts] Post creator data: {}
+[00:00:35.434] Server  LOG     [posts] Post creator data: {}
+[00:00:35.434] Server  LOG     [posts] Post creator data: {}
+[00:00:35.434] Server  LOG     [posts] Post creator data: {}
+[00:00:35.434] Server  LOG     [posts] Post creator data: {}
+[00:00:35.434] Server  LOG     [posts] Post creator data: {}
+[00:00:35.434] Server  LOG     [posts] Post creator data: {}
+[00:00:35.434] Server  LOG     [posts] Post creator data: {}
+[00:00:35.434] Server  LOG     [posts] Post creator data: {}
+[00:00:35.690] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:35.973] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:36.228] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:36.480] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:36.488] Browser LOG     [auth] signUpWithEmail response: {"error":"User already registered","errorCode":422,"hasSession":false,"hasUser":false,"userEmail":"none","userId":"none"}
+[00:00:36.488] Browser ERROR   [auth] signUp error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:00:36.488] Browser ERROR   [auth] Signup error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:00:36.746] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:36.853] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768129991399@example.com","hasSession":true,"hasUser":true,"userId":"2b8c4e87-e08c-4e05-bebc-dfa091de9af4"}
+[00:00:37.056] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:37.056] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/home","route":"/home"}
+[00:00:37.056] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/home color: rgb(120, 120, 120) color: inherit {"dp":"/home","o":"http://localhost:3000/home","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130017602}
+[00:00:37.605] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:37.605] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:00:37.605] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130018151}
+[00:00:38.286] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:00:38.286] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768129991390@example.com"}
+[00:00:38.286] Browser WARN    [auth] After setIsLoading(true)
+[00:00:39.234] Browser LOG     [auth] signUpWithEmail response: {"error":"User already registered","errorCode":422,"hasSession":false,"hasUser":false,"userEmail":"none","userId":"none"}
+[00:00:39.234] Browser ERROR   [auth] signUp error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:00:39.234] Browser ERROR   [auth] Signup error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:00:41.289] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:42.235] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:42.244] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:00:42.251] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130022768}
+[00:00:42.904] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:00:42.904] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768130021445@example.com"}
+[00:00:42.904] Browser WARN    [auth] After setIsLoading(true)
+[00:00:44.124] Browser LOG     [auth] signUpWithEmail response: {"error":"none","errorCode":"none","hasSession":true,"hasUser":true,"userEmail":"e2e-fan-1768130021445@example.com","userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:44.124] Browser WARN    [auth] Signup result: {"hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:44.125] Browser WARN    [auth] Session exists, redirecting to /home
+[00:00:44.125] Browser WARN    [auth] Setting window.location.href to /home
+[00:00:44.195] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:44.234] Browser WARN    [auth] window.location.href set, waiting for navigation...
+[00:00:44.234] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:45.196] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:45.919] Browser LOG     [auth] ensureProfile: Profile created successfully
+[00:00:46.231] Server  ERROR   [auth-server] ensureProfile insert error {}
+[00:00:46.470] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:48.056] Server  LOG     [posts] Post creator data: {}
+[00:00:48.056] Server  LOG     [posts] Post creator data: {}
+[00:00:48.056] Server  LOG     [posts] Post creator data: {}
+[00:00:48.056] Server  LOG     [posts] Post creator data: {}
+[00:00:48.056] Server  LOG     [posts] Post creator data: {}
+[00:00:48.057] Server  LOG     [posts] Post creator data: {}
+[00:00:48.057] Server  LOG     [posts] Post creator data: {}
+[00:00:48.057] Server  LOG     [posts] Post creator data: {}
+[00:00:48.057] Server  LOG     [posts] Post creator data: {}
+[00:00:48.057] Server  LOG     [posts] Post creator data: {}
+[00:00:48.057] Server  LOG     [posts] Post creator data: {}
+[00:00:48.057] Server  LOG     [posts] Post creator data: {}
+[00:00:48.057] Server  LOG     [posts] Post creator data: {}
+[00:00:48.057] Server  LOG     [posts] Post creator data: {}
+[00:00:48.057] Server  LOG     [posts] Post creator data: {}
+[00:00:48.057] Server  LOG     [posts] Post creator data: {}
+[00:00:48.057] Server  LOG     [posts] Post creator data: {}
+[00:00:48.057] Server  LOG     [posts] Post creator data: {}
+[00:00:48.058] Server  LOG     [posts] Post creator data: {}
+[00:00:48.058] Server  LOG     [posts] Post creator data: {}
+[00:00:48.294] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:48.543] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:48.790] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:49.043] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:49.501] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:49.603] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:49.760] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:49.760] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/home","route":"/home"}
+[00:00:49.760] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/home color: rgb(120, 120, 120) color: inherit {"dp":"/home","o":"http://localhost:3000/home","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130030306}
+[00:00:49.834] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:50.315] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:51.917] Server  LOG     [posts] Post creator data: {}
+[00:00:51.917] Server  LOG     [posts] Post creator data: {}
+[00:00:51.917] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:51.918] Server  LOG     [posts] Post creator data: {}
+[00:00:52.149] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:52.801] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:53.044] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:53.669] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:54.093] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:54.404] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <NavHeader user={{username:"...", ...}} notificationCount={0}>
+      <header className="sticky top...">
+        <div className="container ...">
+          <div>
+          <div>
+          <div className="flex items...">
+            <Button>
+            <Button>
+            <Sheet open={false} onOpenChange={function bound dispatchSetState}>
+              <Dialog data-slot="sheet" open={false} onOpenChange={function bound dispatchSetState}>
+                <DialogProvider scope={undefined} triggerRef={{current:null}} contentRef={{current:null}} ...>
+                  <SheetTrigger asChild={true}>
+                    <DialogTrigger data-slot="sheet-trigger" asChild={true}>
+                      <Primitive.button type="button" aria-haspopup="dialog" aria-expanded={false} ...>
+                        <Slot type="button" aria-haspopup="dialog" aria-expanded={false} aria-controls="radix-_R_2..." ...>
+                          <SlotClone type="button" aria-haspopup="dialog" aria-expanded={false} ...>
+                            <Button variant="ghost" className="flex items..." type="button" aria-haspopup="dialog" ...>
+                              <button
+                                data-slot="sheet-trigger"
+                                className={"justify-center whitespace-nowrap text-sm font-medium transition-all hover..."}
+                                type="button"
+                                aria-haspopup="dialog"
+                                aria-expanded={false}
++                               aria-controls="radix-_R_2mlesndlb_"
+-                               aria-controls="radix-_R_ar5esndlb_"
+                                data-state="closed"
+                                onClick={function handleEvent}
+                                ref={function}
+                              >
+                  ...
+
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:54.404] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:54.404] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/home","route":"/home"}
+[00:00:54.404] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/home color: rgb(120, 120, 120) color: inherit {"dp":"/home","o":"http://localhost:3000/home","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130034846}
+[00:00:54.404] Browser ERROR   `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+[00:00:54.404] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:54.404] Browser ERROR   `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+[00:00:54.404] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:54.404] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130021445@example.com","hasSession":true,"hasUser":true,"userId":"9d43f7fe-88d6-442d-a873-1b79f8120fa4"}
+[00:00:55.098] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:56.223] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:56.223] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:00:56.223] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130036768}
+[00:00:56.367] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:56.895] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:00:56.895] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768130035345@example.com"}
+[00:00:56.895] Browser WARN    [auth] After setIsLoading(true)
+[00:00:58.072] Browser LOG     [auth] signUpWithEmail response: {"error":"none","errorCode":"none","hasSession":true,"hasUser":true,"userEmail":"e2e-fan-1768130035345@example.com","userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:00:58.072] Browser WARN    [auth] Signup result: {"hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:00:58.072] Browser WARN    [auth] Session exists, redirecting to /home
+[00:00:58.072] Browser WARN    [auth] Setting window.location.href to /home
+[00:00:58.097] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:58.139] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:58.139] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:00:58.139] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130038685}
+[00:00:58.182] Browser WARN    [auth] window.location.href set, waiting for navigation...
+[00:00:58.182] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:00:58.846] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:00:58.846] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768130036593@example.com"}
+[00:00:58.846] Browser WARN    [auth] After setIsLoading(true)
+[00:00:59.387] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:59.408] Browser LOG     [auth] ensureProfile: Profile created successfully
+[00:00:59.505] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:59.810] Browser LOG     [auth] signUpWithEmail response: {"error":"none","errorCode":"none","hasSession":true,"hasUser":true,"userEmail":"e2e-fan-1768130036593@example.com","userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:00:59.810] Browser WARN    [auth] Signup result: {"hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:00:59.810] Browser WARN    [auth] Session exists, redirecting to /home
+[00:00:59.810] Browser WARN    [auth] Setting window.location.href to /home
+[00:00:59.838] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:00:59.920] Browser WARN    [auth] window.location.href set, waiting for navigation...
+[00:00:59.920] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:00.074] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:00.801] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:00.801] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:01:00.801] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130041348}
+[00:01:01.152] Server  ERROR   [auth-server] ensureProfile insert error {}
+[00:01:01.191] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:01.210] Browser LOG     [auth] ensureProfile: Profile created successfully
+[00:01:01.393] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:01.437] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:01:01.437] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768129991399@example.com"}
+[00:01:01.437] Browser WARN    [auth] After setIsLoading(true)
+[00:01:01.507] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:02.350] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:02.350] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:01:02.350] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130042895}
+[00:01:02.408] Browser LOG     [auth] signUpWithEmail response: {"error":"User already registered","errorCode":422,"hasSession":false,"hasUser":false,"userEmail":"none","userId":"none"}
+[00:01:02.408] Browser ERROR   [auth] signUp error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:01:02.408] Browser ERROR   [auth] Signup error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:01:03.028] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:01:03.028] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768130041410@example.com"}
+[00:01:03.028] Browser WARN    [auth] After setIsLoading(true)
+[00:01:03.127] Server  LOG     [posts] Post creator data: {}
+[00:01:03.127] Server  LOG     [posts] Post creator data: {}
+[00:01:03.127] Server  LOG     [posts] Post creator data: {}
+[00:01:03.127] Server  LOG     [posts] Post creator data: {}
+[00:01:03.127] Server  LOG     [posts] Post creator data: {}
+[00:01:03.127] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.128] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.188] Server  LOG     [posts] Post creator data: {}
+[00:01:03.189] Server  LOG     [posts] Post creator data: {}
+[00:01:03.189] Server  LOG     [posts] Post creator data: {}
+[00:01:03.189] Server  LOG     [posts] Post creator data: {}
+[00:01:03.189] Server  LOG     [posts] Post creator data: {}
+[00:01:03.189] Server  LOG     [posts] Post creator data: {}
+[00:01:03.429] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:03.678] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:03.929] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:03.969] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:03.985] Browser LOG     [auth] signUpWithEmail response: {"error":"none","errorCode":"none","hasSession":true,"hasUser":true,"userEmail":"e2e-fan-1768130041410@example.com","userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:03.985] Browser WARN    [auth] Signup result: {"hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:03.985] Browser WARN    [auth] Session exists, redirecting to /home
+[00:01:03.985] Browser WARN    [auth] Setting window.location.href to /home
+[00:01:04.010] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:04.095] Browser WARN    [auth] window.location.href set, waiting for navigation...
+[00:01:04.095] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:04.178] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:04.231] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:04.512] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:04.696] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:04.995] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:05.078] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:05.375] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/home","route":"/home"}
+[00:01:05.375] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/home color: rgb(120, 120, 120) color: inherit {"dp":"/home","o":"http://localhost:3000/home","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130045887}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130036593@example.com","hasSession":true,"hasUser":true,"userId":"44796089-e9fd-4c4b-bd9c-4a43ab650e1e"}
+[00:01:05.375] Browser LOG     [auth] ensureProfile: Profile created successfully
+[00:01:05.436] Server  ERROR   [auth-server] ensureProfile insert error {}
+[00:01:05.589] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:05.788] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/home","route":"/home"}
+[00:01:05.788] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/home color: rgb(120, 120, 120) color: inherit {"dp":"/home","o":"http://localhost:3000/home","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130046385}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.788] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:05.812] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:06.320] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:06.379] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:06.531] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:06.531] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/me","route":"/me"}
+[00:01:06.534] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/me color: rgb(120, 120, 120) color: inherit {"dp":"/me","o":"http://localhost:3000/me","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130047078}
+[00:01:06.568] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:06.568] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/purchases","route":"/purchases"}
+[00:01:06.568] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/purchases color: rgb(120, 120, 120) color: inherit {"dp":"/purchases","o":"http://localhost:3000/purchases","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130047114}
+[00:01:06.568] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130035345@example.com","hasSession":true,"hasUser":true,"userId":"9d18fe33-de5a-4401-bb85-af0d041d7797"}
+[00:01:06.816] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:07.052] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:07.499] Server  LOG     [posts] Post creator data: {}
+[00:01:07.499] Server  LOG     [posts] Post creator data: {}
+[00:01:07.499] Server  LOG     [posts] Post creator data: {}
+[00:01:07.500] Server  LOG     [posts] Post creator data: {}
+[00:01:07.500] Server  LOG     [posts] Post creator data: {}
+[00:01:07.500] Server  LOG     [posts] Post creator data: {}
+[00:01:07.500] Server  LOG     [posts] Post creator data: {}
+[00:01:07.500] Server  LOG     [posts] Post creator data: {}
+[00:01:07.500] Server  LOG     [posts] Post creator data: {}
+[00:01:07.500] Server  LOG     [posts] Post creator data: {}
+[00:01:07.500] Server  LOG     [posts] Post creator data: {}
+[00:01:07.500] Server  LOG     [posts] Post creator data: {}
+[00:01:07.501] Server  LOG     [posts] Post creator data: {}
+[00:01:07.501] Server  LOG     [posts] Post creator data: {}
+[00:01:07.501] Server  LOG     [posts] Post creator data: {}
+[00:01:07.501] Server  LOG     [posts] Post creator data: {}
+[00:01:07.501] Server  LOG     [posts] Post creator data: {}
+[00:01:07.501] Server  LOG     [posts] Post creator data: {}
+[00:01:07.501] Server  LOG     [posts] Post creator data: {}
+[00:01:07.501] Server  LOG     [posts] Post creator data: {}
+[00:01:07.642] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:07.749] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:08.020] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:08.245] Browser LOG     [auth] ensureProfile: Profile already exists
+[00:01:08.286] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:08.527] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:08.568] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:08.933] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:09.148] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.148] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.148] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.148] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.148] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.148] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.148] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.148] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.148] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.148] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.148] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.149] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.149] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.149] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.149] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.149] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.149] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.149] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.149] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.149] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:09.149] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/home","route":"/home"}
+[00:01:09.149] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/home color: rgb(120, 120, 120) color: inherit {"dp":"/home","o":"http://localhost:3000/home","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130049694}
+[00:01:09.149] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130041410@example.com","hasSession":true,"hasUser":true,"userId":"5beb3bd7-04bc-4d63-a649-71ba12360ed3"}
+[00:01:09.449] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:09.449] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:01:09.449] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130049996}
+[00:01:09.486] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:09.515] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:09.607] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:09.607] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/subscriptions","route":"/subscriptions"}
+[00:01:09.607] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/subscriptions color: rgb(120, 120, 120) color: inherit {"dp":"/subscriptions","o":"http://localhost:3000/subscriptions","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130050153}
+[00:01:09.703] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:09.743] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:10.136] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:01:10.136] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768130036593@example.com"}
+[00:01:10.136] Browser WARN    [auth] After setIsLoading(true)
+[00:01:10.797] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:10.797] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/auth","route":"/auth"}
+[00:01:10.797] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/auth?mode=signup color: rgb(120, 120, 120) color: inherit {"dp":"/auth","o":"http://localhost:3000/auth?mode=signup","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1768130051343}
+[00:01:11.182] Browser LOG     [auth] signUpWithEmail response: {"error":"User already registered","errorCode":422,"hasSession":false,"hasUser":false,"userEmail":"none","userId":"none"}
+[00:01:11.182] Browser ERROR   [auth] signUp error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:01:11.182] Browser ERROR   [auth] Signup error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:01:11.452] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:01:11.452] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768130035345@example.com"}
+[00:01:11.452] Browser WARN    [auth] After setIsLoading(true)
+[00:01:12.988] Browser LOG     [auth] signUpWithEmail response: {"error":"User already registered","errorCode":422,"hasSession":false,"hasUser":false,"userEmail":"none","userId":"none"}
+[00:01:12.988] Browser ERROR   [auth] signUp error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:01:12.988] Browser ERROR   [auth] Signup error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:01:14.642] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:17.489] Browser LOG     [Vercel Web Analytics] Failed to load script from https://va.vercel-scripts.com/v1/script.debug.js. Please check if any ad blockers are enabled and try again.
+[00:01:18.161] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:01:18.161] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768130041410@example.com"}
+[00:01:18.161] Browser WARN    [auth] After setIsLoading(true)
+[00:01:19.153] Browser LOG     [auth] signUpWithEmail response: {"error":"User already registered","errorCode":422,"hasSession":false,"hasUser":false,"userEmail":"none","userId":"none"}
+[00:01:19.153] Browser ERROR   [auth] signUp error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:01:19.153] Browser ERROR   [auth] Signup error: {"__isAuthError":true,"code":"user_already_exists","name":"AuthApiError","status":422}
+[00:01:20.155] Browser ERROR   [wallet] getWalletBalance: create wallet error: {"code":"42501","details":null,"hint":null,"message":"new row violates row-level security policy for table \"wallet_accounts\""}
+[00:01:24.413] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:25.331] Browser LOG     [Vercel Web Analytics] Failed to load script from https://va.vercel-scripts.com/v1/script.debug.js. Please check if any ad blockers are enabled and try again.
+[00:01:26.011] Browser WARN    [auth] ====== BUTTON CLICKED ======
+[00:01:26.011] Browser WARN    [auth] Current state: {"ageConfirmed":true,"hasPassword":true,"isLoading":false,"signupEmail":"e2e-fan-1768130064577@example.com"}
+[00:01:26.011] Browser WARN    [auth] After setIsLoading(true)
+[00:01:26.967] Browser LOG     [auth] signUpWithEmail response: {"error":"none","errorCode":"none","hasSession":true,"hasUser":true,"userEmail":"e2e-fan-1768130064577@example.com","userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:26.967] Browser WARN    [auth] Signup result: {"hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:26.967] Browser WARN    [auth] Session exists, redirecting to /home
+[00:01:26.967] Browser WARN    [auth] Setting window.location.href to /home
+[00:01:27.008] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:27.080] Browser WARN    [auth] window.location.href set, waiting for navigation...
+[00:01:27.080] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:27.813] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:29.122] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:30.276] Browser LOG     [auth] ensureProfile: Profile already exists
+[00:01:30.380] Server  LOG     [posts] Post creator data: {}
+[00:01:30.380] Server  LOG     [posts] Post creator data: {}
+[00:01:30.380] Server  LOG     [posts] Post creator data: {}
+[00:01:30.381] Server  LOG     [posts] Post creator data: {}
+[00:01:30.381] Server  LOG     [posts] Post creator data: {}
+[00:01:30.381] Server  LOG     [posts] Post creator data: {}
+[00:01:30.381] Server  LOG     [posts] Post creator data: {}
+[00:01:30.381] Server  LOG     [posts] Post creator data: {}
+[00:01:30.381] Server  LOG     [posts] Post creator data: {}
+[00:01:30.382] Server  LOG     [posts] Post creator data: {}
+[00:01:30.382] Server  LOG     [posts] Post creator data: {}
+[00:01:30.382] Server  LOG     [posts] Post creator data: {}
+[00:01:30.382] Server  LOG     [posts] Post creator data: {}
+[00:01:30.382] Server  LOG     [posts] Post creator data: {}
+[00:01:30.382] Server  LOG     [posts] Post creator data: {}
+[00:01:30.383] Server  LOG     [posts] Post creator data: {}
+[00:01:30.383] Server  LOG     [posts] Post creator data: {}
+[00:01:30.383] Server  LOG     [posts] Post creator data: {}
+[00:01:30.383] Server  LOG     [posts] Post creator data: {}
+[00:01:30.383] Server  LOG     [posts] Post creator data: {}
+[00:01:30.639] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:30.906] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:31.171] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:31.436] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:31.887] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:31.965] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.068] Browser LOG     [auth] getCurrentUser: {"email":"e2e-fan-1768130064577@example.com","hasSession":true,"hasUser":true,"userId":"6fd28a40-fa99-44ca-b97c-cb35e27494a1"}
+[00:01:32.215] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:32.284] Browser LOG     [Vercel Web Analytics] Failed to load script from https://va.vercel-scripts.com/v1/script.debug.js. Please check if any ad blockers are enabled and try again.
+[00:01:32.468] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:33.000] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:33.253] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:33.487] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:33.731] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:33.969] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:34.214] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:34.460] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:34.703] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:34.947] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:35.593] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:35.837] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:36.088] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:36.335] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:36.582] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:36.834] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:37.080] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[00:01:37.323] Server  ERROR   Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.

@@ -1,56 +1,48 @@
-export type UserRole = "fan" | "creator"
+/**
+ * 共享类型定义
+ * 这些类型可以在客户端和服务端安全使用
+ */
 
-export type KYCStatus = "not_started" | "pending" | "approved" | "failed"
+export type PostVisibility = "free" | "subscribers" | "ppv";
 
-export interface User {
-  id: string
-  username: string
-  email: string
-  role: UserRole
-  kycStatus?: KYCStatus
-  avatar?: string
-  bio?: string
-  subscriptionPrice?: number
-  isVerified?: boolean
-}
+export type Notification = {
+  id: string;
+  user_id: string;
+  type: "like" | "comment" | "subscription" | "payment" | "mention";
+  title: string;
+  message: string;
+  link?: string;
+  actionUrl?: string; // 兼容旧字段名
+  read: boolean;
+  created_at: string;
+  createdAt?: string; // 兼容旧字段名
+};
 
-export interface Post {
-  id: string
-  creatorId: string
-  creator: User
-  type: "free" | "subscribers" | "ppv"
-  price?: number
-  content: string
-  mediaUrl?: string
-  createdAt: string
-  likes: number
-  isLiked?: boolean
-  isUnlocked?: boolean
-}
-
-export interface Subscription {
-  id: string
-  creatorId: string
-  creator: User
-  status: "active" | "expired"
-  startDate: string
-  endDate: string
-  price: number
-}
-
-export interface Purchase {
-  id: string
-  postId: string
-  post: Post
-  price: number
-  purchaseDate: string
-}
-
-export interface Notification {
-  id: string
-  type: "new_post" | "new_subscriber" | "like" | "purchase"
-  message: string
-  read: boolean
-  createdAt: string
-  actionUrl?: string
-}
+export type Post = {
+  id: string;
+  creator_id: string;
+  title?: string;
+  content: string;
+  media_url?: string; // 保留向后兼容（单个媒体）
+  is_locked: boolean; // 保留向后兼容
+  visibility: PostVisibility;
+  price_cents: number | null;
+  preview_enabled: boolean;
+  watermark_enabled: boolean;
+  created_at: string;
+  creator?: {
+    display_name?: string;
+    avatar_url?: string;
+  };
+  media?: Array<{
+    id: string;
+    media_url: string;
+    preview_url?: string; // 预览 URL（10秒限制，仅视频）
+    watermarked_path: string | null;
+    media_type: "image" | "video";
+    file_name: string | null;
+    file_size: number | null;
+    sort_order: number;
+    is_locked?: boolean; // 单个媒体是否锁定
+  }>;
+};

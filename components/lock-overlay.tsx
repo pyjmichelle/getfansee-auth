@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { Lock } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface LockOverlayProps {
-  type: "subscribe" | "ppv"
-  price?: number
-  onUnlock?: () => void
+  type: "subscribe" | "ppv";
+  price?: number;
+  onUnlock?: () => void;
 }
 
 export function LockOverlay({ type, price, onUnlock }: LockOverlayProps) {
@@ -25,11 +25,14 @@ export function LockOverlay({ type, price, onUnlock }: LockOverlayProps) {
           </p>
         </div>
         {onUnlock && (
-          <Button onClick={onUnlock} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+          <Button
+            onClick={onUnlock}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
             {type === "subscribe" ? "Subscribe Now" : `Unlock for $${price}`}
           </Button>
         )}
       </div>
     </div>
-  )
+  );
 }

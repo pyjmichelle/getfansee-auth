@@ -1,16 +1,16 @@
-"use client"
-import { Star, TrendingUp, DollarSign, Users, Shield, ArrowRight } from "lucide-react"
-import { NavHeader } from "@/components/nav-header"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+"use client";
+import { Star, TrendingUp, DollarSign, Users, Shield, ArrowRight } from "lucide-react";
+import { NavHeader } from "@/components/nav-header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function CreatorUpgradePage() {
   const currentUser = {
     username: "john_doe",
     role: "fan" as const,
     avatar: "/placeholder.svg?height=100&width=100",
-  }
+  };
 
   const benefits = [
     {
@@ -33,7 +33,7 @@ export default function CreatorUpgradePage() {
       title: "Secure Platform",
       description: "Your content is protected with industry-leading security",
     },
-  ]
+  ];
 
   const steps = [
     {
@@ -51,7 +51,7 @@ export default function CreatorUpgradePage() {
       title: "Start Creating",
       description: "Upload content and start earning",
     },
-  ]
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,8 +68,8 @@ export default function CreatorUpgradePage() {
             Become a Creator on GetFanSee
           </h1>
           <p className="text-lg text-muted-foreground mb-8 text-balance max-w-2xl mx-auto">
-            Share your content, connect with fans, and earn money doing what you love. Join thousands of creators
-            already earning on our platform.
+            Share your content, connect with fans, and earn money doing what you love. Join
+            thousands of creators already earning on our platform.
           </p>
           <Button asChild size="lg" className="h-12 px-8">
             <Link href="/creator/upgrade/apply">
@@ -137,8 +137,8 @@ export default function CreatorUpgradePage() {
         <Card className="p-8 text-center bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
           <h2 className="text-2xl font-bold text-foreground mb-4">Ready to Get Started?</h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Join our creator community and start monetizing your content today. The application takes less than 5
-            minutes.
+            Join our creator community and start monetizing your content today. The application
+            takes less than 5 minutes.
           </p>
           <Button asChild size="lg" className="h-12 px-8">
             <Link href="/creator/upgrade/apply">Apply Now</Link>
@@ -146,5 +146,5 @@ export default function CreatorUpgradePage() {
         </Card>
       </main>
     </div>
-  )
+  );
 }

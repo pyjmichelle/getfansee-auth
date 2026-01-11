@@ -21,10 +21,12 @@
 ### 3. 配置 Site URL（可选，开发环境）
 
 **开发环境**：
+
 - 可以留空
 - 或填写：`http://localhost:3000`
 
 **生产环境**：
+
 - 填写你的实际域名，例如：`https://www.getfansee.com`
 
 ### 4. 配置 Redirect URLs（必须）
@@ -32,17 +34,20 @@
 在 **"Redirect URLs"** 输入框中，添加以下 URL（每行一个）：
 
 **开发环境**：
+
 ```
 http://localhost:3000/auth/verify
 ```
 
 **生产环境**：
+
 ```
 https://www.getfansee.com/auth/verify
 https://getfansee.com/auth/verify
 ```
 
 **如果有多个环境**：
+
 ```
 http://localhost:3000/auth/verify
 https://staging.getfansee.com/auth/verify
@@ -80,6 +85,7 @@ https://www.getfansee.com/auth/verify
 **原因**：Redirect URLs 中没有包含你的验证页面 URL。
 
 **解决**：
+
 1. 检查 Supabase Dashboard → Settings → API → Redirect URLs
 2. 确保包含：`http://localhost:3000/auth/verify`（开发环境）
 3. 保存后重新发送验证邮件
@@ -89,6 +95,7 @@ https://www.getfansee.com/auth/verify
 **原因**：Redirect URLs 配置不正确或 OAuth 提供商的回调 URL 不匹配。
 
 **解决**：
+
 1. 检查 Supabase Dashboard → Authentication → Providers → Google → Redirect URL
 2. 确保与 Supabase 的 Redirect URLs 配置一致
 3. 确保 Google OAuth 控制台中的授权重定向 URI 也包含该 URL
@@ -98,6 +105,7 @@ https://www.getfansee.com/auth/verify
 **原因**：生产环境的 Redirect URLs 没有配置。
 
 **解决**：
+
 1. 在 Supabase Dashboard 中添加生产环境的 URL
 2. 格式：`https://你的域名/auth/verify`
 3. 保存后重新测试
@@ -129,4 +137,3 @@ https://www.getfansee.com/auth/verify
 
 - [Supabase Auth Redirect URLs](https://supabase.com/docs/guides/auth/auth-deep-dive/auth-deep-dive-jwts#redirect-urls)
 - [Supabase OAuth Configuration](https://supabase.com/docs/guides/auth/social-login)
-

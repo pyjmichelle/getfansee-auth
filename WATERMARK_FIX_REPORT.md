@@ -3,17 +3,20 @@
 ## 📋 改动文件列表
 
 ### 删除的旧代码
+
 - ✅ `lib/watermark.ts` - 删除平铺水印逻辑（tile/pattern），重写为左上角水印
 - ✅ `components/media-display.tsx` - 删除基于 visibility 的强制水印逻辑
 - ✅ `lib/post-media.ts` - 删除 `has_watermark` 字段，替换为 `watermarked_path`
 
 ### 数据库迁移
+
 - ✅ `migrations/012_watermark_final.sql` - 新增：
   - `posts.watermark_enabled` (boolean, default true)
   - `post_media.watermarked_path` (text, nullable)
   - 删除 `post_media.has_watermark`
 
 ### 更新的文件
+
 - ✅ `lib/watermark.ts` - 重写：左上角水印，仅图片，可选
 - ✅ `lib/storage.ts` - 更新：路径包含追踪标识符（creatorId, postId, mediaId, timestamp），添加元数据
 - ✅ `lib/posts.ts` - 更新：支持 `watermark_enabled` 字段
@@ -22,6 +25,7 @@
 - ✅ `app/creator/new-post/page.tsx` - 更新：添加 watermark toggle（默认开启）
 
 ### 新增文件
+
 - ✅ `scripts/test-watermark.js` - 新增：水印功能测试脚本
 
 ---
@@ -44,21 +48,23 @@
 ### 删除的代码片段
 
 **lib/watermark.ts (旧版本)**:
+
 ```typescript
 // 已删除：平铺水印逻辑
-const spacingX = textWidth * 1.5
-const spacingY = textHeight * 2
+const spacingX = textWidth * 1.5;
+const spacingY = textHeight * 2;
 for (let x = spacingX / 2; x < canvas.width; x += spacingX) {
   for (let y = spacingY / 2; y < canvas.height; y += spacingY) {
-    ctx.fillText(watermarkText, x, y)
+    ctx.fillText(watermarkText, x, y);
   }
 }
 ```
 
 **components/media-display.tsx (旧版本)**:
+
 ```typescript
 // 已删除：基于 visibility 的强制水印
-const needsWatermark = shouldAddWatermark(post.visibility, isCreator)
+const needsWatermark = shouldAddWatermark(post.visibility, isCreator);
 ```
 
 ---
@@ -89,11 +95,13 @@ ALTER TABLE post_media DROP COLUMN has_watermark;
 ### 追踪标识符（始终开启）
 
 **Storage 路径格式**：
+
 ```
 creatorId/postId/mediaId/timestamp-uuid.ext
 ```
 
 **元数据**：
+
 ```javascript
 {
   platform: 'getfansee',
@@ -111,6 +119,7 @@ creatorId/postId/mediaId/timestamp-uuid.ext
 ### 测试脚本
 
 运行测试：
+
 ```bash
 pnpm test:watermark
 ```
@@ -148,6 +157,7 @@ pnpm test:watermark
 ### 1. 执行 SQL Migration
 
 在 Supabase Dashboard SQL Editor 中执行：
+
 - `migrations/012_watermark_final.sql`
 
 ### 2. 验证 Schema
@@ -177,6 +187,7 @@ pnpm test:watermark
 ```
 
 **预期输出**：
+
 - ✅ 所有测试通过（失败: 0）
 - ✅ exit code = 0
 
@@ -191,9 +202,6 @@ pnpm test:watermark
 
 ---
 
-**完成时间**: _______________  
-**测试人员**: _______________  
+**完成时间**: ******\_\_\_******  
+**测试人员**: ******\_\_\_******  
 **备注**: 所有旧水印代码已完全移除，新实现符合最终 MVP 规则
-
-
-

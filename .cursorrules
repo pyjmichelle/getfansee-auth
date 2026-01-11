@@ -1,0 +1,40 @@
+# ---------------------------------------------------
+# 🏗️ PROJECT CONTEXT & TECH STACK
+# ---------------------------------------------------
+# Core: Next.js 14+ (App Router), TypeScript (Strict)
+# Database: Supabase (PostgreSQL), Drizzle ORM / Prisma (按需修改)
+# Styling: Tailwind CSS (Mobile-first), Lucide Icons
+# State: React Query / Zustand / Server Actions
+# Auth: Supabase Auth (SSR)
+
+# ---------------------------------------------------
+# 📏 CODING STANDARDS (The "Tech Lead" Rules)
+# ---------------------------------------------------
+# 1. Server Components First: Always use Server Components by default. Only use 'use client' when specific interactivity is needed.
+# 2. Security: Never expose API keys. Always use RLS policies for database access.
+# 3. Styling: Use Tailwind utility classes. Avoid inline styles. Sort classes logically.
+# 4. Error Handling: All Server Actions must return structured objects { success: boolean, data?: any, error?: string }.
+# 5. Type Safety: NO 'any' types. Define interfaces in `types/` directory.
+
+# ---------------------------------------------------
+# 🧪 SKILL: AUTOMATED QA & TESTING (Your Original Genius Idea)
+# ---------------------------------------------------
+ALWAYS_GENERATE_TESTS: true
+TEST_FRAMEWORK: "Vitest"
+TEST_LOCATION: "__tests__"
+
+# ---------------------------------------------------
+# 🧠 PRE-COMMIT VERIFICATION (Your "Chain of Thought")
+# ---------------------------------------------------
+VERIFY_STEPS:
+  - [ ] Does this break Next.js App Router caching?
+  - [ ] Is RLS policy strictly applied?
+  - [ ] Are all edge cases (null/undefined) handled?
+
+# ---------------------------------------------------
+# 🤐 RESPONSE STYLE
+# ---------------------------------------------------
+# - Be concise. No yapping. No lectures.
+# - If showing code, show the FULL updated file or clear partials.
+# - Follow the structure: Implementation -> Test -> Audit Notes.
+

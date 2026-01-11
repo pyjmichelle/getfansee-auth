@@ -42,6 +42,7 @@ pnpm test:auth
 **原因**：未执行 `migrations/004_fix_profiles_final.sql`
 
 **解决**：
+
 1. 执行 `migrations/004_fix_profiles_final.sql`
 2. 等待几秒让 schema cache 刷新
 3. 重新运行 `pnpm test:auth`
@@ -51,6 +52,7 @@ pnpm test:auth
 **原因**：`.env.local` 中没有 `SUPABASE_SERVICE_ROLE_KEY`
 
 **解决**：
+
 ```bash
 echo "SUPABASE_SERVICE_ROLE_KEY=你的_service_role_key" >> .env.local
 ```
@@ -60,6 +62,7 @@ echo "SUPABASE_SERVICE_ROLE_KEY=你的_service_role_key" >> .env.local
 **原因**：表结构不完整或 RLS 策略有问题
 
 **解决**：
+
 1. 重新执行 `migrations/004_fix_profiles_final.sql`
 2. 检查 Supabase Dashboard → Table Editor → profiles 表，确认所有字段存在
 3. 检查 Supabase Dashboard → Authentication → Policies，确认 RLS 策略存在
@@ -80,6 +83,3 @@ echo "SUPABASE_SERVICE_ROLE_KEY=你的_service_role_key" >> .env.local
 ```
 
 **只有所有测试全绿才算交付完成。**
-
-
-

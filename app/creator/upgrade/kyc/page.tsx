@@ -1,45 +1,45 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { ArrowLeft, Shield, Upload, CheckCircle, AlertCircle } from "lucide-react"
-import { NavHeader } from "@/components/nav-header"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
+import { useState } from "react";
+import { ArrowLeft, Shield, Upload, CheckCircle, AlertCircle } from "lucide-react";
+import { NavHeader } from "@/components/nav-header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
-type KYCStatus = "not_started" | "pending" | "approved" | "failed"
+type KYCStatus = "not_started" | "pending" | "approved" | "failed";
 
 export default function KYCPage() {
-  const [status, setStatus] = useState<KYCStatus>("not_started")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [status, setStatus] = useState<KYCStatus>("not_started");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     dateOfBirth: "",
     address: "",
     idType: "",
-  })
+  });
 
   const currentUser = {
     username: "john_doe",
     role: "fan" as const,
     avatar: "/placeholder.svg?height=100&width=100",
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
 
     // Simulate API call
     setTimeout(() => {
-      setIsSubmitting(false)
-      setStatus("pending")
-    }, 2000)
-  }
+      setIsSubmitting(false);
+      setStatus("pending");
+    }, 2000);
+  };
 
   const getStatusBadge = () => {
     switch (status) {
@@ -48,27 +48,27 @@ export default function KYCPage() {
           <Badge variant="secondary" className="text-yellow-600 bg-yellow-100 dark:bg-yellow-950">
             Pending Review
           </Badge>
-        )
+        );
       case "approved":
         return (
           <Badge variant="secondary" className="text-green-600 bg-green-100 dark:bg-green-950">
             Approved
           </Badge>
-        )
+        );
       case "failed":
         return (
           <Badge variant="secondary" className="text-red-600 bg-red-100 dark:bg-red-950">
             Rejected
           </Badge>
-        )
+        );
       default:
         return (
           <Badge variant="secondary" className="text-muted-foreground">
             Not Started
           </Badge>
-        )
+        );
     }
-  }
+  };
 
   if (status === "pending") {
     return (
@@ -82,8 +82,8 @@ export default function KYCPage() {
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-4">Verification in Progress</h1>
             <p className="text-muted-foreground mb-8">
-              Your KYC documents are being reviewed. This typically takes 1-2 business days. We'll notify you via email
-              once the review is complete.
+              Your KYC documents are being reviewed. This typically takes 1-2 business days. We'll
+              notify you via email once the review is complete.
             </p>
             <Button asChild>
               <Link href="/home">Back to Home</Link>
@@ -91,7 +91,7 @@ export default function KYCPage() {
           </Card>
         </main>
       </div>
-    )
+    );
   }
 
   if (status === "approved") {
@@ -106,8 +106,8 @@ export default function KYCPage() {
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-4">Verification Complete!</h1>
             <p className="text-muted-foreground mb-8">
-              Congratulations! Your identity has been verified. You can now access all creator features and start
-              monetizing your content.
+              Congratulations! Your identity has been verified. You can now access all creator
+              features and start monetizing your content.
             </p>
             <Button asChild size="lg">
               <Link href="/creator/studio">Go to Creator Studio</Link>
@@ -115,7 +115,7 @@ export default function KYCPage() {
           </Card>
         </main>
       </div>
-    )
+    );
   }
 
   return (
@@ -144,8 +144,8 @@ export default function KYCPage() {
             <div>
               <h3 className="font-semibold text-foreground mb-2">Why do we need this?</h3>
               <p className="text-sm text-muted-foreground">
-                Identity verification is required by law to prevent fraud and ensure the safety of our community. All
-                information is encrypted and stored securely.
+                Identity verification is required by law to prevent fraud and ensure the safety of
+                our community. All information is encrypted and stored securely.
               </p>
             </div>
           </div>
@@ -213,13 +213,17 @@ export default function KYCPage() {
             <div className="space-y-4">
               <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer">
                 <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-                <p className="text-sm font-medium text-foreground mb-1">Upload ID Document (Front)</p>
+                <p className="text-sm font-medium text-foreground mb-1">
+                  Upload ID Document (Front)
+                </p>
                 <p className="text-xs text-muted-foreground">PNG, JPG or PDF up to 10MB</p>
               </div>
 
               <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer">
                 <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-                <p className="text-sm font-medium text-foreground mb-1">Upload ID Document (Back)</p>
+                <p className="text-sm font-medium text-foreground mb-1">
+                  Upload ID Document (Back)
+                </p>
                 <p className="text-xs text-muted-foreground">PNG, JPG or PDF up to 10MB</p>
               </div>
 
@@ -242,5 +246,5 @@ export default function KYCPage() {
         </form>
       </main>
     </div>
-  )
+  );
 }

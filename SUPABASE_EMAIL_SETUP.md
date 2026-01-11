@@ -128,7 +128,7 @@ Supabase 提供测试邮箱功能：
 5. ✅ 检查 Supabase Dashboard → auth.users 表
 
 如果以上都正常但仍未收到邮件，可能是 Supabase 的默认邮件服务延迟，建议：
+
 - 等待几分钟后再次检查
 - 或配置自定义 SMTP
 - 或临时禁用邮箱验证（仅开发环境）
-

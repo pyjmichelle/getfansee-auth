@@ -246,11 +246,7 @@ END;
 $$;
 
 -- 授予执行权限
--- 注意：PostgreSQL 中，即使函数有默认参数，GRANT 也需要明确指定参数类型
--- 这里授予两个签名：两个参数和单个参数（使用默认值）
 GRANT EXECUTE ON FUNCTION public.rpc_purchase_post(uuid, uuid) TO authenticated;
--- 对于有默认参数的函数，PostgreSQL 会自动处理单参数调用
--- 但为了确保兼容性，我们明确授予两个签名
 
 -- ============================================
 -- 8. Helper function: Get wallet balance
@@ -291,8 +287,8 @@ BEGIN
 END;
 $$;
 
+-- 授予执行权限（只授予带参数的版本，PostgreSQL 会自动处理默认参数）
 GRANT EXECUTE ON FUNCTION public.rpc_get_wallet_balance(uuid) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.rpc_get_wallet_balance() TO authenticated;
 
 -- ============================================
 -- 9. Verify schema
@@ -328,6 +324,17 @@ SELECT
     ELSE '❌ rpc_purchase_post 函数不存在'
   END AS purchase_function_status;
 
+SELECT 
+  CASE 
+    WHEN EXISTS (
+      SELECT 1 FROM pg_proc p
+      JOIN pg_namespace n ON p.pronamespace = n.oid
+      WHERE n.nspname = 'public' 
+        AND p.proname = 'rpc_get_wallet_balance'
+    ) THEN '✅ rpc_get_wallet_balance 函数存在'
+    ELSE '❌ rpc_get_wallet_balance 函数不存在'
+  END AS balance_function_status;
+
 -- 显示函数的完整签名信息
 SELECT 
   p.proname AS function_name,
@@ -336,5 +343,5 @@ SELECT
 FROM pg_proc p
 JOIN pg_namespace n ON p.pronamespace = n.oid
 WHERE n.nspname = 'public' 
-  AND p.proname = 'rpc_purchase_post';
-
+  AND p.proname IN ('rpc_purchase_post', 'rpc_get_wallet_balance')
+ORDER BY p.proname;

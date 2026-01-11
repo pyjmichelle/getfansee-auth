@@ -21,13 +21,13 @@
 
 ```sql
 -- 检查函数是否存在
-SELECT 
+SELECT
   p.proname AS function_name,
   pg_get_function_arguments(p.oid) AS arguments,
   pg_get_function_result(p.oid) AS return_type
 FROM pg_proc p
 JOIN pg_namespace n ON p.pronamespace = n.oid
-WHERE n.nspname = 'public' 
+WHERE n.nspname = 'public'
   AND p.proname = 'rpc_purchase_post';
 ```
 
@@ -38,6 +38,7 @@ WHERE n.nspname = 'public'
 **重要**：函数需要两个参数，第二个参数有默认值。
 
 **方式 1：提供两个参数**
+
 ```sql
 SELECT public.rpc_purchase_post(
   'post-id-here'::uuid,
@@ -46,6 +47,7 @@ SELECT public.rpc_purchase_post(
 ```
 
 **方式 2：只提供一个参数（使用默认值 `auth.uid()`）**
+
 ```sql
 -- 注意：这需要在有认证上下文中调用
 SELECT public.rpc_purchase_post('post-id-here'::uuid);
@@ -69,7 +71,7 @@ SELECT public.rpc_purchase_post('post-id-here'::uuid);
 迁移成功执行后，你应该看到：
 
 1. ✅ `user_wallets` 表存在
-2. ✅ `wallet_transactions` 表存在  
+2. ✅ `wallet_transactions` 表存在
 3. ✅ `rpc_purchase_post` 函数存在（通过步骤 2 的查询确认）
 4. ✅ `rpc_get_wallet_balance` 函数存在
 
@@ -84,10 +86,12 @@ SELECT public.rpc_purchase_post('post-id-here'::uuid);
 ### 错误：`function public.rpc_purchase_post(uuid) does not exist`
 
 **可能原因**：
+
 1. 函数未创建
 2. 验证查询尝试调用函数（不应该）
 
 **解决**：
+
 1. 使用步骤 2 的查询检查函数是否存在
 2. 如果函数存在，可以忽略验证查询的错误
 3. 如果函数不存在，重新执行迁移文件
@@ -111,12 +115,13 @@ RETURNS jsonb
 ```
 
 **参数**：
+
 - `p_post_id` (必需): Post ID
 - `p_user_id` (可选): User ID，默认为 `auth.uid()`
 
 **调用方式**：
+
 - 两个参数：`rpc_purchase_post(post_id, user_id)`
 - 一个参数：`rpc_purchase_post(post_id)` - 使用默认的 `auth.uid()`
 
 **注意**：在 Supabase 客户端（JavaScript/TypeScript）中调用时，如果只提供一个参数，Supabase 会自动处理默认参数。
-

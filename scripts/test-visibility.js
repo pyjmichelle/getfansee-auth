@@ -81,7 +81,7 @@ function loadEnv() {
           }
         }
       })
-  } catch (err) {
+  } catch (_err) {
       // .env.local 不存在或读取失败，继续使用 process.env
   }
   }
@@ -156,7 +156,7 @@ async function registerAndLogin(supabase, email, password) {
     }
     
     return { userId: signUpData.user.id, email, password }
-  } catch (err) {
+  } catch (_err) {
         return null
       }
     }
@@ -270,7 +270,7 @@ async function canViewPost(supabase, userId, postId, creatorId) {
     
     // Subscribers-only: 检查订阅
     if (post.visibility === 'subscribers') {
-      const { data: sub, error: subError } = await supabase
+      const { data: sub, error: _subError } = await supabase
         .from('subscriptions')
         .select('id')
         .eq('subscriber_id', userId)
@@ -284,7 +284,7 @@ async function canViewPost(supabase, userId, postId, creatorId) {
     
     // PPV: 检查解锁（使用 purchases 表）
     if (post.visibility === 'ppv') {
-      const { data: purchase, error: purchaseError } = await supabase
+      const { data: purchase, error: _purchaseError } = await supabase
         .from('purchases')
         .select('id')
         .eq('fan_id', userId)

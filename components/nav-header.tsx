@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Bell,
   Search,
@@ -15,38 +15,56 @@ import {
   DollarSign,
   Eye,
   Sparkles,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { useState } from "react"
+  LogOut,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signOut } from "@/lib/auth";
+import { WalletBalancePreview } from "@/components/wallet-balance-preview";
 
 interface NavHeaderProps {
   user?: {
-    username: string
-    role: "fan" | "creator"
-    avatar?: string
-    creatorStatus?: "pending" | "approved"
-  }
-  notificationCount?: number
+    username: string;
+    role: "fan" | "creator";
+    avatar?: string;
+    creatorStatus?: "pending" | "approved";
+  };
+  notificationCount?: number;
 }
 
 export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
-  const pathname = usePathname()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
+  const router = useRouter();
+  const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const isCreator = user?.role === "creator"
-  const showBecomeCreator = user && !isCreator
+  const isCreator = user?.role === "creator";
+  // 常驻转化入口：仅在用户尚未通过创作者认证时显示
+  const showBecomeCreator = user && !isCreator;
 
-  const [currentView, setCurrentView] = useState<"fan" | "creator">(user?.role || "fan")
+  const handleSignOut = async () => {
+    try {
+      // 清除浏览器 Session
+      await signOut();
 
-  const handleRoleSwitch = () => {
-    setCurrentView(currentView === "fan" ? "creator" : "fan")
-  }
+      // 清除 LocalStorage
+      if (typeof window !== "undefined") {
+        localStorage.clear();
+      }
+
+      // 强制重定向至首页
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      console.error("[NavHeader] signOut error:", err);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -80,14 +98,18 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onBlur={() => {
-                  if (!searchQuery) setSearchOpen(false)
+                  if (!searchQuery) setSearchOpen(false);
                 }}
                 autoFocus
               />
               {searchQuery && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-md shadow-lg p-4">
-                  <p className="text-sm text-muted-foreground">No results found for "{searchQuery}"</p>
-                  <p className="text-xs text-muted-foreground mt-2">Try searching for creator usernames</p>
+                  <p className="text-sm text-muted-foreground">
+                    No results found for "{searchQuery}"
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Try searching for creator usernames
+                  </p>
                 </div>
               )}
             </div>
@@ -95,8 +117,9 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* 常驻转化入口：顶部导航栏固定展示 Become a Creator 渐变按钮 */}
           {showBecomeCreator && (
-            <Button asChild className="hidden md:flex bg-accent hover:bg-accent/90 text-accent-foreground">
+            <Button asChild variant="gradient" className="hidden md:flex rounded-xl">
               <Link href="/creator/upgrade">
                 <Sparkles className="w-4 h-4 mr-2" />
                 Become a Creator
@@ -144,7 +167,10 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                             {isCreator ? "Creator" : "Fan"}
                           </Badge>
                           {isCreator && user.creatorStatus === "pending" && (
-                            <Badge variant="secondary" className="text-xs bg-yellow-500/10 text-yellow-500">
+                            <Badge
+                              variant="secondary"
+                              className="text-xs bg-yellow-500/10 text-yellow-500"
+                            >
                               Pending
                             </Badge>
                           )}
@@ -152,50 +178,32 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                       </div>
                     </div>
 
-                    {isCreator && (
-                      <>
-                        <div className="flex items-center gap-2 mb-4">
-                          <Button
-                            variant={currentView === "fan" ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setCurrentView("fan")}
-                            className={currentView === "fan" ? "" : "bg-transparent flex-1"}
-                          >
-                            Fan
-                          </Button>
-                          <Button
-                            variant={currentView === "creator" ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setCurrentView("creator")}
-                            className={currentView === "creator" ? "" : "bg-transparent flex-1"}
-                          >
-                            Creator
-                          </Button>
-                        </div>
-                        <Separator className="mb-4" />
-                      </>
-                    )}
+                    {/* Wallet Balance Preview */}
+                    <div className="mb-4">
+                      <WalletBalancePreview />
+                    </div>
+                    <Separator className="mb-4" />
                   </div>
 
                   <nav className="flex flex-col gap-2">
-                    {(!isCreator || currentView === "fan") && (
-                      <>
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                          Discover
-                        </p>
-                        <Button
-                          variant={pathname === "/home" ? "secondary" : "ghost"}
-                          className="justify-start"
-                          asChild
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <Link href="/home">
-                            <Home className="w-4 h-4 mr-3" />
-                            Feed
-                          </Link>
-                        </Button>
-                        <Separator className="my-2" />
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                      Discover
+                    </p>
+                    <Button
+                      variant={pathname === "/home" ? "secondary" : "ghost"}
+                      className="justify-start"
+                      asChild
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Link href="/home">
+                        <Home className="w-4 h-4 mr-3" />
+                        Feed
+                      </Link>
+                    </Button>
+                    <Separator className="my-2" />
 
+                    {!isCreator && (
+                      <>
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                           Your Content
                         </p>
@@ -225,7 +233,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                       </>
                     )}
 
-                    {isCreator && currentView === "creator" && (
+                    {isCreator && (
                       <>
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                           Creator Studio
@@ -242,14 +250,16 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                           </Link>
                         </Button>
                         <Button
-                          variant={pathname?.startsWith("/creator/studio/post") ? "secondary" : "ghost"}
+                          variant={
+                            pathname?.startsWith("/creator/new-post") ? "secondary" : "ghost"
+                          }
                           className="justify-start"
                           asChild
                           onClick={() => setMobileMenuOpen(false)}
                         >
-                          <Link href="/creator/studio/post/new">
+                          <Link href="/creator/new-post">
                             <FileText className="w-4 h-4 mr-3" />
-                            My Posts
+                            New Post
                           </Link>
                         </Button>
                         <Button
@@ -263,22 +273,13 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                             Earnings
                           </Link>
                         </Button>
-                        <Button
-                          variant="ghost"
-                          className="justify-start"
-                          asChild
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <Link href={`/creator/${user.username}?viewAs=fan`}>
-                            <Eye className="w-4 h-4 mr-3" />
-                            View as Fan
-                          </Link>
-                        </Button>
                         <Separator className="my-2" />
                       </>
                     )}
 
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Account</p>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                      Account
+                    </p>
                     <Button
                       variant={pathname === "/me" ? "secondary" : "ghost"}
                       className="justify-start"
@@ -295,8 +296,8 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                       <>
                         <Separator className="my-2" />
                         <Button
-                          variant="default"
-                          className="justify-start bg-accent hover:bg-accent/90 text-accent-foreground"
+                          variant="gradient"
+                          className="justify-start rounded-xl"
                           asChild
                           onClick={() => setMobileMenuOpen(false)}
                         >
@@ -307,6 +308,20 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                         </Button>
                       </>
                     )}
+
+                    {/* 退出登录：在个人菜单底部增加真实的 Sign Out 动作 */}
+                    <Separator className="my-2" />
+                    <Button
+                      variant="ghost"
+                      className="justify-start text-[#F43F5E] hover:text-[#F43F5E] hover:bg-[#F43F5E]/10"
+                      onClick={async () => {
+                        setMobileMenuOpen(false);
+                        await handleSignOut();
+                      }}
+                    >
+                      <LogOut className="w-4 h-4 mr-3" />
+                      Sign Out
+                    </Button>
                   </nav>
                 </SheetContent>
               </Sheet>
@@ -315,5 +330,5 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
         </div>
       </div>
     </header>
-  )
+  );
 }

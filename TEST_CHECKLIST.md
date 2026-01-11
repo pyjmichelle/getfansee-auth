@@ -29,6 +29,7 @@
 6. 点击 "Sign up with email"
 
 **预期结果**：
+
 - ✅ 显示绿色提示框："Check your email for a confirmation link..."
 - ✅ 显示两个按钮："Open Gmail / I've confirmed" 和 "Resend email"
 - ✅ 在 Supabase Dashboard → Authentication → Users 看到新用户
@@ -43,6 +44,7 @@
 3. 点击邮件中的验证链接
 
 **预期结果**：
+
 - ✅ 浏览器跳转到 `/auth/verify?code=...`（新格式）或 `/auth/verify?token=...&type=signup`（旧格式）
 - ✅ 或跳转到 `/auth/verify#error=...`（如果链接过期）
 
@@ -126,6 +128,7 @@
 **原因**：Supabase Redirect URLs 配置不正确
 
 **解决**：
+
 1. 检查 Supabase Dashboard → Settings → API → Redirect URLs
 2. 确保包含：`http://localhost:3000/auth/verify`（本地）和 `https://getfansee-auth.vercel.app/auth/verify`（线上）
 3. 保存后重新发送验证邮件
@@ -135,6 +138,7 @@
 **原因**：链接已过期（通常 24 小时）
 
 **解决**：
+
 1. 在 `/auth/verify` 页面点击 "Resend Confirmation Email"
 2. 或访问 `/auth/resend-verification` 页面重新发送
 
@@ -143,6 +147,7 @@
 **原因**：RLS 策略阻止插入，或 `ensureProfile()` 未执行
 
 **解决**：
+
 1. 检查 Supabase Dashboard → Table Editor → `profiles` 表的 RLS 策略
 2. 确认已执行 `migrations/001_init.sql`
 3. 检查浏览器控制台是否有错误
@@ -152,6 +157,7 @@
 **原因**：`router.replace("/home")` 执行失败
 
 **解决**：
+
 1. 检查浏览器控制台是否有错误
 2. 确认 `/home` 页面存在且可访问
 3. 检查 Next.js 路由配置
@@ -180,7 +186,7 @@
 ## 测试完成后
 
 如果所有验收标准都通过，请：
+
 1. ✅ 提供 3 张截图（如上所述）
 2. ✅ 确认 Supabase URL Configuration 已正确配置
 3. ✅ 确认代码已部署到 Vercel（如果测试线上环境）
-

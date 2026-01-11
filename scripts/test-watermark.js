@@ -77,7 +77,7 @@ function loadEnv() {
           }
         }
       })
-    } catch (err) {
+    } catch (_err) {
       // .env.local 不存在，使用 process.env
     }
   }
@@ -226,7 +226,7 @@ async function main() {
     success(`Media 添加成功: ${mediaId1}`)
 
     // 验证 watermarked_path 为 null
-    const { data: verifyMedia1, error: verifyError1 } = await anonClient
+    const { data: verifyMedia1, error: _verifyError1 } = await anonClient
       .from('post_media')
       .select('watermarked_path')
       .eq('id', mediaId1)

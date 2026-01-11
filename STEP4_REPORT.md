@@ -72,10 +72,12 @@
 ### 表结构变更
 
 #### profiles 表新增字段
+
 - `bio` text（可选）
 - `avatar_url` text（可选）
 
 #### 确保存在
+
 - `updated_at` 触发器（`set_profiles_updated_at`）
 - UPDATE RLS 策略（`profiles_update_own`）
 
@@ -200,6 +202,3 @@ pnpm test:role
 - [x] 错误处理和 loading 状态已实现
 
 **下一步**：执行 `migrations/006_creator_onboarding.sql`，然后运行 `pnpm test:role` 验证。
-
-
-

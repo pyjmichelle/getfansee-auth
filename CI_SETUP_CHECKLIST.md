@@ -22,11 +22,13 @@
 ### 1. 创建 Pull Request
 
 1. 创建一个新分支：
+
    ```bash
    git checkout -b test/ci-pipeline
    ```
 
 2. 提交更改：
+
    ```bash
    git add .
    git commit -m "Add CI pipeline"
@@ -112,6 +114,3 @@ pnpm test:mvp
 - ✅ Workflow 日志中不应包含完整的 URL 或 keys
 - ✅ 如果看到 secrets 在日志中，检查是否有 `console.log` 或 `echo` 命令打印了环境变量
 - ✅ 确保所有测试脚本使用环境变量，而不是硬编码值
-
-
-

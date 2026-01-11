@@ -1,4 +1,12 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
+
+const defaultBaseUrl = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+const parsedUrl = new URL(defaultBaseUrl);
+const serverPort = parsedUrl.port || (parsedUrl.protocol === "https:" ? "443" : "80");
+
+// 记录配置信息（用于调试）
+console.log("[Playwright Config] CI:", !!process.env.CI);
+console.log("[Playwright Config] Base URL:", defaultBaseUrl);
 
 /**
  * Read environment variables from file.
@@ -10,7 +18,7 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './e2e',
+  testDir: "./e2e",
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -20,42 +28,46 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
+    baseURL: defaultBaseUrl,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
+    trace: "on-first-retry",
+    screenshot: "only-on-failure",
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
     },
 
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
     },
 
     {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
     },
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: process.env.CI ? undefined : {
-    command: 'pnpm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
+  // 如果服务器已经手动启动，禁用自动启动
+  // 使用环境变量 PLAYWRIGHT_SKIP_SERVER=true 来跳过服务器启动
+  webServer:
+    process.env.CI || process.env.PLAYWRIGHT_SKIP_SERVER
+      ? undefined
+      : {
+          command: `PORT=${serverPort} NEXT_DISABLE_DEV_OVERLAY=1 pnpm dev`,
+          url: defaultBaseUrl,
+          reuseExistingServer: true,
+          timeout: 120 * 1000,
+          stdout: "pipe",
+          stderr: "pipe",
+        },
 });
-
-
-

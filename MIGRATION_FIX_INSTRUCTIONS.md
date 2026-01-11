@@ -5,6 +5,7 @@
 当前 `profiles` 表缺少必需字段，导致 `ensureProfile()` 无法正常工作。
 
 **错误信息**：
+
 - `column profiles.age_verified does not exist`
 - `Could not find the 'email' column of 'profiles' in the schema cache`
 
@@ -33,6 +34,7 @@
 5. ✅ 完成
 
 **注意**：修复脚本会自动：
+
 - 检查字段是否存在
 - 只添加缺失的字段
 - 为已有记录填充默认值
@@ -47,23 +49,23 @@
 ```sql
 SELECT column_name, data_type, is_nullable, column_default
 FROM information_schema.columns
-WHERE table_schema = 'public' 
+WHERE table_schema = 'public'
   AND table_name = 'profiles'
 ORDER BY ordinal_position;
 ```
 
 **预期结果**：应该看到以下字段：
 
-| column_name   | data_type   | is_nullable | column_default        |
-|---------------|-------------|-------------|----------------------|
-| id            | uuid        | NO          | (none)               |
-| email         | text        | NO          | (none)               |
-| display_name  | text        | YES         | (none)               |
-| role          | text        | NO          | 'fan'::text          |
-| age_verified  | boolean     | NO          | false                |
-| avatar_url    | text        | YES         | (none)               |
-| created_at    | timestamptz | NO          | timezone('utc'...)   |
-| updated_at    | timestamptz | NO          | timezone('utc'...)   |
+| column_name  | data_type   | is_nullable | column_default     |
+| ------------ | ----------- | ----------- | ------------------ |
+| id           | uuid        | NO          | (none)             |
+| email        | text        | NO          | (none)             |
+| display_name | text        | YES         | (none)             |
+| role         | text        | NO          | 'fan'::text        |
+| age_verified | boolean     | NO          | false              |
+| avatar_url   | text        | YES         | (none)             |
+| created_at   | timestamptz | NO          | timezone('utc'...) |
+| updated_at   | timestamptz | NO          | timezone('utc'...) |
 
 ---
 
@@ -108,4 +110,3 @@ ORDER BY ordinal_position;
 **在修复完成前，禁止继续任何 UI 或功能开发。**
 
 所有认证相关功能都依赖于 `profiles` 表的正确结构。
-

@@ -1,0 +1,3159 @@
+[Playwright Config] CI: false
+[Playwright Config] Base URL: http://localhost:3000
+{
+  "config": {
+    "configFile": "/Users/puyijun/Downloads/authentication-flow-design (1)/playwright.config.ts",
+    "rootDir": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 5
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 90000
+      },
+      {
+        "outputDir": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 90000
+      },
+      {
+        "outputDir": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 90000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 5,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "complete-journey.spec.ts",
+      "file": "complete-journey.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "完整用户旅程测试",
+          "file": "complete-journey.spec.ts",
+          "line": 18,
+          "column": 6,
+          "specs": [
+            {
+              "title": "完整流程：Fan 注册 → Creator 注册并发布 → Fan 订阅 → Fan 解锁 PPV",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 362,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_ABORTED at http://localhost:3000/auth\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/auth\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_ABORTED at http://localhost:3000/auth\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/auth\", waiting until \"load\"\u001b[22m\n\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/complete-journey.spec.ts:32:18)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/common/testType.js:245:36)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/common/testType.js:243:61)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/complete-journey.spec.ts:31:10)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:15)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:17)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:22)",
+                        "location": {
+                          "file": "1)/e2e/complete-journey.spec.ts",
+                          "column": 18,
+                          "line": 32
+                        }
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "1)/e2e/complete-journey.spec.ts",
+                            "column": 18,
+                            "line": 32
+                          },
+                          "message": "Error: page.goto: net::ERR_ABORTED at http://localhost:3000/auth\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/auth\", waiting until \"load\"\u001b[22m\n\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/complete-journey.spec.ts:32:18)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/common/testType.js:245:36)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/common/testType.js:243:61)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/complete-journey.spec.ts:31:10)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:15)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:17)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:22)"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "steps": [
+                        {
+                          "title": "1. Fan 用户注册",
+                          "duration": 31,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_ABORTED at http://localhost:3000/auth\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/auth\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_ABORTED at http://localhost:3000/auth\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/auth\", waiting until \"load\"\u001b[22m\n\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/complete-journey.spec.ts:32:18)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/common/testType.js:245:36)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/common/testType.js:243:61)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/complete-journey.spec.ts:31:10)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:15)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:17)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:22)",
+                            "location": {
+                              "file": "1)/e2e/complete-journey.spec.ts",
+                              "column": 18,
+                              "line": 32
+                            }
+                          }
+                        },
+                        {
+                          "title": "2. Creator 用户注册并发布内容",
+                          "duration": 82,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/auth\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/auth\", waiting until \"load\"\u001b[22m\n\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/complete-journey.spec.ts:71:25)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/common/testType.js:245:20)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/common/testType.js:243:18)",
+                            "location": {
+                              "file": "1)/e2e/complete-journey.spec.ts",
+                              "column": 25,
+                              "line": 71
+                            }
+                          }
+                        },
+                        {
+                          "title": "3. Fan 浏览 Feed",
+                          "duration": 37,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_ABORTED at http://localhost:3000/home\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/home\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_ABORTED at http://localhost:3000/home\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/home\", waiting until \"load\"\u001b[22m\n\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/complete-journey.spec.ts:218:18)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/common/testType.js:245:36)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/common/testType.js:243:61)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/complete-journey.spec.ts:217:10)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:15)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:17)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:22)",
+                            "location": {
+                              "file": "1)/e2e/complete-journey.spec.ts",
+                              "column": 18,
+                              "line": 218
+                            }
+                          }
+                        },
+                        {
+                          "title": "4. Fan 订阅 Creator",
+                          "duration": 46
+                        },
+                        {
+                          "title": "5. 验证订阅后内容解锁",
+                          "duration": 27,
+                          "error": {
+                            "message": "Error: page.reload: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - waiting for navigation until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.reload: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - waiting for navigation until \"load\"\u001b[22m\n\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/complete-journey.spec.ts:258:18)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/common/testType.js:245:36)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/common/testType.js:243:61)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/complete-journey.spec.ts:256:10)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:15)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:17)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:22)",
+                            "location": {
+                              "file": "1)/e2e/complete-journey.spec.ts",
+                              "column": 18,
+                              "line": 258
+                            }
+                          }
+                        },
+                        {
+                          "title": "6. Fan 解锁 PPV 内容",
+                          "duration": 0
+                        }
+                      ],
+                      "startTime": "2026-01-07T15:30:41.803Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "1)/e2e/complete-journey.spec.ts",
+                        "column": 18,
+                        "line": 32
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "9f5dc3fa1c7e47e906d0-c4304d32681110cc454f",
+              "file": "complete-journey.spec.ts",
+              "line": 27,
+              "column": 7
+            },
+            {
+              "title": "边界情况：未登录用户访问受保护路由",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1349,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-07T15:30:41.790Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9f5dc3fa1c7e47e906d0-66b0b5dd2988600f4d4c",
+              "file": "complete-journey.spec.ts",
+              "line": 272,
+              "column": 7
+            },
+            {
+              "title": "边界情况：Fan 用户访问 Creator 路由",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 27746,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-07T15:30:41.792Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9f5dc3fa1c7e47e906d0-ee255cfae3f70e925f2e",
+              "file": "complete-journey.spec.ts",
+              "line": 282,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "creator-journey.spec.ts",
+      "file": "creator-journey.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Creator 端完整流程测试",
+          "file": "creator-journey.spec.ts",
+          "line": 16,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "2.1 Creator Onboarding 完成",
+              "file": "creator-journey.spec.ts",
+              "line": 23,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "注册并升级为 Creator",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 25807,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:30:41.796Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "635ca36c07e05ffde298-464c882454fe6ad8b0f7",
+                  "file": "creator-journey.spec.ts",
+                  "line": 24,
+                  "column": 9
+                },
+                {
+                  "title": "验证 Creator Studio 权限",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts",
+                            "line": 75,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 4,
+                          "status": "skipped",
+                          "duration": 374,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:30:41.791Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts",
+                                "line": 75,
+                                "column": 12
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "635ca36c07e05ffde298-71abbef364d2a703726e",
+                  "file": "creator-journey.spec.ts",
+                  "line": 72,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "2.2 创建内容（Post）",
+              "file": "creator-journey.spec.ts",
+              "line": 79,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "访问创建 Post 页面",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 4,
+                          "status": "failed",
+                          "duration": 30860,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:143:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:143:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:30:42.673Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-2-创建内容（Post）-访问创建-Post-页面-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-2-创建内容（Post）-访问创建-Post-页面-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "635ca36c07e05ffde298-bc4d1bdc0913c04af86c",
+                  "file": "creator-journey.spec.ts",
+                  "line": 139,
+                  "column": 9
+                },
+                {
+                  "title": "创建免费 Post（无媒体）",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 5,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 29810,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea[name=\"content\"], textarea[placeholder*=\"content\" i]') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea[name=\"content\"], textarea[placeholder*=\"content\" i]') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:154:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea[name=\"content\"], textarea[placeholder*=\"content\" i]') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:154:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:30:43.931Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完-ab382-2-创建内容（Post）-创建免费-Post（无媒体）-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完-ab382-2-创建内容（Post）-创建免费-Post（无媒体）-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "635ca36c07e05ffde298-c3606c61dd1ac3216158",
+                  "file": "creator-journey.spec.ts",
+                  "line": 150,
+                  "column": 9
+                },
+                {
+                  "title": "创建 Post 并上传图片",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 1,
+                          "status": "failed",
+                          "duration": 30169,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea[name=\"content\"], textarea[placeholder*=\"content\" i]') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea[name=\"content\"], textarea[placeholder*=\"content\" i]') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:187:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea[name=\"content\"], textarea[placeholder*=\"content\" i]') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:187:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:30:43.678Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-2-创建内容（Post）-创建-Post-并上传图片-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-2-创建内容（Post）-创建-Post-并上传图片-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "635ca36c07e05ffde298-142d4f85b0d265e1e7d0",
+                  "file": "creator-journey.spec.ts",
+                  "line": 183,
+                  "column": 9
+                },
+                {
+                  "title": "创建订阅者专享 Post",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 3,
+                          "status": "failed",
+                          "duration": 28340,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea[name=\"content\"], textarea[placeholder*=\"content\" i]') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea[name=\"content\"], textarea[placeholder*=\"content\" i]') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:216:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea[name=\"content\"], textarea[placeholder*=\"content\" i]') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:216:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册成功，需要邮箱验证\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:31:08.105Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-2-创建内容（Post）-创建订阅者专享-Post-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-2-创建内容（Post）-创建订阅者专享-Post-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "635ca36c07e05ffde298-ce65643a24574f283d82",
+                  "file": "creator-journey.spec.ts",
+                  "line": 212,
+                  "column": 9
+                },
+                {
+                  "title": "创建 PPV Post",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 2,
+                          "status": "failed",
+                          "duration": 28124,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea[name=\"content\"], textarea[placeholder*=\"content\" i]') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea[name=\"content\"], textarea[placeholder*=\"content\" i]') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:247:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea[name=\"content\"], textarea[placeholder*=\"content\" i]') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:247:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:31:10.045Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-2-创建内容（Post）-创建-PPV-Post-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-2-创建内容（Post）-创建-PPV-Post-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "635ca36c07e05ffde298-c3bfaaea919742ad21c0",
+                  "file": "creator-journey.spec.ts",
+                  "line": 243,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "2.3 编辑和删除 Post",
+              "file": "creator-journey.spec.ts",
+              "line": 275,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "访问 Post 列表页面",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 6,
+                          "parallelIndex": 4,
+                          "status": "failed",
+                          "duration": 28382,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:284:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:284:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:31:14.042Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-3-编辑和删除-Post-访问-Post-列表页面-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-3-编辑和删除-Post-访问-Post-列表页面-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "635ca36c07e05ffde298-a9db86e02a9301f91dad",
+                  "file": "creator-journey.spec.ts",
+                  "line": 280,
+                  "column": 9
+                },
+                {
+                  "title": "编辑 Post",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 7,
+                          "parallelIndex": 1,
+                          "status": "failed",
+                          "duration": 28596,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:294:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:294:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:31:14.303Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-3-编辑和删除-Post-编辑-Post-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-3-编辑和删除-Post-编辑-Post-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "635ca36c07e05ffde298-d59193b66d977c04f49a",
+                  "file": "creator-journey.spec.ts",
+                  "line": 291,
+                  "column": 9
+                },
+                {
+                  "title": "删除 Post",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 28543,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:324:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:324:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:31:14.328Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-3-编辑和删除-Post-删除-Post-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-3-编辑和删除-Post-删除-Post-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "635ca36c07e05ffde298-709797868eb652fe9fd7",
+                  "file": "creator-journey.spec.ts",
+                  "line": 321,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "2.4 管理订阅者",
+              "file": "creator-journey.spec.ts",
+              "line": 346,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "访问订阅者列表页面",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 9,
+                          "parallelIndex": 3,
+                          "status": "failed",
+                          "duration": 28153,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:355:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:355:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:31:37.147Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-4-管理订阅者-访问订阅者列表页面-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-4-管理订阅者-访问订阅者列表页面-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "635ca36c07e05ffde298-f7ed4f015a63e4f07f44",
+                  "file": "creator-journey.spec.ts",
+                  "line": 351,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "2.5 查看收益",
+              "file": "creator-journey.spec.ts",
+              "line": 363,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "访问收益页面",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 10,
+                          "parallelIndex": 2,
+                          "status": "failed",
+                          "duration": 27867,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:372:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:372:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:31:38.597Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-5-查看收益-访问收益页面-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完整流程测试-2-5-查看收益-访问收益页面-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "635ca36c07e05ffde298-02f4591724ba8e9e8551",
+                  "file": "creator-journey.spec.ts",
+                  "line": 368,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "2.6 Creator Analytics",
+              "file": "creator-journey.spec.ts",
+              "line": 380,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "访问 Analytics 页面",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 11,
+                          "parallelIndex": 4,
+                          "status": "failed",
+                          "duration": 27880,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:389:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/creator-journey.spec.ts:389:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:31:43.114Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完-9bcb8-r-Analytics-访问-Analytics-页面-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/creator-journey-Creator-端完-9bcb8-r-Analytics-访问-Analytics-页面-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "635ca36c07e05ffde298-27107499ae5acd078417",
+                  "file": "creator-journey.spec.ts",
+                  "line": 385,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "edge-cases.spec.ts",
+      "file": "edge-cases.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "边界情况和错误处理测试",
+          "file": "edge-cases.spec.ts",
+          "line": 17,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "3.1 认证相关",
+              "file": "edge-cases.spec.ts",
+              "line": 25,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "未登录用户访问受保护路由",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 13,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 451,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:31:43.500Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-2697da02cc3968e1055c",
+                  "file": "edge-cases.spec.ts",
+                  "line": 26,
+                  "column": 9
+                },
+                {
+                  "title": "未登录用户访问 Creator 路由",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 12,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 441,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:31:43.500Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-1a4db9d76c8432240904",
+                  "file": "edge-cases.spec.ts",
+                  "line": 36,
+                  "column": 9
+                },
+                {
+                  "title": "Fan 用户访问 Creator 路由",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 12,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 25331,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:31:44.102Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-4d1a83cdd6a46b56708e",
+                  "file": "edge-cases.spec.ts",
+                  "line": 46,
+                  "column": 9
+                },
+                {
+                  "title": "过期 Session 处理",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 13,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 23105,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册成功，需要邮箱验证\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:31:44.108Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-8fe2eeae9e98fb010129",
+                  "file": "edge-cases.spec.ts",
+                  "line": 57,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "3.2 支付相关",
+              "file": "edge-cases.spec.ts",
+              "line": 71,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "钱包余额不足时解锁 PPV",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/edge-cases.spec.ts",
+                            "line": 84,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 14,
+                          "parallelIndex": 3,
+                          "status": "skipped",
+                          "duration": 22915,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:32:06.265Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/edge-cases.spec.ts",
+                                "line": 84,
+                                "column": 12
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-97847efca283d7e0ffb9",
+                  "file": "edge-cases.spec.ts",
+                  "line": 76,
+                  "column": 9
+                },
+                {
+                  "title": "订阅已订阅的 Creator",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/edge-cases.spec.ts",
+                            "line": 93,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 15,
+                          "parallelIndex": 2,
+                          "status": "skipped",
+                          "duration": 22886,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:32:07.414Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/edge-cases.spec.ts",
+                                "line": 93,
+                                "column": 12
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-0a79ff95df9d1583a0ce",
+                  "file": "edge-cases.spec.ts",
+                  "line": 87,
+                  "column": 9
+                },
+                {
+                  "title": "取消订阅后内容权限验证",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/edge-cases.spec.ts",
+                            "line": 103,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 13,
+                          "parallelIndex": 1,
+                          "status": "skipped",
+                          "duration": 22551,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册成功，需要邮箱验证\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:32:07.224Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/edge-cases.spec.ts",
+                                "line": 103,
+                                "column": 12
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-51fe40062f065fa10578",
+                  "file": "edge-cases.spec.ts",
+                  "line": 96,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "3.3 内容相关",
+              "file": "edge-cases.spec.ts",
+              "line": 107,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "未完成 KYC 的 Creator 尝试发布付费内容",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 12,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 22657,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:32:09.441Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-839fc4b2ac73ba6db9fd",
+                  "file": "edge-cases.spec.ts",
+                  "line": 108,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "3.4 数据一致性",
+              "file": "edge-cases.spec.ts",
+              "line": 162,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "订阅后立即刷新页面，验证状态保持",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/edge-cases.spec.ts",
+                            "line": 169,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 16,
+                          "parallelIndex": 4,
+                          "status": "skipped",
+                          "duration": 22813,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:32:11.580Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/edge-cases.spec.ts",
+                                "line": 169,
+                                "column": 12
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-454cf2842ecd3d0a9e6b",
+                  "file": "edge-cases.spec.ts",
+                  "line": 167,
+                  "column": 9
+                },
+                {
+                  "title": "解锁后立即刷新页面，验证内容可见",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/edge-cases.spec.ts",
+                            "line": 174,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 14,
+                          "parallelIndex": 3,
+                          "status": "skipped",
+                          "duration": 22492,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册成功，需要邮箱验证\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:32:29.359Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/edge-cases.spec.ts",
+                                "line": 174,
+                                "column": 12
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "db200a91ff2226597e25-8799749f4a67d1d602cb",
+                  "file": "edge-cases.spec.ts",
+                  "line": 172,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "fan-journey.spec.ts",
+      "file": "fan-journey.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Fan 端完整流程测试",
+          "file": "fan-journey.spec.ts",
+          "line": 18,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "1.1 用户注册与登录",
+              "file": "fan-journey.spec.ts",
+              "line": 26,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "邮箱注册新用户",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 13,
+                          "parallelIndex": 1,
+                          "status": "failed",
+                          "duration": 72264,
+                          "error": {
+                            "message": "Error: 登录后 session 未正确保存，无法访问 /home",
+                            "stack": "Error: 登录后 session 未正确保存，无法访问 /home\n    at signInUser (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:261:17)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:113:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 17,
+                              "line": 261
+                            },
+                            "snippet": "   at shared/helpers.ts:261\n\n  259 |         const currentUrl2 = page.url();\n  260 |         if (currentUrl2.includes(\"/auth\")) {\n> 261 |           throw new Error(\"登录后 session 未正确保存，无法访问 /home\");\n      |                 ^\n  262 |         }\n  263 |         // 其他错误，抛出原始错误\n  264 |         throw new Error(`登录后导航失败: ${gotoError instanceof Error ? gotoError.message : String(gotoError)}`);"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 17,
+                                "line": 261
+                              },
+                              "message": "Error: 登录后 session 未正确保存，无法访问 /home\n\n   at shared/helpers.ts:261\n\n  259 |         const currentUrl2 = page.url();\n  260 |         if (currentUrl2.includes(\"/auth\")) {\n> 261 |           throw new Error(\"登录后 session 未正确保存，无法访问 /home\");\n      |                 ^\n  262 |         }\n  263 |         // 其他错误，抛出原始错误\n  264 |         throw new Error(`登录后导航失败: ${gotoError instanceof Error ? gotoError.message : String(gotoError)}`);\n    at signInUser (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:261:17)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:113:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "[Browser Console] log: [auth] ====== BUTTON CLICKED ======\n"
+                            },
+                            {
+                              "text": "[Browser Console] log: [auth] Current state: {signupEmail: e2e-fan-1767799949790@example.com, hasPassword: true, ageConfirmed: true, isLoading: false}\n"
+                            },
+                            {
+                              "text": "[Browser Console] log: [auth] After setIsLoading(true)\n"
+                            },
+                            {
+                              "text": "[Browser Console] log: [auth] signUpWithEmail response: {hasUser: true, hasSession: true, userId: 6271122f-4c8e-4f14-b97c-9912223bee63, userEmail: e2e-fan-1767799949790@example.com, error: none}\n"
+                            },
+                            {
+                              "text": "[Browser Console] log: [auth] Signup result: {hasUser: true, hasSession: true, userId: 6271122f-4c8e-4f14-b97c-9912223bee63}\n"
+                            },
+                            {
+                              "text": "[Browser Console] log: [auth] Session exists, redirecting to /home\n"
+                            },
+                            {
+                              "text": "[Browser Console] log: [auth] Setting window.location.href to /home\n"
+                            },
+                            {
+                              "text": "[Browser Console] log: [auth] window.location.href set, waiting for navigation...\n"
+                            },
+                            {
+                              "text": "[Browser Console] log: [auth] getCurrentUser: {hasSession: true, hasUser: true, userId: 6271122f-4c8e-4f14-b97c-9912223bee63, email: e2e-fan-1767799949790@example.com}\n"
+                            },
+                            {
+                              "text": "[Test] Current URL after signup: http://localhost:3000/auth\n"
+                            },
+                            {
+                              "text": "[Test] 注册后没有自动跳转，尝试登录\n"
+                            },
+                            {
+                              "text": "登录后没有自动跳转，等待 session 保存后尝试手动导航到 /home\n"
+                            },
+                            {
+                              "text": "Session 未保存，等待更长时间...\n"
+                            },
+                            {
+                              "text": "第一次导航被重定向到 /auth，等待后重试\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:32:29.791Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-1-用户注册与登录-邮箱注册新用户-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-1-用户注册与登录-邮箱注册新用户-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 17,
+                            "line": 261
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-f563ddf5a3cf8a2be5a3",
+                  "file": "fan-journey.spec.ts",
+                  "line": 27,
+                  "column": 9
+                },
+                {
+                  "title": "邮箱登录已存在用户",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 15,
+                          "parallelIndex": 2,
+                          "status": "failed",
+                          "duration": 71535,
+                          "error": {
+                            "message": "Error: 登录后 session 未正确保存，无法访问 /home",
+                            "stack": "Error: 登录后 session 未正确保存，无法访问 /home\n    at signInUser (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:261:17)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:125:7)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 17,
+                              "line": 261
+                            },
+                            "snippet": "   at shared/helpers.ts:261\n\n  259 |         const currentUrl2 = page.url();\n  260 |         if (currentUrl2.includes(\"/auth\")) {\n> 261 |           throw new Error(\"登录后 session 未正确保存，无法访问 /home\");\n      |                 ^\n  262 |         }\n  263 |         // 其他错误，抛出原始错误\n  264 |         throw new Error(`登录后导航失败: ${gotoError instanceof Error ? gotoError.message : String(gotoError)}`);"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 17,
+                                "line": 261
+                              },
+                              "message": "Error: 登录后 session 未正确保存，无法访问 /home\n\n   at shared/helpers.ts:261\n\n  259 |         const currentUrl2 = page.url();\n  260 |         if (currentUrl2.includes(\"/auth\")) {\n> 261 |           throw new Error(\"登录后 session 未正确保存，无法访问 /home\");\n      |                 ^\n  262 |         }\n  263 |         // 其他错误，抛出原始错误\n  264 |         throw new Error(`登录后导航失败: ${gotoError instanceof Error ? gotoError.message : String(gotoError)}`);\n    at signInUser (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:261:17)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:125:7)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            },
+                            {
+                              "text": "登录后没有自动跳转，等待 session 保存后尝试手动导航到 /home\n"
+                            },
+                            {
+                              "text": "Session 未保存，等待更长时间...\n"
+                            },
+                            {
+                              "text": "第一次导航被重定向到 /auth，等待后重试\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:32:30.441Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-1-用户注册与登录-邮箱登录已存在用户-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-1-用户注册与登录-邮箱登录已存在用户-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 17,
+                            "line": 261
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-f221444caf06ade8bb7a",
+                  "file": "fan-journey.spec.ts",
+                  "line": 117,
+                  "column": 9
+                },
+                {
+                  "title": "登录错误处理 - 错误密码",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 12,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 30053,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('text=/invalid|incorrect|wrong/i').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('text=/invalid|incorrect|wrong/i').first()\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('text=/invalid|incorrect|wrong/i').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('text=/invalid|incorrect|wrong/i').first()\u001b[22m\n\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:152:39)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "1)/e2e/fan-journey.spec.ts",
+                              "column": 39,
+                              "line": 152
+                            }
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "1)/e2e/fan-journey.spec.ts",
+                                "column": 39,
+                                "line": 152
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('text=/invalid|incorrect|wrong/i').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('text=/invalid|incorrect|wrong/i').first()\u001b[22m\n\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:152:39)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:32:32.112Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-1-用户注册与登录-登录错误处理---错误密码-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-1-用户注册与登录-登录错误处理---错误密码-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "1)/e2e/fan-journey.spec.ts",
+                            "column": 39,
+                            "line": 152
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-a4801e36c1843d735940",
+                  "file": "fan-journey.spec.ts",
+                  "line": 131,
+                  "column": 9
+                },
+                {
+                  "title": "登录错误处理 - 不存在的邮箱",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 16,
+                          "parallelIndex": 4,
+                          "status": "failed",
+                          "duration": 7510,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('text=/invalid|not found|does not exist/i').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('text=/invalid|not found|does not exist/i').first()\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('text=/invalid|not found|does not exist/i').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('text=/invalid|not found|does not exist/i').first()\u001b[22m\n\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:172:39)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "1)/e2e/fan-journey.spec.ts",
+                              "column": 39,
+                              "line": 172
+                            }
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "1)/e2e/fan-journey.spec.ts",
+                                "column": 39,
+                                "line": 172
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('text=/invalid|not found|does not exist/i').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('text=/invalid|not found|does not exist/i').first()\u001b[22m\n\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:172:39)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:32:34.531Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-1-用户注册与登录-登录错误处理---不存在的邮箱-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-1-用户注册与登录-登录错误处理---不存在的邮箱-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "1)/e2e/fan-journey.spec.ts",
+                            "column": 39,
+                            "line": 172
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-d72e2f799c825c296509",
+                  "file": "fan-journey.spec.ts",
+                  "line": 155,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "1.2 Feed 内容浏览",
+              "file": "fan-journey.spec.ts",
+              "line": 176,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "访问 Feed 页面并验证内容加载",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 17,
+                          "parallelIndex": 4,
+                          "status": "failed",
+                          "duration": 32918,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:185:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:185:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:32:42.532Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-2-Feed-内容浏览-访问-Feed-页面并验证内容加载-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-2-Feed-内容浏览-访问-Feed-页面并验证内容加载-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-88ad993773fec37dcf09",
+                  "file": "fan-journey.spec.ts",
+                  "line": 181,
+                  "column": 9
+                },
+                {
+                  "title": "验证免费内容可见",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 14,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 25145,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:32:51.868Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-9a43f314e3a8108bf25d",
+                  "file": "fan-journey.spec.ts",
+                  "line": 192,
+                  "column": 9
+                },
+                {
+                  "title": "验证订阅者专享内容显示锁定遮罩",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 18,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 23025,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:33:02.662Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-6579dfa4ddbfcfe1ef47",
+                  "file": "fan-journey.spec.ts",
+                  "line": 204,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "1.3 订阅 Creator",
+              "file": "fan-journey.spec.ts",
+              "line": 214,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "访问 Creator 页面并订阅",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 19,
+                          "parallelIndex": 4,
+                          "status": "passed",
+                          "duration": 22833,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:33:16.144Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-573bf6f2b5344b9ba959",
+                  "file": "fan-journey.spec.ts",
+                  "line": 219,
+                  "column": 9
+                },
+                {
+                  "title": "验证订阅状态在订阅列表页面显示",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 14,
+                          "parallelIndex": 3,
+                          "status": "failed",
+                          "duration": 27661,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:252:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:252:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册成功，需要邮箱验证\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:33:17.026Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-3-订阅-Creator-验证订阅状态在订阅列表页面显示-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-3-订阅-Creator-验证订阅状态在订阅列表页面显示-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-928310c1918f4f7db7db",
+                  "file": "fan-journey.spec.ts",
+                  "line": 248,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "1.4 解锁 PPV 内容",
+              "file": "fan-journey.spec.ts",
+              "line": 260,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "解锁 PPV 内容流程",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 18,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 27727,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:270:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:270:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册成功，需要邮箱验证\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:33:25.868Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-4-解锁-PPV-内容-解锁-PPV-内容流程-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-4-解锁-PPV-内容-解锁-PPV-内容流程-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-fde440b2f3f0f54e4603",
+                  "file": "fan-journey.spec.ts",
+                  "line": 265,
+                  "column": 9
+                },
+                {
+                  "title": "验证购买历史记录",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 19,
+                          "parallelIndex": 4,
+                          "status": "failed",
+                          "duration": 27724,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:300:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:300:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册成功，需要邮箱验证\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:33:39.127Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-4-解锁-PPV-内容-验证购买历史记录-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-4-解锁-PPV-内容-验证购买历史记录-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-54567a785db290f2bdf1",
+                  "file": "fan-journey.spec.ts",
+                  "line": 296,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "1.5 个人中心功能",
+              "file": "fan-journey.spec.ts",
+              "line": 308,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "访问个人中心页面",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 20,
+                          "parallelIndex": 2,
+                          "status": "failed",
+                          "duration": 28313,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:317:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:317:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:33:42.457Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-5-个人中心功能-访问个人中心页面-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-5-个人中心功能-访问个人中心页面-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-6bc8d37aac83a2df1e1a",
+                  "file": "fan-journey.spec.ts",
+                  "line": 313,
+                  "column": 9
+                },
+                {
+                  "title": "更新 Display Name",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 21,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 23312,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:33:42.472Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-c27e3554f8ef9ca73648",
+                  "file": "fan-journey.spec.ts",
+                  "line": 324,
+                  "column": 9
+                },
+                {
+                  "title": "查看订阅列表",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 22,
+                          "parallelIndex": 3,
+                          "status": "failed",
+                          "duration": 27826,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:353:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:353:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:33:45.232Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-5-个人中心功能-查看订阅列表-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-5-个人中心功能-查看订阅列表-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-021e2553cbe127b5c404",
+                  "file": "fan-journey.spec.ts",
+                  "line": 349,
+                  "column": 9
+                },
+                {
+                  "title": "查看购买历史",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 23,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 27828,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:364:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('main, [role=\\'main\\']') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:364:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:33:54.034Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-5-个人中心功能-查看购买历史-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-5-个人中心功能-查看购买历史-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-d5a523be09630dcdbf3d",
+                  "file": "fan-journey.spec.ts",
+                  "line": 360,
+                  "column": 9
+                },
+                {
+                  "title": "查看钱包余额",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 21,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 22724,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册成功，需要邮箱验证\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:34:05.963Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-b95afac24111d6d4b559",
+                  "file": "fan-journey.spec.ts",
+                  "line": 367,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "1.6 成为 Creator 流程",
+              "file": "fan-journey.spec.ts",
+              "line": 379,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "点击 Become a Creator 按钮",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts",
+                            "line": 402,
+                            "column": 14
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 24,
+                          "parallelIndex": 4,
+                          "status": "skipped",
+                          "duration": 23010,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:34:07.337Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts",
+                                "line": 402,
+                                "column": 14
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-ce8157ef40690943d911",
+                  "file": "fan-journey.spec.ts",
+                  "line": 384,
+                  "column": 9
+                },
+                {
+                  "title": "填写 Creator Profile",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 25,
+                          "parallelIndex": 2,
+                          "status": "failed",
+                          "duration": 28080,
+                          "error": {
+                            "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"display_name\"], input[placeholder*=\"name\" i]') to be visible\u001b[22m\n",
+                            "stack": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"display_name\"], input[placeholder*=\"name\" i]') to be visible\u001b[22m\n\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:410:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)",
+                            "location": {
+                              "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                              "column": 14,
+                              "line": 314
+                            },
+                            "snippet": "   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                                "column": 14,
+                                "line": 314
+                              },
+                              "message": "TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"display_name\"], input[placeholder*=\"name\" i]') to be visible\u001b[22m\n\n\n   at shared/helpers.ts:314\n\n  312 |   timeout: number = 5000\n  313 | ): Promise<void> {\n> 314 |   await page.waitForSelector(selector, { state: \"visible\", timeout });\n      |              ^\n  315 | }\n  316 |\n  317 | /**\n    at waitForVisible (/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts:314:14)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/fan-journey.spec.ts:410:27)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "注册后没有自动跳转，尝试手动导航到 /home\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-07T15:34:11.384Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-6-成为-Creator-流程-填写-Creator-Profile-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/fan-journey-Fan-端完整流程测试-1-6-成为-Creator-流程-填写-Creator-Profile-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/puyijun/Downloads/authentication-flow-design (1)/e2e/shared/helpers.ts",
+                            "column": 14,
+                            "line": 314
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "9e7134ff9625dd8a1949-a26c6ccab082dd6682da",
+                  "file": "fan-journey.spec.ts",
+                  "line": 406,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "paywall-flow.spec.ts",
+      "file": "paywall-flow.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Paywall Flow E2E",
+          "file": "paywall-flow.spec.ts",
+          "line": 19,
+          "column": 6,
+          "specs": [
+            {
+              "title": "完整流程：注册 → 成为 Creator → 上传图片 → 发布 locked post → 订阅 → 查看",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 26,
+                      "parallelIndex": 3,
+                      "status": "timedOut",
+                      "duration": 90113,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 90000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 90000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 90000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "1)/e2e/paywall-flow.spec.ts",
+                            "column": 21,
+                            "line": 54
+                          },
+                          "message": "Error: page.click: Test timeout of 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"Sign In\")')\u001b[22m\n\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/paywall-flow.spec.ts:54:21)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/paywall-flow.spec.ts:52:5)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                        },
+                        {
+                          "location": {
+                            "file": "1)/e2e/paywall-flow.spec.ts",
+                            "column": 23,
+                            "line": 62
+                          },
+                          "message": "Error: page.click: Test timeout of 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"Become a Creator\")')\u001b[22m\n\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/paywall-flow.spec.ts:62:23)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-07T15:34:13.635Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/paywall-flow-Paywall-Flow--7b522--→-发布-locked-post-→-订阅-→-查看-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/paywall-flow-Paywall-Flow--7b522--→-发布-locked-post-→-订阅-→-查看-chromium/test-failed-2.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/paywall-flow-Paywall-Flow--7b522--→-发布-locked-post-→-订阅-→-查看-chromium/error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "2442c67bdf7823db2d46-b22bab28353a473c41ad",
+              "file": "paywall-flow.spec.ts",
+              "line": 25,
+              "column": 7
+            },
+            {
+              "title": "上传视频并发布",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 27,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 90087,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 90000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 90000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 90000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "1)/e2e/paywall-flow.spec.ts",
+                            "column": 16,
+                            "line": 127
+                          },
+                          "message": "Error: page.click: Test timeout of 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"Sign In\")')\u001b[22m\n\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/e2e/paywall-flow.spec.ts:127:16)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:322:9)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:11)\n    at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:320:7)"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-07T15:34:22.447Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/paywall-flow-Paywall-Flow-E2E-上传视频并发布-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/puyijun/Downloads/authentication-flow-design (1)/test-results/paywall-flow-Paywall-Flow-E2E-上传视频并发布-chromium/error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "2442c67bdf7823db2d46-08ac3330b1f541bb1801",
+              "file": "paywall-flow.spec.ts",
+              "line": 120,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-01-07T15:30:41.272Z",
+    "duration": 311441.138,
+    "expected": 13,
+    "skipped": 7,
+    "unexpected": 26,
+    "flaky": 0
+  }
+}

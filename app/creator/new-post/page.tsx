@@ -1,34 +1,35 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { NavHeader } from "@/components/nav-header"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { supabase } from "@/lib/supabase-client"
-import { getProfile } from "@/lib/profile"
-import { createPost, type PostVisibility } from "@/lib/posts"
-import { ensureProfile } from "@/lib/auth"
-import { toast } from "sonner"
-import { MultiMediaUpload } from "@/components/multi-media-upload"
-import { type MediaFile } from "@/lib/storage"
-import Link from "next/link"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { NavHeader } from "@/components/nav-header";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
+// 所有服务器端函数都通过 API 调用，不直接导入
+import { type PostVisibility } from "@/lib/types";
+import { toast } from "sonner";
+import { MultiMediaUpload } from "@/components/multi-media-upload";
+import { type MediaFile } from "@/lib/storage";
+import Link from "next/link";
+
+const supabase = getSupabaseBrowserClient();
 
 export default function NewPostPage() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<{
-    username: string
-    role: "fan" | "creator"
-    avatar?: string
-  } | null>(null)
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+    username: string;
+    role: "fan" | "creator";
+    avatar?: string;
+  } | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -38,8 +39,8 @@ export default function NewPostPage() {
     price: "",
     preview_enabled: false,
     watermark_enabled: true, // 默认开启
-  })
-  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([])
+  });
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -47,106 +48,123 @@ export default function NewPostPage() {
         const {
           data: { session },
           error: sessionError,
-        } = await supabase.auth.getSession()
+        } = await supabase.auth.getSession();
 
         if (sessionError || !session) {
-          router.push("/auth")
-          return
+          router.push("/auth");
+          return;
         }
 
-        await ensureProfile()
-        setCurrentUserId(session.user.id)
+        // 确保 profile 存在（通过 API）
+        await fetch("/api/auth/ensure-profile", { method: "POST" });
+        setCurrentUserId(session.user.id);
 
-        const profile = await getProfile(session.user.id)
+        // 加载 profile（通过 API）
+        const profileResponse = await fetch("/api/profile");
+        if (!profileResponse.ok) {
+          setError("无法加载 profile");
+          return;
+        }
+        const profileData = await profileResponse.json();
+        const profile = profileData.profile;
         if (!profile) {
-          setError("无法加载 profile")
-          return
+          setError("无法加载 profile");
+          return;
         }
 
         setCurrentUser({
           username: profile.display_name || "user",
           role: (profile.role || "fan") as "fan" | "creator",
           avatar: profile.avatar_url || undefined,
-        })
+        });
 
         // 检查是否为 creator
         if (profile.role !== "creator") {
-          setError("只有 creator 可以发帖")
+          setError("只有 creator 可以发帖");
         }
       } catch (err) {
-        console.error("[new-post] checkAuth error", err)
-        setError("加载失败，请重试")
+        console.error("[new-post] checkAuth error", err);
+        setError("加载失败，请重试");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    checkAuth()
-  }, [router])
+    checkAuth();
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!currentUserId) {
-      setError("用户未登录")
-      return
+      setError("用户未登录");
+      return;
     }
 
     if (!formData.content.trim()) {
-      setError("Content 是必填项")
-      return
+      setError("Content 是必填项");
+      return;
     }
 
     // 验证 PPV 价格
     if (formData.visibility === "ppv") {
-      const priceValue = parseFloat(formData.price)
-      if (!formData.price.trim() || isNaN(priceValue) || priceValue <= 0) {
-        setError("Pay-per-post 必须设置价格（大于 0）")
-        return
+      const priceValue = parseFloat(formData.price);
+      if (!formData.price.trim() || isNaN(priceValue) || priceValue < 1.0) {
+        setError("PPV 价格不能低于 $1.00");
+        return;
       }
     }
 
     try {
-      setIsSaving(true)
-      setError(null)
+      setIsSaving(true);
+      setError(null);
 
-      const priceCents = formData.visibility === "ppv" 
-        ? Math.round(parseFloat(formData.price) * 100)
-        : null
+      const priceCents =
+        formData.visibility === "ppv" ? Math.round(parseFloat(formData.price) * 100) : null;
 
-      const postId = await createPost({
-        title: formData.title.trim() || undefined,
-        content: formData.content.trim(),
-        media_url: formData.media_url.trim() || undefined, // 向后兼容
-        mediaFiles: mediaFiles.length > 0 ? mediaFiles : undefined, // Phase 2: 多文件
-        visibility: formData.visibility,
-        price_cents: priceCents,
-        preview_enabled: formData.preview_enabled,
-        watermark_enabled: formData.watermark_enabled,
-      })
+      const response = await fetch("/api/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: formData.title.trim() || undefined,
+          content: formData.content.trim(),
+          media_url: formData.media_url.trim() || undefined, // 向后兼容
+          mediaFiles: mediaFiles.length > 0 ? mediaFiles : undefined, // Phase 2: 多文件
+          visibility: formData.visibility,
+          priceCents: priceCents,
+          previewEnabled: formData.preview_enabled,
+          watermarkEnabled: formData.watermark_enabled,
+        }),
+      });
 
-      if (postId) {
-        toast.success("Post 创建成功！")
+      const result = await response.json();
+
+      if (result.success && result.postId) {
+        toast.success("Post 创建成功！");
         setTimeout(() => {
-          router.push("/home")
-        }, 500)
+          router.push("/home");
+        }, 500);
       } else {
-        setError("创建失败，请重试")
+        setError(result.error || "创建失败，请重试");
       }
     } catch (err) {
-      console.error("[new-post] handleSubmit error", err)
-      setError("创建失败，请重试")
+      console.error("[new-post] handleSubmit error", err);
+      setError("创建失败，请重试");
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground">Loading...</div>
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="animate-pulse space-y-4 w-full max-w-2xl px-4">
+          <div className="h-8 w-48 bg-[#121212] rounded"></div>
+          <div className="h-64 bg-[#121212] rounded-3xl"></div>
+          <div className="h-12 w-full bg-[#121212] rounded-xl"></div>
+        </div>
       </div>
-    )
+    );
   }
 
   if (error && currentUser?.role !== "creator") {
@@ -165,27 +183,27 @@ export default function NewPostPage() {
           </Card>
         </main>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#050505]">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
-      <main className="container max-w-2xl mx-auto px-4 py-6">
-        <div className="mb-6">
+      <main className="container max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+        <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Create New Post</h1>
           <p className="text-muted-foreground">分享你的内容</p>
         </div>
 
         {error && (
-          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
-            <p className="text-destructive font-medium">错误</p>
+          <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-3xl p-6 mb-8">
+            <p className="text-[#F43F5E] font-medium">错误</p>
             <p className="text-sm text-muted-foreground mt-1">{error}</p>
           </div>
         )}
 
-        <Card className="p-6">
+        <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title */}
             <div className="space-y-2">
@@ -221,12 +239,12 @@ export default function NewPostPage() {
               <Label>Media (可选，支持多文件)</Label>
               <MultiMediaUpload
                 onUploadComplete={(files) => {
-                  setMediaFiles(files)
-                  toast.success(`已上传 ${files.length} 个文件`)
+                  setMediaFiles(files);
+                  toast.success(`已上传 ${files.length} 个文件`);
                 }}
                 onUploadError={(error) => {
-                  setError(error)
-                  toast.error(error)
+                  setError(error);
+                  toast.error(error);
                 }}
                 maxFiles={10}
               />
@@ -247,7 +265,13 @@ export default function NewPostPage() {
                     name="visibility"
                     value="free"
                     checked={formData.visibility === "free"}
-                    onChange={(e) => setFormData({ ...formData, visibility: e.target.value as PostVisibility, price: "" })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        visibility: e.target.value as PostVisibility,
+                        price: "",
+                      })
+                    }
                     disabled={isSaving}
                     className="w-4 h-4"
                   />
@@ -259,7 +283,13 @@ export default function NewPostPage() {
                     name="visibility"
                     value="subscribers"
                     checked={formData.visibility === "subscribers"}
-                    onChange={(e) => setFormData({ ...formData, visibility: e.target.value as PostVisibility, price: "" })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        visibility: e.target.value as PostVisibility,
+                        price: "",
+                      })
+                    }
                     disabled={isSaving}
                     className="w-4 h-4"
                   />
@@ -271,7 +301,9 @@ export default function NewPostPage() {
                     name="visibility"
                     value="ppv"
                     checked={formData.visibility === "ppv"}
-                    onChange={(e) => setFormData({ ...formData, visibility: e.target.value as PostVisibility })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, visibility: e.target.value as PostVisibility })
+                    }
                     disabled={isSaving}
                     className="w-4 h-4"
                   />
@@ -297,32 +329,30 @@ export default function NewPostPage() {
                   disabled={isSaving}
                   required
                 />
-                <p className="text-xs text-muted-foreground">
-                  设置解锁此 post 的价格（美元）
-                </p>
+                <p className="text-xs text-muted-foreground">设置解锁此 post 的价格（美元）</p>
               </div>
             )}
 
             {/* Preview Enabled (for videos) */}
-            {mediaFiles.some(f => f.type === 'video') && (
+            {mediaFiles.some((f) => f.type === "video") && (
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="preview_enabled">Enable Preview (视频前 10 秒)</Label>
-                  <p className="text-sm text-muted-foreground">
-                    允许未订阅用户预览视频前 10 秒
-                  </p>
+                  <p className="text-sm text-muted-foreground">允许未订阅用户预览视频前 10 秒</p>
                 </div>
                 <Switch
                   id="preview_enabled"
                   checked={formData.preview_enabled}
-                  onCheckedChange={(checked) => setFormData({ ...formData, preview_enabled: checked })}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, preview_enabled: checked })
+                  }
                   disabled={isSaving}
                 />
               </div>
             )}
 
             {/* Watermark Enabled (for images) */}
-            {mediaFiles.some(f => f.type === 'image') && (
+            {mediaFiles.some((f) => f.type === "image") && (
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="watermark_enabled">Enable Watermark (图片左上角)</Label>
@@ -333,31 +363,37 @@ export default function NewPostPage() {
                 <Switch
                   id="watermark_enabled"
                   checked={formData.watermark_enabled}
-                  onCheckedChange={(checked) => setFormData({ ...formData, watermark_enabled: checked })}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, watermark_enabled: checked })
+                  }
                   disabled={isSaving}
                 />
               </div>
             )}
 
             {/* Submit Button */}
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-4 pt-6 border-t border-[#1F1F1F]">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => router.push("/home")}
                 disabled={isSaving}
-                className="flex-1"
+                className="flex-1 rounded-xl border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A]"
               >
                 取消
               </Button>
-              <Button type="submit" disabled={isSaving} className="flex-1">
+              <Button
+                type="submit"
+                variant="gradient"
+                disabled={isSaving}
+                className="flex-1 rounded-xl"
+              >
                 {isSaving ? "发布中..." : "发布"}
               </Button>
             </div>
           </form>
-        </Card>
+        </div>
       </main>
     </div>
-  )
+  );
 }
-

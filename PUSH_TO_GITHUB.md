@@ -18,22 +18,24 @@ git push -u origin main
 ### 方式 2: 使用 SSH（推荐）
 
 1. 首先配置 SSH key（如果还没有）：
+
    ```bash
    # 检查是否已有 SSH key
    ls -al ~/.ssh
-   
+
    # 如果没有，生成新的 SSH key
    ssh-keygen -t ed25519 -C "your_email@example.com"
-   
+
    # 添加 SSH key 到 ssh-agent
    eval "$(ssh-agent -s)"
    ssh-add ~/.ssh/id_ed25519
-   
+
    # 复制公钥（添加到 GitHub Settings → SSH and GPG keys）
    cat ~/.ssh/id_ed25519.pub
    ```
 
 2. 更改 remote URL 为 SSH：
+
    ```bash
    git remote set-url origin git@github.com:pyjmichelle/getfansee-auth.git
    ```
@@ -75,6 +77,7 @@ git push -u origin main
 ### 错误：`fatal: could not read Username`
 
 **解决方案**：
+
 - 使用 SSH 方式（方式 2）
 - 或使用 Personal Access Token：
   1. GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
@@ -84,14 +87,13 @@ git push -u origin main
 ### 错误：`Permission denied`
 
 **解决方案**：
+
 - 确认你有该仓库的写入权限
 - 检查 SSH key 是否正确添加到 GitHub
 
 ### 错误：`remote: Support for password authentication was removed`
 
 **解决方案**：
+
 - 必须使用 Personal Access Token 或 SSH key
 - 不能使用账户密码
-
-
-

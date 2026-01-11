@@ -3,15 +3,15 @@
  * Money & Access MVP
  */
 
-import { supabase } from "./supabase-client"
+import { getSupabaseUniversalClient } from "./supabase-universal";
 
 export type Creator = {
-  id: string
-  display_name: string
-  avatar_url?: string
-  bio?: string
-  created_at: string
-}
+  id: string;
+  display_name: string;
+  avatar_url?: string;
+  bio?: string;
+  created_at: string;
+};
 
 /**
  * 获取所有 creators 列表
@@ -19,20 +19,21 @@ export type Creator = {
  */
 export async function listCreators(): Promise<Creator[] | null> {
   try {
+    const supabase = await getSupabaseUniversalClient();
     const { data, error } = await supabase
       .from("creators")
       .select("*")
-      .order("created_at", { ascending: false })
+      .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("[creators] listCreators error:", error)
-      return null
+      console.error("[creators] listCreators error:", error);
+      return null;
     }
 
-    return data || []
+    return data || [];
   } catch (err) {
-    console.error("[creators] listCreators exception:", err)
-    return null
+    console.error("[creators] listCreators exception:", err);
+    return null;
   }
 }
 
@@ -43,23 +44,21 @@ export async function listCreators(): Promise<Creator[] | null> {
  */
 export async function getCreator(creatorId: string): Promise<Creator | null> {
   try {
+    const supabase = await getSupabaseUniversalClient();
     const { data, error } = await supabase
       .from("creators")
       .select("*")
       .eq("id", creatorId)
-      .single()
+      .single();
 
     if (error) {
-      console.error("[creators] getCreator error:", error)
-      return null
+      console.error("[creators] getCreator error:", error);
+      return null;
     }
 
-    return data
+    return data;
   } catch (err) {
-    console.error("[creators] getCreator exception:", err)
-    return null
+    console.error("[creators] getCreator exception:", err);
+    return null;
   }
 }
-
-
-

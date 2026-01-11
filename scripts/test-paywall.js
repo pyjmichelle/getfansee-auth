@@ -81,7 +81,7 @@ function loadEnv() {
           }
         }
       })
-    } catch (err) {
+    } catch (_err) {
       // .env.local 不存在或读取失败，继续使用 process.env
     }
   }
@@ -124,43 +124,6 @@ function recordTest(name, passed, details = '') {
     testResults.failed++
     error(`${name} - 失败`)
     if (details) error(`   详情: ${details}`)
-  }
-}
-
-// 模拟 getMyPaywallState（用于测试）
-async function getMyPaywallState(supabase, userId) {
-  try {
-    // 查询 active subscriptions
-    const { data: subscriptions, error: subError } = await supabase
-      .from('subscriptions')
-      .select('creator_id')
-      .eq('subscriber_id', userId)
-      .eq('status', 'active')
-      .gt('current_period_end', new Date().toISOString())
-    
-    if (subError) {
-      console.error('[test] getMyPaywallState subscriptions error:', subError)
-      return null
-    }
-    
-    // 查询 purchased posts (PPV unlocks)
-    const { data: purchases, error: purchaseError } = await supabase
-      .from('purchases')
-      .select('post_id')
-      .eq('fan_id', userId)
-    
-    if (purchaseError) {
-      console.error('[test] getMyPaywallState purchases error:', purchaseError)
-      return null
-    }
-    
-    return {
-      hasActiveSubscription: (subscriptions?.length || 0) > 0,
-      unlockedPostIds: new Set(purchases?.map(p => p.post_id) || []),
-    }
-  } catch (err) {
-    console.error('[test] getMyPaywallState exception:', err)
-    return null
   }
 }
 
@@ -214,7 +177,7 @@ async function testRegisterAndLogin(supabase) {
 }
 
 // 测试 2: 创建 Creator 和 Post
-async function testCreateCreatorAndPost(fanSupabase, fanUserId) {
+async function testCreateCreatorAndPost() {
   log('\n👨‍🎨 测试 2: 创建 Creator 和 Post', 'blue')
   
   try {
@@ -719,7 +682,7 @@ async function main() {
     }
     
     // 测试 2: 创建 Creator 和 Post（使用新的 supabase 客户端，不影响 fan session）
-    creatorData = await testCreateCreatorAndPost(supabase, fanUser.userId)
+    creatorData = await testCreateCreatorAndPost()
     if (!creatorData) {
       error('测试终止：无法创建 Creator 和 Post')
       process.exit(1)

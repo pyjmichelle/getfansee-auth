@@ -1,31 +1,33 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { Mail, ArrowLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import Link from "next/link"
-import { supabase } from "@/lib/supabase-client"
+import type React from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Mail, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
+import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
+
+const supabase = getSupabaseBrowserClient();
 
 export default function ResendVerificationPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [sent, setSent] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setIsLoading(true)
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
 
     if (!email || !email.includes("@")) {
-      setError("Please enter a valid email address")
-      setIsLoading(false)
-      return
+      setError("Please enter a valid email address");
+      setIsLoading(false);
+      return;
     }
 
     try {
@@ -33,22 +35,23 @@ export default function ResendVerificationPage() {
         type: "signup",
         email,
         options: {
-          emailRedirectTo: typeof window !== "undefined" ? `${window.location.origin}/auth/verify` : undefined,
+          emailRedirectTo:
+            typeof window !== "undefined" ? `${window.location.origin}/auth/verify` : undefined,
         },
-      })
+      });
 
       if (resendError) {
-        throw resendError
+        throw resendError;
       }
 
-      setIsLoading(false)
-      setSent(true)
+      setIsLoading(false);
+      setSent(true);
     } catch (err: any) {
-      console.error("[resend] Error:", err)
-      setError(err?.message || "Failed to send verification email. Please try again.")
-      setIsLoading(false)
+      console.error("[resend] Error:", err);
+      setError(err?.message || "Failed to send verification email. Please try again.");
+      setIsLoading(false);
     }
-  }
+  };
 
   if (sent) {
     return (
@@ -68,10 +71,10 @@ export default function ResendVerificationPage() {
             <div className="space-y-3">
               <Button
                 onClick={() => {
-                  window.open("https://mail.google.com", "_blank")
+                  window.open("https://mail.google.com", "_blank");
                   setTimeout(() => {
-                    router.push("/auth/verify")
-                  }, 1000)
+                    router.push("/auth/verify");
+                  }, 1000);
                 }}
                 className="w-full"
               >
@@ -87,7 +90,7 @@ export default function ResendVerificationPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -101,7 +104,9 @@ export default function ResendVerificationPage() {
                 Back
               </Link>
             </Button>
-            <h1 className="text-2xl font-semibold text-foreground text-balance">Resend Verification Email</h1>
+            <h1 className="text-2xl font-semibold text-foreground text-balance">
+              Resend Verification Email
+            </h1>
             <p className="text-muted-foreground mt-2">
               Enter your email address and we'll send you a new verification link.
             </p>
@@ -136,5 +141,5 @@ export default function ResendVerificationPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -22,6 +22,7 @@ Execute the migration SQL in Supabase Dashboard SQL Editor:
 ```
 
 This creates:
+
 - `creators` table
 - Updates `posts` table with `price_cents` field
 - Updates `subscriptions` table with `plan` field
@@ -33,6 +34,7 @@ This creates:
 You can seed demo data in two ways:
 
 **Option A: Using the seed script (requires SERVICE_ROLE_KEY)**
+
 ```bash
 # Add to .env.local:
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
@@ -42,6 +44,7 @@ pnpm tsx scripts/seed-demo.ts
 ```
 
 **Option B: Using the UI**
+
 1. Log in to the app
 2. Visit `/me`
 3. Click "Create my creator profile" (if you're a fan)
@@ -57,29 +60,34 @@ pnpm dev
 ## Demo Flow
 
 ### Step 1: View Creators
+
 1. Log in to the app
 2. Visit `/home`
 3. You should see a list of creators (cards)
 4. Click on a creator card to view their profile
 
 ### Step 2: Subscribe to a Creator
+
 1. Visit `/creator/[id]` (replace `[id]` with a creator ID)
 2. Click "Subscribe" button at the top
 3. This creates a fake subscription (30 days)
 4. Subscriber-only posts (price_cents=0) should now be visible
 
 ### Step 3: Unlock PPV Content
+
 1. On the creator profile page, find a PPV post (price_cents > 0)
 2. Click "Unlock for $X.XX" button
 3. This creates a fake purchase record
 4. The PPV post content should now be visible
 
 ### Step 4: View Subscriptions
+
 1. Visit `/subscriptions`
 2. You should see your active subscriptions
 3. You can cancel a subscription (sets status to 'canceled')
 
 ### Step 5: View Purchases
+
 1. Visit `/purchases`
 2. You should see all your PPV purchases
 3. Total spent is displayed at the top
@@ -87,6 +95,7 @@ pnpm dev
 ## Database Schema
 
 ### creators
+
 - `id` (uuid, PK, FK to auth.users)
 - `display_name` (text)
 - `avatar_url` (text, nullable)
@@ -94,6 +103,7 @@ pnpm dev
 - `created_at` (timestamptz)
 
 ### posts
+
 - `id` (uuid, PK)
 - `creator_id` (uuid, FK to creators)
 - `title` (text, nullable)
@@ -105,6 +115,7 @@ pnpm dev
 - `created_at` (timestamptz)
 
 ### subscriptions
+
 - `id` (uuid, PK)
 - `fan_id` (uuid, FK to auth.users)
 - `creator_id` (uuid, FK to creators)
@@ -115,6 +126,7 @@ pnpm dev
 - UNIQUE(fan_id, creator_id)
 
 ### purchases
+
 - `id` (uuid, PK)
 - `fan_id` (uuid, FK to auth.users)
 - `post_id` (uuid, FK to posts)
@@ -125,16 +137,19 @@ pnpm dev
 ## Access Control Logic
 
 ### isActiveSubscriber(fanId, creatorId)
+
 - Checks if fan has an active subscription to creator
 - Returns `true` if subscription exists with:
   - `status = 'active'`
   - `current_period_end > now()`
 
 ### hasPurchasedPost(fanId, postId)
+
 - Checks if fan has purchased a specific PPV post
 - Returns `true` if purchase record exists
 
 ### Post Visibility Rules
+
 - **Creator**: Always sees all their own posts
 - **Subscriber-only (price_cents=0)**: Visible if fan has active subscription
 - **PPV (price_cents>0)**: Visible if fan has purchased the post (subscription does NOT unlock PPV)
@@ -150,19 +165,19 @@ pnpm dev
 ## Troubleshooting
 
 ### No creators showing on /home
+
 - Ensure you've run the migration
 - Create a creator profile via `/me` page
 - Or run the seed script
 
 ### Posts not unlocking after subscribe/unlock
+
 - Check browser console for errors
 - Verify RLS policies are correct
 - Ensure you're logged in with a valid session
 
 ### Subscription/Purchase not showing
+
 - Check that records were created in database
 - Verify RLS policies allow SELECT for authenticated users
 - Check that `fan_id` matches `auth.uid()`
-
-
-

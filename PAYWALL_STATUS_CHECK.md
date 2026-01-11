@@ -24,6 +24,7 @@
 ## 📋 必需的表和策略
 
 ### subscriptions 表必需字段
+
 - `id` (uuid, primary key)
 - `user_id` (uuid, references auth.users)
 - `status` (text, default 'active')
@@ -33,6 +34,7 @@
 - `UNIQUE(user_id)` 约束
 
 ### post_unlocks 表必需字段
+
 - `id` (uuid, primary key)
 - `user_id` (uuid, references auth.users)
 - `post_id` (text)
@@ -42,17 +44,20 @@
 ### 必需的 RLS 策略
 
 **subscriptions (4 个策略)**：
+
 - `subscriptions_select_own` (SELECT)
 - `subscriptions_insert_own` (INSERT)
 - `subscriptions_update_own` (UPDATE)
 - `subscriptions_delete_own` (DELETE)
 
 **post_unlocks (3 个策略)**：
+
 - `post_unlocks_select_own` (SELECT)
 - `post_unlocks_insert_own` (INSERT)
 - `post_unlocks_delete_own` (DELETE)
 
 ### 必需的触发器
+
 - `set_subscriptions_updated_at` (在 subscriptions 表上)
 
 ---
@@ -70,6 +75,7 @@
 ## ✅ 当前状态
 
 从测试结果看：
+
 - ✅ 所有测试通过（12/12）
 - ✅ subscribe30d 功能正常
 - ✅ unlockPost 功能正常
@@ -84,6 +90,3 @@
 1. **保留 SQL 文件**：即使删除了，建议保留 `005_paywall_clean.sql` 作为备份
 2. **执行验证脚本**：运行 `005_verify_paywall.sql` 确认一切正常
 3. **如果一切正常**：可以继续开发，不需要担心
-
-
-

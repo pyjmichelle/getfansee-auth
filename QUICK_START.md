@@ -5,11 +5,13 @@
 **在 Supabase Dashboard 执行 `migrations/004_fix_profiles_final.sql`**
 
 这个 SQL 会：
+
 - ✅ 补齐 profiles 表所有字段（email, display_name, role, age_verified, created_at, updated_at）
 - ✅ 创建/修复 RLS 策略
 - ✅ 刷新 schema cache
 
 **执行方法**：
+
 1. 登录 https://supabase.com/dashboard
 2. 选择你的项目
 3. 进入 **SQL Editor**
@@ -31,6 +33,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 ```
 
 **如果 SERVICE_ROLE_KEY 不存在，手动添加**：
+
 ```bash
 echo "SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZG9ta3lnanB1anh5aXZ3dmlxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDQ4ODQ2NywiZXhwIjoyMDgwMDY0NDY3fQ.aDk8dVJfxCxxoGjejRje7-O-keDq59Bvw9oL7IsPIH4" >> .env.local
 ```
@@ -44,6 +47,7 @@ pnpm test:auth
 ```
 
 **预期输出**：
+
 ```
 🚀 开始认证流程自动化测试
 
@@ -93,6 +97,7 @@ pnpm test:auth
 ### 错误：Schema 验收失败
 
 **解决**：
+
 1. 重新执行 `migrations/004_fix_profiles_final.sql`
 2. 等待 5-10 秒让 schema cache 刷新
 3. 重新运行测试
@@ -102,6 +107,3 @@ pnpm test:auth
 ## ✅ 交付标准
 
 **只有所有测试全绿（失败: 0）才算交付完成。**
-
-
-

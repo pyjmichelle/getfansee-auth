@@ -65,6 +65,7 @@
 ### 表结构说明
 
 #### subscriptions 表
+
 - `id` uuid primary key
 - `user_id` uuid not null references auth.users(id)
 - `creator_id` uuid null（MVP 暂未使用）
@@ -75,6 +76,7 @@
 - `UNIQUE(user_id)` - 每个用户只能有一条 subscription
 
 #### post_unlocks 表
+
 - `id` uuid primary key
 - `user_id` uuid not null references auth.users(id)
 - `post_id` text not null
@@ -213,6 +215,3 @@ pnpm test:paywall
 - [x] 错误处理和 loading 状态已实现
 
 **下一步**：执行 `migrations/005_paywall.sql`，然后运行 `pnpm test:paywall` 验证。
-
-
-

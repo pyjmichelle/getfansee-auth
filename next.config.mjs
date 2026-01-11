@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
-    ignoreBuildErrors: true,
+    // 开发环境允许类型错误，生产环境必须修复
+    ignoreBuildErrors: process.env.NODE_ENV === 'development',
   },
   images: {
     // 不使用 Next Image 优化（如果需要可以启用）

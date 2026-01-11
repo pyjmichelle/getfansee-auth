@@ -1,6 +1,7 @@
 # 修复 Creators 表 RLS 策略
 
 ## 问题
+
 测试 `test:visibility` 失败，因为 RLS 策略阻止插入 `creators` 表。
 
 ## 解决方案
@@ -45,18 +46,19 @@ WITH CHECK (id = auth.uid());
 执行以下 SQL 验证策略是否正确创建：
 
 ```sql
-SELECT 
+SELECT
   policyname,
   cmd,
   qual,
   with_check
 FROM pg_policies
-WHERE schemaname = 'public' 
+WHERE schemaname = 'public'
   AND tablename = 'creators'
 ORDER BY policyname;
 ```
 
 应该看到 3 个策略：
+
 - `creators_select_all` (SELECT)
 - `creators_insert_self` (INSERT)
 - `creators_update_self` (UPDATE)
@@ -70,6 +72,7 @@ pnpm test:visibility
 ## 测试脚本更改
 
 测试脚本已更新为：
+
 1. 先创建 profile（role='fan'）避免 trigger 问题
 2. 显式插入 `creators` 记录（不依赖 trigger）
 3. 然后更新 profile role 为 'creator'
@@ -80,6 +83,3 @@ pnpm test:visibility
 - 确保在 Supabase 中执行了 migration 或上述 SQL
 - 测试脚本现在不依赖 trigger，直接插入 `creators` 记录
 - 如果仍然失败，检查 Supabase 中的 RLS 策略是否正确应用
-
-
-

@@ -129,7 +129,7 @@ async function ensureProfile(supabase, userId, userEmail) {
     }
 
     return true
-  } catch (err) {
+  } catch (_err) {
     return false
   }
 }
@@ -148,7 +148,7 @@ async function getProfile(supabase, userId) {
     }
 
     return data
-  } catch (err) {
+  } catch (_err) {
     return null
   }
 }
@@ -162,7 +162,7 @@ async function setRoleCreator(supabase, userId) {
       .eq('id', userId)
 
     return !error
-  } catch (err) {
+  } catch (_err) {
     return false
   }
 }
@@ -192,7 +192,7 @@ async function updateCreatorProfile(supabase, params) {
       .eq('id', params.userId)
 
     return !error
-  } catch (err) {
+  } catch (_err) {
     return false
   }
 }

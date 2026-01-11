@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { useState, useRef, useCallback } from "react"
-import { Upload, X, Image as ImageIcon, Video, Loader2, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { uploadFiles, validateFile, type MediaFile } from "@/lib/storage"
+import { useState, useRef, useCallback } from "react";
+import { Upload, X, Image as ImageIcon, Video, Loader2, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { uploadFiles, validateFile, type MediaFile } from "@/lib/storage";
 
 export type MultiMediaUploadProps = {
-  onUploadComplete: (files: MediaFile[]) => void
-  onUploadError?: (error: string) => void
-  maxFiles?: number
-  className?: string
-}
+  onUploadComplete: (files: MediaFile[]) => void;
+  onUploadError?: (error: string) => void;
+  maxFiles?: number;
+  className?: string;
+};
 
 export function MultiMediaUpload({
   onUploadComplete,
@@ -18,128 +18,137 @@ export function MultiMediaUpload({
   maxFiles = 10,
   className = "",
 }: MultiMediaUploadProps) {
-  const [isDragging, setIsDragging] = useState(false)
-  const [isUploading, setIsUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState<Map<number, { loaded: number; total: number; percentage: number }>>(new Map())
-  const [uploadedFiles, setUploadedFiles] = useState<MediaFile[]>([])
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<
+    Map<number, { loaded: number; total: number; percentage: number }>
+  >(new Map());
+  const [uploadedFiles, setUploadedFiles] = useState<MediaFile[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = useCallback(
     async (files: FileList | File[]) => {
-      const fileArray = Array.from(files)
-      
+      const fileArray = Array.from(files);
+
       // 验证文件数量
       if (uploadedFiles.length + fileArray.length > maxFiles) {
-        onUploadError?.(`最多只能上传 ${maxFiles} 个文件`)
-        return
+        onUploadError?.(`最多只能上传 ${maxFiles} 个文件`);
+        return;
       }
 
       // 验证每个文件
       for (const file of fileArray) {
-        const validation = validateFile(file)
+        const validation = validateFile(file);
         if (!validation.valid) {
-          onUploadError?.(validation.error || "文件验证失败")
-          return
+          onUploadError?.(validation.error || "文件验证失败");
+          return;
         }
       }
 
       try {
-        setIsUploading(true)
-        
+        setIsUploading(true);
+
         // 初始化进度
-        const progressMap = new Map<number, { loaded: number; total: number; percentage: number }>()
+        const progressMap = new Map<
+          number,
+          { loaded: number; total: number; percentage: number }
+        >();
         fileArray.forEach((_, index) => {
-          progressMap.set(index, { loaded: 0, total: fileArray[index].size, percentage: 0 })
-        })
-        setUploadProgress(progressMap)
+          progressMap.set(index, { loaded: 0, total: fileArray[index].size, percentage: 0 });
+        });
+        setUploadProgress(progressMap);
 
         // 模拟进度更新
         const progressInterval = setInterval(() => {
           setUploadProgress((prev) => {
-            const newMap = new Map(prev)
+            const newMap = new Map(prev);
             prev.forEach((progress, index) => {
               if (progress.percentage < 90) {
                 newMap.set(index, {
                   ...progress,
                   percentage: Math.min(progress.percentage + 5, 90),
                   loaded: (progress.total * Math.min(progress.percentage + 5, 90)) / 100,
-                })
+                });
               }
-            })
-            return newMap
-          })
-        }, 200)
+            });
+            return newMap;
+          });
+        }, 200);
 
         // 上传文件
-        const results = await uploadFiles(fileArray, (fileIndex, progress) => {
-          setUploadProgress((prev) => {
-            const newMap = new Map(prev)
-            newMap.set(fileIndex, progress)
-            return newMap
-          })
-        })
+        const results = await uploadFiles(
+          fileArray,
+          undefined, // postId (可选)
+          (fileIndex: number, progress: { loaded: number; total: number; percentage: number }) => {
+            setUploadProgress((prev) => {
+              const newMap = new Map(prev);
+              newMap.set(fileIndex, progress);
+              return newMap;
+            });
+          }
+        );
 
-        clearInterval(progressInterval)
-        
+        clearInterval(progressInterval);
+
         // 更新已上传文件列表
-        const newFiles = [...uploadedFiles, ...results]
-        setUploadedFiles(newFiles)
-        onUploadComplete(newFiles)
-        setUploadProgress(new Map())
+        const newFiles = [...uploadedFiles, ...results];
+        setUploadedFiles(newFiles);
+        onUploadComplete(newFiles);
+        setUploadProgress(new Map());
       } catch (err: any) {
-        console.error("[MultiMediaUpload] upload error:", err)
-        onUploadError?.(err.message || "上传失败")
-        setUploadProgress(new Map())
+        console.error("[MultiMediaUpload] upload error:", err);
+        onUploadError?.(err.message || "上传失败");
+        setUploadProgress(new Map());
       } finally {
-        setIsUploading(false)
+        setIsUploading(false);
       }
     },
     [uploadedFiles, maxFiles, onUploadComplete, onUploadError]
-  )
+  );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
+    const files = e.target.files;
     if (files && files.length > 0) {
-      handleFiles(files)
+      handleFiles(files);
     }
     // 重置 input，允许重复选择同一文件
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+      fileInputRef.current.value = "";
     }
-  }
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(true)
-  }
+    e.preventDefault();
+    setIsDragging(true);
+  };
 
   const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-  }
+    e.preventDefault();
+    setIsDragging(false);
+  };
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
+    e.preventDefault();
+    setIsDragging(false);
 
-    const files = e.dataTransfer.files
+    const files = e.dataTransfer.files;
     if (files && files.length > 0) {
-      handleFiles(files)
+      handleFiles(files);
     }
-  }
+  };
 
   const handleRemove = (index: number) => {
-    const newFiles = uploadedFiles.filter((_, i) => i !== index)
-    setUploadedFiles(newFiles)
-    onUploadComplete(newFiles)
-  }
+    const newFiles = uploadedFiles.filter((_, i) => i !== index);
+    setUploadedFiles(newFiles);
+    onUploadComplete(newFiles);
+  };
 
   const formatFileSize = (bytes: number): string => {
-    if (bytes < 1024) return `${bytes} B`
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`
-    if (bytes < 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(2)} MB`
-    return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`
-  }
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+    if (bytes < 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+    return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
+  };
 
   return (
     <div className={className}>
@@ -149,10 +158,10 @@ export function MultiMediaUpload({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={`
-            border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
+            border-2 border-dashed rounded-xl p-8 text-center cursor-pointer
             transition-colors
-            ${isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25"}
-            hover:border-primary/50
+            ${isDragging ? "border-[#6366F1] bg-[#6366F1]/5" : "border-[#1F1F1F] bg-[#0D0D0D]"}
+            hover:border-[#6366F1]/50
           `}
           onClick={() => fileInputRef.current?.click()}
         >
@@ -184,10 +193,10 @@ export function MultiMediaUpload({
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               className={`
-                border-2 border-dashed rounded-lg p-4 text-center cursor-pointer
+                border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
                 transition-colors
-                ${isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25"}
-                ${isUploading ? "opacity-50 cursor-not-allowed" : "hover:border-primary/50"}
+                ${isDragging ? "border-[#6366F1] bg-[#6366F1]/5" : "border-[#1F1F1F] bg-[#0D0D0D]"}
+                ${isUploading ? "opacity-50 cursor-not-allowed" : "hover:border-[#6366F1]/50"}
               `}
               onClick={() => !isUploading && fileInputRef.current?.click()}
             >
@@ -218,13 +227,13 @@ export function MultiMediaUpload({
           {/* 已上传文件列表 */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {uploadedFiles.map((file, index) => {
-              const progress = uploadProgress.get(index)
-              const isUploadingFile = progress && progress.percentage < 100
+              const progress = uploadProgress.get(index);
+              const isUploadingFile = progress && progress.percentage < 100;
 
               return (
                 <div key={index} className="relative group">
-                  <div className="relative rounded-lg overflow-hidden border border-border bg-muted">
-                    {file.type === 'image' ? (
+                  <div className="relative rounded-xl overflow-hidden border border-[#1F1F1F] bg-[#0D0D0D]">
+                    {file.type === "image" ? (
                       <img
                         src={file.url}
                         alt={file.fileName}
@@ -235,12 +244,19 @@ export function MultiMediaUpload({
                         <Video className="w-8 h-8 text-muted-foreground" />
                       </div>
                     )}
-                    
+
                     {isUploadingFile && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <div className="text-center text-white">
-                          <Loader2 className="w-6 h-6 mx-auto mb-1 animate-spin" />
-                          <p className="text-xs">{progress?.percentage.toFixed(0)}%</p>
+                      <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center">
+                        <Loader2 className="w-6 h-6 mb-2 animate-spin text-white" />
+                        <p className="text-xs text-white mb-2">
+                          {progress?.percentage.toFixed(0)}%
+                        </p>
+                        {/* Primary Gradient 进度条 */}
+                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#0D0D0D]">
+                          <div
+                            className="h-full bg-primary-gradient transition-all duration-300"
+                            style={{ width: `${progress?.percentage || 0}%` }}
+                          ></div>
                         </div>
                       </div>
                     )}
@@ -255,22 +271,17 @@ export function MultiMediaUpload({
                       <X className="w-4 h-4" />
                     </Button>
                   </div>
-                  
-                  <div className="mt-1 text-xs text-muted-foreground truncate">
-                    {file.fileName}
-                  </div>
+
+                  <div className="mt-1 text-xs text-muted-foreground truncate">{file.fileName}</div>
                   <div className="text-xs text-muted-foreground">
                     {formatFileSize(file.fileSize)}
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }
-
-
-

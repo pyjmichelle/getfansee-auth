@@ -1,34 +1,34 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { User, DollarSign, Check, ArrowRight } from "lucide-react"
-import { NavHeader } from "@/components/nav-header"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { User, DollarSign, Check, ArrowRight } from "lucide-react";
+import { NavHeader } from "@/components/nav-header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function CreatorOnboardPage() {
-  const router = useRouter()
-  const [step, setStep] = useState<1 | 2>(1)
-  const [username, setUsername] = useState("")
-  const [bio, setBio] = useState("")
-  const [subscriptionPrice, setSubscriptionPrice] = useState("9.99")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter();
+  const [step, setStep] = useState<1 | 2>(1);
+  const [username, setUsername] = useState("");
+  const [bio, setBio] = useState("");
+  const [subscriptionPrice, setSubscriptionPrice] = useState("9.99");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleContinue = () => {
     if (step === 1) {
-      setStep(2)
+      setStep(2);
     } else {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
       setTimeout(() => {
-        router.push("/creator/studio")
-      }, 1500)
+        router.push("/creator/studio");
+      }, 1500);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -92,13 +92,20 @@ export default function CreatorOnboardPage() {
                     </Avatar>
                     <div>
                       <p className="font-semibold text-foreground">{username || "your_username"}</p>
-                      <p className="text-sm text-muted-foreground mt-1">{bio || "Your bio will appear here..."}</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {bio || "Your bio will appear here..."}
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <Button size="lg" className="w-full" onClick={handleContinue} disabled={!username || !bio}>
+              <Button
+                size="lg"
+                className="w-full"
+                onClick={handleContinue}
+                disabled={!username || !bio}
+              >
                 Continue
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -109,7 +116,9 @@ export default function CreatorOnboardPage() {
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <DollarSign className="w-8 h-8 text-primary" />
                 </div>
-                <h1 className="text-2xl font-bold text-foreground mb-2">Set Your Subscription Price</h1>
+                <h1 className="text-2xl font-bold text-foreground mb-2">
+                  Set Your Subscription Price
+                </h1>
                 <p className="text-muted-foreground">You can always change this later</p>
               </div>
 
@@ -117,7 +126,9 @@ export default function CreatorOnboardPage() {
                 <div className="space-y-2">
                   <Label htmlFor="price">Monthly Subscription Price (USD) *</Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                      $
+                    </span>
                     <Input
                       id="price"
                       type="number"
@@ -130,7 +141,9 @@ export default function CreatorOnboardPage() {
                       className="pl-8"
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground">Recommended range: $5 - $25 per month</p>
+                  <p className="text-xs text-muted-foreground">
+                    Recommended range: $5 - $25 per month
+                  </p>
                 </div>
 
                 {/* Earnings Preview */}
@@ -163,7 +176,9 @@ export default function CreatorOnboardPage() {
                     <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <div className="text-sm">
                       <p className="font-semibold text-foreground mb-1">You keep 90% of earnings</p>
-                      <p className="text-muted-foreground">Platform fee is 10%. Payouts are processed monthly.</p>
+                      <p className="text-muted-foreground">
+                        Platform fee is 10%. Payouts are processed monthly.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -182,5 +197,5 @@ export default function CreatorOnboardPage() {
         </Card>
       </main>
     </div>
-  )
+  );
 }

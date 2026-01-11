@@ -1,13 +1,13 @@
-import { notFound } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { CheckCircle2 } from "lucide-react"
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { CheckCircle2 } from "lucide-react";
 
 export default function TestPage() {
   // Only accessible when NEXT_PUBLIC_TEST_MODE is enabled
   if (process.env.NEXT_PUBLIC_TEST_MODE !== "true") {
-    notFound()
+    notFound();
   }
 
   return (
@@ -15,9 +15,7 @@ export default function TestPage() {
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold text-foreground">Test Mode</h1>
-          <p className="text-muted-foreground">
-            Testing entry point for development and QA
-          </p>
+          <p className="text-muted-foreground">Testing entry point for development and QA</p>
         </div>
 
         <Card className="p-6 space-y-4">
@@ -66,7 +64,9 @@ export default function TestPage() {
             <div className="flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-medium text-foreground">Visit /home and open a creator</p>
+                <p className="text-sm font-medium text-foreground">
+                  Visit /home and open a creator
+                </p>
                 <p className="text-xs text-muted-foreground">
                   Browse creators list and navigate to a creator profile
                 </p>
@@ -93,7 +93,9 @@ export default function TestPage() {
             <div className="flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-medium text-foreground">Check /subscriptions and /purchases</p>
+                <p className="text-sm font-medium text-foreground">
+                  Check /subscriptions and /purchases
+                </p>
                 <p className="text-xs text-muted-foreground">
                   Verify that subscriptions and purchases are recorded correctly
                 </p>
@@ -102,7 +104,9 @@ export default function TestPage() {
             <div className="flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-medium text-foreground">Use /me to create creator profile (if applicable)</p>
+                <p className="text-sm font-medium text-foreground">
+                  Use /me to create creator profile (if applicable)
+                </p>
                 <p className="text-xs text-muted-foreground">
                   Convert your account to a creator and set up your profile
                 </p>
@@ -112,6 +116,5 @@ export default function TestPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
-

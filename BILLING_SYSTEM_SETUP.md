@@ -11,6 +11,7 @@
 ```
 
 这个迁移文件会创建：
+
 - `user_wallets` 表（用户钱包）
 - `wallet_transactions` 表（交易流水）
 - `rpc_purchase_post` 函数（原子扣费函数）
@@ -22,20 +23,20 @@
 
 ```sql
 -- 检查表是否存在
-SELECT 
-  CASE 
+SELECT
+  CASE
     WHEN EXISTS (
-      SELECT 1 FROM information_schema.tables 
+      SELECT 1 FROM information_schema.tables
       WHERE table_schema = 'public' AND table_name = 'user_wallets'
     ) THEN '✅ user_wallets 表存在'
     ELSE '❌ user_wallets 表不存在'
   END AS wallets_status;
 
 -- 检查函数是否存在
-SELECT 
-  CASE 
+SELECT
+  CASE
     WHEN EXISTS (
-      SELECT 1 FROM pg_proc 
+      SELECT 1 FROM pg_proc
       WHERE proname = 'rpc_purchase_post'
     ) THEN '✅ rpc_purchase_post 函数存在'
     ELSE '❌ rpc_purchase_post 函数不存在'
@@ -114,15 +115,18 @@ pnpm test:audit-billing
 ### 原子扣费函数 `rpc_purchase_post`
 
 **功能**：
+
 - 在数据库内部检查余额是否充足
 - 原子操作：扣费 + 记录交易 + 创建购买记录
 - 防止余额变为负数（使用 CHECK 约束和 SELECT FOR UPDATE）
 
 **参数**：
+
 - `p_post_id`: Post ID
 - `p_user_id`: User ID（可选，默认使用 `auth.uid()`）
 
 **返回**：
+
 ```json
 {
   "success": true,
@@ -135,6 +139,7 @@ pnpm test:audit-billing
 ```
 
 或失败时：
+
 ```json
 {
   "success": false,
@@ -147,6 +152,7 @@ pnpm test:audit-billing
 ### 权限检查
 
 在 `lib/posts.ts` 的 `listFeed` 函数中：
+
 - 未购买 PPV 内容时，**绝对禁止返回原始视频 URL**
 - 对于视频：返回 `preview_url`（前端控制 10 秒限制）
 - 对于图片：不返回 URL（显示锁定遮罩）
@@ -155,7 +161,7 @@ pnpm test:audit-billing
 ### 前端视频控制
 
 在 `components/media-display.tsx` 中：
+
 - 检测到 `is_locked` 时，视频播放至 10 秒后自动暂停
 - 自动呼出 `PaywallModal` 支付弹窗
 - 支付成功后刷新页面解锁完整内容
-

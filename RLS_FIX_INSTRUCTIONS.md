@@ -43,7 +43,7 @@ pnpm test:auth
 
 ```sql
 -- 检查所有策略
-SELECT 
+SELECT
   policyname,
   cmd,
   qual,
@@ -53,12 +53,13 @@ WHERE schemaname = 'public' AND tablename = 'profiles'
 ORDER BY policyname;
 
 -- 检查 RLS 是否启用
-SELECT tablename, rowsecurity 
-FROM pg_tables 
+SELECT tablename, rowsecurity
+FROM pg_tables
 WHERE schemaname = 'public' AND tablename = 'profiles';
 ```
 
 **预期结果**：
+
 - `rowsecurity` 应该是 `true`
 - 至少有 3 个策略（SELECT, INSERT, UPDATE）
 
@@ -71,6 +72,7 @@ WHERE schemaname = 'public' AND tablename = 'profiles';
 **原因**：策略的条件不正确
 
 **解决**：
+
 1. 执行 `migrations/003_fix_rls_policies.sql`（会先删除再重新创建）
 2. 确保 `WITH CHECK (auth.uid() = id)` 条件正确
 
@@ -79,6 +81,7 @@ WHERE schemaname = 'public' AND tablename = 'profiles';
 **原因**：用户没有有效的 session
 
 **解决**：
+
 1. 确保在插入前用户已登录（有 session）
 2. 检查 Supabase Auth 配置是否正确
 
@@ -87,6 +90,7 @@ WHERE schemaname = 'public' AND tablename = 'profiles';
 **原因**：权限不足或语法错误
 
 **解决**：
+
 1. 确认使用 `postgres` 角色执行 SQL
 2. 检查 SQL 语法是否正确
 3. 查看 Supabase Dashboard 的错误信息
@@ -102,6 +106,7 @@ pnpm test:auth
 ```
 
 **预期结果**：
+
 - ✅ `ensureProfile (创建)` - 通过
 - ✅ `RLS INSERT 策略` - 通过
 - ✅ 所有测试通过
@@ -120,11 +125,13 @@ CREATE POLICY "profiles_insert_own"
 ```
 
 **含义**：
+
 - 用户只能插入自己的 profile
 - `auth.uid()` 必须等于插入的 `id`
 - 这确保了用户不能为其他用户创建 profile
 
 **为什么测试失败**：
+
 - 如果 `auth.uid()` 返回 `null`（没有 session）
 - 或者策略没有正确创建
 - 或者策略被其他策略覆盖
@@ -134,9 +141,7 @@ CREATE POLICY "profiles_insert_own"
 ## 🚀 下一步
 
 RLS 策略修复后，可以继续：
+
 1. 运行完整测试：`pnpm test:auth`
 2. 测试实际功能（注册、登录、创建 profile）
 3. 继续开发其他功能
-
-
-

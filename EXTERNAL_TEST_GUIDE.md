@@ -3,6 +3,7 @@
 ## 测试链接
 
 **生产环境（Vercel）**：
+
 - 主链接：`https://getfansee-auth.vercel.app/auth`
 - 测试入口（如果启用了测试模式）：`https://getfansee-auth.vercel.app/test`
 
@@ -18,6 +19,7 @@
 6. 点击 "Sign up with email"
 
 **注意**：
+
 - 如果 Supabase 配置为**需要邮箱验证**：注册后会收到验证邮件，需要点击邮件中的链接完成验证
 - 如果 Supabase 配置为**不需要邮箱验证**：注册后立即可以登录并跳转到 `/home`
 
@@ -26,17 +28,20 @@
 如果自行注册需要邮箱验证，或需要快速开始测试，可以使用以下测试账号：
 
 **测试账号 1（Fan 用户）**：
+
 - 邮箱：`test-fan@example.com`
 - 密码：`TestPassword123!`
 - 用途：测试订阅、PPV 解锁等 Fan 功能
 
 **测试账号 2（Creator 用户）**：
+
 - 邮箱：`test-creator@example.com`
 - 密码：`TestPassword123!`
 - 用途：测试创建内容、管理帖子等 Creator 功能
 
 **创建测试账号**：
 如果这些账号不存在，可以运行以下命令创建：
+
 ```bash
 pnpm tsx scripts/create-test-users.ts
 ```
@@ -46,6 +51,7 @@ pnpm tsx scripts/create-test-users.ts
 ## 可测试功能清单
 
 ### ✅ 1. 用户认证
+
 - [ ] 注册新账号
 - [ ] 登录现有账号
 - [ ] 邮箱验证（如果启用）
@@ -53,17 +59,20 @@ pnpm tsx scripts/create-test-users.ts
 - [ ] Google OAuth 登录（如果配置）
 
 ### ✅ 2. 浏览 Creators
+
 - [ ] 访问 `/home` 查看 Creators 列表
 - [ ] 点击 Creator 卡片查看详情
 - [ ] 查看 Creator 的个人资料（display_name, bio, avatar）
 
 ### ✅ 3. 订阅功能
+
 - [ ] 在 Creator 页面点击 "Subscribe" 按钮
 - [ ] 订阅后，subscriber-only 内容（price_cents=0）应该可见
 - [ ] 访问 `/subscriptions` 查看订阅列表
 - [ ] 取消订阅功能
 
 ### ✅ 4. PPV（按次付费）解锁
+
 - [ ] 在 Creator 页面找到 PPV 内容（price_cents > 0）
 - [ ] 点击 "Unlock for $X.XX" 按钮
 - [ ] 解锁后，PPV 内容应该可见
@@ -71,6 +80,7 @@ pnpm tsx scripts/create-test-users.ts
 - [ ] **重要**：订阅不会自动解锁 PPV，需要单独购买
 
 ### ✅ 5. Creator 功能
+
 - [ ] 访问 `/me` 页面
 - [ ] 点击 "Become a Creator" 转换为 Creator
 - [ ] 访问 `/creator/onboarding` 填写 Creator 资料
@@ -82,6 +92,7 @@ pnpm tsx scripts/create-test-users.ts
 - [ ] 查看自己创建的帖子
 
 ### ✅ 6. 数据持久化验证
+
 - [ ] 登录后刷新页面，保持登录状态
 - [ ] 订阅后刷新页面，订阅状态保持
 - [ ] 解锁 PPV 后刷新页面，解锁状态保持
@@ -146,6 +157,7 @@ pnpm tsx scripts/create-test-users.ts
 ## 问题反馈
 
 如果遇到问题，请提供：
+
 1. 操作步骤
 2. 预期结果
 3. 实际结果

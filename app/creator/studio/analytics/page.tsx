@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ArrowLeft, TrendingUp, Users, Eye, Heart, DollarSign } from "lucide-react"
-import { NavHeader } from "@/components/nav-header"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
+import { useState } from "react";
+import { ArrowLeft, TrendingUp, Users, Eye, Heart, DollarSign } from "lucide-react";
+import { NavHeader } from "@/components/nav-header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 export default function AnalyticsPage() {
-  const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "all">("30d")
+  const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "all">("30d");
 
   const currentUser = {
     username: "sophia_creative",
     role: "creator" as const,
     avatar: "/placeholder.svg?height=100&width=100",
-  }
+  };
 
   const topPosts = [
     {
@@ -42,7 +42,7 @@ export default function AnalyticsPage() {
       revenue: 0,
       type: "free" as const,
     },
-  ]
+  ];
 
   const audienceStats = {
     byAge: [
@@ -58,7 +58,7 @@ export default function AnalyticsPage() {
       { country: "Australia", percentage: 8 },
       { country: "Other", percentage: 15 },
     ],
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -192,7 +192,11 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
                 <Badge variant={post.type === "free" ? "secondary" : "default"}>
-                  {post.type === "free" ? "Free" : post.type === "subscribers" ? "Subscribers" : "PPV"}
+                  {post.type === "free"
+                    ? "Free"
+                    : post.type === "subscribers"
+                      ? "Subscribers"
+                      : "PPV"}
                 </Badge>
               </div>
             ))}
@@ -243,5 +247,5 @@ export default function AnalyticsPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

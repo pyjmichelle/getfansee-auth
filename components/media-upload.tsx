@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { useState, useRef, useCallback } from "react"
-import { Upload, X, Image as ImageIcon, Video, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { uploadFile, type UploadProgress } from "@/lib/storage"
+import { useState, useRef, useCallback } from "react";
+import { Upload, X, Image as ImageIcon, Video, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { uploadFile, type UploadProgress } from "@/lib/storage";
 
 export type MediaUploadProps = {
-  onUploadComplete: (url: string) => void
-  onUploadError?: (error: string) => void
-  accept?: string
-  maxSize?: number // in bytes
-  className?: string
-}
+  onUploadComplete: (url: string) => void;
+  onUploadError?: (error: string) => void;
+  accept?: string;
+  maxSize?: number; // in bytes
+  className?: string;
+};
 
 export function MediaUpload({
   onUploadComplete,
@@ -20,105 +20,105 @@ export function MediaUpload({
   maxSize,
   className = "",
 }: MediaUploadProps) {
-  const [isDragging, setIsDragging] = useState(false)
-  const [isUploading, setIsUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(
     async (file: File) => {
       // 验证文件类型
       if (!file.type.match(/^(image|video)\//)) {
-        onUploadError?.("只支持图片和视频文件")
-        return
+        onUploadError?.("只支持图片和视频文件");
+        return;
       }
 
       // 验证文件大小
       if (maxSize && file.size > maxSize) {
-        onUploadError?.(`文件大小超过限制: ${(file.size / 1024 / 1024).toFixed(2)}MB`)
-        return
+        onUploadError?.(`文件大小超过限制: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+        return;
       }
 
       // 创建预览
-      const preview = URL.createObjectURL(file)
-      setPreviewUrl(preview)
+      const preview = URL.createObjectURL(file);
+      setPreviewUrl(preview);
 
       try {
-        setIsUploading(true)
-        setUploadProgress({ loaded: 0, total: file.size, percentage: 0 })
+        setIsUploading(true);
+        setUploadProgress({ loaded: 0, total: file.size, percentage: 0 });
 
         // 上传文件（注意：Supabase Storage 不支持实时进度，这里模拟进度）
         // 模拟上传进度（实际进度需要等待上传完成）
         const progressInterval = setInterval(() => {
           setUploadProgress((prev) => {
-            if (!prev) return { loaded: 0, total: file.size, percentage: 0 }
-            const newPercentage = Math.min(prev.percentage + 10, 90)
+            if (!prev) return { loaded: 0, total: file.size, percentage: 0 };
+            const newPercentage = Math.min(prev.percentage + 10, 90);
             return {
               loaded: (file.size * newPercentage) / 100,
               total: file.size,
               percentage: newPercentage,
-            }
-          })
-        }, 200)
+            };
+          });
+        }, 200);
 
-        const url = await uploadFile(file)
-        
-        clearInterval(progressInterval)
+        const mediaFile = await uploadFile(file);
 
-        setUploadedUrl(url)
-        onUploadComplete(url)
-        setUploadProgress(null)
+        clearInterval(progressInterval);
+
+        setUploadedUrl(mediaFile.url);
+        onUploadComplete(mediaFile.url);
+        setUploadProgress(null);
       } catch (err: any) {
-        console.error("[MediaUpload] upload error:", err)
-        onUploadError?.(err.message || "上传失败")
-        setPreviewUrl(null)
-        setUploadProgress(null)
+        console.error("[MediaUpload] upload error:", err);
+        onUploadError?.(err.message || "上传失败");
+        setPreviewUrl(null);
+        setUploadProgress(null);
       } finally {
-        setIsUploading(false)
+        setIsUploading(false);
       }
     },
     [onUploadComplete, onUploadError, maxSize]
-  )
+  );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      handleFile(file)
+      handleFile(file);
     }
-  }
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(true)
-  }
+    e.preventDefault();
+    setIsDragging(true);
+  };
 
   const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-  }
+    e.preventDefault();
+    setIsDragging(false);
+  };
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
+    e.preventDefault();
+    setIsDragging(false);
 
-    const file = e.dataTransfer.files?.[0]
+    const file = e.dataTransfer.files?.[0];
     if (file) {
-      handleFile(file)
+      handleFile(file);
     }
-  }
+  };
 
   const handleRemove = () => {
-    setPreviewUrl(null)
-    setUploadedUrl(null)
-    setUploadProgress(null)
+    setPreviewUrl(null);
+    setUploadedUrl(null);
+    setUploadProgress(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+      fileInputRef.current.value = "";
     }
-  }
+  };
 
-  const isImage = previewUrl && previewUrl.startsWith("blob:") && !uploadedUrl
+  const isImage = previewUrl && previewUrl.startsWith("blob:") && !uploadedUrl;
 
   return (
     <div className={className}>
@@ -183,11 +183,7 @@ export function MediaUpload({
                   className="w-full h-auto max-h-96 object-contain"
                 />
               ) : (
-                <video
-                  src={uploadedUrl}
-                  controls
-                  className="w-full h-auto max-h-96"
-                />
+                <video src={uploadedUrl} controls className="w-full h-auto max-h-96" />
               )}
               <Button
                 variant="destructive"
@@ -207,11 +203,7 @@ export function MediaUpload({
                   className="w-full h-auto max-h-96 object-contain"
                 />
               ) : (
-                <video
-                  src={previewUrl || undefined}
-                  controls
-                  className="w-full h-auto max-h-96"
-                />
+                <video src={previewUrl || undefined} controls className="w-full h-auto max-h-96" />
               )}
               {isUploading && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -238,6 +230,5 @@ export function MediaUpload({
         </div>
       )}
     </div>
-  )
+  );
 }
-

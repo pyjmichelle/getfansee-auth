@@ -1,44 +1,44 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { ArrowLeft, User, FileText, Check } from "lucide-react"
-import { NavHeader } from "@/components/nav-header"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import Link from "next/link"
+import { useState } from "react";
+import { ArrowLeft, User, FileText, Check } from "lucide-react";
+import { NavHeader } from "@/components/nav-header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import Link from "next/link";
 
 export default function CreatorApplicationPage() {
-  const [step, setStep] = useState<"form" | "success">("form")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [step, setStep] = useState<"form" | "success">("form");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     displayName: "",
     bio: "",
     category: "",
     socialLinks: "",
     reason: "",
-  })
+  });
 
   const currentUser = {
     username: "john_doe",
     role: "fan" as const,
     avatar: "/placeholder.svg?height=100&width=100",
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
 
     // Simulate API call
     setTimeout(() => {
-      setIsSubmitting(false)
-      setStep("success")
-    }, 2000)
-  }
+      setIsSubmitting(false);
+      setStep("success");
+    }, 2000);
+  };
 
   if (step === "success") {
     return (
@@ -52,8 +52,8 @@ export default function CreatorApplicationPage() {
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-4">Application Submitted!</h1>
             <p className="text-muted-foreground mb-8 text-balance">
-              Thank you for applying to become a creator. Our team will review your application and get back to you
-              within 2-3 business days.
+              Thank you for applying to become a creator. Our team will review your application and
+              get back to you within 2-3 business days.
             </p>
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">Next Steps:</p>
@@ -95,7 +95,7 @@ export default function CreatorApplicationPage() {
           </Card>
         </main>
       </div>
-    )
+    );
   }
 
   return (
@@ -112,7 +112,9 @@ export default function CreatorApplicationPage() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Creator Application</h1>
-          <p className="text-muted-foreground">Tell us about yourself and why you want to become a creator</p>
+          <p className="text-muted-foreground">
+            Tell us about yourself and why you want to become a creator
+          </p>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -233,5 +235,5 @@ export default function CreatorApplicationPage() {
         </form>
       </main>
     </div>
-  )
+  );
 }

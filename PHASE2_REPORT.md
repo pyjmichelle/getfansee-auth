@@ -3,19 +3,23 @@
 ## 📋 改动文件列表
 
 ### 数据库迁移
+
 - ✅ `migrations/011_phase2_upload.sql` - 创建 `post_media` 表，添加 `preview_enabled` 字段
 
 ### 后端函数
+
 - ✅ `lib/storage.ts` - 更新：支持多文件上传，文件大小限制（图片 20MB，视频 2GB）
 - ✅ `lib/watermark.ts` - 新增：图片水印功能（半透明平铺）
 - ✅ `lib/post-media.ts` - 新增：Post Media 数据访问层
 - ✅ `lib/posts.ts` - 更新：支持 `mediaFiles`、`preview_enabled`，添加 `deletePost` 函数
 
 ### UI 组件
+
 - ✅ `components/multi-media-upload.tsx` - 新增：多文件上传组件（支持 drag&drop、进度条）
 - ✅ `components/media-display.tsx` - 新增：媒体显示组件（支持水印、preview、遮罩）
 
 ### 页面
+
 - ✅ `app/creator/new-post/page.tsx` - 更新：集成多文件上传，支持 preview_enabled
 - ✅ `app/home/page.tsx` - 更新：使用 MediaDisplay 组件，添加删除功能
 - ✅ `app/creator/[id]/page.tsx` - 更新：使用 MediaDisplay 组件
@@ -25,12 +29,15 @@
 ## 📄 Migration 文件
 
 ### 文件名
+
 `migrations/011_phase2_upload.sql`
 
 ### 内容位置
+
 项目根目录：`/migrations/011_phase2_upload.sql`
 
 ### 主要变更
+
 1. 创建 `post_media` 表（多媒体资源）
    - `id`, `post_id`, `media_url`, `media_type`, `file_name`, `file_size`, `sort_order`, `has_watermark`
 2. 添加 `posts.preview_enabled` 字段（boolean，默认 false）
@@ -49,6 +56,7 @@ $ pnpm test:phase1
 ```
 
 **预期输出**：
+
 - ✅ 全部测试通过（失败: 0）
 - ✅ exit code = 0
 
@@ -59,6 +67,7 @@ $ pnpm test:visibility
 ```
 
 **预期输出**：
+
 - ✅ 全部测试通过（失败: 0）
 - ✅ exit code = 0
 
@@ -69,9 +78,11 @@ $ pnpm test:visibility
 ### 步骤 1: 执行 SQL Migration
 
 在 Supabase Dashboard SQL Editor 中执行：
+
 - `migrations/011_phase2_upload.sql`
 
 **注意**：Storage bucket 配置需要手动更新：
+
 - 进入 Supabase Dashboard → Storage → media bucket → Settings
 - Max file size: `2147483648` bytes (2GB)
 - Allowed MIME types: `image/jpeg, image/png, image/webp, video/mp4, video/quicktime`
@@ -111,6 +122,7 @@ $ pnpm test:visibility
 ## 🎯 核心功能验证
 
 ### 1. 多文件上传
+
 - ✅ 支持一次选择多个文件
 - ✅ 支持图片（jpg, png, webp）和视频（mp4, mov）
 - ✅ 文件大小限制：图片 ≤ 20MB，视频 ≤ 2GB
@@ -118,17 +130,20 @@ $ pnpm test:visibility
 - ✅ 文件预览和删除
 
 ### 2. 图片水印
+
 - ✅ 仅对非 free 内容添加水印
 - ✅ Creator 本人查看时不添加水印
 - ✅ 水印内容：Creator display_name
 - ✅ 水印样式：半透明白色，平铺覆盖
 
 ### 3. 视频 Preview
+
 - ✅ Creator 可选择开启 preview
 - ✅ Preview 显示视频前 10 秒
 - ✅ 10 秒后自动暂停并提示解锁/订阅
 
 ### 4. 内容删除
+
 - ✅ Creator 可删除自己发布的 post
 - ✅ 删除时确认提示
 - ✅ 删除后从 feed 中移除
@@ -180,9 +195,6 @@ ALTER TABLE posts ADD COLUMN preview_enabled boolean NOT NULL DEFAULT false;
 
 ---
 
-**完成时间**: _______________  
-**测试人员**: _______________  
-**备注**: _______________
-
-
-
+**完成时间**: ******\_\_\_******  
+**测试人员**: ******\_\_\_******  
+**备注**: ******\_\_\_******

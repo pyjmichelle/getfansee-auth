@@ -1,57 +1,61 @@
+"use client";
+
 /**
  * Storage 上传工具函数
  * Phase 2: 真实内容上传与基础内容保护
  */
 
-import { supabase } from "./supabase-client"
-import { getCurrentUser } from "./auth"
+import { getSupabaseBrowserClient } from "./supabase-browser";
+import { getCurrentUser } from "./auth";
+
+const supabase = getSupabaseBrowserClient();
 
 export type UploadProgress = {
-  loaded: number
-  total: number
-  percentage: number
-}
+  loaded: number;
+  total: number;
+  percentage: number;
+};
 
 export type MediaFile = {
-  url: string
-  type: 'image' | 'video'
-  fileName: string
-  fileSize: number
-}
+  url: string;
+  type: "image" | "video";
+  fileName: string;
+  fileSize: number;
+};
 
 // 允许的文件类型
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
-const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime'] // mp4, mov
-const MAX_IMAGE_SIZE = 20 * 1024 * 1024 // 20MB
-const MAX_VIDEO_SIZE = 2 * 1024 * 1024 * 1024 // 2GB
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/quicktime"]; // mp4, mov
+const MAX_IMAGE_SIZE = 20 * 1024 * 1024; // 20MB
+const MAX_VIDEO_SIZE = 2 * 1024 * 1024 * 1024; // 2GB
 
 /**
  * 验证文件类型和大小
  */
 export function validateFile(file: File): { valid: boolean; error?: string } {
   // 验证文件类型
-  const isImage = ALLOWED_IMAGE_TYPES.includes(file.type)
-  const isVideo = ALLOWED_VIDEO_TYPES.includes(file.type)
-  
+  const isImage = ALLOWED_IMAGE_TYPES.includes(file.type);
+  const isVideo = ALLOWED_VIDEO_TYPES.includes(file.type);
+
   if (!isImage && !isVideo) {
     return {
       valid: false,
-      error: `不支持的文件类型: ${file.type}。支持格式：图片 (jpg, png, webp)，视频 (mp4, mov)`
-    }
+      error: `不支持的文件类型: ${file.type}。支持格式：图片 (jpg, png, webp)，视频 (mp4, mov)`,
+    };
   }
 
   // 验证文件大小
-  const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_VIDEO_SIZE
+  const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_VIDEO_SIZE;
   if (file.size > maxSize) {
-    const maxSizeMB = (maxSize / 1024 / 1024).toFixed(0)
-    const fileSizeMB = (file.size / 1024 / 1024).toFixed(2)
+    const maxSizeMB = (maxSize / 1024 / 1024).toFixed(0);
+    const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
     return {
       valid: false,
-      error: `文件大小超过限制：${fileSizeMB}MB（最大 ${maxSizeMB}MB）`
-    }
+      error: `文件大小超过限制：${fileSizeMB}MB（最大 ${maxSizeMB}MB）`,
+    };
   }
 
-  return { valid: true }
+  return { valid: true };
 }
 
 /**
@@ -69,72 +73,70 @@ export async function uploadFile(
   onProgress?: (progress: UploadProgress) => void
 ): Promise<MediaFile> {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      throw new Error("用户未登录")
+      throw new Error("用户未登录");
     }
 
     // 验证文件
-    const validation = validateFile(file)
+    const validation = validateFile(file);
     if (!validation.valid) {
-      throw new Error(validation.error)
+      throw new Error(validation.error);
     }
 
-    const isImage = ALLOWED_IMAGE_TYPES.includes(file.type)
-    const mediaType = isImage ? 'image' : 'video'
+    const isImage = ALLOWED_IMAGE_TYPES.includes(file.type);
+    const mediaType = isImage ? "image" : "video";
 
     // 生成文件路径: creatorId/postId/mediaId/timestamp-uuid.ext
     // 包含追踪标识符：creatorId, postId, mediaId, timestamp
-    const now = new Date()
-    const timestamp = now.getTime()
-    const fileExt = file.name.split(".").pop()?.toLowerCase() || "bin"
-    const uuid = crypto.randomUUID()
-    
+    const now = new Date();
+    const timestamp = now.getTime();
+    const fileExt = file.name.split(".").pop()?.toLowerCase() || "bin";
+    const uuid = crypto.randomUUID();
+
     // 路径格式：creatorId/postId/mediaId/timestamp-uuid.ext
     // 如果 postId 或 mediaId 未提供，使用占位符
     const pathParts = [
       user.id, // creatorId (always present)
-      postId || 'pending', // postId
+      postId || "pending", // postId
       mediaId || uuid, // mediaId (use uuid if not provided)
-      `${timestamp}-${uuid}.${fileExt}` // timestamp-uuid.ext
-    ]
-    const filePath = pathParts.join('/')
+      `${timestamp}-${uuid}.${fileExt}`, // timestamp-uuid.ext
+    ];
+    const filePath = pathParts.join("/");
 
     // 上传文件（包含元数据用于追踪）
     const metadata: Record<string, string> = {
-      platform: 'getfansee',
+      platform: "getfansee",
       creator_id: user.id,
       uploaded_at: now.toISOString(),
-    }
-    
+    };
+
     if (postId) {
-      metadata.post_id = postId
+      metadata.post_id = postId;
     }
     if (mediaId) {
-      metadata.media_id = mediaId
+      metadata.media_id = mediaId;
     }
 
-    const { data, error } = await supabase.storage
-      .from("media")
-      .upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: false,
-        metadata: metadata,
-      })
+    const { data, error } = await supabase.storage.from("media").upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false,
+      metadata: metadata,
+    });
 
     if (error) {
-      console.error("[storage] upload error:", error)
-      throw new Error(`上传失败: ${error.message}`)
+      console.error("[storage] upload error:", error);
+      throw new Error(`上传失败: ${error.message}`);
     }
 
     // 获取 signed URL（有效期 1 年）
     const { data: urlData, error: urlError } = await supabase.storage
       .from("media")
-      .createSignedUrl(filePath, 31536000) // 1 year
+      .createSignedUrl(filePath, 31536000); // 1 year
 
     if (urlError || !urlData) {
-      console.error("[storage] createSignedUrl error:", urlError)
-      throw new Error(`生成 URL 失败: ${urlError?.message}`)
+      console.error("[storage] createSignedUrl error:", urlError);
+      throw new Error(`生成 URL 失败: ${urlError?.message}`);
     }
 
     return {
@@ -142,10 +144,10 @@ export async function uploadFile(
       type: mediaType,
       fileName: file.name,
       fileSize: file.size,
-    }
+    };
   } catch (err: any) {
-    console.error("[storage] uploadFile exception:", err)
-    throw err
+    console.error("[storage] uploadFile exception:", err);
+    throw err;
   }
 }
 
@@ -161,24 +163,79 @@ export async function uploadFiles(
   postId?: string,
   onProgress?: (fileIndex: number, progress: UploadProgress) => void
 ): Promise<MediaFile[]> {
-  const results: MediaFile[] = []
-  
+  const results: MediaFile[] = [];
+
   for (let i = 0; i < files.length; i++) {
-    const file = files[i]
+    const file = files[i];
     try {
       // 为每个文件生成唯一的 mediaId
-      const mediaId = crypto.randomUUID()
+      const mediaId = crypto.randomUUID();
       const result = await uploadFile(file, postId, mediaId, (progress) => {
-        onProgress?.(i, progress)
-      })
-      results.push(result)
+        onProgress?.(i, progress);
+      });
+      results.push(result);
     } catch (err: any) {
-      console.error(`[storage] uploadFiles: file ${i} failed:`, err)
-      throw new Error(`文件 "${file.name}" 上传失败: ${err.message}`)
+      console.error(`[storage] uploadFiles: file ${i} failed:`, err);
+      throw new Error(`文件 "${file.name}" 上传失败: ${err.message}`);
     }
   }
-  
-  return results
+
+  return results;
+}
+
+/**
+ * 上传头像到 Supabase Storage
+ * @param file 头像文件
+ * @param userId 用户 ID
+ * @param onProgress 进度回调（可选）
+ * @returns 头像 URL
+ */
+export async function uploadAvatar(
+  file: File,
+  userId: string,
+  onProgress?: (progress: UploadProgress) => void
+): Promise<string> {
+  try {
+    // 验证文件类型（仅支持图片）
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      throw new Error(`不支持的文件类型: ${file.type}。支持格式：jpg, png, webp`);
+    }
+
+    // 验证文件大小
+    if (file.size > MAX_IMAGE_SIZE) {
+      const maxSizeMB = (MAX_IMAGE_SIZE / 1024 / 1024).toFixed(0);
+      const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+      throw new Error(`文件大小超过限制：${fileSizeMB}MB（最大 ${maxSizeMB}MB）`);
+    }
+
+    // 生成文件路径: avatars/userId/timestamp-uuid.ext
+    const now = new Date();
+    const timestamp = now.getTime();
+    const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const uuid = crypto.randomUUID();
+    const filePath = `${userId}/${timestamp}-${uuid}.${fileExt}`;
+
+    // 上传到 Supabase Storage (avatars bucket)
+    const { data, error } = await supabase.storage.from("avatars").upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+
+    if (error) {
+      console.error("[storage] uploadAvatar error:", error);
+      throw new Error(`上传失败: ${error.message}`);
+    }
+
+    // 获取公共 URL
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("avatars").getPublicUrl(filePath);
+
+    return publicUrl;
+  } catch (err: any) {
+    console.error("[storage] uploadAvatar exception:", err);
+    throw err;
+  }
 }
 
 /**
@@ -187,29 +244,29 @@ export async function uploadFiles(
  */
 export async function deleteFile(filePath: string): Promise<boolean> {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      console.error("[storage] deleteFile: no user")
-      return false
+      console.error("[storage] deleteFile: no user");
+      return false;
     }
 
     // 验证文件路径属于当前用户
     if (!filePath.startsWith(`${user.id}/`)) {
-      console.error("[storage] deleteFile: 无权删除此文件")
-      return false
+      console.error("[storage] deleteFile: 无权删除此文件");
+      return false;
     }
 
-    const { error } = await supabase.storage.from("media").remove([filePath])
+    const { error } = await supabase.storage.from("media").remove([filePath]);
 
     if (error) {
-      console.error("[storage] deleteFile error:", error)
-      return false
+      console.error("[storage] deleteFile error:", error);
+      return false;
     }
 
-    return true
+    return true;
   } catch (err) {
-    console.error("[storage] deleteFile exception:", err)
-    return false
+    console.error("[storage] deleteFile exception:", err);
+    return false;
   }
 }
 
@@ -220,14 +277,14 @@ export async function deleteFile(filePath: string): Promise<boolean> {
  */
 export function extractFilePathFromUrl(signedUrl: string): string | null {
   try {
-    const url = new URL(signedUrl)
+    const url = new URL(signedUrl);
     // Supabase signed URL 格式: https://<project>.supabase.co/storage/v1/object/sign/media/path?token=...
-    const pathMatch = url.pathname.match(/\/storage\/v1\/object\/sign\/media\/(.+)/)
+    const pathMatch = url.pathname.match(/\/storage\/v1\/object\/sign\/media\/(.+)/);
     if (pathMatch) {
-      return decodeURIComponent(pathMatch[1])
+      return decodeURIComponent(pathMatch[1]);
     }
-    return null
+    return null;
   } catch {
-    return null
+    return null;
   }
 }

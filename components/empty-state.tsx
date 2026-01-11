@@ -1,33 +1,33 @@
-"use client"
+"use client";
 
-import { Heart, ShoppingBag, Bell } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { Heart, ShoppingBag, Bell } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface EmptyStateProps {
-  icon: "heart" | "shopping-bag" | "bell" | string
-  title: string
-  description: string
+  icon: "heart" | "shopping-bag" | "bell" | string;
+  title: string;
+  description: string;
   action?: {
-    label: string
-    href?: string
-    onClick?: () => void
-  }
+    label: string;
+    href?: string;
+    onClick?: () => void;
+  };
 }
 
 export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   const getIcon = () => {
     switch (icon) {
       case "heart":
-        return <Heart className="w-10 h-10 text-muted-foreground" />
+        return <Heart className="w-10 h-10 text-muted-foreground" />;
       case "shopping-bag":
-        return <ShoppingBag className="w-10 h-10 text-muted-foreground" />
+        return <ShoppingBag className="w-10 h-10 text-muted-foreground" />;
       case "bell":
-        return <Bell className="w-10 h-10 text-muted-foreground" />
+        return <Bell className="w-10 h-10 text-muted-foreground" />;
       default:
-        return <Heart className="w-10 h-10 text-muted-foreground" />
+        return <Heart className="w-10 h-10 text-muted-foreground" />;
     }
-  }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
@@ -43,12 +43,15 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
               <Link href={action.href}>{action.label}</Link>
             </Button>
           ) : (
-            <Button onClick={action.onClick} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+            <Button
+              onClick={action.onClick}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
               {action.label}
             </Button>
           )}
         </>
       )}
     </div>
-  )
+  );
 }

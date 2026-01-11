@@ -5,6 +5,7 @@
 ### 1. 执行 SQL Migration
 
 在 Supabase Dashboard SQL Editor 中执行：
+
 - `migrations/011_phase2_upload.sql`
 
 ### 2. 更新 Storage Bucket 配置（手动）
@@ -12,7 +13,7 @@
 在 Supabase Dashboard → Storage → media bucket → Settings：
 
 1. **Max file size**: `2147483648` bytes (2GB)
-2. **Allowed MIME types**: 
+2. **Allowed MIME types**:
    ```
    image/jpeg, image/png, image/webp, video/mp4, video/quicktime
    ```
@@ -20,6 +21,7 @@
 ### 3. 环境变量
 
 确保 `.env.local` 包含：
+
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=你的 Supabase URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=你的 Anon Key
@@ -40,6 +42,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=你的 Anon Key
 7. 点击 "发布"
 
 **验证点**：
+
 - ✅ 多个文件上传成功
 - ✅ 文件预览正常
 - ✅ Post 创建成功
@@ -51,6 +54,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=你的 Anon Key
 3. 查看不同 visibility 的 post
 
 **验证点**：
+
 - ✅ Free post: 直接显示（无水印）
 - ✅ Subscribers-only post: 遮罩 + "Subscribe to view"
 - ✅ PPV post: 遮罩 + "Unlock for $X.XX"
@@ -81,22 +85,22 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=你的 Anon Key
 ## 📊 技术实现
 
 ### 数据模型
+
 - `post_media` 表：存储多个媒体资源
 - `posts.preview_enabled`：是否开启视频 preview
 
 ### 水印生成
+
 - 客户端生成（Canvas API）
 - 仅对非 free 内容添加
 - Creator 本人查看时不添加
 
 ### 视频 Preview
+
 - 前端限制播放时间（10 秒）
 - 10 秒后自动暂停并提示解锁/订阅
 
 ---
 
-**完成时间**: _______________  
-**测试人员**: _______________  
-
-
-
+**完成时间**: ******\_\_\_******  
+**测试人员**: ******\_\_\_******

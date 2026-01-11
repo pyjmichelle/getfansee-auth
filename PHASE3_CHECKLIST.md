@@ -7,7 +7,7 @@
 - ✅ **SQL Migration**: `migrations/009_phase3_storage.sql`
   - 创建 `media` bucket（如果不存在）
   - 配置 file_size_limit: 200MB
-  - 配置 allowed_mime_types: image/*, video/*
+  - 配置 allowed_mime_types: image/_, video/_
   - INSERT policy: 只允许登录用户写入自己的目录 (`userId/yyyy-mm/*`)
   - SELECT policy: 用户可以查看自己上传的文件
   - DELETE policy: 用户可以删除自己上传的文件
@@ -26,7 +26,7 @@
   - `uploadFile(file, onProgress?)`: 上传文件到 Supabase Storage
   - `deleteFile(filePath)`: 删除文件
   - `extractFilePathFromUrl(signedUrl)`: 从 signed URL 提取文件路径
-  - 文件类型验证（image/*, video/*）
+  - 文件类型验证（image/_, video/_）
   - 文件大小验证（图片 10MB，视频 200MB）
   - 路径规则：`userId/yyyy-mm/<uuid>.<ext>`
 
@@ -72,6 +72,7 @@ npx playwright install
 ### 2. 执行 SQL Migration
 
 在 Supabase Dashboard SQL Editor 中执行：
+
 - `migrations/009_phase3_storage.sql`
 
 **注意**：Storage bucket 需要通过 Supabase Dashboard 手动创建（SQL 可能不支持），然后执行 policies 部分。
@@ -79,6 +80,7 @@ npx playwright install
 ### 3. 创建 Storage Bucket（手动）
 
 在 Supabase Dashboard → Storage：
+
 1. 点击 "New bucket"
 2. Name: `media`
 3. Public: **关闭**
@@ -98,6 +100,7 @@ pnpm test:e2e
 ### 5. Staging 部署
 
 参考 `TESTING_GUIDE_STAGING.md` 进行：
+
 1. 配置 Vercel 环境变量
 2. 配置 Supabase Redirect URLs
 3. 执行所有 SQL migrations
@@ -117,17 +120,21 @@ pnpm test:e2e
 ## 📁 新增文件清单
 
 ### 数据库
+
 - `migrations/009_phase3_storage.sql`
 
 ### 代码
+
 - `lib/storage.ts` - Storage 工具函数
 - `components/media-upload.tsx` - 上传组件
 
 ### 测试
+
 - `playwright.config.ts` - Playwright 配置
 - `e2e/paywall-flow.spec.ts` - E2E 测试
 
 ### 文档
+
 - `TESTING_GUIDE_STAGING.md` - Staging 验收指南
 - `PHASE3_CHECKLIST.md` - 本文件
 
@@ -142,9 +149,6 @@ pnpm test:e2e
 
 ---
 
-**完成时间**: _______________  
-**测试人员**: _______________  
-**备注**: _______________
-
-
-
+**完成时间**: ******\_\_\_******  
+**测试人员**: ******\_\_\_******  
+**备注**: ******\_\_\_******

@@ -39,11 +39,13 @@ pnpm test:paywall
 ```
 
 **预期结果**：
+
 - ✅ 全部测试通过（失败: 0）
 - ✅ 输出 "通过：全部测试通过"
 - ✅ exit code = 0
 
 **测试覆盖**：
+
 1. ✅ 初始 fan 无订阅，locked 不可见
 2. ✅ subscribe30d 后 locked 可见
 3. ✅ cancel 后再次不可见
@@ -56,10 +58,12 @@ pnpm test:paywall
 ### 1. Feed 页面 (`/home`)
 
 **场景 A: Free Post**
+
 - ✅ 创建一条 `is_locked=false` 的 post
 - ✅ 在 `/home` feed 中直接显示完整内容（无遮罩）
 
 **场景 B: Locked Post（未订阅）**
+
 - ✅ 创建一条 `is_locked=true` 的 post
 - ✅ 在 `/home` feed 中显示：
   - 内容区域：显示 "This content is locked" + Lock 图标
@@ -68,12 +72,14 @@ pnpm test:paywall
 - ✅ 订阅成功后，locked 内容变为可见
 
 **场景 C: Locked Post（已订阅）**
+
 - ✅ 订阅 Creator 后
 - ✅ 在 `/home` feed 中直接显示 locked 内容（无遮罩）
 
 ### 2. Creator Profile 页面 (`/creator/[id]`)
 
 **场景 A: 未订阅**
+
 - ✅ 访问 Creator profile 页面
 - ✅ 显示 "Subscribe" 按钮
 - ✅ 点击 "Subscribe" 按钮
@@ -82,6 +88,7 @@ pnpm test:paywall
   - locked posts 变为可见
 
 **场景 B: 已订阅**
+
 - ✅ 访问已订阅的 Creator profile 页面
 - ✅ 显示 "Cancel Subscription" 按钮
 - ✅ 点击 "Cancel Subscription" 按钮
@@ -90,6 +97,7 @@ pnpm test:paywall
   - locked posts 再次不可见
 
 **场景 C: Creator 本人**
+
 - ✅ Creator 访问自己的 profile 页面
 - ✅ 不显示 Subscribe 按钮（本人无需订阅）
 - ✅ 所有 posts（包括 locked）都可见
@@ -99,9 +107,11 @@ pnpm test:paywall
 ## 📁 新增/修改文件清单
 
 ### 数据库迁移
+
 - ✅ `migrations/008_phase2_paywall.sql` - 新建 subscriptions/post_unlocks 表 + RLS
 
 ### 后端函数
+
 - ✅ `lib/paywall.ts` - 更新/新增：
   - `subscribe30d(creatorId)`
   - `cancelSubscription(creatorId)`
@@ -111,6 +121,7 @@ pnpm test:paywall
   - `getMyPaywallState(userId)` (保留用于批量检查)
 
 ### UI 页面
+
 - ✅ `app/home/page.tsx` - 更新：
   - 导入 paywall 函数
   - 显示 locked posts 遮罩
@@ -123,6 +134,7 @@ pnpm test:paywall
   - 根据订阅状态显示/隐藏 locked posts
 
 ### 测试脚本
+
 - ✅ `scripts/test-paywall.js` - 更新：
   - 匹配新的表结构（subscriber_id, creator_id, starts_at, ends_at）
   - 4 条核心断言测试
@@ -163,6 +175,3 @@ pnpm test:paywall
 **完成时间**: 请填写完成日期  
 **测试人员**: 请填写测试人员姓名  
 **备注**: 如有问题请在此记录
-
-
-
