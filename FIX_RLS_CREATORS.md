@@ -81,3 +81,5 @@ pnpm test:visibility
 - 测试脚本现在不依赖 trigger，直接插入 `creators` 记录
 - 如果仍然失败，检查 Supabase 中的 RLS 策略是否正确应用
 
+
+

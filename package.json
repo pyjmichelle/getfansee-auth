@@ -18,7 +18,8 @@
     "test:e2e:ui": "playwright test --ui",
     "create-test-users": "tsx scripts/create-test-users.ts",
     "seed-feed": "tsx scripts/seed-feed-data.ts",
-    "fix-avatars": "tsx scripts/fix-avatars.ts"
+    "fix-avatars": "tsx scripts/fix-avatars.ts",
+    "test:audit-billing": "tsx tests/audit_billing.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

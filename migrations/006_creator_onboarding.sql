@@ -69,3 +69,5 @@ WHERE schemaname = 'public'
   AND tablename = 'profiles'
   AND policyname = 'profiles_update_own';
 
+
+

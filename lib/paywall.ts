@@ -129,17 +129,19 @@ export async function isActiveSubscriber(fanId: string | null, creatorId: string
 }
 
 /**
- * 解锁单个 post（PPV unlock - 创建 purchase）
+ * 解锁单个 post（PPV unlock - 使用原子扣费函数）
  * @param postId Post ID
- * @param priceCents Price in cents (from post.price_cents)
- * @returns true 成功，false 失败（unique 冲突视为成功）
+ * @param priceCents Price in cents (from post.price_cents, optional)
+ * @returns { success: boolean, error?: string, balance_after_cents?: number }
  */
-export async function unlockPost(postId: string, priceCents: number): Promise<boolean> {
+export async function unlockPost(
+  postId: string,
+  priceCents?: number
+): Promise<{ success: boolean; error?: string; balance_after_cents?: number }> {
   try {
     const user = await getCurrentUser()
     if (!user) {
-      console.error("[paywall] unlockPost: no user")
-      return false
+      return { success: false, error: "User not authenticated" }
     }
 
     // Get post price if not provided
@@ -152,32 +154,76 @@ export async function unlockPost(postId: string, priceCents: number): Promise<bo
 
       if (postError || !post) {
         console.error("[paywall] unlockPost: post not found", postError)
-        return false
+        return { success: false, error: "Post not found" }
       }
 
       priceCents = post.price_cents || 0
     }
 
-    // Create purchase record
-    const { error } = await supabase.from("purchases").insert({
-      fan_id: user.id,
-      post_id: postId,
-      paid_amount_cents: priceCents,
+    // 调用原子扣费函数（在数据库内部完成：检查余额 -> 扣费 -> 记录交易 -> 创建购买）
+    const { data, error } = await supabase.rpc("rpc_purchase_post", {
+      p_post_id: postId,
+      p_user_id: user.id,
     })
 
     if (error) {
-      // unique 冲突视为成功（已购买）
-      if (error.code === "23505") {
-        return true
-      }
-      console.error("[paywall] unlockPost error:", error)
-      return false
+      console.error("[paywall] unlockPost rpc error:", error)
+      return { success: false, error: error.message }
     }
 
-    return true
-  } catch (err) {
+    if (!data || !data.success) {
+      return {
+        success: false,
+        error: data?.error || "Purchase failed",
+        balance_after_cents: data?.balance_after_cents,
+      }
+    }
+
+    return {
+      success: true,
+      balance_after_cents: data.balance_after_cents,
+    }
+  } catch (err: any) {
     console.error("[paywall] unlockPost exception:", err)
-    return false
+    return { success: false, error: err?.message || "Unknown error" }
+  }
+}
+
+/**
+ * 获取钱包余额
+ * @returns { success: boolean, balance_cents?: number, error?: string }
+ */
+export async function getWalletBalance(): Promise<{
+  success: boolean
+  balance_cents?: number
+  error?: string
+}> {
+  try {
+    const user = await getCurrentUser()
+    if (!user) {
+      return { success: false, error: "User not authenticated" }
+    }
+
+    const { data, error } = await supabase.rpc("rpc_get_wallet_balance", {
+      p_user_id: user.id,
+    })
+
+    if (error) {
+      console.error("[paywall] getWalletBalance error:", error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data || !data.success) {
+      return { success: false, error: data?.error || "Failed to get balance" }
+    }
+
+    return {
+      success: true,
+      balance_cents: data.balance_cents || 0,
+    }
+  } catch (err: any) {
+    console.error("[paywall] getWalletBalance exception:", err)
+    return { success: false, error: err?.message || "Unknown error" }
   }
 }
 

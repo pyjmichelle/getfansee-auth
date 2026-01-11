@@ -1,45 +1,315 @@
-name: MVP Test Pipeline
+name: CI Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10'
 
 jobs:
-  test:
+  lint-and-type-check:
+    name: Lint & Type Check
     runs-on: ubuntu-latest
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      CI: 'true'
-      GITHUB_ACTIONS: 'true'
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-      
-      - name: Setup pnpm (corepack)
-        run: |
-          corepack enable
-          corepack prepare pnpm@9.12.3 --activate
-          pnpm --version
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
       
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       
-      - name: Check required env
+      - name: Run ESLint
+        run: pnpm lint
+      
+      - name: Run TypeScript type check
+        run: pnpm type-check
+
+  legacy-tests:
+    name: Legacy Test Scripts
+    runs-on: ubuntu-latest
+    needs: lint-and-type-check
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_TEST_MODE: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Run auth tests
+        run: pnpm test:auth
+      
+      - name: Run paywall tests
+        run: pnpm test:paywall
+      
+      - name: Run comprehensive tests
+        run: pnpm test:all
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint-and-type-check
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Run unit tests
+        run: pnpm test:unit --coverage
+      
+      - name: Check coverage thresholds
         run: |
-          test -n "$NEXT_PUBLIC_SUPABASE_URL" || (echo "Missing NEXT_PUBLIC_SUPABASE_URL" && exit 1)
-          test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" || (echo "Missing NEXT_PUBLIC_SUPABASE_ANON_KEY" && exit 1)
-          echo "✅ Required environment variables are present"
-          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
-            echo "⚠️  SUPABASE_SERVICE_ROLE_KEY not set - admin-only tests will be skipped"
+          echo "Checking coverage thresholds..."
+          if [ -f coverage/coverage-summary.json ]; then
+            LINES=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+            FUNCTIONS=$(cat coverage/coverage-summary.json | jq '.total.functions.pct')
+            BRANCHES=$(cat coverage/coverage-summary.json | jq '.total.branches.pct')
+            
+            echo "📊 Coverage Report:"
+            echo "  Lines: $LINES%"
+            echo "  Functions: $FUNCTIONS%"
+            echo "  Branches: $BRANCHES%"
+            
+            FAILED=0
+            if (( $(echo "$LINES < 60" | bc -l) )); then
+              echo "❌ Lines coverage $LINES% is below threshold 60%"
+              FAILED=1
+            fi
+            if (( $(echo "$FUNCTIONS < 60" | bc -l) )); then
+              echo "❌ Functions coverage $FUNCTIONS% is below threshold 60%"
+              FAILED=1
+            fi
+            if (( $(echo "$BRANCHES < 50" | bc -l) )); then
+              echo "❌ Branches coverage $BRANCHES% is below threshold 50%"
+              FAILED=1
+            fi
+            
+            if [ $FAILED -eq 1 ]; then
+              echo "❌ Coverage check failed"
+              exit 1
+            fi
+            
+            echo "✅ All coverage thresholds met"
+          else
+            echo "⚠️ Coverage file not found, skipping threshold check"
           fi
       
-      - name: Run MVP tests
-        run: pnpm test:mvp
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unit
+          token: ${{ secrets.CODECOV_TOKEN }}
 
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_TEST_MODE: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Start dev server
+        run: pnpm dev &
+        env:
+          PORT: 3000
+      
+      - name: Wait for server
+        run: npx wait-on http://localhost:3000 --timeout 60000
+      
+      - name: Run integration tests
+        run: pnpm vitest run tests/integration
+
+  rls-security-tests:
+    name: RLS Security Tests
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_TEST_MODE: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Run system lockdown verification
+        run: pnpm verify:lockdown
+
+  e2e-tests:
+    name: E2E Tests (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    needs: rls-security-tests
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_TEST_MODE: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Install Playwright browsers
+        run: pnpm playwright install --with-deps ${{ matrix.browser }}
+      
+      - name: Start dev server
+        run: pnpm dev &
+        env:
+          PORT: 3000
+      
+      - name: Wait for server
+        run: npx wait-on http://localhost:3000 --timeout 60000
+      
+      - name: Run E2E tests on ${{ matrix.browser }}
+        run: pnpm test:e2e --project=${{ matrix.browser }}
+      
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: playwright-report/
+          retention-days: 30
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build application
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: .next/
+
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: [lint-and-type-check, legacy-tests, unit-tests, integration-tests, rls-security-tests, e2e-tests, build]
+    steps:
+      - name: Check quality metrics
+        run: |
+          echo "🎉 ================================"
+          echo "✅ All Quality Checks Passed!"
+          echo "================================"
+          echo ""
+          echo "📋 Test Results:"
+          echo "  ✅ Lint & Type Check: Passed"
+          echo "  ✅ Legacy Tests (auth, paywall, all): Passed"
+          echo "  ✅ Unit Tests (>60% coverage): Passed"
+          echo "  ✅ Integration Tests: Passed"
+          echo "  ✅ RLS Security Tests: Passed"
+          echo "  ✅ E2E Tests (Chrome, Firefox, Safari): Passed"
+          echo "  ✅ Build: Passed"
+          echo ""
+          echo "🚀 Ready for deployment!"

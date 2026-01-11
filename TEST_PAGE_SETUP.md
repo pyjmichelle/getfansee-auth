@@ -47,3 +47,5 @@ Then open: http://localhost:3000/test
 
 This page is isolated and does not affect existing product routing logic. It only provides navigation and testing guidance.
 
+
+

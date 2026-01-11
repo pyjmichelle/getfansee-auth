@@ -83,3 +83,5 @@ FROM information_schema.triggers
 WHERE trigger_schema = 'public'
   AND event_object_table IN ('subscriptions', 'post_unlocks');
 
+
+

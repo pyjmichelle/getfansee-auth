@@ -164,3 +164,5 @@ pnpm dev
 - Verify RLS policies allow SELECT for authenticated users
 - Check that `fan_id` matches `auth.uid()`
 
+
+

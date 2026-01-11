@@ -214,3 +214,5 @@ pnpm test:paywall
 
 **下一步**：执行 `migrations/005_paywall.sql`，然后运行 `pnpm test:paywall` 验证。
 
+
+

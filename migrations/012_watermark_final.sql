@@ -57,3 +57,5 @@ SELECT
     ELSE '✅ has_watermark 列已删除'
   END AS has_watermark_status;
 
+
+

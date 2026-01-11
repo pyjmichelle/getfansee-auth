@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { addWatermarkToImage, shouldAddWatermark } from "@/lib/watermark"
 import { getCurrentUser } from "@/lib/auth"
+import { PaywallModal } from "@/components/paywall-modal"
 import type { Post } from "@/lib/posts"
 
 export type MediaDisplayProps = {
@@ -26,6 +27,8 @@ export function MediaDisplay({
 }: MediaDisplayProps) {
   const [watermarkedImages, setWatermarkedImages] = useState<Map<string, string>>(new Map())
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const [showPaywallModal, setShowPaywallModal] = useState(false)
+  const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map())
 
   useEffect(() => {
     const checkUser = async () => {
@@ -195,40 +198,99 @@ export function MediaDisplay({
 
   // 显示内容（带水印，如果启用）
   return (
-    <div className="space-y-4">
-      {post.media && post.media.length > 0 ? (
-        post.media.map((media) => (
-          <div key={media.id} className="relative rounded-lg overflow-hidden bg-muted">
-            {media.media_type === 'image' ? (
-              <img
-                src={getMediaUrl(media)}
-                alt={media.file_name || 'Post media'}
-                className="w-full h-auto object-contain max-h-[600px]"
-                onError={(e) => {
-                  console.error('[MediaDisplay] Image load error:', media.media_url)
-                  const target = e.target as HTMLImageElement
-                  target.style.display = 'none'
-                }}
-              />
-            ) : (
-              <video
-                src={media.media_url}
-                controls
-                className="w-full h-auto max-h-[600px]"
-                onError={(e) => {
-                  console.error('[MediaDisplay] Video load error:', media.media_url)
-                }}
-              >
-                Your browser does not support the video tag.
-              </video>
-            )}
+    <>
+      <div className="space-y-4">
+        {post.media && post.media.length > 0 ? (
+          post.media.map((media) => {
+            // 如果内容被锁定且是视频，使用预览 URL
+            const videoUrl = !canView && media.is_locked && media.media_type === 'video' && post.preview_enabled
+              ? (media.preview_url || media.media_url)
+              : media.media_url
+
+            return (
+              <div key={media.id} className="relative rounded-lg overflow-hidden bg-muted">
+                {media.media_type === 'image' ? (
+                  <img
+                    src={getMediaUrl(media)}
+                    alt={media.file_name || 'Post media'}
+                    className="w-full h-auto object-contain max-h-[600px]"
+                    onError={(e) => {
+                      console.error('[MediaDisplay] Image load error:', media.media_url)
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'none'
+                    }}
+                  />
+                ) : (
+                  <video
+                    ref={(el) => {
+                      if (el) {
+                        videoRefs.current.set(media.id, el)
+                      } else {
+                        videoRefs.current.delete(media.id)
+                      }
+                    }}
+                    src={videoUrl}
+                    controls
+                    className="w-full h-auto max-h-[600px]"
+                    onError={(e) => {
+                      console.error('[MediaDisplay] Video load error:', videoUrl)
+                    }}
+                    onLoadedMetadata={(e) => {
+                      const video = e.currentTarget
+                      // 如果内容被锁定且启用了预览，设置 10 秒限制
+                      if (!canView && post.preview_enabled && media.is_locked) {
+                        const timeUpdateHandler = () => {
+                          if (video.currentTime >= 10) {
+                            video.pause()
+                            video.currentTime = 10
+                            // 呼出支付弹窗
+                            setShowPaywallModal(true)
+                            video.removeEventListener('timeupdate', timeUpdateHandler)
+                          }
+                        }
+                        video.addEventListener('timeupdate', timeUpdateHandler)
+                        
+                        // 清理函数
+                        return () => {
+                          video.removeEventListener('timeupdate', timeUpdateHandler)
+                        }
+                      }
+                    }}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                )}
+              </div>
+            )
+          })
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>No media available</p>
           </div>
-        ))
-      ) : (
-        <div className="text-center py-8 text-muted-foreground">
-          <p>No media available</p>
-        </div>
+        )}
+      </div>
+
+      {/* 支付弹窗 */}
+      {post.visibility === 'ppv' && post.price_cents && post.price_cents > 0 && (
+        <PaywallModal
+          open={showPaywallModal}
+          onOpenChange={setShowPaywallModal}
+          type="ppv"
+          creatorName={creatorDisplayName || "Creator"}
+          price={post.price_cents / 100}
+          postId={post.id}
+          benefits={["Unlock full video", "Access to all content"]}
+          onSuccess={async () => {
+            // 支付成功后刷新页面以解锁内容
+            if (onUnlock) {
+              await onUnlock()
+            }
+            setShowPaywallModal(false)
+            // 刷新页面以显示完整内容
+            window.location.reload()
+          }}
+        />
       )}
-    </div>
+    </>
   )
 }

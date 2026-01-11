@@ -17,7 +17,9 @@ interface PaywallModalProps {
   billingPeriod?: "month" | "year"
   benefits: string[]
   contentPreview?: string
-  onSuccess: () => void
+  postId?: string // PPV 解锁需要的 post ID
+  creatorId?: string // 订阅需要的 creator ID
+  onSuccess: () => void | Promise<void>
 }
 
 export function PaywallModal({
@@ -30,6 +32,8 @@ export function PaywallModal({
   billingPeriod = "month",
   benefits,
   contentPreview,
+  postId,
+  creatorId,
   onSuccess,
 }: PaywallModalProps) {
   const [paymentState, setPaymentState] = useState<"idle" | "processing" | "success" | "error">("idle")
@@ -38,20 +42,54 @@ export function PaywallModal({
   const handlePayment = async () => {
     setPaymentState("processing")
 
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      // 根据类型调用不同的支付逻辑
+      if (type === "ppv") {
+        // PPV 解锁：调用原子扣费函数
+        if (!postId) {
+          setPaymentState("error")
+          console.error("[PaywallModal] postId is required for PPV unlock")
+          return
+        }
 
-    // Simulate random success/failure for demo
-    const success = Math.random() > 0.1
+        const { unlockPost } = await import("@/lib/paywall")
+        const result = await unlockPost(postId, price * 100)
+        
+        if (result.success) {
+          setPaymentState("success")
+          setTimeout(async () => {
+            await onSuccess()
+            onOpenChange(false)
+            setPaymentState("idle")
+          }, 1500)
+        } else {
+          setPaymentState("error")
+          console.error("[PaywallModal] Purchase failed:", result.error)
+        }
+      } else {
+        // 订阅：调用订阅函数
+        if (!creatorId) {
+          setPaymentState("error")
+          console.error("[PaywallModal] creatorId is required for subscription")
+          return
+        }
 
-    if (success) {
-      setPaymentState("success")
-      setTimeout(() => {
-        onSuccess()
-        onOpenChange(false)
-        setPaymentState("idle")
-      }, 1500)
-    } else {
+        const { subscribe30d } = await import("@/lib/paywall")
+        const success = await subscribe30d(creatorId)
+        
+        if (success) {
+          setPaymentState("success")
+          setTimeout(async () => {
+            await onSuccess()
+            onOpenChange(false)
+            setPaymentState("idle")
+          }, 1500)
+        } else {
+          setPaymentState("error")
+        }
+      }
+    } catch (err: any) {
+      console.error("[PaywallModal] Payment error:", err)
       setPaymentState("error")
     }
   }
