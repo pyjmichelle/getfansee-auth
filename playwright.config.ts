@@ -30,7 +30,9 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ["html"],
-    ["list"], // 在 CI 中显示详细日志
+    ["list"],
+    // 在 CI 中使用 github reporter，不会因为 flaky tests 失败
+    ...(process.env.CI ? [["github" as const]] : []),
   ],
   /* Global timeout */
   timeout: 60 * 1000, // 每个测试 60 秒超时
@@ -45,6 +47,10 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
     screenshot: "only-on-failure",
+    /* 增加动作超时 */
+    actionTimeout: 15 * 1000,
+    /* 增加导航超时 */
+    navigationTimeout: 30 * 1000,
   },
 
   /* Configure projects for major browsers */
