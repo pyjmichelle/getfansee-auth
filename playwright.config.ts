@@ -28,12 +28,9 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [
-    ["html"],
-    ["list"],
-    // 在 CI 中使用 github reporter，不会因为 flaky tests 失败
-    ...(process.env.CI ? [["github" as const]] : []),
-  ],
+  reporter: process.env.CI 
+    ? [["html"], ["list"], ["github"]]
+    : [["html"], ["list"]],
   /* Global timeout */
   timeout: 60 * 1000, // 每个测试 60 秒超时
   /* Expect timeout */
