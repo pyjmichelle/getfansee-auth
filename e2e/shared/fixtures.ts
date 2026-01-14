@@ -317,6 +317,16 @@ export async function createTestSubscription(
   fanId: string,
   creatorId: string
 ): Promise<string> {
+  });
+}
+
+/**
+ * 创建订阅关系（用于测试订阅功能）
+ */
+export async function createTestSubscription(
+  fanId: string,
+  creatorId: string
+): Promise<string> {
   if (!adminClient) {
     throw new Error("Admin client not available");
   }

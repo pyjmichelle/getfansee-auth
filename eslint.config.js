@@ -20,6 +20,8 @@ export default [
       'playwright.config.ts',
       'vitest.config.ts',
       'commitlint.config.js',
+      'playwright-report/**/*',
+      'test-results/**/*',
     ],
   },
   js.configs.recommended,
@@ -90,6 +92,14 @@ export default [
     },
   },
   {
-    ignores: ['node_modules/**', '.next/**', 'out/**', 'dist/**', 'build/**'],
+    ignores: [
+      'node_modules/**',
+      '.next/**',
+      'out/**',
+      'dist/**',
+      'build/**',
+      'playwright-report/**',
+      'test-results/**',
+    ],
   },
 ];

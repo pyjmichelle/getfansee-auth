@@ -456,20 +456,3 @@ git push
 - 手动验证关键流程
 
 **阶段 3**: ⏳ **所有测试通过后**
-- 部署到 Staging
-- Staging 环境验证
-- 部署到生产环境
-
----
-
-## 📚 相关文档
-
-- [测试执行报告](./TEST_EXECUTION_REPORT.md) - 详细执行日志
-- [测试计划](/.cursor/plans/完整功能测试计划_CI集成版.plan.md) - 完整测试计划
-- [CI 配置](./.github/workflows/ci.yml) - GitHub Actions 配置
-
----
-
-**报告生成时间**: 2026-01-11 21:14  
-**下次更新**: E2E 测试完成后  
-**审核状态**: 待 Chief Quality Officer 审核
