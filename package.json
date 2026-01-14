@@ -36,7 +36,9 @@
     "verify:lockdown": "tsx scripts/verify_system_lockdown.ts",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest watch",
-    "test:unit:coverage": "vitest run --coverage"
+    "test:unit:coverage": "vitest run --coverage",
+    "test:frontend": "tsx scripts/agent-browser-test.ts",
+    "test:frontend:headed": "HEADED=true tsx scripts/agent-browser-test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -106,6 +108,7 @@
     "@typescript-eslint/parser": "^8.51.0",
     "@vitest/coverage-v8": "^4.0.16",
     "@vitest/ui": "^4.0.16",
+    "agent-browser": "^0.5.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",

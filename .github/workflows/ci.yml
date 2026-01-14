@@ -84,8 +84,8 @@ jobs:
       - name: Wait for server
         run: npx wait-on http://localhost:3000 --timeout 60000
       
-      - name: Run E2E stable tests on ${{ matrix.browser }}
-        run: pnpm playwright test e2e/stable-tests.spec.ts --project=${{ matrix.browser }}
+      - name: Run all E2E tests on ${{ matrix.browser }}
+        run: pnpm playwright test --project=${{ matrix.browser }}
       
       - name: Upload Playwright report
         if: always()
