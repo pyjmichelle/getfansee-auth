@@ -38,10 +38,10 @@ jobs:
         run: pnpm lint
       
       - name: Run TypeScript type check
-        run: pnpm type-check || true
+        run: pnpm type-check
 
   # ============================================
-  # Stage 2: E2E Tests (Most Reliable)
+  # Stage 2: E2E Tests (Multi-browser)
   # ============================================
   e2e-tests:
     name: E2E Tests (${{ matrix.browser }})
@@ -50,7 +50,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium]  # 只测试 chromium，加快速度
+        browser: [chromium, firefox, webkit]
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -96,71 +96,12 @@ jobs:
           retention-days: 30
 
   # ============================================
-  # Stage 3: Build Verification
-  # ============================================
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    needs: e2e-tests
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-      
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-      
-      - name: Build application
-        run: pnpm build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          path: .next/
-
-  # ============================================
-  # Stage 4: Quality Gate
-  # ============================================
-  quality-gate:
-    name: Quality Gate
-    runs-on: ubuntu-latest
-    needs: [lint-and-type-check, e2e-tests, build]
-    steps:
-      - name: Check quality metrics
-        run: |
-          echo "🎉 ================================"
-          echo "✅ All Quality Checks Passed!"
-          echo "================================"
-          echo ""
-          echo "📋 Test Results:"
-          echo "  ✅ Lint & Type Check: Passed"
-          echo "  ✅ E2E Tests (Chromium): Passed"
-          echo "  ✅ Build: Passed"
-          echo ""
-          echo "🚀 Ready for deployment!"
-
-  # ============================================
-  # Optional: Legacy Tests (Non-blocking)
+  # Stage 3: Legacy Test Scripts
   # ============================================
   legacy-tests:
-    name: Legacy Test Scripts (Optional)
+    name: Legacy Test Scripts
     runs-on: ubuntu-latest
     needs: lint-and-type-check
-    continue-on-error: true
-    if: false  # 暂时禁用，需要配置 SUPABASE_SERVICE_ROLE_KEY
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -193,14 +134,12 @@ jobs:
         run: pnpm test:all
 
   # ============================================
-  # Optional: Unit Tests (Non-blocking)
+  # Stage 4: Build Verification
   # ============================================
-  unit-tests:
-    name: Unit Tests (Optional)
+  build:
+    name: Build
     runs-on: ubuntu-latest
-    needs: lint-and-type-check
-    continue-on-error: true
-    if: false  # 暂时禁用，模块导入问题需要修复
+    needs: [e2e-tests, legacy-tests]
     steps:
       - uses: actions/checkout@v4
       
@@ -218,47 +157,38 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
       
-      - name: Run unit tests
-        run: pnpm test:unit --coverage
+      - name: Build application
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: .next/
 
   # ============================================
-  # Optional: Integration Tests (Non-blocking)
+  # Stage 5: Quality Gate
   # ============================================
-  integration-tests:
-    name: Integration Tests (Optional)
+  quality-gate:
+    name: Quality Gate
     runs-on: ubuntu-latest
-    needs: lint-and-type-check
-    continue-on-error: true
-    if: false  # 暂时禁用，需要环境配置
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      NEXT_PUBLIC_TEST_MODE: 'true'
+    needs: [lint-and-type-check, e2e-tests, legacy-tests, build]
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-      
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-      
-      - name: Start dev server
-        run: pnpm dev &
-        env:
-          PORT: 3000
-      
-      - name: Wait for server
-        run: npx wait-on http://localhost:3000 --timeout 60000
-      
-      - name: Run integration tests
-        run: pnpm vitest run tests/integration
+      - name: Check quality metrics
+        run: |
+          echo "🎉 ================================"
+          echo "✅ All Quality Checks Passed!"
+          echo "================================"
+          echo ""
+          echo "📋 Test Results:"
+          echo "  ✅ Lint & Type Check: Passed"
+          echo "  ✅ E2E Tests (Chromium): Passed"
+          echo "  ✅ E2E Tests (Firefox): Passed"
+          echo "  ✅ E2E Tests (WebKit): Passed"
+          echo "  ✅ Legacy Tests: Passed"
+          echo "  ✅ Build: Passed"
+          echo ""
+          echo "🚀 Ready for deployment!"

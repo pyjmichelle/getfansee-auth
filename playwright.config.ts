@@ -42,11 +42,19 @@ export default defineConfig({
     ignoreHTTPSErrors: true,
   },
 
-  /* 只测试 chromium - 减少复杂度 */
+  /* 多浏览器测试 */
   projects: [
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
+    },
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
     },
   ],
 
