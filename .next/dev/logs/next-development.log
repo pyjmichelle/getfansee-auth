@@ -3249,3 +3249,76 @@ Export createClient doesn't exist in target module
 The export createClient was not found in module [project]/Downloads/authentication-flow-design (1)/lib/supabase-server.ts [app-route] (ecmascript).
 Did you mean to import getSupabaseServerClient?
 All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+[00:09:11.004] Browser ERROR   ./Downloads/authentication-flow-design (1)/app/api/posts/[id]/like/route.ts:2:1
+Export createClient doesn't exist in target module
+  1 | import { NextRequest, NextResponse } from "next/server";
+> 2 | import { createClient } from "@/lib/supabase-server";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | interface RouteContext {
+  5 |   params: Promise<{
+
+The export createClient was not found in module [project]/Downloads/authentication-flow-design (1)/lib/supabase-server.ts [app-route] (ecmascript).
+Did you mean to import getSupabaseServerClient?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+[00:09:11.534] Browser ERROR   ./Downloads/authentication-flow-design (1)/app/api/posts/[id]/like/route.ts:2:1
+Export createClient doesn't exist in target module
+  1 | import { NextRequest, NextResponse } from "next/server";
+> 2 | import { createClient } from "@/lib/supabase-server";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | interface RouteContext {
+  5 |   params: Promise<{
+
+The export createClient was not found in module [project]/Downloads/authentication-flow-design (1)/lib/supabase-server.ts [app-route] (ecmascript).
+Did you mean to import getSupabaseServerClient?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+[00:09:19.667] Browser ERROR   ./Downloads/authentication-flow-design (1)/app/api/posts/[id]/like/route.ts:2:1
+Export createClient doesn't exist in target module
+  1 | import { NextRequest, NextResponse } from "next/server";
+> 2 | import { createClient } from "@/lib/supabase-server";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | interface RouteContext {
+  5 |   params: Promise<{
+
+The export createClient was not found in module [project]/Downloads/authentication-flow-design (1)/lib/supabase-server.ts [app-route] (ecmascript).
+Did you mean to import getSupabaseServerClient?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+[00:09:20.519] Browser ERROR   ./Downloads/authentication-flow-design (1)/app/api/posts/[id]/like/route.ts:2:1
+Export createClient doesn't exist in target module
+  1 | import { NextRequest, NextResponse } from "next/server";
+> 2 | import { createClient } from "@/lib/supabase-server";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | interface RouteContext {
+  5 |   params: Promise<{
+
+The export createClient was not found in module [project]/Downloads/authentication-flow-design (1)/lib/supabase-server.ts [app-route] (ecmascript).
+Did you mean to import getSupabaseServerClient?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+[00:10:01.293] Server  LOG      ✓ Compiled in 121ms
+[00:10:01.394] Browser ERROR   ./Downloads/authentication-flow-design (1)/app/api/posts/[id]/like/route.ts:2:1
+Export createClient doesn't exist in target module
+  1 | import { NextRequest, NextResponse } from "next/server";
+> 2 | import { createClient } from "@/lib/supabase-server";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | interface RouteContext {
+  5 |   params: Promise<{
+
+The export createClient was not found in module [project]/Downloads/authentication-flow-design (1)/lib/supabase-server.ts [app-route] (ecmascript).
+Did you mean to import getSupabaseServerClient?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+[00:10:01.522] Browser ERROR   ./Downloads/authentication-flow-design (1)/app/api/posts/[id]/like/route.ts:2:1
+Export createClient doesn't exist in target module
+  1 | import { NextRequest, NextResponse } from "next/server";
+> 2 | import { createClient } from "@/lib/supabase-server";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | interface RouteContext {
+  5 |   params: Promise<{
+
+The export createClient was not found in module [project]/Downloads/authentication-flow-design (1)/lib/supabase-server.ts [app-route] (ecmascript).
+Did you mean to import getSupabaseServerClient?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.

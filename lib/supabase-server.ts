@@ -12,7 +12,7 @@ function getEnv(key: string): string {
   return value;
 }
 
-export async function getSupabaseServerClient(): Promise<SupabaseClient> {
+export async function createClient(): Promise<SupabaseClient> {
   const cookieStore = await cookies();
   const supabaseUrl = getEnv("NEXT_PUBLIC_SUPABASE_URL");
   const supabaseAnonKey = getEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
@@ -36,3 +36,6 @@ export async function getSupabaseServerClient(): Promise<SupabaseClient> {
     },
   });
 }
+
+// 保持向后兼容
+export const getSupabaseServerClient = createClient;
