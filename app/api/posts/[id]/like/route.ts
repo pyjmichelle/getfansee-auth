@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { createClient } from "@/lib/supabase-server";
 
 interface RouteContext {
   params: Promise<{
@@ -14,7 +13,11 @@ interface RouteContext {
  */
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
-    const user = await getCurrentUser();
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     if (!user) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
@@ -22,8 +25,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const { id: postId } = await context.params;
 
     console.log("[api/posts/like] POST:", { userId: user.id, postId });
-
-    const supabase = getSupabaseBrowserClient();
 
     // 检查帖子是否存在
     const { data: post, error: postError } = await supabase
@@ -83,7 +84,11 @@ export async function POST(request: NextRequest, context: RouteContext) {
  */
 export async function DELETE(request: NextRequest, context: RouteContext) {
   try {
-    const user = await getCurrentUser();
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     if (!user) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
@@ -91,8 +96,6 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     const { id: postId } = await context.params;
 
     console.log("[api/posts/like] DELETE:", { userId: user.id, postId });
-
-    const supabase = getSupabaseBrowserClient();
 
     // 删除点赞记录
     const { error: deleteError } = await supabase
