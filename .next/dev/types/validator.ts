@@ -380,6 +380,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../../app/api/comments/[id]/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/comments/[id]">> = Specific
+  const handler = {} as typeof import("../../../app/api/comments/[id]/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../../app/api/creator/[id]/posts/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/creator/[id]/posts">> = Specific
@@ -447,6 +456,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/paywall/subscribers">> = Specific
   const handler = {} as typeof import("../../../app/api/paywall/subscribers/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../../app/api/posts/[id]/comments/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/posts/[id]/comments">> = Specific
+  const handler = {} as typeof import("../../../app/api/posts/[id]/comments/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check
