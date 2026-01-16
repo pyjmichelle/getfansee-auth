@@ -9,12 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera } from "lucide-react";
+import { Camera, Upload } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 // 所有服务器端函数都通过 API 调用，不直接导入
 import { submitVerification, type VerificationData } from "@/lib/kyc";
 import { toast } from "sonner";
-import { Upload } from "lucide-react";
+import { LoadingState } from "@/components/loading-state";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -175,7 +175,7 @@ export default function CreatorOnboardingPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground">Loading...</div>
+        <LoadingState type="spinner" text="Loading profile..." />
       </div>
     );
   }
