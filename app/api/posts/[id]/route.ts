@@ -1,82 +1,86 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPost, updatePost } from "@/lib/posts";
-import { getCurrentUser } from "@/lib/auth-server";
+import { createClient } from "@/lib/supabase-server";
 
-type UpdatePostPayload = {
-  title?: string;
-  content?: string;
-  mediaFiles?: Array<{
-    url: string;
-    type: "image" | "video";
-    fileName: string;
-    fileSize: number;
-  }>;
-};
-
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const user = await getCurrentUser();
+    const supabase = await createClient();
+    const postId = params.id;
+
+    // 获取当前用户
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = await params;
-    const postId = id;
-    const post = await getPost(postId);
+    // 获取帖子详情（包含创作者信息）
+    const { data: post, error: postError } = await supabase
+      .from("posts")
+      .select(
+        `
+        *,
+        creator:profiles!posts_creator_id_fkey(
+          id,
+          display_name,
+          avatar_url
+        )
+      `
+      )
+      .eq("id", postId)
+      .single();
 
-    if (!post) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    if (postError || !post) {
+      console.error("[GET /api/posts/[id]] Post fetch error:", postError);
+      return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
     }
 
-    // 验证是否为 post 的 creator
-    if (post.creator_id !== user.id) {
-      return NextResponse.json({ error: "Not authorized to view this post" }, { status: 403 });
+    // 检查查看权限
+    let canView = false;
+
+    // 1. 创作者自己可以查看
+    if (post.creator_id === user.id) {
+      canView = true;
+    }
+    // 2. 免费内容所有人可以查看
+    else if (post.visibility === "free") {
+      canView = true;
+    }
+    // 3. 订阅内容 - 检查是否已订阅
+    else if (post.visibility === "subscribers") {
+      const { data: subscription } = await supabase
+        .from("subscriptions")
+        .select("id")
+        .eq("fan_id", user.id)
+        .eq("creator_id", post.creator_id)
+        .eq("status", "active")
+        .single();
+
+      canView = !!subscription;
+    }
+    // 4. PPV 内容 - 检查是否已购买
+    else if (post.visibility === "ppv") {
+      const { data: purchase } = await supabase
+        .from("purchases")
+        .select("id")
+        .eq("fan_id", user.id)
+        .eq("post_id", postId)
+        .single();
+
+      canView = !!purchase;
     }
 
-    return NextResponse.json({ post });
-  } catch (err: unknown) {
-    console.error("[api] get post error:", err);
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
-}
-
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { id } = await params;
-    const postId = id;
-    const body = (await request.json()) as UpdatePostPayload;
-    const { title, content, mediaFiles } = body;
-
-    // 验证是否为 post 的 creator
-    const post = await getPost(postId);
-    if (!post) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
-    }
-
-    if (post.creator_id !== user.id) {
-      return NextResponse.json({ error: "Not authorized to edit this post" }, { status: 403 });
-    }
-
-    const success = await updatePost(postId, {
-      title,
-      content,
-      mediaFiles,
+    return NextResponse.json({
+      success: true,
+      post: post,
+      canView: canView,
     });
-
-    if (success) {
-      return NextResponse.json({ success: true });
-    } else {
-      return NextResponse.json({ success: false, error: "Failed to update post" }, { status: 500 });
-    }
-  } catch (err: unknown) {
-    console.error("[api] update post error:", err);
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+  } catch (error: any) {
+    console.error("[GET /api/posts/[id]] Error:", error);
+    return NextResponse.json(
+      { success: false, error: error.message || "Internal server error" },
+      { status: 500 }
+    );
   }
 }

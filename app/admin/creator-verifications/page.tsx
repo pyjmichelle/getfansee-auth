@@ -127,7 +127,7 @@ export default function CreatorVerificationsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505]">
+      <div className="min-h-screen bg-background">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
         <main className="container max-w-6xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
@@ -141,7 +141,7 @@ export default function CreatorVerificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
       <main className="container max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -151,7 +151,7 @@ export default function CreatorVerificationsPage() {
         </div>
 
         {verifications.length === 0 ? (
-          <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-12 text-center">
+          <div className="bg-card border border-border rounded-3xl p-12 text-center">
             <p className="text-muted-foreground">No pending verifications</p>
           </div>
         ) : (
@@ -159,7 +159,7 @@ export default function CreatorVerificationsPage() {
             {verifications.map((verification) => (
               <div
                 key={verification.id}
-                className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 hover:border-[#262626] transition-colors"
+                className="bg-card border border-border rounded-3xl p-6 hover:border-[#262626] transition-colors"
               >
                 <div className="flex items-start gap-6">
                   <Avatar className="w-16 h-16">
@@ -228,7 +228,7 @@ export default function CreatorVerificationsPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-3 pt-4 border-t border-[#1F1F1F]">
+                    <div className="flex gap-3 pt-4 border-t border-border">
                       <Button
                         onClick={() => handleReview(verification.id, true)}
                         disabled={isReviewing}
@@ -242,7 +242,7 @@ export default function CreatorVerificationsPage() {
                         onClick={() => setReviewingId(verification.id)}
                         disabled={isReviewing}
                         variant="outline"
-                        className="flex-1 border-[#F43F5E] text-[#F43F5E] hover:bg-[#F43F5E]/10 rounded-xl"
+                        className="flex-1 border-[#F43F5E] text-destructive hover:bg-[#F43F5E]/10 rounded-xl"
                       >
                         <X className="w-4 h-4 mr-2" />
                         Reject
@@ -260,7 +260,7 @@ export default function CreatorVerificationsPage() {
           open={reviewingId !== null}
           onOpenChange={(open) => !open && setReviewingId(null)}
         >
-          <AlertDialogContent className="bg-[#0D0D0D] border-[#1F1F1F] rounded-3xl">
+          <AlertDialogContent className="bg-card border-border rounded-3xl">
             <AlertDialogHeader>
               <AlertDialogTitle className="text-foreground">Reject Verification</AlertDialogTitle>
               <AlertDialogDescription className="text-muted-foreground">
@@ -275,13 +275,13 @@ export default function CreatorVerificationsPage() {
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
                   placeholder="例如：证件照片不清晰，信息不匹配等"
-                  className="bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                  className="bg-card border-border rounded-xl"
                   rows={4}
                 />
               </div>
             </div>
             <AlertDialogFooter>
-              <AlertDialogCancel className="border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl">
+              <AlertDialogCancel className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl">
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction

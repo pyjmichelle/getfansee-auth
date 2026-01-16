@@ -200,7 +200,7 @@ export default function NotificationsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505]">
+      <div className="min-h-screen bg-background">
         <div className="container max-w-2xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
             {[1, 2, 3].map((i) => (
@@ -217,7 +217,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       <NavHeader user={currentUser} notificationCount={unreadCount} />
 
       <main className="container max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -231,7 +231,7 @@ export default function NotificationsPage() {
               variant="outline"
               size="sm"
               onClick={markAllAsRead}
-              className="border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
+              className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
             >
               <Check className="w-4 h-4 mr-2" />
               Mark all read
@@ -245,9 +245,7 @@ export default function NotificationsPage() {
             variant={filter === "all" ? "default" : "outline"}
             onClick={() => setFilter("all")}
             className={`rounded-xl ${
-              filter === "all"
-                ? "bg-primary-gradient"
-                : "border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A]"
+              filter === "all" ? "bg-primary-gradient" : "border-border bg-card hover:bg-[#1A1A1A]"
             }`}
           >
             All
@@ -258,7 +256,7 @@ export default function NotificationsPage() {
             className={`rounded-xl ${
               filter === "unread"
                 ? "bg-primary-gradient"
-                : "border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A]"
+                : "border-border bg-card hover:bg-[#1A1A1A]"
             }`}
           >
             Unread ({unreadCount})
@@ -268,7 +266,7 @@ export default function NotificationsPage() {
         {/* Notifications List */}
         {filteredNotifications.length === 0 ? (
           <div className="text-center py-24">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[#0D0D0D] border border-[#1F1F1F] flex items-center justify-center">
+            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-card border border-border flex items-center justify-center">
               <Bell className="w-12 h-12 text-muted-foreground opacity-50" />
             </div>
             <h3 className="text-xl font-semibold text-foreground mb-2">Inbox Empty</h3>
@@ -283,7 +281,7 @@ export default function NotificationsPage() {
             {filteredNotifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-4 md:p-6 cursor-pointer transition-all hover:bg-[#1A1A1A] ${
+                className={`bg-card border border-border rounded-3xl p-4 md:p-6 cursor-pointer transition-all hover:bg-[#1A1A1A] ${
                   !notification.read ? "border-[#6366F1]/30" : ""
                 }`}
                 onClick={async () => {

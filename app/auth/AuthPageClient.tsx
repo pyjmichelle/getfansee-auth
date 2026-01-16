@@ -249,7 +249,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 md:p-8">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 md:p-8">
       {/* PC: 左右分割布局 */}
       <div className="hidden lg:flex w-full max-w-7xl gap-16 items-center">
         {/* 左侧：品牌 Slogan 动画 */}
@@ -269,7 +269,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
             </p>
           </div>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></div>
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
             <span>18+ Adults Only Platform</span>
           </div>
         </div>
@@ -277,7 +277,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
         {/* 右侧：登录框 */}
         <div className="flex-1 max-w-md">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6 bg-[#0D0D0D] border border-[#1F1F1F] rounded-xl p-1">
+            <TabsList className="grid w-full grid-cols-2 mb-6 bg-card border border-border rounded-xl p-1">
               <TabsTrigger
                 value="login"
                 className="text-base rounded-lg data-[state=active]:bg-primary-gradient data-[state=active]:text-white"
@@ -293,7 +293,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
             </TabsList>
 
             <TabsContent value="login">
-              <div className="bg-white/5 backdrop-blur-xl border border-[#1F1F1F] rounded-3xl p-8 space-y-6">
+              <div className="bg-white/5 backdrop-blur-xl border border-border rounded-3xl p-8 space-y-6">
                 <h2 className="text-xl font-semibold text-foreground">Welcome back</h2>
                 <p className="text-xs text-muted-foreground">
                   Use your email and password to continue. We never share your credentials with
@@ -392,7 +392,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
             </TabsContent>
 
             <TabsContent value="signup">
-              <div className="bg-white/5 backdrop-blur-xl border border-[#1F1F1F] rounded-3xl p-8 space-y-6">
+              <div className="bg-white/5 backdrop-blur-xl border border-border rounded-3xl p-8 space-y-6">
                 <h2 className="text-2xl font-semibold text-foreground mb-1">Create your account</h2>
                 <p className="text-xs text-muted-foreground">
                   This is an adults-only platform. You must be 18+ to sign up. We require email
@@ -592,19 +592,17 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
 
                   <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-[#1F1F1F]" />
+                      <div className="w-full border-t border-border" />
                     </div>
                     <div className="relative flex justify-center text-xs">
-                      <span className="px-3 bg-[#0D0D0D] text-muted-foreground">
-                        or continue with
-                      </span>
+                      <span className="px-3 bg-card text-muted-foreground">or continue with</span>
                     </div>
                   </div>
 
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full h-12 text-base font-medium bg-[#0D0D0D] border-[#1F1F1F] hover:bg-[#1A1A1A] rounded-xl"
+                    className="w-full h-12 text-base font-medium bg-card border-border hover:bg-[#1A1A1A] rounded-xl"
                     onClick={handleGoogleAuth}
                     disabled={isLoading}
                   >
@@ -653,7 +651,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
         </div>
 
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6 bg-[#0D0D0D] border border-[#1F1F1F] rounded-xl p-1">
+          <TabsList className="grid w-full grid-cols-2 mb-6 bg-card border border-border rounded-xl p-1">
             <TabsTrigger
               value="login"
               className={`text-base rounded-lg transition-all ${
@@ -677,7 +675,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
           </TabsList>
 
           <TabsContent value="login">
-            <div className="bg-white/5 backdrop-blur-xl border border-[#1F1F1F] rounded-3xl p-6 space-y-6">
+            <div className="bg-white/5 backdrop-blur-xl border border-border rounded-3xl p-6 space-y-6">
               <h2 className="text-xl font-semibold text-foreground">Welcome back</h2>
               <p className="text-xs text-muted-foreground">
                 Use your email and password to continue. We never share your credentials with
@@ -686,12 +684,12 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
 
               <form onSubmit={handleLoginSubmit} className="space-y-6">
                 {error && (
-                  <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 text-[#F43F5E] text-sm px-4 py-3 rounded-xl">
+                  <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 text-destructive text-sm px-4 py-3 rounded-xl">
                     {error}
                   </div>
                 )}
                 {info && (
-                  <div className="bg-[#0D0D0D] border border-[#1F1F1F] text-xs text-foreground px-4 py-3 rounded-xl">
+                  <div className="bg-card border border-border text-xs text-foreground px-4 py-3 rounded-xl">
                     {info}
                   </div>
                 )}
@@ -706,7 +704,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
                     placeholder="you@example.com"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
-                    className="h-12 bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                    className="h-12 bg-card border-border rounded-xl"
                     disabled={isLoading}
                   />
                 </div>
@@ -721,7 +719,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
                     placeholder="••••••••"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    className="h-12 bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                    className="h-12 bg-card border-border rounded-xl"
                     disabled={isLoading}
                   />
                 </div>
@@ -737,19 +735,17 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
 
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-[#1F1F1F]" />
+                    <div className="w-full border-t border-border" />
                   </div>
                   <div className="relative flex justify-center text-xs">
-                    <span className="px-3 bg-[#0D0D0D] text-muted-foreground">
-                      or continue with
-                    </span>
+                    <span className="px-3 bg-card text-muted-foreground">or continue with</span>
                   </div>
                 </div>
 
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 text-base font-medium bg-[#0D0D0D] border-[#1F1F1F] hover:bg-[#1A1A1A] rounded-xl"
+                  className="w-full h-12 text-base font-medium bg-card border-border hover:bg-[#1A1A1A] rounded-xl"
                   onClick={handleGoogleAuth}
                   disabled={isLoading}
                 >
@@ -778,7 +774,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
           </TabsContent>
 
           <TabsContent value="signup">
-            <div className="bg-white/5 backdrop-blur-xl border border-[#1F1F1F] rounded-3xl p-6 space-y-6">
+            <div className="bg-white/5 backdrop-blur-xl border border-border rounded-3xl p-6 space-y-6">
               <h2 className="text-2xl font-semibold text-foreground mb-1">Create your account</h2>
               <p className="text-xs text-muted-foreground">
                 This is an adults-only platform. You must be 18+ to sign up. We require email
@@ -787,12 +783,12 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
 
               <form onSubmit={handleSignupSubmit} className="space-y-6">
                 {error && (
-                  <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 text-[#F43F5E] text-sm px-4 py-3 rounded-xl">
+                  <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 text-destructive text-sm px-4 py-3 rounded-xl">
                     {error}
                   </div>
                 )}
                 {info && (
-                  <div className="bg-[#10B981]/10 border border-[#10B981]/20 text-[#10B981] text-sm px-4 py-3 rounded-xl space-y-3">
+                  <div className="bg-green-500/10 border border-[#10B981]/20 text-green-600 dark:text-green-400 text-sm px-4 py-3 rounded-xl space-y-3">
                     <p>{info}</p>
                     {info.includes("Check your email") && (
                       <div className="flex flex-col gap-2 pt-2">
@@ -800,7 +796,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
                           type="button"
                           variant="outline"
                           size="sm"
-                          className="w-full bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                          className="w-full bg-card border-border rounded-xl"
                           onClick={() => {
                             window.open("https://mail.google.com", "_blank");
                             setTimeout(() => {
@@ -850,7 +846,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
                     placeholder="you@example.com"
                     value={signupEmail}
                     onChange={(e) => setSignupEmail(e.target.value)}
-                    className="h-12 bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                    className="h-12 bg-card border-border rounded-xl"
                     disabled={isLoading}
                   />
                 </div>
@@ -865,7 +861,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
                     placeholder="••••••••"
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
-                    className="h-12 bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                    className="h-12 bg-card border-border rounded-xl"
                     disabled={isLoading}
                   />
                   <p className="text-xs text-muted-foreground">Must be at least 8 characters</p>
@@ -877,7 +873,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
                     type="checkbox"
                     checked={ageConfirmed}
                     onChange={(e) => setAgeConfirmed(e.target.checked)}
-                    className="mt-1 h-4 w-4 rounded border-[#1F1F1F] bg-[#0D0D0D] accent-[#6366F1]"
+                    className="mt-1 h-4 w-4 rounded border-border bg-card accent-[#6366F1]"
                     disabled={isLoading}
                   />
                   <Label htmlFor="age-confirm" className="text-xs text-muted-foreground">
@@ -970,19 +966,17 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
 
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-[#1F1F1F]" />
+                    <div className="w-full border-t border-border" />
                   </div>
                   <div className="relative flex justify-center text-xs">
-                    <span className="px-3 bg-[#0D0D0D] text-muted-foreground">
-                      or continue with
-                    </span>
+                    <span className="px-3 bg-card text-muted-foreground">or continue with</span>
                   </div>
                 </div>
 
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 text-base font-medium bg-[#0D0D0D] border-[#1F1F1F] hover:bg-[#1A1A1A] rounded-xl"
+                  className="w-full h-12 text-base font-medium bg-card border-border hover:bg-[#1A1A1A] rounded-xl"
                   onClick={handleGoogleAuth}
                   disabled={isLoading}
                 >

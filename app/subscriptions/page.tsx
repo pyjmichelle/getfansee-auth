@@ -198,14 +198,14 @@ export default function SubscriptionsPage() {
 
   if (isLoading || !currentUser) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       <NavHeader user={currentUser} notificationCount={0} />
 
       <main className="container max-w-4xl mx-auto px-4 py-6">
@@ -226,7 +226,7 @@ export default function SubscriptionsPage() {
             {subscriptions.map((subscription) => (
               <div
                 key={subscription.id}
-                className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 hover:border-[#262626] transition-colors"
+                className="bg-card border border-border rounded-3xl p-6 hover:border-[#262626] transition-colors"
               >
                 <div className="flex items-start justify-between gap-4">
                   <Link
@@ -267,7 +267,7 @@ export default function SubscriptionsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
+                        className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
                         onClick={() => setCancellingSubscriptionId(subscription.id)}
                       >
                         Cancel
@@ -277,7 +277,7 @@ export default function SubscriptionsPage() {
                 </div>
 
                 {subscription.status === "active" && (
-                  <div className="mt-4 pt-4 border-t border-[#1F1F1F]">
+                  <div className="mt-4 pt-4 border-t border-border">
                     <p className="text-sm text-muted-foreground">
                       Subscribed since {formatDate(subscription.created_at)} • Will end on{" "}
                       {formatDate(subscription.current_period_end)}
@@ -287,7 +287,7 @@ export default function SubscriptionsPage() {
 
                 {/* 针对已取消的订阅，显示其对应的 cancelled_at 日期 */}
                 {subscription.status === "canceled" && subscription.cancelled_at && (
-                  <div className="mt-4 pt-4 border-t border-[#1F1F1F]">
+                  <div className="mt-4 pt-4 border-t border-border">
                     <p className="text-sm text-muted-foreground">
                       Cancelled on {formatDate(subscription.cancelled_at)}
                     </p>
@@ -304,7 +304,7 @@ export default function SubscriptionsPage() {
             open={cancellingSubscriptionId !== null}
             onOpenChange={(open) => !open && setCancellingSubscriptionId(null)}
           >
-            <AlertDialogContent className="bg-[#0D0D0D] border-[#1F1F1F] rounded-3xl">
+            <AlertDialogContent className="bg-card border-border rounded-3xl">
               <AlertDialogHeader>
                 <AlertDialogTitle className="text-foreground">Cancel Subscription</AlertDialogTitle>
                 <AlertDialogDescription className="text-muted-foreground">
@@ -316,7 +316,7 @@ export default function SubscriptionsPage() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl">
+                <AlertDialogCancel className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl">
                   Keep Subscription
                 </AlertDialogCancel>
                 <AlertDialogAction

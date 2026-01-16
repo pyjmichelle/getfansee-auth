@@ -166,7 +166,7 @@ export default function EditPostPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse space-y-4 w-full max-w-2xl px-4">
           <div className="h-8 w-48 bg-[#121212] rounded"></div>
           <div className="h-64 bg-[#121212] rounded-3xl"></div>
@@ -178,10 +178,10 @@ export default function EditPostPage() {
 
   if (error && !post) {
     return (
-      <div className="min-h-screen bg-[#050505]">
+      <div className="min-h-screen bg-background">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
         <main className="container max-w-2xl mx-auto px-4 py-6">
-          <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6">
+          <div className="bg-card border border-border rounded-3xl p-6">
             <div className="text-center">
               <h1 className="text-2xl font-bold text-foreground mb-4">Error</h1>
               <p className="text-muted-foreground mb-6">{error}</p>
@@ -198,7 +198,7 @@ export default function EditPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
       <main className="container max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -209,15 +209,15 @@ export default function EditPostPage() {
 
         {error && (
           <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-3xl p-6 mb-8">
-            <p className="text-[#F43F5E] font-medium">错误</p>
+            <p className="text-destructive font-medium">错误</p>
             <p className="text-sm text-muted-foreground mt-1">{error}</p>
           </div>
         )}
 
-        <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 md:p-8">
+        <div className="bg-card border border-border rounded-3xl p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Locked Visibility & Price Info */}
-            <div className="bg-[#121212] border border-[#1F1F1F] rounded-xl p-4 space-y-3">
+            <div className="bg-[#121212] border border-border rounded-xl p-4 space-y-3">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Lock className="w-4 h-4" />
                 <span className="text-sm font-medium">价格和可见性已锁定（不可修改）</span>
@@ -226,7 +226,7 @@ export default function EditPostPage() {
                 <Badge
                   className={
                     post.visibility === "free"
-                      ? "bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20 rounded-lg"
+                      ? "bg-green-500/10 text-green-600 dark:text-green-400 border-[#10B981]/20 rounded-lg"
                       : post.visibility === "subscribers"
                         ? "bg-[#6366F1]/10 text-[#6366F1] border-[#6366F1]/20 rounded-lg"
                         : "bg-[#A855F7]/10 text-[#A855F7] border-[#A855F7]/20 rounded-lg"
@@ -317,7 +317,7 @@ export default function EditPostPage() {
                 variant="outline"
                 onClick={() => router.push("/creator/studio/post/list")}
                 disabled={isSaving}
-                className="flex-1 border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
+                className="flex-1 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
               >
                 Cancel
               </Button>

@@ -120,21 +120,21 @@ export default function ReportPageClient({ initialType, initialId }: ReportPageC
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
       <main className="container max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
         <Button
           variant="ghost"
           size="sm"
-          className="mb-6 border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
+          className="mb-6 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
           onClick={() => router.back()}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -146,7 +146,7 @@ export default function ReportPageClient({ initialType, initialId }: ReportPageC
           <p className="text-muted-foreground">Help us keep the community safe</p>
         </div>
 
-        <Card className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 md:p-8">
+        <Card className="bg-card border border-border rounded-3xl p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex items-start gap-3 p-4 bg-[#F59E0B]/10 border border-[#F59E0B]/20 rounded-xl">
               <AlertTriangle className="w-5 h-5 text-[#F59E0B] flex-shrink-0 mt-0.5" />
@@ -168,7 +168,7 @@ export default function ReportPageClient({ initialType, initialId }: ReportPageC
                 value={formData.reason}
                 onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                 required
-                className="w-full h-11 px-3 bg-[#0D0D0D] border border-[#1F1F1F] rounded-xl text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                className="w-full h-11 px-3 bg-card border border-border rounded-xl text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <option value="">Select a reason</option>
                 {REPORT_REASONS.map((reason) => (
@@ -187,7 +187,7 @@ export default function ReportPageClient({ initialType, initialId }: ReportPageC
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Please provide any additional information that might help us understand the issue..."
                 rows={6}
-                className="bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                className="bg-card border-border rounded-xl"
               />
             </div>
 
@@ -197,7 +197,7 @@ export default function ReportPageClient({ initialType, initialId }: ReportPageC
                 variant="outline"
                 onClick={() => router.back()}
                 disabled={isSubmitting}
-                className="flex-1 border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
+                className="flex-1 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
               >
                 Cancel
               </Button>

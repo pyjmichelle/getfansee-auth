@@ -116,7 +116,7 @@ export default function CreatorPostListPage() {
   const getVisibilityBadge = (visibility: string, priceCents: number | null) => {
     if (visibility === "free") {
       return (
-        <Badge className="bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20 rounded-lg">
+        <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-[#10B981]/20 rounded-lg">
           Free
         </Badge>
       );
@@ -137,7 +137,7 @@ export default function CreatorPostListPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505]">
+      <div className="min-h-screen bg-background">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
         <main className="container max-w-4xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-6">
@@ -151,7 +151,7 @@ export default function CreatorPostListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
       <main className="container max-w-4xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -175,7 +175,7 @@ export default function CreatorPostListPage() {
         )}
 
         {posts.length === 0 ? (
-          <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-12 text-center">
+          <div className="bg-card border border-border rounded-3xl p-12 text-center">
             <p className="text-muted-foreground mb-4">No posts yet</p>
             <Button asChild variant="gradient" className="rounded-xl">
               <Link href="/creator/new-post">
@@ -189,7 +189,7 @@ export default function CreatorPostListPage() {
             {posts.map((post) => (
               <div
                 key={post.id}
-                className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 hover:border-[#262626] transition-colors"
+                className="bg-card border border-border rounded-3xl p-6 hover:border-[#262626] transition-colors"
               >
                 <div className="flex flex-col md:flex-row gap-6">
                   {/* Media Preview */}
@@ -242,7 +242,7 @@ export default function CreatorPostListPage() {
                         <span>0 likes</span>
                       </div>
                       {post.visibility === "ppv" && (
-                        <div className="flex items-center gap-1 text-[#10B981]">
+                        <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
                           <DollarSign className="w-4 h-4" />
                           <span>$0</span>
                         </div>
@@ -255,7 +255,7 @@ export default function CreatorPostListPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="flex-1 md:flex-none border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
+                      className="flex-1 md:flex-none border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
                       asChild
                     >
                       <Link href={`/creator/studio/post/edit/${post.id}`}>
@@ -285,7 +285,7 @@ export default function CreatorPostListPage() {
           open={deletingPostId !== null}
           onOpenChange={(open) => !open && setDeletingPostId(null)}
         >
-          <AlertDialogContent className="bg-[#0D0D0D] border-[#1F1F1F] rounded-3xl">
+          <AlertDialogContent className="bg-card border-border rounded-3xl">
             <AlertDialogHeader>
               <AlertDialogTitle className="text-foreground">Delete Post</AlertDialogTitle>
               <AlertDialogDescription className="text-muted-foreground">
@@ -294,7 +294,7 @@ export default function CreatorPostListPage() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl">
+              <AlertDialogCancel className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl">
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction

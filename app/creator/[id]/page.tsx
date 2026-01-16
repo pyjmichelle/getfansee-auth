@@ -129,7 +129,7 @@ export default function CreatorProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505]">
+      <div className="min-h-screen bg-background">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
         <main className="container max-w-4xl mx-auto px-4 py-6">
           {/* Shimmer 骨架屏 */}
@@ -144,14 +144,14 @@ export default function CreatorProfilePage() {
               </div>
             </div>
             {/* Tabs Skeleton */}
-            <div className="flex gap-8 border-b border-[#1F1F1F]">
+            <div className="flex gap-8 border-b border-border">
               <div className="h-10 w-20 bg-[#121212] rounded"></div>
               <div className="h-10 w-20 bg-[#121212] rounded"></div>
               <div className="h-10 w-20 bg-[#121212] rounded"></div>
             </div>
             {/* Posts Skeleton */}
             {[1, 2, 3].map((i) => (
-              <div key={i} className="space-y-4 pb-8 border-b border-[#1F1F1F]">
+              <div key={i} className="space-y-4 pb-8 border-b border-border">
                 <div className="h-48 bg-[#121212] rounded-3xl"></div>
                 <div className="h-4 w-3/4 bg-[#121212] rounded"></div>
               </div>
@@ -246,7 +246,7 @@ export default function CreatorProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] relative">
+    <div className="min-h-screen bg-background relative">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
       <main className="container max-w-4xl mx-auto px-4 md:px-8 py-0">
@@ -264,7 +264,7 @@ export default function CreatorProfilePage() {
                 <div className="absolute -inset-1 bg-primary-gradient rounded-full blur-md opacity-50"></div>
                 <Avatar className="relative w-24 h-24 md:w-32 md:h-32 border-4 border-[#050505]">
                   <AvatarImage src={creatorProfile.avatar_url || "/placeholder.svg"} />
-                  <AvatarFallback className="text-3xl md:text-4xl bg-[#0D0D0D] text-foreground">
+                  <AvatarFallback className="text-3xl md:text-4xl bg-card text-foreground">
                     {creatorProfile.display_name?.[0]?.toUpperCase() || "C"}
                   </AvatarFallback>
                 </Avatar>
@@ -287,7 +287,7 @@ export default function CreatorProfilePage() {
                     variant="outline"
                     onClick={handleCancelSubscription}
                     disabled={isSubscribing}
-                    className="rounded-xl border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] min-w-[160px]"
+                    className="rounded-xl border-border bg-card hover:bg-[#1A1A1A] min-w-[160px]"
                   >
                     {isSubscribing ? "处理中..." : "Cancel Subscription"}
                   </Button>
@@ -304,7 +304,7 @@ export default function CreatorProfilePage() {
                 <Button
                   variant="outline"
                   asChild
-                  className="rounded-xl border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] min-w-[160px] text-muted-foreground"
+                  className="rounded-xl border-border bg-card hover:bg-[#1A1A1A] min-w-[160px] text-muted-foreground"
                 >
                   <Link href={`/report?type=user&id=${creatorId}`}>
                     <AlertTriangle className="w-4 h-4 mr-2" />
@@ -318,7 +318,7 @@ export default function CreatorProfilePage() {
 
         {/* Tabs: Posts, Media, Likes */}
         <div className="px-4 md:px-8 mb-8">
-          <div className="flex gap-8 border-b border-[#1F1F1F] relative">
+          <div className="flex gap-8 border-b border-border relative">
             <button
               onClick={() => setActiveTab("posts")}
               className={`pb-4 text-base font-medium transition-colors relative ${
@@ -379,17 +379,14 @@ export default function CreatorProfilePage() {
                     postViewStates.get(post.id) === true || post.creator_id === currentUserId;
 
                   return (
-                    <article
-                      key={post.id}
-                      className="pb-8 border-b border-[#1F1F1F] last:border-b-0"
-                    >
+                    <article key={post.id} className="pb-8 border-b border-border last:border-b-0">
                       {post.title && (
                         <h3 className="text-xl font-semibold text-foreground mb-3">{post.title}</h3>
                       )}
                       {canView ? (
                         <p className="text-foreground whitespace-pre-wrap mb-6">{post.content}</p>
                       ) : (
-                        <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 text-center mb-6">
+                        <div className="bg-card border border-border rounded-3xl p-6 text-center mb-6">
                           <p className="text-muted-foreground mb-4">
                             {post.price_cents === 0
                               ? "This content is for subscribers only"
@@ -541,13 +538,13 @@ export default function CreatorProfilePage() {
 
         {/* MB: 底部浮动订阅按钮 */}
         {currentUserId && currentUserId !== creatorId && (
-          <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-[#0D0D0D] border-t border-[#1F1F1F] z-50">
+          <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-card border-t border-border z-50">
             {isSubscribed ? (
               <Button
                 variant="outline"
                 onClick={handleCancelSubscription}
                 disabled={isSubscribing}
-                className="w-full rounded-xl border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] h-12"
+                className="w-full rounded-xl border-border bg-card hover:bg-[#1A1A1A] h-12"
               >
                 {isSubscribing ? "处理中..." : "Cancel Subscription"}
               </Button>

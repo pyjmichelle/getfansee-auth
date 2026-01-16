@@ -129,7 +129,7 @@ export default function SubscribersPage() {
     switch (status) {
       case "active":
         return (
-          <Badge className="bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20 rounded-lg">
+          <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-[#10B981]/20 rounded-lg">
             Active
           </Badge>
         );
@@ -141,7 +141,7 @@ export default function SubscribersPage() {
         );
       case "canceled":
         return (
-          <Badge className="bg-[#F43F5E]/10 text-[#F43F5E] border-[#F43F5E]/20 rounded-lg">
+          <Badge className="bg-[#F43F5E]/10 text-destructive border-[#F43F5E]/20 rounded-lg">
             Cancelled
           </Badge>
         );
@@ -158,7 +158,7 @@ export default function SubscribersPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505]">
+      <div className="min-h-screen bg-background">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
         <main className="container max-w-6xl mx-auto px-4 py-6">
           <div className="animate-pulse space-y-4">
@@ -172,7 +172,7 @@ export default function SubscribersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
       <main className="container max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -180,7 +180,7 @@ export default function SubscribersPage() {
           asChild
           variant="ghost"
           size="sm"
-          className="mb-6 border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
+          className="mb-6 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
         >
           <Link href="/creator/studio">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -195,15 +195,15 @@ export default function SubscribersPage() {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
-          <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6">
+          <div className="bg-card border border-border rounded-3xl p-6">
             <p className="text-sm text-muted-foreground mb-1">Total Subscribers</p>
             <p className="text-3xl font-bold text-foreground">{subscribers.length}</p>
           </div>
-          <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6">
+          <div className="bg-card border border-border rounded-3xl p-6">
             <p className="text-sm text-muted-foreground mb-1">Active</p>
-            <p className="text-3xl font-bold text-[#10B981]">{activeCount}</p>
+            <p className="text-3xl font-bold text-green-600 dark:text-green-400">{activeCount}</p>
           </div>
-          <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6">
+          <div className="bg-card border border-border rounded-3xl p-6">
             <p className="text-sm text-muted-foreground mb-1">Expiring Soon</p>
             <p className="text-3xl font-bold text-[#F59E0B]">{willCancelCount}</p>
           </div>
@@ -217,7 +217,7 @@ export default function SubscribersPage() {
               placeholder="Search subscribers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-11 bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+              className="pl-9 h-11 bg-card border-border rounded-xl"
             />
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
@@ -228,7 +228,7 @@ export default function SubscribersPage() {
               className={`rounded-xl ${
                 filter === "all"
                   ? "bg-primary-gradient"
-                  : "border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A]"
+                  : "border-border bg-card hover:bg-[#1A1A1A]"
               }`}
             >
               All
@@ -240,7 +240,7 @@ export default function SubscribersPage() {
               className={`rounded-xl ${
                 filter === "active"
                   ? "bg-primary-gradient"
-                  : "border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A]"
+                  : "border-border bg-card hover:bg-[#1A1A1A]"
               }`}
             >
               Active
@@ -252,7 +252,7 @@ export default function SubscribersPage() {
               className={`rounded-xl ${
                 filter === "will_cancel"
                   ? "bg-primary-gradient"
-                  : "border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A]"
+                  : "border-border bg-card hover:bg-[#1A1A1A]"
               }`}
             >
               Expiring
@@ -264,7 +264,7 @@ export default function SubscribersPage() {
               className={`rounded-xl ${
                 filter === "canceled"
                   ? "bg-primary-gradient"
-                  : "border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A]"
+                  : "border-border bg-card hover:bg-[#1A1A1A]"
               }`}
             >
               Cancelled
@@ -274,7 +274,7 @@ export default function SubscribersPage() {
 
         {/* Subscribers List */}
         {filteredSubscribers.length === 0 ? (
-          <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-12 text-center">
+          <div className="bg-card border border-border rounded-3xl p-12 text-center">
             <p className="text-muted-foreground">No subscribers found</p>
           </div>
         ) : (
@@ -287,7 +287,7 @@ export default function SubscribersPage() {
               return (
                 <div
                   key={subscriber.id}
-                  className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-4 md:p-6 hover:border-[#262626] transition-colors"
+                  className="bg-card border border-border rounded-3xl p-4 md:p-6 hover:border-[#262626] transition-colors"
                 >
                   <div className="flex items-center gap-4">
                     <Avatar className="w-12 h-12">
@@ -308,7 +308,7 @@ export default function SubscribersPage() {
                           Started {formatDate(subscriber.starts_at)}
                         </span>
                         {status === "canceled" && subscriber.cancelled_at ? (
-                          <span className="flex items-center gap-1 text-[#F43F5E]">
+                          <span className="flex items-center gap-1 text-destructive">
                             Cancelled on {formatDate(subscriber.cancelled_at)}
                           </span>
                         ) : (
@@ -336,7 +336,7 @@ export default function SubscribersPage() {
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-[#0D0D0D] border-[#1F1F1F]">
+                      <DropdownMenuContent align="end" className="bg-card border-border">
                         <DropdownMenuItem asChild>
                           <Link href={`/creator/${subscriber.fan_id}`}>View Profile</Link>
                         </DropdownMenuItem>

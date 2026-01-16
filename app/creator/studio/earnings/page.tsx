@@ -141,7 +141,7 @@ export default function EarningsPage() {
         );
       case "commission":
         return (
-          <Badge className="bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20 rounded-lg">
+          <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-[#10B981]/20 rounded-lg">
             Commission
           </Badge>
         );
@@ -152,7 +152,7 @@ export default function EarningsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505]">
+      <div className="min-h-screen bg-background">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
         <main className="container max-w-6xl mx-auto px-4 py-6">
           <div className="animate-pulse space-y-4">
@@ -166,7 +166,7 @@ export default function EarningsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
       <main className="container max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -174,7 +174,7 @@ export default function EarningsPage() {
           asChild
           variant="ghost"
           size="sm"
-          className="mb-6 border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
+          className="mb-6 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
         >
           <Link href="/creator/studio">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -187,10 +187,7 @@ export default function EarningsPage() {
             <h1 className="text-3xl font-bold text-foreground mb-2">Earnings</h1>
             <p className="text-muted-foreground">Track your revenue and payouts</p>
           </div>
-          <Button
-            variant="outline"
-            className="bg-[#0D0D0D] border-[#1F1F1F] hover:bg-[#1A1A1A] rounded-xl"
-          >
+          <Button variant="outline" className="bg-card border-border hover:bg-[#1A1A1A] rounded-xl">
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
@@ -205,7 +202,7 @@ export default function EarningsPage() {
             className={`rounded-xl ${
               timeRange === "7d"
                 ? "bg-primary-gradient"
-                : "border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A]"
+                : "border-border bg-card hover:bg-[#1A1A1A]"
             }`}
           >
             7 Days
@@ -217,7 +214,7 @@ export default function EarningsPage() {
             className={`rounded-xl ${
               timeRange === "30d"
                 ? "bg-primary-gradient"
-                : "border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A]"
+                : "border-border bg-card hover:bg-[#1A1A1A]"
             }`}
           >
             30 Days
@@ -229,7 +226,7 @@ export default function EarningsPage() {
             className={`rounded-xl ${
               timeRange === "90d"
                 ? "bg-primary-gradient"
-                : "border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A]"
+                : "border-border bg-card hover:bg-[#1A1A1A]"
             }`}
           >
             90 Days
@@ -241,7 +238,7 @@ export default function EarningsPage() {
             className={`rounded-xl ${
               timeRange === "all"
                 ? "bg-primary-gradient"
-                : "border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A]"
+                : "border-border bg-card hover:bg-[#1A1A1A]"
             }`}
           >
             All Time
@@ -250,9 +247,9 @@ export default function EarningsPage() {
 
         {/* Earnings Overview */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-          <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6">
+          <div className="bg-card border border-border rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-[#10B981]/10 text-[#10B981] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-600 dark:text-green-400 flex items-center justify-center">
                 <DollarSign className="w-5 h-5" />
               </div>
               <div>
@@ -262,7 +259,7 @@ export default function EarningsPage() {
             <p className="text-sm text-muted-foreground">Total Earnings</p>
           </div>
 
-          <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6">
+          <div className="bg-card border border-border rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-[#6366F1]/10 text-[#6366F1] flex items-center justify-center">
                 <TrendingUp className="w-5 h-5" />
@@ -274,7 +271,7 @@ export default function EarningsPage() {
             <p className="text-sm text-muted-foreground">Available Balance</p>
           </div>
 
-          <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6">
+          <div className="bg-card border border-border rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-[#F59E0B]/10 text-[#F59E0B] flex items-center justify-center">
                 <Clock className="w-5 h-5" />
@@ -286,7 +283,7 @@ export default function EarningsPage() {
             <p className="text-sm text-muted-foreground">Pending Balance</p>
           </div>
 
-          <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6">
+          <div className="bg-card border border-border rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-muted text-muted-foreground flex items-center justify-center">
                 <DollarSign className="w-5 h-5" />
@@ -301,7 +298,7 @@ export default function EarningsPage() {
 
         {/* Next Payout */}
         {pendingBalance > 0 && (
-          <div className="bg-[#0D0D0D] border border-[#6366F1]/20 rounded-3xl p-6 mb-8 bg-[#6366F1]/5">
+          <div className="bg-card border border-[#6366F1]/20 rounded-3xl p-6 mb-8 bg-[#6366F1]/5">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-foreground mb-1">Pending Settlement</h3>
@@ -320,7 +317,7 @@ export default function EarningsPage() {
         )}
 
         {/* Transaction History */}
-        <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6">
+        <div className="bg-card border border-border rounded-3xl p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">Transaction History</h2>
           {transactions.length === 0 ? (
             <div className="text-center py-12">
@@ -340,7 +337,7 @@ export default function EarningsPage() {
                     <div
                       className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                         transaction.status === "completed"
-                          ? "bg-[#10B981]/10 text-[#10B981]"
+                          ? "bg-green-500/10 text-green-600 dark:text-green-400"
                           : "bg-[#F59E0B]/10 text-[#F59E0B]"
                       }`}
                     >

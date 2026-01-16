@@ -132,7 +132,7 @@ export default function ContentReviewPage() {
   const getVisibilityBadge = (visibility: string, priceCents: number | null) => {
     if (visibility === "free") {
       return (
-        <Badge className="bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20 rounded-lg">
+        <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-[#10B981]/20 rounded-lg">
           Free
         </Badge>
       );
@@ -153,7 +153,7 @@ export default function ContentReviewPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505]">
+      <div className="min-h-screen bg-background">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
         <main className="container max-w-6xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
@@ -167,7 +167,7 @@ export default function ContentReviewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
       <main className="container max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -177,7 +177,7 @@ export default function ContentReviewPage() {
         </div>
 
         {posts.length === 0 ? (
-          <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-12 text-center">
+          <div className="bg-card border border-border rounded-3xl p-12 text-center">
             <p className="text-muted-foreground">No content to review</p>
           </div>
         ) : (
@@ -185,7 +185,7 @@ export default function ContentReviewPage() {
             {posts.map((post) => (
               <div
                 key={post.id}
-                className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 hover:border-[#262626] transition-colors"
+                className="bg-card border border-border rounded-3xl p-6 hover:border-[#262626] transition-colors"
               >
                 <div className="flex items-start gap-6">
                   <Avatar className="w-12 h-12">
@@ -243,12 +243,12 @@ export default function ContentReviewPage() {
                     )}
 
                     {/* Actions */}
-                    <div className="flex gap-3 pt-4 border-t border-[#1F1F1F]">
+                    <div className="flex gap-3 pt-4 border-t border-border">
                       <Button
                         asChild
                         variant="outline"
                         size="sm"
-                        className="border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
+                        className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
                       >
                         <Link href={`/post/${post.id}`}>
                           <Eye className="w-4 h-4 mr-2" />
@@ -259,7 +259,7 @@ export default function ContentReviewPage() {
                         onClick={() => setDeletingPostId(post.id)}
                         variant="outline"
                         size="sm"
-                        className="border-[#F43F5E] text-[#F43F5E] hover:bg-[#F43F5E]/10 rounded-xl"
+                        className="border-[#F43F5E] text-destructive hover:bg-[#F43F5E]/10 rounded-xl"
                       >
                         <Trash2 className="w-4 h-4 mr-2" />
                         Delete
@@ -277,7 +277,7 @@ export default function ContentReviewPage() {
           open={deletingPostId !== null}
           onOpenChange={(open) => !open && setDeletingPostId(null)}
         >
-          <AlertDialogContent className="bg-[#0D0D0D] border-[#1F1F1F] rounded-3xl">
+          <AlertDialogContent className="bg-card border-border rounded-3xl">
             <AlertDialogHeader>
               <AlertDialogTitle className="text-foreground">Delete Content</AlertDialogTitle>
               <AlertDialogDescription className="text-muted-foreground">
@@ -293,13 +293,13 @@ export default function ContentReviewPage() {
                   value={deletionReason}
                   onChange={(e) => setDeletionReason(e.target.value)}
                   placeholder="例如：违规内容、版权问题等"
-                  className="bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                  className="bg-card border-border rounded-xl"
                   rows={3}
                 />
               </div>
             </div>
             <AlertDialogFooter>
-              <AlertDialogCancel className="border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl">
+              <AlertDialogCancel className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl">
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction

@@ -233,9 +233,22 @@ export function HomeFeedClient({
 
                   {/* Post Content */}
                   {post.title && (
-                    <h2 className="text-xl font-semibold text-foreground mb-3">{post.title}</h2>
+                    <Link href={`/posts/${post.id}`}>
+                      <h2 className="text-xl font-semibold text-foreground mb-3 hover:text-primary transition-colors cursor-pointer">
+                        {post.title}
+                      </h2>
+                    </Link>
                   )}
-                  <p className="text-foreground mb-6 whitespace-pre-wrap">{post.content}</p>
+                  <p className="text-foreground mb-6 whitespace-pre-wrap line-clamp-4">
+                    {post.content}
+                  </p>
+                  {post.content.length > 200 && (
+                    <Link href={`/posts/${post.id}`}>
+                      <Button variant="ghost" size="sm" className="mb-4 -ml-2">
+                        Read more
+                      </Button>
+                    </Link>
+                  )}
 
                   {/* Media Display */}
                   <div className="mb-6">

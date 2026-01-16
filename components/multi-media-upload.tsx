@@ -160,7 +160,7 @@ export function MultiMediaUpload({
           className={`
             border-2 border-dashed rounded-xl p-8 text-center cursor-pointer
             transition-colors
-            ${isDragging ? "border-[#6366F1] bg-[#6366F1]/5" : "border-[#1F1F1F] bg-[#0D0D0D]"}
+            ${isDragging ? "border-[#6366F1] bg-[#6366F1]/5" : "border-border bg-card"}
             hover:border-[#6366F1]/50
           `}
           onClick={() => fileInputRef.current?.click()}
@@ -195,7 +195,7 @@ export function MultiMediaUpload({
               className={`
                 border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
                 transition-colors
-                ${isDragging ? "border-[#6366F1] bg-[#6366F1]/5" : "border-[#1F1F1F] bg-[#0D0D0D]"}
+                ${isDragging ? "border-[#6366F1] bg-[#6366F1]/5" : "border-border bg-card"}
                 ${isUploading ? "opacity-50 cursor-not-allowed" : "hover:border-[#6366F1]/50"}
               `}
               onClick={() => !isUploading && fileInputRef.current?.click()}
@@ -232,7 +232,7 @@ export function MultiMediaUpload({
 
               return (
                 <div key={index} className="relative group">
-                  <div className="relative rounded-xl overflow-hidden border border-[#1F1F1F] bg-[#0D0D0D]">
+                  <div className="relative rounded-xl overflow-hidden border border-border bg-card">
                     {file.type === "image" ? (
                       <img
                         src={file.url}
@@ -252,7 +252,7 @@ export function MultiMediaUpload({
                           {progress?.percentage.toFixed(0)}%
                         </p>
                         {/* Primary Gradient 进度条 */}
-                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#0D0D0D]">
+                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-card">
                           <div
                             className="h-full bg-primary-gradient transition-all duration-300"
                             style={{ width: `${progress?.percentage || 0}%` }}

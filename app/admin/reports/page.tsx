@@ -148,7 +148,7 @@ export default function ReportsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505]">
+      <div className="min-h-screen bg-background">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
         <main className="container max-w-6xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
@@ -162,7 +162,7 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
       <main className="container max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -172,7 +172,7 @@ export default function ReportsPage() {
         </div>
 
         {reports.length === 0 ? (
-          <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-12 text-center">
+          <div className="bg-card border border-border rounded-3xl p-12 text-center">
             <p className="text-muted-foreground">No pending reports</p>
           </div>
         ) : (
@@ -180,7 +180,7 @@ export default function ReportsPage() {
             {reports.map((report) => (
               <div
                 key={report.id}
-                className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 hover:border-[#262626] transition-colors"
+                className="bg-card border border-border rounded-3xl p-6 hover:border-[#262626] transition-colors"
               >
                 <div className="flex items-start gap-6">
                   <Avatar className="w-12 h-12">
@@ -230,13 +230,13 @@ export default function ReportsPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-3 pt-4 border-t border-[#1F1F1F]">
+                    <div className="flex gap-3 pt-4 border-t border-border">
                       {report.reported_type === "post" && (
                         <Button
                           asChild
                           variant="outline"
                           size="sm"
-                          className="border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
+                          className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
                         >
                           <Link href={`/post/${report.reported_id}`}>View Post</Link>
                         </Button>
@@ -246,7 +246,7 @@ export default function ReportsPage() {
                           asChild
                           variant="outline"
                           size="sm"
-                          className="border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
+                          className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
                         >
                           <Link href={`/creator/${report.reported_id}`}>View User</Link>
                         </Button>
@@ -258,7 +258,7 @@ export default function ReportsPage() {
                         }}
                         variant="outline"
                         size="sm"
-                        className="border-[#F43F5E] text-[#F43F5E] hover:bg-[#F43F5E]/10 rounded-xl"
+                        className="border-[#F43F5E] text-destructive hover:bg-[#F43F5E]/10 rounded-xl"
                       >
                         {report.reported_type === "post" ? "Delete Content" : "Ban User"}
                       </Button>
@@ -269,7 +269,7 @@ export default function ReportsPage() {
                         }}
                         variant="outline"
                         size="sm"
-                        className="border-[#10B981] text-[#10B981] hover:bg-[#10B981]/10 rounded-xl"
+                        className="border-[#10B981] text-green-600 dark:text-green-400 hover:bg-green-500/10 rounded-xl"
                       >
                         No Violation
                       </Button>
@@ -292,7 +292,7 @@ export default function ReportsPage() {
             }
           }}
         >
-          <AlertDialogContent className="bg-[#0D0D0D] border-[#1F1F1F] rounded-3xl">
+          <AlertDialogContent className="bg-card border-border rounded-3xl">
             <AlertDialogHeader>
               <AlertDialogTitle className="text-foreground">
                 {resolutionAction === "delete"
@@ -317,13 +317,13 @@ export default function ReportsPage() {
                   value={resolutionNotes}
                   onChange={(e) => setResolutionNotes(e.target.value)}
                   placeholder="Add any notes about this resolution..."
-                  className="bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                  className="bg-card border-border rounded-xl"
                   rows={3}
                 />
               </div>
             </div>
             <AlertDialogFooter>
-              <AlertDialogCancel className="border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl">
+              <AlertDialogCancel className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl">
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction
@@ -332,7 +332,7 @@ export default function ReportsPage() {
                 }
                 className={`rounded-xl ${
                   resolutionAction === "no_violation"
-                    ? "bg-[#10B981] hover:bg-[#10B981]/90"
+                    ? "bg-green-500 hover:bg-green-500/90"
                     : "bg-destructive hover:bg-destructive/90"
                 }`}
               >

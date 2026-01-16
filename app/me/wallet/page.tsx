@@ -175,7 +175,7 @@ export default function WalletPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505]">
+      <div className="min-h-screen bg-background">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
         <main className="container max-w-4xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-8">
@@ -192,7 +192,7 @@ export default function WalletPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
       <main className="container max-w-4xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -226,7 +226,7 @@ export default function WalletPage() {
                   ${
                     selectedAmount === amount
                       ? "border-[#6366F1] bg-[#6366F1]/10 shadow-primary-glow"
-                      : "border-[#1F1F1F] bg-[#0D0D0D] hover:border-[#6366F1]/50"
+                      : "border-border bg-card hover:border-[#6366F1]/50"
                   }
                 `}
               >
@@ -271,7 +271,7 @@ export default function WalletPage() {
               {transactions.map((transaction) => (
                 <div
                   key={transaction.id}
-                  className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 flex items-center justify-between"
+                  className="bg-card border border-border rounded-3xl p-6 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-4">
                     <div
@@ -279,8 +279,8 @@ export default function WalletPage() {
                         w-12 h-12 rounded-xl flex items-center justify-center
                         ${
                           getTransactionType(transaction.type) === "recharge"
-                            ? "bg-[#10B981]/10 text-[#10B981]"
-                            : "bg-[#F43F5E]/10 text-[#F43F5E]"
+                            ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                            : "bg-[#F43F5E]/10 text-destructive"
                         }
                       `}
                     >
@@ -304,8 +304,8 @@ export default function WalletPage() {
                       text-lg font-bold
                       ${
                         getTransactionType(transaction.type) === "recharge"
-                          ? "text-[#10B981]"
-                          : "text-[#F43F5E]"
+                          ? "text-green-600 dark:text-green-400"
+                          : "text-destructive"
                       }
                     `}
                   >

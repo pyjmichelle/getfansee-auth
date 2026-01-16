@@ -14,6 +14,7 @@ import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { type PostVisibility } from "@/lib/types";
 import { toast } from "sonner";
 import { MultiMediaUpload } from "@/components/multi-media-upload";
+import { TagSelector } from "@/components/tag-selector";
 import { type MediaFile } from "@/lib/storage";
 import Link from "next/link";
 
@@ -41,6 +42,7 @@ export default function NewPostPage() {
     watermark_enabled: true, // 默认开启
   });
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -140,6 +142,20 @@ export default function NewPostPage() {
       const result = await response.json();
 
       if (result.success && result.postId) {
+        // 如果有标签，保存标签
+        if (selectedTags.length > 0) {
+          try {
+            await fetch(`/api/posts/${result.postId}/tags`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ tagIds: selectedTags }),
+            });
+          } catch (tagError) {
+            console.error("Failed to save tags:", tagError);
+            // 不阻止帖子创建成功，只是标签保存失败
+          }
+        }
+
         toast.success("Post 创建成功！");
         setTimeout(() => {
           router.push("/home");
@@ -157,7 +173,7 @@ export default function NewPostPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse space-y-4 w-full max-w-2xl px-4">
           <div className="h-8 w-48 bg-[#121212] rounded"></div>
           <div className="h-64 bg-[#121212] rounded-3xl"></div>
@@ -187,7 +203,7 @@ export default function NewPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
       <main className="container max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -198,12 +214,12 @@ export default function NewPostPage() {
 
         {error && (
           <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-3xl p-6 mb-8">
-            <p className="text-[#F43F5E] font-medium">错误</p>
+            <p className="text-destructive font-medium">错误</p>
             <p className="text-sm text-muted-foreground mt-1">{error}</p>
           </div>
         )}
 
-        <div className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 md:p-8">
+        <div className="bg-card border border-border rounded-3xl p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title */}
             <div className="space-y-2">
@@ -253,6 +269,13 @@ export default function NewPostPage() {
                   已上传 {mediaFiles.length} 个文件
                 </p>
               )}
+            </div>
+
+            {/* Tags */}
+            <div className="space-y-2">
+              <Label>Tags (可选，最多 5 个)</Label>
+              <TagSelector selectedTags={selectedTags} onTagsChange={setSelectedTags} maxTags={5} />
+              <p className="text-xs text-muted-foreground">添加标签帮助用户发现你的内容</p>
             </div>
 
             {/* Visibility */}
@@ -372,13 +395,13 @@ export default function NewPostPage() {
             )}
 
             {/* Submit Button */}
-            <div className="flex gap-4 pt-6 border-t border-[#1F1F1F]">
+            <div className="flex gap-4 pt-6 border-t border-border">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => router.push("/home")}
                 disabled={isSaving}
-                className="flex-1 rounded-xl border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A]"
+                className="flex-1 rounded-xl border-border bg-card hover:bg-[#1A1A1A]"
               >
                 取消
               </Button>

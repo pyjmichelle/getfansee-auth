@@ -174,7 +174,7 @@ export default function CreatorOnboardingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-muted-foreground">Loading...</div>
       </div>
     );
@@ -187,7 +187,7 @@ export default function CreatorOnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       <NavHeader user={currentUser} notificationCount={0} />
 
       <main className="container max-w-2xl mx-auto px-4 py-6">
@@ -198,7 +198,7 @@ export default function CreatorOnboardingPage() {
 
         {error && (
           <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-3xl p-4 mb-6">
-            <p className="text-[#F43F5E] font-medium">错误</p>
+            <p className="text-destructive font-medium">错误</p>
             <p className="text-sm text-muted-foreground mt-1">{error}</p>
           </div>
         )}
@@ -223,7 +223,7 @@ export default function CreatorOnboardingPage() {
                   placeholder="https://example.com/avatar.jpg"
                   value={formData.avatar_url}
                   onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-                  className="mt-2 max-w-md bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                  className="mt-2 max-w-md bg-card border-border rounded-xl"
                 />
               </div>
 
@@ -240,7 +240,7 @@ export default function CreatorOnboardingPage() {
                   onChange={(e) => setFormData({ ...formData, display_name: e.target.value })}
                   required
                   disabled={isSaving}
-                  className="bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                  className="bg-card border-border rounded-xl"
                 />
               </div>
 
@@ -254,7 +254,7 @@ export default function CreatorOnboardingPage() {
                   onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                   rows={4}
                   disabled={isSaving}
-                  className="bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                  className="bg-card border-border rounded-xl"
                 />
               </div>
 
@@ -265,7 +265,7 @@ export default function CreatorOnboardingPage() {
                   variant="outline"
                   onClick={() => router.push("/home")}
                   disabled={isSaving}
-                  className="flex-1 border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
+                  className="flex-1 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
                 >
                   取消
                 </Button>
@@ -289,7 +289,7 @@ export default function CreatorOnboardingPage() {
 
               {verificationStatus?.status === "rejected" && (
                 <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-xl p-4">
-                  <p className="text-sm text-[#F43F5E] font-medium mb-2">验证被拒绝</p>
+                  <p className="text-sm text-destructive font-medium mb-2">验证被拒绝</p>
                   {verificationStatus.rejection_reason && (
                     <p className="text-sm text-muted-foreground">
                       原因：{verificationStatus.rejection_reason}
@@ -300,8 +300,10 @@ export default function CreatorOnboardingPage() {
               )}
 
               {verificationStatus?.status === "approved" && (
-                <div className="bg-[#10B981]/10 border border-[#10B981]/20 rounded-xl p-4">
-                  <p className="text-sm text-[#10B981] font-medium">身份验证已通过</p>
+                <div className="bg-green-500/10 border border-[#10B981]/20 rounded-xl p-4">
+                  <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                    身份验证已通过
+                  </p>
                   <Button
                     onClick={() => router.push("/home")}
                     variant="gradient"
@@ -371,7 +373,7 @@ export default function CreatorOnboardingPage() {
                       onChange={(e) => setKycData({ ...kycData, real_name: e.target.value })}
                       required
                       disabled={isSubmittingKYC}
-                      className="bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                      className="bg-card border-border rounded-xl"
                     />
                   </div>
 
@@ -386,7 +388,7 @@ export default function CreatorOnboardingPage() {
                       onChange={(e) => setKycData({ ...kycData, birth_date: e.target.value })}
                       required
                       disabled={isSubmittingKYC}
-                      className="bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                      className="bg-card border-border rounded-xl"
                     />
                   </div>
 
@@ -402,7 +404,7 @@ export default function CreatorOnboardingPage() {
                       placeholder="例如：US, CN, JP"
                       required
                       disabled={isSubmittingKYC}
-                      className="bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                      className="bg-card border-border rounded-xl"
                     />
                   </div>
 
@@ -410,7 +412,7 @@ export default function CreatorOnboardingPage() {
                     <Label>
                       证件照片 <span className="text-destructive">*</span>
                     </Label>
-                    <div className="border-2 border-dashed border-[#1F1F1F] rounded-xl p-6 text-center hover:border-[#262626] transition-colors">
+                    <div className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-[#262626] transition-colors">
                       <input
                         type="file"
                         accept="image/jpeg,image/jpg,image/png,image/webp"
@@ -455,7 +457,7 @@ export default function CreatorOnboardingPage() {
                       variant="outline"
                       onClick={() => setCurrentStep("profile")}
                       disabled={isSubmittingKYC}
-                      className="flex-1 border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
+                      className="flex-1 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
                     >
                       上一步
                     </Button>
