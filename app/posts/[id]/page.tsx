@@ -112,7 +112,7 @@ export default function PostDetailPage() {
     return (
       <div className="min-h-screen bg-background">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-        <main className="container max-w-3xl mx-auto px-4 py-8">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <LoadingState type="spinner" text="Loading post..." />
         </main>
       </div>
@@ -123,7 +123,7 @@ export default function PostDetailPage() {
     return (
       <div className="min-h-screen bg-background">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-        <main className="container max-w-3xl mx-auto px-4 py-8">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <ErrorState
             title="Failed to load post"
             message={error || "Post not found"}
@@ -141,12 +141,12 @@ export default function PostDetailPage() {
     <div className="min-h-screen bg-background">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
-      <main className="container max-w-3xl mx-auto px-4 py-8">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* 返回按钮 */}
         <Button
           variant="ghost"
           size="sm"
-          className="mb-6 -ml-2"
+          className="mb-6 -ml-2 rounded-lg min-h-[40px]"
           onClick={() => router.back()}
           aria-label="Go back"
         >
@@ -154,33 +154,36 @@ export default function PostDetailPage() {
           Back
         </Button>
 
-        <Card className="rounded-2xl border-border mb-6">
-          <CardContent className="p-6">
+        <Card className="rounded-xl border shadow-sm mb-6">
+          <CardContent className="p-6 sm:p-8">
             {/* Creator Header */}
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-4 mb-6 pb-6 border-b">
               <Link href={`/creator/${post.creator_id}`}>
-                <Avatar className="w-12 h-12 cursor-pointer hover:opacity-80 transition-opacity">
+                <Avatar className="w-14 h-14 cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-background">
                   <AvatarImage
                     src={post.creator?.avatar_url || "/placeholder.svg"}
                     alt={post.creator?.display_name || "Creator"}
                   />
-                  <AvatarFallback className="bg-primary/10 text-primary">
+                  <AvatarFallback className="bg-primary/10 text-primary text-lg">
                     {post.creator?.display_name?.[0]?.toUpperCase() || "C"}
                   </AvatarFallback>
                 </Avatar>
               </Link>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <Link href={`/creator/${post.creator_id}`}>
-                  <h3 className="font-semibold text-foreground hover:text-primary transition-colors">
+                  <h3 className="font-semibold text-foreground hover:text-primary transition-colors text-base">
                     {post.creator?.display_name || "Creator"}
                   </h3>
                 </Link>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                 </p>
               </div>
               {post.visibility !== "free" && (
-                <Badge variant={post.visibility === "ppv" ? "default" : "secondary"}>
+                <Badge
+                  variant={post.visibility === "ppv" ? "default" : "secondary"}
+                  className="shrink-0"
+                >
                   {post.visibility === "ppv"
                     ? `$${((post.price_cents || 0) / 100).toFixed(2)}`
                     : "Subscribers"}
@@ -190,9 +193,13 @@ export default function PostDetailPage() {
 
             {/* Post Content */}
             {post.title && (
-              <h1 className="text-2xl font-bold text-foreground mb-4">{post.title}</h1>
+              <h1 className="text-3xl font-bold text-foreground mb-4 leading-tight">
+                {post.title}
+              </h1>
             )}
-            <p className="text-foreground mb-6 whitespace-pre-wrap">{post.content}</p>
+            <p className="text-foreground mb-6 whitespace-pre-wrap text-base leading-relaxed">
+              {post.content}
+            </p>
 
             {/* Media Display */}
             <div className="mb-6">
@@ -214,21 +221,22 @@ export default function PostDetailPage() {
 
             {/* Locked State */}
             {!canView && !isCreator && (
-              <div className="p-6 bg-muted/50 rounded-2xl border border-border text-center">
-                <Lock className="w-8 h-8 mx-auto mb-3 text-muted-foreground" aria-hidden="true" />
-                <p className="text-sm text-muted-foreground mb-4">
+              <div className="p-8 bg-muted/50 rounded-xl border border-border text-center">
+                <Lock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" aria-hidden="true" />
+                <h3 className="text-lg font-semibold mb-2">Locked Content</h3>
+                <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
                   {post.visibility === "subscribers"
                     ? "This content is for subscribers only"
                     : `Unlock this post for $${((post.price_cents || 0) / 100).toFixed(2)}`}
                 </p>
-                <Button variant="gradient" className="rounded-xl">
-                  {post.visibility === "subscribers" ? "Subscribe to view" : "Unlock"}
+                <Button className="rounded-lg min-h-[44px] px-8">
+                  {post.visibility === "subscribers" ? "Subscribe to view" : "Unlock Now"}
                 </Button>
               </div>
             )}
 
             {/* Post Actions */}
-            <div className="flex items-center gap-6 pt-6 border-t border-border">
+            <div className="flex items-center gap-4 pt-6 border-t border-border">
               <PostLikeButton
                 postId={post.id}
                 initialLikesCount={post.likes_count || 0}
@@ -237,7 +245,7 @@ export default function PostDetailPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="gap-2 hover:bg-accent rounded-xl min-h-[44px]"
+                className="gap-2 hover:bg-accent rounded-lg min-h-[40px]"
                 onClick={handleShare}
                 aria-label="Share this post"
               >

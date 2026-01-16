@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { NavHeader } from "@/components/nav-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { CenteredContainer } from "@/components/layouts/centered-container";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { getProfile } from "@/lib/profile";
 import { ensureProfile, getCurrentUser } from "@/lib/auth";
@@ -177,15 +178,17 @@ export default function WalletPage() {
     return (
       <div className="min-h-screen bg-background">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-        <main className="container max-w-4xl mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-8">
-            <div className="h-32 bg-muted rounded-3xl"></div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-24 bg-muted rounded-xl"></div>
-              ))}
+        <main className="py-6 sm:py-8 lg:py-12">
+          <CenteredContainer maxWidth="4xl">
+            <div className="animate-pulse space-y-8">
+              <div className="h-32 bg-muted rounded-xl"></div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="h-24 bg-muted rounded-xl"></div>
+                ))}
+              </div>
             </div>
-          </div>
+          </CenteredContainer>
         </main>
       </div>
     );
@@ -195,128 +198,134 @@ export default function WalletPage() {
     <div className="min-h-screen bg-background">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
-      <main className="container max-w-4xl mx-auto px-4 md:px-8 py-8 md:py-12">
-        {/* 余额显示 */}
-        <div className="mb-12 text-center">
-          <div className="inline-block relative">
-            <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full"></div>
-            <div className="relative">
-              <p className="text-sm text-muted-foreground mb-2">Wallet Balance</p>
-              <h1 className="text-6xl md:text-7xl font-bold text-foreground mb-2">
-                ${availableBalance.toFixed(2)}
-              </h1>
-              <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                <Wallet className="w-5 h-5" />
-                <span className="text-sm">Available</span>
+      <main className="py-6 sm:py-8 lg:py-12">
+        <CenteredContainer maxWidth="4xl">
+          {/* 余额显示 */}
+          <div className="mb-12 text-center">
+            <div className="inline-block relative">
+              <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full"></div>
+              <div className="relative">
+                <p className="text-sm text-muted-foreground mb-2">Wallet Balance</p>
+                <h1 className="text-6xl md:text-7xl font-bold text-foreground mb-2">
+                  ${availableBalance.toFixed(2)}
+                </h1>
+                <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                  <Wallet className="w-5 h-5" aria-hidden="true" />
+                  <span className="text-sm">Available</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* 充值选项 */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-semibold text-foreground mb-6">Recharge</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {rechargeAmounts.map((amount) => (
-              <button
-                key={amount}
-                onClick={() => setSelectedAmount(amount)}
-                className={`
-                  relative p-6 rounded-xl border-2 transition-all duration-300
-                  ${
-                    selectedAmount === amount
-                      ? "border-primary bg-primary/10 shadow-primary-glow"
-                      : "border-border bg-card hover:border-primary/50"
-                  }
-                `}
-              >
-                {selectedAmount === amount && (
-                  <div className="absolute -inset-0.5 bg-primary-gradient rounded-xl opacity-50 animate-pulse"></div>
-                )}
-                <div className="relative">
-                  <p className="text-2xl font-bold text-foreground">${amount}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Recharge</p>
-                </div>
-              </button>
-            ))}
+          {/* 充值选项 */}
+          <div className="mb-12">
+            <h2 className="text-2xl font-semibold text-foreground mb-6">Recharge</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {rechargeAmounts.map((amount) => (
+                <button
+                  key={amount}
+                  onClick={() => setSelectedAmount(amount)}
+                  className={`
+                    relative p-6 rounded-xl border-2 transition-all duration-200
+                    ${
+                      selectedAmount === amount
+                        ? "border-primary bg-primary/10 shadow-lg"
+                        : "border-border bg-card hover:border-primary/50"
+                    }
+                  `}
+                  aria-label={`Select $${amount} recharge amount`}
+                  aria-pressed={selectedAmount === amount}
+                >
+                  {selectedAmount === amount && (
+                    <div className="absolute -inset-0.5 bg-primary/20 rounded-xl opacity-50"></div>
+                  )}
+                  <div className="relative">
+                    <p className="text-2xl font-bold text-foreground">${amount}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Recharge</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <Button
+              onClick={handleRecharge}
+              disabled={!selectedAmount || isRecharging}
+              className="w-full mt-6 rounded-xl min-h-[44px] transition-all duration-200"
+              aria-label={`Recharge $${selectedAmount || 0}`}
+            >
+              {isRecharging ? (
+                "处理中..."
+              ) : (
+                <>
+                  <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
+                  Recharge ${selectedAmount || 0}
+                </>
+              )}
+            </Button>
           </div>
 
-          <Button
-            onClick={handleRecharge}
-            disabled={!selectedAmount || isRecharging}
-            variant="gradient"
-            className="w-full mt-6 rounded-xl h-12"
-          >
-            {isRecharging ? (
-              "处理中..."
+          {/* 交易历史 */}
+          <div>
+            <h2 className="text-2xl font-semibold text-foreground mb-6">Transaction History</h2>
+            {transactions.length === 0 ? (
+              <div className="text-center py-16 text-muted-foreground">
+                <Wallet className="w-12 h-12 mx-auto mb-4 opacity-50" aria-hidden="true" />
+                <p>No transactions yet</p>
+              </div>
             ) : (
-              <>
-                <Plus className="w-4 h-4 mr-2" />
-                Recharge ${selectedAmount || 0}
-              </>
-            )}
-          </Button>
-        </div>
-
-        {/* 交易历史 */}
-        <div>
-          <h2 className="text-2xl font-semibold text-foreground mb-6">Transaction History</h2>
-          {transactions.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">
-              <Wallet className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>No transactions yet</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {transactions.map((transaction) => (
-                <div
-                  key={transaction.id}
-                  className="bg-card border border-border rounded-3xl p-6 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-4">
+              <div className="space-y-4">
+                {transactions.map((transaction) => (
+                  <div
+                    key={transaction.id}
+                    className="bg-card border border-border rounded-xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition-all duration-200"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`
+                          w-12 h-12 rounded-xl flex items-center justify-center
+                          ${
+                            getTransactionType(transaction.type) === "recharge"
+                              ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                              : "bg-destructive/10 text-destructive"
+                          }
+                        `}
+                      >
+                        {getTransactionType(transaction.type) === "recharge" ? (
+                          <ArrowDown className="w-6 h-6" aria-hidden="true" />
+                        ) : (
+                          <ArrowUp className="w-6 h-6" aria-hidden="true" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">
+                          {getTransactionDescription(transaction)}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {formatDistanceToNow(new Date(transaction.created_at), {
+                            addSuffix: true,
+                          })}
+                        </p>
+                      </div>
+                    </div>
                     <div
                       className={`
-                        w-12 h-12 rounded-xl flex items-center justify-center
+                        text-lg font-bold
                         ${
                           getTransactionType(transaction.type) === "recharge"
-                            ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                            : "bg-destructive/10 text-destructive"
+                            ? "text-green-600 dark:text-green-400"
+                            : "text-destructive"
                         }
                       `}
                     >
-                      {getTransactionType(transaction.type) === "recharge" ? (
-                        <ArrowDown className="w-6 h-6" />
-                      ) : (
-                        <ArrowUp className="w-6 h-6" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">
-                        {getTransactionDescription(transaction)}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {formatDistanceToNow(new Date(transaction.created_at), { addSuffix: true })}
-                      </p>
+                      {getTransactionType(transaction.type) === "recharge" ? "+" : "-"}$
+                      {(transaction.amount_cents / 100).toFixed(2)}
                     </div>
                   </div>
-                  <div
-                    className={`
-                      text-lg font-bold
-                      ${
-                        getTransactionType(transaction.type) === "recharge"
-                          ? "text-green-600 dark:text-green-400"
-                          : "text-destructive"
-                      }
-                    `}
-                  >
-                    {getTransactionType(transaction.type) === "recharge" ? "+" : "-"}$
-                    {(transaction.amount_cents / 100).toFixed(2)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </CenteredContainer>
       </main>
     </div>
   );

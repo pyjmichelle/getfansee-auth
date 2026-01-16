@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatCard } from "@/components/stat-card";
+import { CenteredContainer } from "@/components/layouts/centered-container";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { getProfile } from "@/lib/profile";
 import { ensureProfile } from "@/lib/auth";
@@ -171,22 +172,24 @@ export default function CreatorStudioPage() {
     return (
       <div className="min-h-screen bg-background">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-        <main className="container max-w-6xl mx-auto px-4 py-8">
-          <div className="space-y-8">
-            <Skeleton className="h-8 w-64" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Card key={i} className="rounded-xl">
-                  <CardContent className="pt-6">
-                    <Skeleton className="h-12 w-12 rounded-lg mb-4" />
-                    <Skeleton className="h-8 w-20 mb-2" />
-                    <Skeleton className="h-4 w-24" />
-                  </CardContent>
-                </Card>
-              ))}
+        <main className="py-6 sm:py-8 lg:py-12">
+          <CenteredContainer maxWidth="7xl">
+            <div className="space-y-8">
+              <Skeleton className="h-8 w-64" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                {[1, 2, 3, 4].map((i) => (
+                  <Card key={i} className="rounded-xl border shadow-sm">
+                    <CardContent className="pt-6">
+                      <Skeleton className="h-12 w-12 rounded-lg mb-4" />
+                      <Skeleton className="h-8 w-20 mb-2" />
+                      <Skeleton className="h-4 w-24" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              <Skeleton className="h-64 rounded-xl" />
             </div>
-            <Skeleton className="h-64 rounded-2xl" />
-          </div>
+          </CenteredContainer>
         </main>
       </div>
     );
@@ -196,252 +199,272 @@ export default function CreatorStudioPage() {
     <div className="min-h-screen bg-background">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
-      <main className="container max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Creator Studio</h1>
-            <p className="text-muted-foreground">Manage your content and track performance</p>
-          </div>
-          <Button
-            asChild
-            variant="gradient"
-            size="lg"
-            className="w-full sm:w-auto rounded-xl min-h-[44px]"
-          >
-            <Link href="/creator/new-post">
-              <Plus className="w-5 h-5 mr-2" aria-hidden="true" />
-              New Post
-            </Link>
-          </Button>
-        </div>
-
-        {/* Time Range Filter */}
-        <div className="flex gap-2 mb-8" role="tablist" aria-label="Time range filter">
-          <Button
-            variant={timeRange === "7d" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTimeRange("7d")}
-            className="rounded-xl"
-            role="tab"
-            aria-selected={timeRange === "7d"}
-          >
-            7 Days
-          </Button>
-          <Button
-            variant={timeRange === "30d" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTimeRange("30d")}
-            className="rounded-xl"
-            role="tab"
-            aria-selected={timeRange === "30d"}
-          >
-            30 Days
-          </Button>
-          <Button
-            variant={timeRange === "90d" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTimeRange("90d")}
-            className="rounded-xl"
-            role="tab"
-            aria-selected={timeRange === "90d"}
-          >
-            90 Days
-          </Button>
-        </div>
-
-        {/* Stats Grid - 使用 StatCard 组件 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-          <StatCard
-            title="Total Revenue"
-            value={`$${stats.revenue.value.toFixed(2)}`}
-            change={{ value: stats.revenue.change, trend: stats.revenue.trend }}
-            icon={<DollarSign className="w-5 h-5" aria-hidden="true" />}
-          />
-          <StatCard
-            title="New Subscribers"
-            value={stats.subscribers.value}
-            change={{ value: stats.subscribers.change, trend: stats.subscribers.trend }}
-            icon={<Users className="w-5 h-5" aria-hidden="true" />}
-          />
-          <StatCard
-            title="PPV Sales"
-            value={stats.ppvSales.value}
-            change={{ value: stats.ppvSales.change, trend: stats.ppvSales.trend }}
-            icon={<DollarSign className="w-5 h-5" aria-hidden="true" />}
-          />
-          <StatCard
-            title="Visitors"
-            value={stats.visitors.value.toLocaleString()}
-            change={{ value: stats.visitors.change, trend: stats.visitors.trend }}
-            icon={<Eye className="w-5 h-5" aria-hidden="true" />}
-          />
-        </div>
-
-        {/* Chart - 平滑面积图，渐变紫色线条 */}
-        <Card className="rounded-2xl border-border mb-8">
-          <CardHeader>
-            <CardTitle className="text-xl">Revenue & Subscribers</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#A855F7" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#A855F7" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colorSubscribers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" />
-                <XAxis dataKey="date" stroke="#999999" />
-                <YAxis stroke="#999999" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#0D0D0D",
-                    border: "1px solid #1F1F1F",
-                    borderRadius: "12px",
-                    color: "#E5E5E5",
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#A855F7"
-                  fillOpacity={1}
-                  fill="url(#colorRevenue)"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="subscribers"
-                  stroke="#6366F1"
-                  fillOpacity={1}
-                  fill="url(#colorSubscribers)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          <Button asChild variant="outline" className="h-auto py-4 rounded-xl min-h-[44px]">
-            <Link href="/creator/studio/analytics" className="flex items-center gap-3">
-              <BarChart3 className="w-5 h-5" aria-hidden="true" />
-              <div className="text-left">
-                <p className="font-semibold">Analytics</p>
-                <p className="text-xs text-muted-foreground">Detailed performance metrics</p>
-              </div>
-            </Link>
-          </Button>
-
-          <Button asChild variant="outline" className="h-auto py-4 rounded-xl min-h-[44px]">
-            <Link href="/creator/studio/subscribers" className="flex items-center gap-3">
-              <Users className="w-5 h-5" aria-hidden="true" />
-              <div className="text-left">
-                <p className="font-semibold">Subscribers</p>
-                <p className="text-xs text-muted-foreground">Manage your subscriber base</p>
-              </div>
-            </Link>
-          </Button>
-
-          <Button asChild variant="outline" className="h-auto py-4 rounded-xl min-h-[44px]">
-            <Link href="/creator/studio/earnings" className="flex items-center gap-3">
-              <DollarSign className="w-5 h-5" aria-hidden="true" />
-              <div className="text-left">
-                <p className="font-semibold">Earnings</p>
-                <p className="text-xs text-muted-foreground">View revenue and payouts</p>
-              </div>
-            </Link>
-          </Button>
-        </div>
-
-        {/* Recent Posts */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-foreground">Recent Posts</h2>
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/creator/studio/post/list">View All</Link>
+      <main className="py-6 sm:py-8 lg:py-12">
+        <CenteredContainer maxWidth="7xl">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">Creator Studio</h1>
+              <p className="text-lg text-muted-foreground">
+                Manage your content and track performance
+              </p>
+            </div>
+            <Button
+              asChild
+              size="lg"
+              className="w-full sm:w-auto rounded-xl min-h-[44px] transition-all duration-200"
+            >
+              <Link href="/creator/new-post">
+                <Plus className="w-5 h-5 mr-2" aria-hidden="true" />
+                New Post
+              </Link>
             </Button>
           </div>
 
-          <div className="space-y-4">
-            {recentPosts.map((post) => (
-              <Card key={post.id} className="rounded-2xl border-border overflow-hidden">
-                <div className="flex flex-col md:flex-row">
-                  {/* Media Preview */}
-                  <div className="relative bg-muted md:w-48 aspect-video md:aspect-auto">
-                    <img
-                      src={post.mediaUrl || "/placeholder.svg"}
-                      alt="Post preview"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Post Details */}
-                  <div className="flex-1 p-4 md:p-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge
-                            variant={post.type === "free" ? "secondary" : "default"}
-                            className="rounded-lg"
-                          >
-                            {post.type === "free"
-                              ? "Free"
-                              : post.type === "subscribers"
-                                ? "Subscribers"
-                                : `$${post.price}`}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {formatDate(post.createdAt)}
-                          </span>
-                        </div>
-                        <p className="text-foreground mb-3">{post.content}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-6 text-sm">
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <Eye className="w-4 h-4" aria-hidden="true" />
-                        {post.views.toLocaleString()} views
-                      </div>
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <Heart className="w-4 h-4" aria-hidden="true" />
-                        {post.likes} likes
-                      </div>
-                      {post.revenue > 0 && (
-                        <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                          <DollarSign className="w-4 h-4" aria-hidden="true" />${post.revenue}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-4 md:p-6 flex md:flex-col gap-2 border-t md:border-t-0 md:border-l border-border">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1 md:flex-none rounded-xl min-h-[40px]"
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="flex-1 md:flex-none rounded-xl min-h-[40px]"
-                    >
-                      View
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            ))}
+          {/* Time Range Filter */}
+          <div className="flex gap-2 mb-8" role="tablist" aria-label="Time range filter">
+            <Button
+              variant={timeRange === "7d" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setTimeRange("7d")}
+              className="rounded-xl transition-all duration-200"
+              role="tab"
+              aria-selected={timeRange === "7d"}
+            >
+              7 Days
+            </Button>
+            <Button
+              variant={timeRange === "30d" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setTimeRange("30d")}
+              className="rounded-xl transition-all duration-200"
+              role="tab"
+              aria-selected={timeRange === "30d"}
+            >
+              30 Days
+            </Button>
+            <Button
+              variant={timeRange === "90d" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setTimeRange("90d")}
+              className="rounded-xl transition-all duration-200"
+              role="tab"
+              aria-selected={timeRange === "90d"}
+            >
+              90 Days
+            </Button>
           </div>
-        </div>
+
+          {/* Stats Grid - 使用 StatCard 组件 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+            <StatCard
+              title="Total Revenue"
+              value={`$${stats.revenue.value.toFixed(2)}`}
+              change={{ value: stats.revenue.change, trend: stats.revenue.trend }}
+              icon={<DollarSign className="w-5 h-5" aria-hidden="true" />}
+            />
+            <StatCard
+              title="New Subscribers"
+              value={stats.subscribers.value}
+              change={{ value: stats.subscribers.change, trend: stats.subscribers.trend }}
+              icon={<Users className="w-5 h-5" aria-hidden="true" />}
+            />
+            <StatCard
+              title="PPV Sales"
+              value={stats.ppvSales.value}
+              change={{ value: stats.ppvSales.change, trend: stats.ppvSales.trend }}
+              icon={<DollarSign className="w-5 h-5" aria-hidden="true" />}
+            />
+            <StatCard
+              title="Visitors"
+              value={stats.visitors.value.toLocaleString()}
+              change={{ value: stats.visitors.change, trend: stats.visitors.trend }}
+              icon={<Eye className="w-5 h-5" aria-hidden="true" />}
+            />
+          </div>
+
+          {/* Chart - 平滑面积图，渐变紫色线条 */}
+          <Card className="rounded-xl border shadow-sm mb-8">
+            <CardHeader>
+              <CardTitle className="text-xl">Revenue & Subscribers</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#A855F7" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#A855F7" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorSubscribers" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366F1" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" />
+                  <XAxis dataKey="date" stroke="#999999" />
+                  <YAxis stroke="#999999" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#0D0D0D",
+                      border: "1px solid #1F1F1F",
+                      borderRadius: "12px",
+                      color: "#E5E5E5",
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#A855F7"
+                    fillOpacity={1}
+                    fill="url(#colorRevenue)"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="subscribers"
+                    stroke="#6366F1"
+                    fillOpacity={1}
+                    fill="url(#colorSubscribers)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            <Button
+              asChild
+              variant="outline"
+              className="h-auto py-4 rounded-xl min-h-[44px] transition-all duration-200"
+            >
+              <Link href="/creator/studio/analytics" className="flex items-center gap-3">
+                <BarChart3 className="w-5 h-5" aria-hidden="true" />
+                <div className="text-left">
+                  <p className="font-semibold">Analytics</p>
+                  <p className="text-xs text-muted-foreground">Detailed performance metrics</p>
+                </div>
+              </Link>
+            </Button>
+
+            <Button
+              asChild
+              variant="outline"
+              className="h-auto py-4 rounded-xl min-h-[44px] transition-all duration-200"
+            >
+              <Link href="/creator/studio/subscribers" className="flex items-center gap-3">
+                <Users className="w-5 h-5" aria-hidden="true" />
+                <div className="text-left">
+                  <p className="font-semibold">Subscribers</p>
+                  <p className="text-xs text-muted-foreground">Manage your subscriber base</p>
+                </div>
+              </Link>
+            </Button>
+
+            <Button
+              asChild
+              variant="outline"
+              className="h-auto py-4 rounded-xl min-h-[44px] transition-all duration-200"
+            >
+              <Link href="/creator/studio/earnings" className="flex items-center gap-3">
+                <DollarSign className="w-5 h-5" aria-hidden="true" />
+                <div className="text-left">
+                  <p className="font-semibold">Earnings</p>
+                  <p className="text-xs text-muted-foreground">View revenue and payouts</p>
+                </div>
+              </Link>
+            </Button>
+          </div>
+
+          {/* Recent Posts */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-foreground">Recent Posts</h2>
+              <Button asChild variant="ghost" size="sm" className="transition-all duration-200">
+                <Link href="/creator/studio/post/list">View All</Link>
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {recentPosts.map((post) => (
+                <Card
+                  key={post.id}
+                  className="rounded-xl border shadow-sm overflow-hidden hover:shadow-md transition-all duration-200"
+                >
+                  <div className="flex flex-col md:flex-row">
+                    {/* Media Preview */}
+                    <div className="relative bg-muted md:w-48 aspect-video md:aspect-auto">
+                      <img
+                        src={post.mediaUrl || "/placeholder.svg"}
+                        alt="Post preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    {/* Post Details */}
+                    <div className="flex-1 p-4 md:p-6">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge
+                              variant={post.type === "free" ? "secondary" : "default"}
+                              className="rounded-lg"
+                            >
+                              {post.type === "free"
+                                ? "Free"
+                                : post.type === "subscribers"
+                                  ? "Subscribers"
+                                  : `$${post.price}`}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {formatDate(post.createdAt)}
+                            </span>
+                          </div>
+                          <p className="text-foreground mb-3">{post.content}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-6 text-sm">
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <Eye className="w-4 h-4" aria-hidden="true" />
+                          {post.views.toLocaleString()} views
+                        </div>
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <Heart className="w-4 h-4" aria-hidden="true" />
+                          {post.likes} likes
+                        </div>
+                        {post.revenue > 0 && (
+                          <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                            <DollarSign className="w-4 h-4" aria-hidden="true" />${post.revenue}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="p-4 md:p-6 flex md:flex-col gap-2 border-t md:border-t-0 md:border-l border-border">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 md:flex-none rounded-xl min-h-[40px] transition-all duration-200"
+                        aria-label="Edit post"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="flex-1 md:flex-none rounded-xl min-h-[40px] transition-all duration-200"
+                        aria-label="View post"
+                      >
+                        View
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </CenteredContainer>
       </main>
     </div>
   );

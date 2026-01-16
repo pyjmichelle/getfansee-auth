@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { CenteredContainer } from "@/components/layouts/centered-container";
 import { Search, Users, FileText, Heart, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
@@ -117,218 +118,229 @@ export default function SearchPage() {
     <div className="min-h-screen bg-background">
       <NavHeader user={currentUser} notificationCount={0} />
 
-      <main className="container max-w-4xl mx-auto px-4 py-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Search</h1>
-          <p className="text-muted-foreground">Find creators and content</p>
-        </div>
+      <main className="py-6 sm:py-8 lg:py-12">
+        <CenteredContainer maxWidth="4xl">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">Search</h1>
+            <p className="text-lg text-muted-foreground">Find creators and content</p>
+          </div>
 
-        {/* Search Form */}
-        <form onSubmit={handleSearch} className="mb-6">
-          <div className="relative">
-            <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <Input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search creators or content..."
-              className="pl-10 pr-4 h-12 text-base rounded-xl"
-              autoFocus
-              aria-label="Search query"
-            />
-            {isSearching && (
-              <Loader2
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground animate-spin"
+          {/* Search Form */}
+          <form onSubmit={handleSearch} className="mb-6">
+            <div className="relative">
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground"
                 aria-hidden="true"
               />
-            )}
-          </div>
-        </form>
+              <Input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search creators or content..."
+                className="pl-10 pr-4 min-h-[44px] text-base rounded-xl"
+                autoFocus
+                aria-label="Search query"
+              />
+              {isSearching && (
+                <Loader2
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground animate-spin"
+                  aria-hidden="true"
+                />
+              )}
+            </div>
+          </form>
 
-        {/* Search Type Tabs */}
-        <Tabs
-          value={searchType}
-          onValueChange={(value) => {
-            setSearchType(value as "all" | "creators" | "posts");
-            if (query) {
-              performSearch(query);
-            }
-          }}
-          className="mb-6"
-        >
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="all">
-              <Search className="w-4 h-4 mr-2" />
-              All
-            </TabsTrigger>
-            <TabsTrigger value="creators">
-              <Users className="w-4 h-4 mr-2" />
-              Creators ({creators.length})
-            </TabsTrigger>
-            <TabsTrigger value="posts">
-              <FileText className="w-4 h-4 mr-2" />
-              Posts ({posts.length})
-            </TabsTrigger>
-          </TabsList>
+          {/* Search Type Tabs */}
+          <Tabs
+            value={searchType}
+            onValueChange={(value) => {
+              setSearchType(value as "all" | "creators" | "posts");
+              if (query) {
+                performSearch(query);
+              }
+            }}
+            className="mb-6"
+          >
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="all" className="transition-all duration-200">
+                <Search className="w-4 h-4 mr-2" aria-hidden="true" />
+                All
+              </TabsTrigger>
+              <TabsTrigger value="creators" className="transition-all duration-200">
+                <Users className="w-4 h-4 mr-2" aria-hidden="true" />
+                Creators ({creators.length})
+              </TabsTrigger>
+              <TabsTrigger value="posts" className="transition-all duration-200">
+                <FileText className="w-4 h-4 mr-2" aria-hidden="true" />
+                Posts ({posts.length})
+              </TabsTrigger>
+            </TabsList>
 
-          {/* All Results */}
-          <TabsContent value="all" className="space-y-6">
-            {isSearching ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <Card key={i} className="p-4">
-                    <div className="flex items-center gap-4">
-                      <Skeleton className="h-16 w-16 rounded-full" />
-                      <div className="flex-1 space-y-2">
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-3 w-48" />
+            {/* All Results */}
+            <TabsContent value="all" className="space-y-6">
+              {isSearching ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <Card key={i} className="p-4">
+                      <div className="flex items-center gap-4">
+                        <Skeleton className="h-16 w-16 rounded-full" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-3 w-48" />
+                        </div>
                       </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <>
-                {/* Creators Section */}
-                {creators.length > 0 && (
-                  <div>
-                    <h2 className="text-xl font-semibold mb-4">Creators</h2>
-                    <div className="grid gap-4">
-                      {creators.slice(0, 3).map((creator) => (
-                        <CreatorCard key={creator.id} creator={creator} />
-                      ))}
-                    </div>
-                    {creators.length > 3 && (
-                      <Button
-                        variant="ghost"
-                        onClick={() => setSearchType("creators")}
-                        className="w-full mt-4"
-                      >
-                        View all {creators.length} creators
-                      </Button>
-                    )}
-                  </div>
-                )}
-
-                {/* Posts Section */}
-                {posts.length > 0 && (
-                  <div>
-                    <h2 className="text-xl font-semibold mb-4">Posts</h2>
-                    <div className="grid gap-4">
-                      {posts.slice(0, 5).map((post) => (
-                        <PostCard key={post.id} post={post} />
-                      ))}
-                    </div>
-                    {posts.length > 5 && (
-                      <Button
-                        variant="ghost"
-                        onClick={() => setSearchType("posts")}
-                        className="w-full mt-4"
-                      >
-                        View all {posts.length} posts
-                      </Button>
-                    )}
-                  </div>
-                )}
-
-                {/* No Results */}
-                {!isSearching && creators.length === 0 && posts.length === 0 && query && (
-                  <div className="flex flex-col items-center justify-center py-16 px-4">
-                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                      <Search className="w-8 h-8 text-muted-foreground" aria-hidden="true" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">No results found</h3>
-                    <p className="text-sm text-muted-foreground text-center max-w-sm">
-                      No results found for &quot;{query}&quot;. Try a different search term or
-                      browse creators.
-                    </p>
-                  </div>
-                )}
-
-                {/* Initial State - No Search Yet */}
-                {!isSearching && creators.length === 0 && posts.length === 0 && !query && (
-                  <div className="flex flex-col items-center justify-center py-16 px-4">
-                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                      <Sparkles className="w-8 h-8 text-primary" aria-hidden="true" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">Discover Content</h3>
-                    <p className="text-sm text-muted-foreground text-center max-w-sm">
-                      Search for your favorite creators or explore trending content.
-                    </p>
-                  </div>
-                )}
-              </>
-            )}
-          </TabsContent>
-
-          {/* Creators Results */}
-          <TabsContent value="creators">
-            {isSearching ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <Card key={i} className="p-4">
-                    <div className="flex items-center gap-4">
-                      <Skeleton className="h-16 w-16 rounded-full" />
-                      <div className="flex-1 space-y-2">
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-3 w-48" />
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  {/* Creators Section */}
+                  {creators.length > 0 && (
+                    <div>
+                      <h2 className="text-xl font-semibold mb-4">Creators</h2>
+                      <div className="grid gap-4">
+                        {creators.slice(0, 3).map((creator) => (
+                          <CreatorCard key={creator.id} creator={creator} />
+                        ))}
                       </div>
+                      {creators.length > 3 && (
+                        <Button
+                          variant="ghost"
+                          onClick={() => setSearchType("creators")}
+                          className="w-full mt-4 rounded-xl min-h-[44px] transition-all duration-200"
+                        >
+                          View all {creators.length} creators
+                        </Button>
+                      )}
                     </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="grid gap-4">
-                {creators.map((creator) => (
-                  <CreatorCard key={creator.id} creator={creator} />
-                ))}
-                {!isSearching && creators.length === 0 && query && (
-                  <div className="flex flex-col items-center justify-center py-12">
-                    <Users className="w-12 h-12 text-muted-foreground mb-3" aria-hidden="true" />
-                    <p className="text-muted-foreground">
-                      No creators found for &quot;{query}&quot;
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </TabsContent>
+                  )}
 
-          {/* Posts Results */}
-          <TabsContent value="posts">
-            {isSearching ? (
-              <div className="space-y-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <Card key={i} className="p-4">
-                    <div className="flex items-start gap-4">
-                      <Skeleton className="h-12 w-12 rounded-full" />
-                      <div className="flex-1 space-y-2">
-                        <Skeleton className="h-4 w-24" />
-                        <Skeleton className="h-3 w-full" />
-                        <Skeleton className="h-3 w-3/4" />
+                  {/* Posts Section */}
+                  {posts.length > 0 && (
+                    <div>
+                      <h2 className="text-xl font-semibold mb-4">Posts</h2>
+                      <div className="grid gap-4">
+                        {posts.slice(0, 5).map((post) => (
+                          <PostCard key={post.id} post={post} />
+                        ))}
                       </div>
+                      {posts.length > 5 && (
+                        <Button
+                          variant="ghost"
+                          onClick={() => setSearchType("posts")}
+                          className="w-full mt-4 rounded-xl min-h-[44px] transition-all duration-200"
+                        >
+                          View all {posts.length} posts
+                        </Button>
+                      )}
                     </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="grid gap-4">
-                {posts.map((post) => (
-                  <PostCard key={post.id} post={post} />
-                ))}
-                {!isSearching && posts.length === 0 && query && (
-                  <div className="flex flex-col items-center justify-center py-12">
-                    <FileText className="w-12 h-12 text-muted-foreground mb-3" aria-hidden="true" />
-                    <p className="text-muted-foreground">No posts found for &quot;{query}&quot;</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+                  )}
+
+                  {/* No Results */}
+                  {!isSearching && creators.length === 0 && posts.length === 0 && query && (
+                    <div className="flex flex-col items-center justify-center py-16 px-4">
+                      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                        <Search className="w-8 h-8 text-muted-foreground" aria-hidden="true" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        No results found
+                      </h3>
+                      <p className="text-sm text-muted-foreground text-center max-w-sm">
+                        No results found for &quot;{query}&quot;. Try a different search term or
+                        browse creators.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Initial State - No Search Yet */}
+                  {!isSearching && creators.length === 0 && posts.length === 0 && !query && (
+                    <div className="flex flex-col items-center justify-center py-16 px-4">
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                        <Sparkles className="w-8 h-8 text-primary" aria-hidden="true" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        Discover Content
+                      </h3>
+                      <p className="text-sm text-muted-foreground text-center max-w-sm">
+                        Search for your favorite creators or explore trending content.
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+            </TabsContent>
+
+            {/* Creators Results */}
+            <TabsContent value="creators">
+              {isSearching ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <Card key={i} className="p-4">
+                      <div className="flex items-center gap-4">
+                        <Skeleton className="h-16 w-16 rounded-full" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-3 w-48" />
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {creators.map((creator) => (
+                    <CreatorCard key={creator.id} creator={creator} />
+                  ))}
+                  {!isSearching && creators.length === 0 && query && (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <Users className="w-12 h-12 text-muted-foreground mb-3" aria-hidden="true" />
+                      <p className="text-muted-foreground">
+                        No creators found for &quot;{query}&quot;
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Posts Results */}
+            <TabsContent value="posts">
+              {isSearching ? (
+                <div className="space-y-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Card key={i} className="p-4 rounded-xl border shadow-sm">
+                      <div className="flex items-start gap-4">
+                        <Skeleton className="h-12 w-12 rounded-full" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="h-3 w-full" />
+                          <Skeleton className="h-3 w-3/4" />
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {posts.map((post) => (
+                    <PostCard key={post.id} post={post} />
+                  ))}
+                  {!isSearching && posts.length === 0 && query && (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <FileText
+                        className="w-12 h-12 text-muted-foreground mb-3"
+                        aria-hidden="true"
+                      />
+                      <p className="text-muted-foreground">
+                        No posts found for &quot;{query}&quot;
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </CenteredContainer>
       </main>
     </div>
   );
@@ -336,7 +348,7 @@ export default function SearchPage() {
 
 function CreatorCard({ creator }: { creator: any }) {
   return (
-    <Card className="p-4 hover:bg-accent/50 transition-colors rounded-xl border-border">
+    <Card className="p-4 hover:bg-accent/50 transition-all duration-200 rounded-xl border shadow-sm">
       <Link href={`/creator/${creator.id}`} className="flex items-center gap-4">
         <Avatar className="h-16 w-16 ring-2 ring-border">
           <AvatarImage src={creator.avatar_url || undefined} alt={creator.display_name} />
@@ -357,7 +369,12 @@ function CreatorCard({ creator }: { creator: any }) {
             <p className="text-sm text-muted-foreground line-clamp-2">{creator.bio}</p>
           )}
         </div>
-        <Button variant="outline" size="sm" className="rounded-lg min-h-[40px] hidden sm:flex">
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-xl min-h-[40px] hidden sm:flex transition-all duration-200"
+          aria-label={`View ${creator.display_name}'s profile`}
+        >
           View Profile
         </Button>
       </Link>
@@ -367,7 +384,7 @@ function CreatorCard({ creator }: { creator: any }) {
 
 function PostCard({ post }: { post: any }) {
   return (
-    <Card className="p-4 hover:bg-accent/50 transition-colors rounded-xl border-border">
+    <Card className="p-4 hover:bg-accent/50 transition-all duration-200 rounded-xl border shadow-sm">
       <div className="flex items-start gap-4">
         <Avatar className="h-12 w-12">
           <AvatarImage
