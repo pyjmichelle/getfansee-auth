@@ -400,7 +400,13 @@ function PostCard({ post }: { post: any }) {
               </Badge>
             )}
           </div>
-          {post.title && <h3 className="font-medium text-foreground mb-1">{post.title}</h3>}
+          {post.title && (
+            <Link href={`/posts/${post.id}`}>
+              <h3 className="font-medium text-foreground mb-1 hover:text-primary transition-colors cursor-pointer">
+                {post.title}
+              </h3>
+            </Link>
+          )}
           <p className="text-sm text-muted-foreground line-clamp-2">{post.content}</p>
           <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
             {post.likes_count > 0 && (

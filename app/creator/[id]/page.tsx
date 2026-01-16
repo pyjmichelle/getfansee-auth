@@ -381,7 +381,11 @@ export default function CreatorProfilePage() {
                   return (
                     <article key={post.id} className="pb-8 border-b border-border last:border-b-0">
                       {post.title && (
-                        <h3 className="text-xl font-semibold text-foreground mb-3">{post.title}</h3>
+                        <Link href={`/posts/${post.id}`}>
+                          <h3 className="text-xl font-semibold text-foreground mb-3 hover:text-primary transition-colors cursor-pointer">
+                            {post.title}
+                          </h3>
+                        </Link>
                       )}
                       {canView ? (
                         <p className="text-foreground whitespace-pre-wrap mb-6">{post.content}</p>
