@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Mail, Camera, Save, LogOut, Sparkles } from "lucide-react";
+import { User, Mail, Camera, Save, LogOut, Sparkles, Loader2 } from "lucide-react";
 import { NavHeader } from "@/components/nav-header";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { LoadingState } from "@/components/loading-state";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 // 所有服务器端函数都通过 API 调用，不直接导入
 import { uploadAvatar } from "@/lib/storage";
@@ -249,8 +250,8 @@ export default function ProfilePage() {
 
   if (isLoading || !currentUser) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-        <div className="text-muted-foreground">Loading...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <LoadingState type="spinner" text="Loading profile..." />
       </div>
     );
   }
@@ -309,134 +310,151 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       <NavHeader user={currentUser} notificationCount={0} />
 
       <main className="container max-w-2xl mx-auto px-4 py-6">
-        <div className="mb-6">
+        <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Your Profile</h1>
           <p className="text-muted-foreground">Manage your account settings</p>
         </div>
 
         {/* Profile Card */}
-        <Card className="p-6 mb-6">
-          <div className="flex flex-col items-center mb-6">
-            <div className="relative">
-              <Avatar className="w-32 h-32">
-                <AvatarImage src={avatar || "/placeholder.svg"} />
-                <AvatarFallback className="text-2xl">
-                  {username[0]?.toUpperCase() || email[0]?.toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-              {isEditing && (
-                <label className="absolute bottom-0 right-0 cursor-pointer">
+        <Card className="rounded-2xl border-border mb-6">
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center mb-6">
+              <div className="relative">
+                <Avatar className="w-32 h-32 ring-4 ring-border">
+                  <AvatarImage src={avatar || "/placeholder.svg"} alt="Profile picture" />
+                  <AvatarFallback className="text-2xl bg-primary/10 text-primary">
+                    {username[0]?.toUpperCase() || email[0]?.toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                {isEditing && (
+                  <label className="absolute bottom-0 right-0 cursor-pointer">
+                    <Button
+                      size="icon"
+                      type="button"
+                      className="rounded-full w-10 h-10 min-h-[44px] min-w-[44px] bg-primary hover:bg-primary/90"
+                      disabled={isUploadingAvatar}
+                      aria-label="Upload new avatar"
+                    >
+                      <Camera className="w-5 h-5" aria-hidden="true" />
+                    </Button>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                      disabled={isUploadingAvatar}
+                      aria-label="Choose avatar file"
+                    />
+                  </label>
+                )}
+                {isUploadingAvatar && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                    <Loader2 className="w-6 h-6 text-white animate-spin" aria-hidden="true" />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="username" className="flex items-center gap-2">
+                  <User className="w-4 h-4" aria-hidden="true" />
+                  Display Name
+                </Label>
+                <Input
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={!isEditing}
+                  className="h-11 rounded-xl"
+                  placeholder="Enter your display name"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" aria-hidden="true" />
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  disabled
+                  className="h-11 rounded-xl bg-muted"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Email cannot be changed directly. Contact support to update.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bio">Bio</Label>
+                <Textarea
+                  id="bio"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  disabled={!isEditing}
+                  placeholder="Tell us about yourself..."
+                  className="min-h-[100px] resize-none rounded-xl"
+                  maxLength={500}
+                />
+                {isEditing && (
+                  <p className="text-xs text-muted-foreground text-right">
+                    {bio.length}/500 characters
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              {isEditing ? (
+                <>
                   <Button
-                    size="icon"
-                    type="button"
-                    className="rounded-full w-10 h-10 bg-primary-gradient hover:shadow-primary-glow"
-                    disabled={isUploadingAvatar}
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    variant="gradient"
+                    className="flex-1 rounded-xl min-h-[44px]"
                   >
-                    <Camera className="w-5 h-5" />
+                    {isSaving ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <Save className="w-4 h-4 mr-2" aria-hidden="true" />
+                    )}
+                    {isSaving ? "Saving..." : "Save Changes"}
                   </Button>
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/jpg,image/png,image/webp"
-                    onChange={handleAvatarUpload}
-                    className="hidden"
-                    disabled={isUploadingAvatar}
-                  />
-                </label>
-              )}
-              {isUploadingAvatar && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
-                  <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="username" className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                Display Name
-              </Label>
-              <Input
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                disabled={!isEditing}
-                className="h-11 bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email" className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                disabled
-                className="h-11 bg-[#121212] border-[#1F1F1F] rounded-xl"
-              />
-              <p className="text-xs text-muted-foreground">
-                Email cannot be changed directly. Contact support to update.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea
-                id="bio"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                disabled={!isEditing}
-                placeholder="Tell us about yourself..."
-                className="min-h-[100px] resize-none bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-3 mt-6">
-            {isEditing ? (
-              <>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsEditing(false)}
+                    disabled={isSaving}
+                    className="flex-1 rounded-xl min-h-[44px]"
+                  >
+                    Cancel
+                  </Button>
+                </>
+              ) : (
                 <Button
-                  onClick={handleSave}
-                  disabled={isSaving}
+                  onClick={() => setIsEditing(true)}
                   variant="gradient"
-                  className="flex-1 rounded-xl"
+                  className="w-full rounded-xl min-h-[44px]"
                 >
-                  <Save className="w-4 h-4 mr-2" />
-                  {isSaving ? "Saving..." : "Save Changes"}
+                  Edit Profile
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsEditing(false)}
-                  disabled={isSaving}
-                  className="flex-1 border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
-                >
-                  Cancel
-                </Button>
-              </>
-            ) : (
-              <Button
-                onClick={() => setIsEditing(true)}
-                variant="gradient"
-                className="w-full rounded-xl"
-              >
-                Edit Profile
-              </Button>
-            )}
-          </div>
+              )}
+            </div>
+          </CardContent>
         </Card>
 
         {/* Password Change Card */}
-        <Card className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 mb-6 hover:border-[#262626] transition-colors">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Change Password</h2>
-          <div className="space-y-4">
+        <Card className="rounded-2xl border-border mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg">Change Password</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="oldPassword">Current Password</Label>
               <Input
@@ -444,8 +462,9 @@ export default function ProfilePage() {
                 type="password"
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
-                className="h-11 bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                className="h-11 rounded-xl"
                 placeholder="Enter current password"
+                autoComplete="current-password"
               />
             </div>
             <div className="space-y-2">
@@ -455,8 +474,9 @@ export default function ProfilePage() {
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="h-11 bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                className="h-11 rounded-xl"
                 placeholder="Enter new password (min 8 characters)"
+                autoComplete="new-password"
               />
             </div>
             <div className="space-y-2">
@@ -466,68 +486,99 @@ export default function ProfilePage() {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="h-11 bg-[#0D0D0D] border-[#1F1F1F] rounded-xl"
+                className="h-11 rounded-xl"
                 placeholder="Confirm new password"
+                autoComplete="new-password"
               />
             </div>
             <Button
               onClick={handlePasswordChange}
               disabled={isSaving || !oldPassword || !newPassword || !confirmPassword}
               variant="gradient"
-              className="w-full rounded-xl"
+              className="w-full rounded-xl min-h-[44px]"
             >
-              {isSaving ? "Changing..." : "Change Password"}
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
+                  Changing...
+                </>
+              ) : (
+                "Change Password"
+              )}
             </Button>
-          </div>
+          </CardContent>
         </Card>
 
         {/* Creator Actions */}
         {currentUser.role === "fan" && (
-          <Card className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 mb-6 hover:border-[#262626] transition-colors">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Become a Creator</h2>
-            <Button
-              onClick={handleCreateCreator}
-              disabled={isCreatingCreator}
-              variant="gradient"
-              className="w-full rounded-xl"
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              {isCreatingCreator ? "Creating..." : "Create my creator profile"}
-            </Button>
+          <Card className="rounded-2xl border-border mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg">Become a Creator</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Start creating content and monetize your work. Upgrade your account to unlock
+                creator features.
+              </p>
+              <Button
+                onClick={handleCreateCreator}
+                disabled={isCreatingCreator}
+                variant="gradient"
+                className="w-full rounded-xl min-h-[44px]"
+              >
+                {isCreatingCreator ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
+                ) : (
+                  <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
+                )}
+                {isCreatingCreator ? "Creating..." : "Create my creator profile"}
+              </Button>
+            </CardContent>
           </Card>
         )}
 
         {currentUser.role === "creator" && (
-          <Card className="bg-[#0D0D0D] border border-[#1F1F1F] rounded-3xl p-6 mb-6 hover:border-[#262626] transition-colors">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Creator Tools</h2>
-            <Button
-              onClick={handleSeedPosts}
-              disabled={isSeeding}
-              variant="outline"
-              className="w-full border-[#1F1F1F] bg-[#0D0D0D] hover:bg-[#1A1A1A] rounded-xl"
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              {isSeeding ? "Seeding..." : "Seed demo posts"}
-            </Button>
-            <p className="text-xs text-muted-foreground mt-2">
-              Creates 3 demo posts: subscriber-only, PPV $4.99, PPV $9.99
-            </p>
+          <Card className="rounded-2xl border-border mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg">Creator Tools</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={handleSeedPosts}
+                disabled={isSeeding}
+                variant="outline"
+                className="w-full rounded-xl min-h-[44px]"
+              >
+                {isSeeding ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
+                ) : (
+                  <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
+                )}
+                {isSeeding ? "Seeding..." : "Seed demo posts"}
+              </Button>
+              <p className="text-xs text-muted-foreground mt-2">
+                Creates 3 demo posts: subscriber-only, PPV $4.99, PPV $9.99
+              </p>
+            </CardContent>
           </Card>
         )}
 
         {/* Account Actions */}
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Account Actions</h2>
-          <div className="space-y-3">
+        <Card className="rounded-2xl border-border">
+          <CardHeader>
+            <CardTitle className="text-lg">Account Actions</CardTitle>
+          </CardHeader>
+          <CardContent>
             <Button
               variant="ghost"
               onClick={handleLogout}
-              className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+              className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 min-h-[44px]"
+              aria-label="Log out of your account"
             >
-              <LogOut className="w-4 h-4 mr-2" />
+              <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
               Log Out
             </Button>
-          </div>
+          </CardContent>
         </Card>
       </main>
     </div>

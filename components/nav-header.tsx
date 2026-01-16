@@ -82,20 +82,34 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
           <Link href="/search" className="w-full">
             <Button
               variant="outline"
-              className="w-full justify-start text-muted-foreground bg-background"
+              className="w-full justify-start text-muted-foreground bg-background hover:bg-accent transition-colors"
+              aria-label="Search for creators and content"
             >
-              <Search className="w-4 h-4 mr-2" />
+              <Search className="w-4 h-4 mr-2" aria-hidden="true" />
               Search creators...
             </Button>
           </Link>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* 移动端搜索按钮 */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden min-h-[44px] min-w-[44px]"
+            asChild
+            aria-label="Search creators"
+          >
+            <Link href="/search">
+              <Search className="w-5 h-5" aria-hidden="true" />
+            </Link>
+          </Button>
+
           {/* 常驻转化入口：顶部导航栏固定展示 Become a Creator 渐变按钮 */}
           {showBecomeCreator && (
             <Button asChild variant="gradient" className="hidden md:flex rounded-xl">
               <Link href="/creator/upgrade">
-                <Sparkles className="w-4 h-4 mr-2" />
+                <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
                 Become a Creator
               </Link>
             </Button>
@@ -103,9 +117,15 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
 
           {user && (
             <>
-              <Button variant="ghost" size="icon" className="relative" asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative min-h-[44px] min-w-[44px]"
+                asChild
+                aria-label={`Notifications${notificationCount > 0 ? `, ${notificationCount} unread` : ""}`}
+              >
                 <Link href="/notifications">
-                  <Bell className="w-5 h-5" />
+                  <Bell className="w-5 h-5" aria-hidden="true" />
                   {notificationCount > 0 && (
                     <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 text-xs">
                       {notificationCount}
@@ -143,7 +163,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                           {isCreator && user.creatorStatus === "pending" && (
                             <Badge
                               variant="secondary"
-                              className="text-xs bg-yellow-500/10 text-yellow-500"
+                              className="text-xs bg-amber-500/10 text-amber-600 dark:text-amber-400"
                             >
                               Pending
                             </Badge>
@@ -165,12 +185,12 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                     </p>
                     <Button
                       variant={pathname === "/home" ? "secondary" : "ghost"}
-                      className="justify-start"
+                      className="justify-start min-h-[44px]"
                       asChild
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <Link href="/home">
-                        <Home className="w-4 h-4 mr-3" />
+                        <Home className="w-4 h-4 mr-3" aria-hidden="true" />
                         Feed
                       </Link>
                     </Button>
@@ -183,23 +203,23 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                         </p>
                         <Button
                           variant={pathname === "/subscriptions" ? "secondary" : "ghost"}
-                          className="justify-start"
+                          className="justify-start min-h-[44px]"
                           asChild
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <Link href="/subscriptions">
-                            <Heart className="w-4 h-4 mr-3" />
+                            <Heart className="w-4 h-4 mr-3" aria-hidden="true" />
                             Subscriptions
                           </Link>
                         </Button>
                         <Button
                           variant={pathname === "/purchases" ? "secondary" : "ghost"}
-                          className="justify-start"
+                          className="justify-start min-h-[44px]"
                           asChild
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <Link href="/purchases">
-                            <CreditCard className="w-4 h-4 mr-3" />
+                            <CreditCard className="w-4 h-4 mr-3" aria-hidden="true" />
                             Purchases
                           </Link>
                         </Button>
@@ -214,12 +234,12 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                         </p>
                         <Button
                           variant={pathname === "/creator/studio" ? "secondary" : "ghost"}
-                          className="justify-start"
+                          className="justify-start min-h-[44px]"
                           asChild
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <Link href="/creator/studio">
-                            <LayoutDashboard className="w-4 h-4 mr-3" />
+                            <LayoutDashboard className="w-4 h-4 mr-3" aria-hidden="true" />
                             Dashboard
                           </Link>
                         </Button>
@@ -227,23 +247,23 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                           variant={
                             pathname?.startsWith("/creator/new-post") ? "secondary" : "ghost"
                           }
-                          className="justify-start"
+                          className="justify-start min-h-[44px]"
                           asChild
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <Link href="/creator/new-post">
-                            <FileText className="w-4 h-4 mr-3" />
+                            <FileText className="w-4 h-4 mr-3" aria-hidden="true" />
                             New Post
                           </Link>
                         </Button>
                         <Button
                           variant={pathname === "/creator/studio/earnings" ? "secondary" : "ghost"}
-                          className="justify-start"
+                          className="justify-start min-h-[44px]"
                           asChild
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <Link href="/creator/studio/earnings">
-                            <DollarSign className="w-4 h-4 mr-3" />
+                            <DollarSign className="w-4 h-4 mr-3" aria-hidden="true" />
                             Earnings
                           </Link>
                         </Button>
@@ -256,12 +276,12 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                     </p>
                     <Button
                       variant={pathname === "/me" ? "secondary" : "ghost"}
-                      className="justify-start"
+                      className="justify-start min-h-[44px]"
                       asChild
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <Link href="/me">
-                        <User className="w-4 h-4 mr-3" />
+                        <User className="w-4 h-4 mr-3" aria-hidden="true" />
                         Profile
                       </Link>
                     </Button>
@@ -271,12 +291,12 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                         <Separator className="my-2" />
                         <Button
                           variant="gradient"
-                          className="justify-start rounded-xl"
+                          className="justify-start rounded-xl min-h-[44px]"
                           asChild
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <Link href="/creator/upgrade">
-                            <Sparkles className="w-4 h-4 mr-3" />
+                            <Sparkles className="w-4 h-4 mr-3" aria-hidden="true" />
                             Become a Creator
                           </Link>
                         </Button>
@@ -287,13 +307,14 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                     <Separator className="my-2" />
                     <Button
                       variant="ghost"
-                      className="justify-start text-[#F43F5E] hover:text-[#F43F5E] hover:bg-[#F43F5E]/10"
+                      className="justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
                       onClick={async () => {
                         setMobileMenuOpen(false);
                         await handleSignOut();
                       }}
+                      aria-label="Sign out of your account"
                     >
-                      <LogOut className="w-4 h-4 mr-3" />
+                      <LogOut className="w-4 h-4 mr-3" aria-hidden="true" />
                       Sign Out
                     </Button>
                   </nav>

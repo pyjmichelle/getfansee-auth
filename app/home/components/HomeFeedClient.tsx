@@ -5,15 +5,18 @@ import { useRouter } from "next/navigation";
 import { NavHeader } from "@/components/nav-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import { type Post } from "@/lib/types";
 import { MediaDisplay } from "@/components/media-display";
 import { useUnlock } from "@/contexts/unlock-context";
 import { PostLikeButton } from "@/components/post-like-button";
 import Link from "next/link";
-import { Lock, Heart, Share2 } from "lucide-react";
+import { Lock, Share2, AlertCircle, FileText, RefreshCw } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { PaywallModal } from "@/components/paywall-modal";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface HomeFeedClientProps {
   initialPosts: Post[];
@@ -123,18 +126,28 @@ export function HomeFeedClient({
   };
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <div className="min-h-screen bg-background">
       <NavHeader user={currentUser} notificationCount={0} />
 
       <main className="container max-w-[680px] mx-auto px-4 md:px-8 py-8 md:py-12">
         {/* Mobile: Tab 切换 (关注/发现) */}
         <div className="lg:hidden mb-8">
-          <div className="flex gap-8 border-b border-[#1F1F1F] relative">
-            <button className="pb-4 text-base font-medium text-foreground relative">
+          <div className="flex gap-8 border-b border-border relative">
+            <button
+              className="pb-4 text-base font-medium text-foreground relative"
+              aria-selected="true"
+              role="tab"
+            >
               Following
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-gradient"></span>
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></span>
             </button>
-            <button className="pb-4 text-base font-medium text-muted-foreground">Discover</button>
+            <button
+              className="pb-4 text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
+              aria-selected="false"
+              role="tab"
+            >
+              Discover
+            </button>
           </div>
         </div>
 
@@ -145,19 +158,30 @@ export function HomeFeedClient({
         </div>
 
         {error && (
-          <div className="mb-4 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" aria-hidden="true" />
+            <AlertDescription className="flex items-center justify-between">
+              <span>{error}</span>
+              <Button variant="ghost" size="sm" onClick={reloadFeed} className="ml-2 h-8 px-2">
+                <RefreshCw className="w-4 h-4 mr-1" aria-hidden="true" />
+                Retry
+              </Button>
+            </AlertDescription>
+          </Alert>
         )}
 
         {posts.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground mb-4">No posts found</p>
-            <p className="text-sm text-muted-foreground">
-              Visit{" "}
-              <Link href="/me" className="text-primary underline">
-                /me
-              </Link>{" "}
-              to create your creator profile and start posting
+          <div className="flex flex-col items-center justify-center py-16 px-4">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+              <FileText className="w-8 h-8 text-muted-foreground" aria-hidden="true" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">No posts yet</h3>
+            <p className="text-sm text-muted-foreground text-center mb-6 max-w-sm">
+              Follow some creators or check back later to see their latest content.
             </p>
+            <Button asChild variant="outline" className="rounded-xl">
+              <Link href="/search">Discover Creators</Link>
+            </Button>
           </div>
         ) : (
           <div className="space-y-6">
@@ -175,7 +199,7 @@ export function HomeFeedClient({
               return (
                 <article
                   key={post.id}
-                  className="pb-8 mb-8 border-b border-[#1F1F1F] last:border-b-0"
+                  className="pb-8 mb-8 border-b border-border last:border-b-0 transition-colors"
                 >
                   {/* Creator Header */}
                   <div className="flex items-center gap-3 mb-6">
@@ -227,10 +251,13 @@ export function HomeFeedClient({
 
                   {/* Locked State Actions */}
                   {!canView && !isCreator && (
-                    <div className="mt-6 p-6 bg-[#0D0D0D] rounded-3xl border border-[#1F1F1F]">
+                    <div className="mt-6 p-6 bg-muted/50 rounded-2xl border border-border">
                       {post.visibility === "subscribers" ? (
                         <div className="text-center">
-                          <Lock className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
+                          <Lock
+                            className="w-8 h-8 mx-auto mb-3 text-muted-foreground"
+                            aria-hidden="true"
+                          />
                           <p className="text-sm text-muted-foreground mb-4">
                             This content is for subscribers only
                           </p>
@@ -246,7 +273,10 @@ export function HomeFeedClient({
                         </div>
                       ) : post.visibility === "ppv" ? (
                         <div className="text-center">
-                          <Lock className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
+                          <Lock
+                            className="w-8 h-8 mx-auto mb-3 text-muted-foreground"
+                            aria-hidden="true"
+                          />
                           <p className="text-sm text-muted-foreground mb-4">
                             Unlock this post for ${((post.price_cents || 0) / 100).toFixed(2)}
                           </p>
@@ -273,13 +303,26 @@ export function HomeFeedClient({
                       initialLikesCount={post.likes_count || 0}
                       userId={currentUserId || undefined}
                     />
-                    {/* Comment 功能已全局隐藏 */}
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="gap-2 hover:bg-white/5 rounded-xl min-h-[44px] min-w-[44px]"
+                      className="gap-2 hover:bg-accent rounded-xl min-h-[44px] min-w-[44px] transition-colors"
+                      onClick={() => {
+                        if (navigator.share) {
+                          navigator.share({
+                            title: post.title || "Check out this post",
+                            url: window.location.origin + `/creator/${post.creator_id}`,
+                          });
+                        } else {
+                          navigator.clipboard.writeText(
+                            window.location.origin + `/creator/${post.creator_id}`
+                          );
+                          toast.success("Link copied to clipboard");
+                        }
+                      }}
+                      aria-label="Share this post"
                     >
-                      <Share2 className="w-4 h-4" />
+                      <Share2 className="w-4 h-4" aria-hidden="true" />
                       <span className="hidden sm:inline">Share</span>
                     </Button>
                   </div>

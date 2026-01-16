@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Users, FileText } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Search, Users, FileText, Heart, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { ensureProfile } from "@/lib/auth";
@@ -100,8 +102,13 @@ export default function SearchPage() {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+      <div
+        className="min-h-screen bg-background flex items-center justify-center"
+        role="status"
+        aria-live="polite"
+      >
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" aria-hidden="true" />
+        <span className="sr-only">Loading...</span>
       </div>
     );
   }
@@ -119,15 +126,25 @@ export default function SearchPage() {
         {/* Search Form */}
         <form onSubmit={handleSearch} className="mb-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground"
+              aria-hidden="true"
+            />
             <Input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search creators or content..."
-              className="pl-10 pr-4 h-12 text-base"
+              className="pl-10 pr-4 h-12 text-base rounded-xl"
               autoFocus
+              aria-label="Search query"
             />
+            {isSearching && (
+              <Loader2
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground animate-spin"
+                aria-hidden="true"
+              />
+            )}
           </div>
         </form>
 
@@ -160,7 +177,19 @@ export default function SearchPage() {
           {/* All Results */}
           <TabsContent value="all" className="space-y-6">
             {isSearching ? (
-              <p className="text-center text-muted-foreground py-8">Searching...</p>
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <Card key={i} className="p-4">
+                    <div className="flex items-center gap-4">
+                      <Skeleton className="h-16 w-16 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-48" />
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
             ) : (
               <>
                 {/* Creators Section */}
@@ -207,9 +236,29 @@ export default function SearchPage() {
 
                 {/* No Results */}
                 {!isSearching && creators.length === 0 && posts.length === 0 && query && (
-                  <p className="text-center text-muted-foreground py-8">
-                    No results found for &quot;{query}&quot;
-                  </p>
+                  <div className="flex flex-col items-center justify-center py-16 px-4">
+                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                      <Search className="w-8 h-8 text-muted-foreground" aria-hidden="true" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">No results found</h3>
+                    <p className="text-sm text-muted-foreground text-center max-w-sm">
+                      No results found for &quot;{query}&quot;. Try a different search term or
+                      browse creators.
+                    </p>
+                  </div>
+                )}
+
+                {/* Initial State - No Search Yet */}
+                {!isSearching && creators.length === 0 && posts.length === 0 && !query && (
+                  <div className="flex flex-col items-center justify-center py-16 px-4">
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                      <Sparkles className="w-8 h-8 text-primary" aria-hidden="true" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">Discover Content</h3>
+                    <p className="text-sm text-muted-foreground text-center max-w-sm">
+                      Search for your favorite creators or explore trending content.
+                    </p>
+                  </div>
                 )}
               </>
             )}
@@ -218,16 +267,31 @@ export default function SearchPage() {
           {/* Creators Results */}
           <TabsContent value="creators">
             {isSearching ? (
-              <p className="text-center text-muted-foreground py-8">Searching...</p>
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <Card key={i} className="p-4">
+                    <div className="flex items-center gap-4">
+                      <Skeleton className="h-16 w-16 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-48" />
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
             ) : (
               <div className="grid gap-4">
                 {creators.map((creator) => (
                   <CreatorCard key={creator.id} creator={creator} />
                 ))}
                 {!isSearching && creators.length === 0 && query && (
-                  <p className="text-center text-muted-foreground py-8">
-                    No creators found for &quot;{query}&quot;
-                  </p>
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Users className="w-12 h-12 text-muted-foreground mb-3" aria-hidden="true" />
+                    <p className="text-muted-foreground">
+                      No creators found for &quot;{query}&quot;
+                    </p>
+                  </div>
                 )}
               </div>
             )}
@@ -236,16 +300,30 @@ export default function SearchPage() {
           {/* Posts Results */}
           <TabsContent value="posts">
             {isSearching ? (
-              <p className="text-center text-muted-foreground py-8">Searching...</p>
+              <div className="space-y-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <Card key={i} className="p-4">
+                    <div className="flex items-start gap-4">
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-3 w-full" />
+                        <Skeleton className="h-3 w-3/4" />
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
             ) : (
               <div className="grid gap-4">
                 {posts.map((post) => (
                   <PostCard key={post.id} post={post} />
                 ))}
                 {!isSearching && posts.length === 0 && query && (
-                  <p className="text-center text-muted-foreground py-8">
-                    No posts found for &quot;{query}&quot;
-                  </p>
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <FileText className="w-12 h-12 text-muted-foreground mb-3" aria-hidden="true" />
+                    <p className="text-muted-foreground">No posts found for &quot;{query}&quot;</p>
+                  </div>
                 )}
               </div>
             )}
@@ -258,19 +336,28 @@ export default function SearchPage() {
 
 function CreatorCard({ creator }: { creator: any }) {
   return (
-    <Card className="p-4 hover:bg-accent/50 transition-colors">
+    <Card className="p-4 hover:bg-accent/50 transition-colors rounded-xl border-border">
       <Link href={`/creator/${creator.id}`} className="flex items-center gap-4">
-        <Avatar className="h-16 w-16">
-          <AvatarImage src={creator.avatar_url || undefined} />
-          <AvatarFallback>{creator.display_name?.[0] || "C"}</AvatarFallback>
+        <Avatar className="h-16 w-16 ring-2 ring-border">
+          <AvatarImage src={creator.avatar_url || undefined} alt={creator.display_name} />
+          <AvatarFallback className="bg-primary/10 text-primary text-lg">
+            {creator.display_name?.[0] || "C"}
+          </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-foreground truncate">{creator.display_name}</h3>
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-semibold text-foreground truncate">{creator.display_name}</h3>
+            {creator.role === "creator" && (
+              <Badge variant="secondary" className="text-xs">
+                Creator
+              </Badge>
+            )}
+          </div>
           {creator.bio && (
             <p className="text-sm text-muted-foreground line-clamp-2">{creator.bio}</p>
           )}
         </div>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="rounded-lg min-h-[40px] hidden sm:flex">
           View Profile
         </Button>
       </Link>
@@ -280,33 +367,48 @@ function CreatorCard({ creator }: { creator: any }) {
 
 function PostCard({ post }: { post: any }) {
   return (
-    <Card className="p-4 hover:bg-accent/50 transition-colors">
+    <Card className="p-4 hover:bg-accent/50 transition-colors rounded-xl border-border">
       <div className="flex items-start gap-4">
         <Avatar className="h-12 w-12">
-          <AvatarImage src={post.profiles?.avatar_url || undefined} />
-          <AvatarFallback>{post.profiles?.display_name?.[0] || "C"}</AvatarFallback>
+          <AvatarImage
+            src={post.profiles?.avatar_url || undefined}
+            alt={post.profiles?.display_name}
+          />
+          <AvatarFallback className="bg-primary/10 text-primary">
+            {post.profiles?.display_name?.[0] || "C"}
+          </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <Link
               href={`/creator/${post.creator_id}`}
-              className="font-semibold text-foreground hover:underline"
+              className="font-semibold text-foreground hover:text-primary transition-colors"
             >
               {post.profiles?.display_name || "Creator"}
             </Link>
             <span className="text-sm text-muted-foreground">
               {new Date(post.created_at).toLocaleDateString()}
             </span>
+            {post.visibility === "ppv" && (
+              <Badge variant="secondary" className="text-xs">
+                ${(post.price_cents / 100).toFixed(2)}
+              </Badge>
+            )}
+            {post.visibility === "subscribers" && (
+              <Badge variant="outline" className="text-xs">
+                Subscribers
+              </Badge>
+            )}
           </div>
           {post.title && <h3 className="font-medium text-foreground mb-1">{post.title}</h3>}
           <p className="text-sm text-muted-foreground line-clamp-2">{post.content}</p>
-          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-            {post.visibility === "ppv" && (
-              <span className="font-medium text-primary">
-                ${(post.price_cents / 100).toFixed(2)}
+          <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
+            {post.likes_count > 0 && (
+              <span className="flex items-center gap-1">
+                <Heart className="w-3 h-3" aria-hidden="true" />
+                {post.likes_count}
               </span>
             )}
-            {post.likes_count > 0 && <span>{post.likes_count} likes</span>}
           </div>
         </div>
       </div>

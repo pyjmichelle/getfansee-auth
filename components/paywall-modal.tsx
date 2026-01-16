@@ -65,7 +65,7 @@ export function PaywallModal({
         if (!user) {
           if (mounted) {
             setBalance(null);
-            setBalanceError("请先登录以查看余额");
+            setBalanceError("Please sign in to view balance");
           }
           return;
         }
@@ -77,7 +77,7 @@ export function PaywallModal({
         console.error("[PaywallModal] Failed to load wallet balance:", err);
         if (mounted) {
           setBalance(null);
-          setBalanceError("无法获取余额");
+          setBalanceError("Unable to load balance");
         }
       } finally {
         if (mounted) {
@@ -173,14 +173,14 @@ export function PaywallModal({
   const content = (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="flex flex-col items-center text-center pb-6 border-b border-[#1F1F1F]">
-        <div className="w-16 h-16 rounded-full bg-[#6366F1]/10 flex items-center justify-center mb-4">
+      <div className="flex flex-col items-center text-center pb-6 border-b border-border">
+        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
           {paymentState === "success" ? (
-            <Check className="w-8 h-8 text-[#10B981]" />
+            <Check className="w-8 h-8 text-green-500" aria-hidden="true" />
           ) : paymentState === "error" ? (
-            <X className="w-8 h-8 text-[#F43F5E]" />
+            <X className="w-8 h-8 text-destructive" aria-hidden="true" />
           ) : (
-            <Lock className="w-8 h-8 text-[#6366F1]" />
+            <Lock className="w-8 h-8 text-primary" aria-hidden="true" />
           )}
         </div>
 
@@ -211,7 +211,7 @@ export function PaywallModal({
       {paymentState === "idle" && (
         <>
           {/* Pricing */}
-          <div className="py-6 border-b border-[#1F1F1F]">
+          <div className="py-6 border-b border-border">
             <div className="flex items-baseline justify-center gap-2 mb-2">
               <span className="text-4xl font-bold text-foreground">${price.toFixed(2)}</span>
               {type === "subscribe" && (
@@ -233,7 +233,7 @@ export function PaywallModal({
             <ul className="space-y-3">
               {benefits.map((benefit, index) => (
                 <li key={index} className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-[#6366F1] flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
                   <span className="text-foreground">{benefit}</span>
                 </li>
               ))}
@@ -241,19 +241,19 @@ export function PaywallModal({
           </div>
 
           {/* Trust indicators - 加密支付安全标识 */}
-          <div className="pt-4 pb-6 border-t border-[#1F1F1F]">
+          <div className="pt-4 pb-6 border-t border-border">
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-[#10B981]/10 text-[#10B981] rounded-lg border border-[#10B981]/20">
-                <Lock className="w-3 h-3" />
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-600 dark:text-green-400 rounded-lg border border-green-500/20">
+                <Lock className="w-3 h-3" aria-hidden="true" />
                 <span className="font-medium">Encrypted Payment</span>
               </div>
               <div className="flex items-center gap-1">
-                <CreditCard className="w-3 h-3" />
+                <CreditCard className="w-3 h-3" aria-hidden="true" />
                 <span>Secure checkout</span>
               </div>
               {type === "subscribe" && (
                 <div className="flex items-center gap-1">
-                  <Check className="w-3 h-3" />
+                  <Check className="w-3 h-3" aria-hidden="true" />
                   <span>Cancel anytime</span>
                 </div>
               )}
@@ -265,45 +265,56 @@ export function PaywallModal({
             {type === "ppv" && (
               <div className="text-center text-xs text-muted-foreground">
                 {isBalanceLoading ? (
-                  "正在检测钱包余额..."
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-3 h-3 animate-spin" aria-hidden="true" />
+                    Checking balance...
+                  </span>
                 ) : balance !== null ? (
                   <>
-                    当前余额：${balance.toFixed(2)}
+                    Current balance: ${balance.toFixed(2)}
                     {insufficientBalance && (
                       <span className="ml-2">
-                        <Link href="/me/wallet" className="text-primary underline">
-                          去充值
+                        <Link
+                          href="/me/wallet"
+                          className="text-primary underline hover:text-primary/80 transition-colors"
+                        >
+                          Add funds
                         </Link>
                       </span>
                     )}
                   </>
                 ) : balanceError ? (
-                  balanceError
+                  <span className="text-destructive">{balanceError}</span>
                 ) : (
-                  "登录后可查看余额"
+                  "Sign in to see balance"
                 )}
               </div>
             )}
             <Button
               size="lg"
               variant="gradient"
-              className="w-full rounded-xl"
+              className="w-full rounded-xl min-h-[48px]"
               onClick={handlePayment}
               disabled={
                 paymentState !== "idle" ||
                 (type === "ppv" && (isBalanceLoading || insufficientBalance))
               }
+              aria-label={
+                type === "subscribe"
+                  ? `Subscribe for $${price.toFixed(2)} per ${billingPeriod}`
+                  : `Unlock content for $${price.toFixed(2)}`
+              }
             >
               {type === "subscribe"
-                ? `Subscribe for $${price}/${billingPeriod}`
+                ? `Subscribe for $${price.toFixed(2)}/${billingPeriod}`
                 : insufficientBalance
-                  ? "余额不足"
+                  ? "Insufficient balance"
                   : `Unlock for $${price.toFixed(2)}`}
             </Button>
             <Button
               variant="ghost"
               size="lg"
-              className="w-full rounded-xl"
+              className="w-full rounded-xl min-h-[48px]"
               onClick={handleClose}
               disabled={paymentState !== "idle"}
             >
@@ -314,18 +325,32 @@ export function PaywallModal({
       )}
 
       {paymentState === "processing" && (
-        <div className="py-12 flex flex-col items-center justify-center gap-4">
-          <Loader2 className="w-12 h-12 text-[#6366F1] animate-spin" />
+        <div
+          className="py-12 flex flex-col items-center justify-center gap-4"
+          role="status"
+          aria-live="polite"
+        >
+          <Loader2 className="w-12 h-12 text-primary animate-spin" aria-hidden="true" />
           <p className="text-muted-foreground">Processing your payment...</p>
         </div>
       )}
 
       {paymentState === "error" && (
         <div className="pt-6 flex flex-col gap-3">
-          <Button size="lg" variant="gradient" className="w-full rounded-xl" onClick={handleRetry}>
+          <Button
+            size="lg"
+            variant="gradient"
+            className="w-full rounded-xl min-h-[48px]"
+            onClick={handleRetry}
+          >
             Try Again
           </Button>
-          <Button variant="ghost" size="lg" className="w-full rounded-xl" onClick={handleClose}>
+          <Button
+            variant="ghost"
+            size="lg"
+            className="w-full rounded-xl min-h-[48px]"
+            onClick={handleClose}
+          >
             Cancel
           </Button>
         </div>
@@ -338,7 +363,7 @@ export function PaywallModal({
       <Sheet open={open} onOpenChange={handleClose}>
         <SheetContent
           side="bottom"
-          className="h-[90vh] overflow-y-auto bg-[#0D0D0D] border-t border-[#1F1F1F] rounded-t-3xl"
+          className="h-[90vh] overflow-y-auto bg-card border-t border-border rounded-t-3xl"
         >
           {content}
         </SheetContent>
@@ -349,7 +374,7 @@ export function PaywallModal({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className="sm:max-w-md bg-[#0D0D0D] border-[#1F1F1F] rounded-3xl"
+        className="sm:max-w-md bg-card border-border rounded-3xl"
         showCloseButton={paymentState !== "processing"}
       >
         {content}

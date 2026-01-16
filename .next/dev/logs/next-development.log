@@ -5494,3 +5494,6 @@ For more information, see https://radix-ui.com/primitives/docs/components/dialog
 [48:10:17.562] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
 [48:10:18.067] Server  WARN    Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
 [48:45:36.573] Server  LOG      ✓ Compiled in 91ms
+[50:12:37.830] Server  LOG      ✓ Compiled in 153ms
+[50:15:37.625] Server  LOG      ✓ Compiled in 126ms
+[50:16:16.767] Server  LOG      ✓ Compiled in 115ms
