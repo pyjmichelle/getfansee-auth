@@ -79,41 +79,15 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
         </div>
 
         <div className="hidden md:flex flex-1 max-w-md mx-6">
-          {!searchOpen ? (
+          <Link href="/search" className="w-full">
             <Button
               variant="outline"
               className="w-full justify-start text-muted-foreground bg-background"
-              onClick={() => setSearchOpen(true)}
             >
               <Search className="w-4 h-4 mr-2" />
               Search creators...
             </Button>
-          ) : (
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search creators..."
-                className="w-full h-10 pl-9 pr-4 rounded-md border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onBlur={() => {
-                  if (!searchQuery) setSearchOpen(false);
-                }}
-                autoFocus
-              />
-              {searchQuery && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-md shadow-lg p-4">
-                  <p className="text-sm text-muted-foreground">
-                    No results found for "{searchQuery}"
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Try searching for creator usernames
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
+          </Link>
         </div>
 
         <div className="flex items-center gap-3">

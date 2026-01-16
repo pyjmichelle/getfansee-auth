@@ -51,14 +51,9 @@ export default function CreatorStudioPage() {
     visitors: { value: 0, change: 0, trend: "up" as "up" | "down" },
   });
 
-  // 模拟图表数据（实际应该从数据库获取）
-  const chartData = [
-    { date: "Jan 1", revenue: 120, subscribers: 45 },
-    { date: "Jan 8", revenue: 190, subscribers: 52 },
-    { date: "Jan 15", revenue: 300, subscribers: 61 },
-    { date: "Jan 22", revenue: 280, subscribers: 58 },
-    { date: "Jan 29", revenue: 350, subscribers: 68 },
-  ];
+  const [chartData, setChartData] = useState<
+    Array<{ date: string; revenue: number; subscribers: number }>
+  >([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -91,15 +86,8 @@ export default function CreatorStudioPage() {
           }
         }
 
-        // 加载统计数据
-        // TODO: 从数据库获取真实数据
-        // 这里使用模拟数据
-        setStats({
-          revenue: { value: 2845.32, change: 12.5, trend: "up" },
-          subscribers: { value: 342, change: 8.3, trend: "up" },
-          ppvSales: { value: 127, change: 15.2, trend: "up" },
-          visitors: { value: 15234, change: -2.1, trend: "down" },
-        });
+        // 加载真实统计数据
+        await loadStats();
       } catch (err) {
         console.error("[studio] loadData error:", err);
       } finally {
@@ -110,39 +98,65 @@ export default function CreatorStudioPage() {
     loadData();
   }, [router]);
 
-  const recentPosts = [
-    {
-      id: "1",
-      type: "subscribers" as const,
-      content: "Behind the scenes content",
-      mediaUrl: "/placeholder.svg?height=300&width=400",
-      createdAt: "2024-01-15T10:30:00Z",
-      likes: 234,
-      views: 1523,
-      revenue: 0,
-    },
-    {
-      id: "2",
-      type: "ppv" as const,
-      price: 25,
-      content: "Premium exclusive content",
-      mediaUrl: "/placeholder.svg?height=300&width=400",
-      createdAt: "2024-01-14T14:20:00Z",
-      likes: 156,
-      views: 892,
-      revenue: 375,
-    },
-    {
-      id: "3",
-      type: "free" as const,
-      content: "Check out my latest work!",
-      mediaUrl: "/placeholder.svg?height=300&width=400",
-      createdAt: "2024-01-13T09:15:00Z",
-      likes: 421,
-      views: 2341,
-      revenue: 0,
-    },
-  ];
+  // 加载统计数据
+  const loadStats = async () => {
+    try {
+      const response = await fetch(
+        `/api/creator/stats?timeRange=${timeRange}&includeChart=true&includePosts=false`
+      );
+      const data = await response.json();
+
+      if (data.success) {
+        setStats(data.stats);
+        if (data.chartData) {
+          setChartData(data.chartData);
+        }
+      }
+    } catch (err) {
+      console.error("[studio] loadStats error:", err);
+    }
+  };
+
+  // 当时间范围变化时重新加载统计数据
+  useEffect(() => {
+    if (currentUserId) {
+      loadStats();
+    }
+  }, [timeRange, currentUserId]);
+
+  const [recentPosts, setRecentPosts] = useState<
+    Array<{
+      id: string;
+      type: "free" | "subscribers" | "ppv";
+      price?: number;
+      content: string;
+      mediaUrl: string;
+      createdAt: string;
+      likes: number;
+      views: number;
+      revenue: number;
+    }>
+  >([]);
+
+  // 加载最近的帖子
+  useEffect(() => {
+    const loadRecentPosts = async () => {
+      if (!currentUserId) return;
+
+      try {
+        const response = await fetch("/api/creator/stats?includePosts=true");
+        const data = await response.json();
+
+        if (data.success && data.recentPosts) {
+          setRecentPosts(data.recentPosts);
+        }
+      } catch (err) {
+        console.error("[studio] loadRecentPosts error:", err);
+      }
+    };
+
+    loadRecentPosts();
+  }, [currentUserId]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {

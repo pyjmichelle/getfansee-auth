@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button";
 import { type Post } from "@/lib/types";
 import { MediaDisplay } from "@/components/media-display";
 import { useUnlock } from "@/contexts/unlock-context";
+import { PostLikeButton } from "@/components/post-like-button";
 import Link from "next/link";
 import { Lock, Heart, Share2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { PaywallModal } from "@/components/paywall-modal";
+import { cn } from "@/lib/utils";
 
 interface HomeFeedClientProps {
   initialPosts: Post[];
@@ -266,14 +268,11 @@ export function HomeFeedClient({
 
                   {/* Post Actions */}
                   <div className="flex items-center gap-6 pt-6">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="gap-2 hover:bg-white/5 rounded-xl min-h-[44px] min-w-[44px]"
-                    >
-                      <Heart className="w-4 h-4" />
-                      <span className="hidden sm:inline">Like</span>
-                    </Button>
+                    <PostLikeButton
+                      postId={post.id}
+                      initialLikesCount={post.likes_count || 0}
+                      userId={currentUserId || undefined}
+                    />
                     {/* Comment 功能已全局隐藏 */}
                     <Button
                       variant="ghost"

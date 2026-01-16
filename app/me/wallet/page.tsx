@@ -117,24 +117,31 @@ export default function WalletPage() {
     try {
       setIsRecharging(true);
 
-      // Mock 支付处理：直接调用 deposit 函数
-      const success = await deposit(currentUserId, selectedAmount);
+      // 调用服务端 API 进行充值
+      const response = await fetch("/api/wallet/recharge", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: selectedAmount,
+        }),
+      });
 
-      if (success) {
+      const result = await response.json();
+
+      if (result.success) {
         toast.success(`成功充值 $${selectedAmount}`);
         setSelectedAmount(null);
 
-        // 重新加载余额和交易记录
-        const balanceData = await getWalletBalance(currentUserId);
-        if (balanceData) {
-          setAvailableBalance(balanceData.available);
-          setPendingBalance(balanceData.pending);
-        }
+        // 更新余额显示
+        setAvailableBalance(result.balance);
 
+        // 重新加载交易记录
         const transactionsData = await getTransactions(currentUserId);
         setTransactions(transactionsData);
       } else {
-        toast.error("充值失败，请重试");
+        toast.error(result.error || "充值失败，请重试");
       }
     } catch (err: any) {
       console.error("[wallet] recharge error:", err);

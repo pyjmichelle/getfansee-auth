@@ -371,6 +371,7 @@ export async function listFeed(
         price_cents,
         preview_enabled,
         watermark_enabled,
+        likes_count,
         created_at,
         profiles:creator_id (
           display_name,
