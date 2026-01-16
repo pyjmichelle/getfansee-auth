@@ -39,21 +39,35 @@ export async function createPost(params: {
   price_cents?: number | null;
   preview_enabled?: boolean;
   watermark_enabled?: boolean;
-}): Promise<string | null> {
+}): Promise<{ success: true; postId: string } | { success: false; error: string; details?: any }> {
   try {
     const supabase = await getSupabaseServerClient();
     // 检查当前用户是否为 creator
     const user = await getCurrentUser();
     if (!user) {
-      console.error("[posts] createPost: no user");
-      return null;
+      console.error("[posts] createPost: no user - user not authenticated");
+      return { success: false, error: "User not authenticated" };
     }
 
+    console.log("[posts] createPost: user authenticated, userId:", user.id);
+
     const profile = await getProfile(user.id);
-    if (!profile || profile.role !== "creator") {
-      console.error("[posts] createPost: user is not a creator", profile?.role);
-      return null;
+    if (!profile) {
+      console.error("[posts] createPost: profile not found for user", user.id);
+      return { success: false, error: "Profile not found" };
     }
+
+    if (profile.role !== "creator") {
+      console.error("[posts] createPost: user is not a creator", {
+        userId: user.id,
+        role: profile.role,
+      });
+      return { success: false, error: "User is not a creator", details: { role: profile.role } };
+    }
+
+    console.log("[posts] createPost: user is creator, proceeding");
+    console.log("  userId:", user.id);
+    console.log("  ageVerified:", profile.age_verified);
 
     // KYC 拦截：检查 age_verified 状态
     // 如果用户未完成身份验证，禁止发布 PPV 或订阅内容
@@ -62,37 +76,53 @@ export async function createPost(params: {
       !profile.age_verified
     ) {
       console.error(
-        "[posts] createPost: KYC not verified, cannot create PPV or subscriber content"
+        "[posts] createPost: KYC not verified, cannot create PPV or subscriber content",
+        { userId: user.id, visibility: params.visibility }
       );
-      return null;
+      return { success: false, error: "KYC verification required for paid content" };
     }
 
     // 验证参数
     if (params.visibility === "ppv" && (!params.price_cents || params.price_cents <= 0)) {
-      console.error("[posts] createPost: ppv post must have price_cents > 0");
-      return null;
+      console.error("[posts] createPost: ppv post must have price_cents > 0", {
+        priceCents: params.price_cents,
+      });
+      return { success: false, error: "PPV posts must have a price greater than $0" };
     }
 
+    const insertData = {
+      creator_id: user.id,
+      title: params.title || null,
+      content: params.content,
+      media_url: params.media_url || null, // 向后兼容
+      visibility: params.visibility,
+      price_cents: params.visibility === "ppv" ? params.price_cents! : 0, // 非 PPV 帖子价格为 0
+      preview_enabled: params.preview_enabled || false,
+      watermark_enabled: params.watermark_enabled !== undefined ? params.watermark_enabled : true, // 默认开启
+      is_locked: params.visibility !== "free", // 向后兼容
+    };
+
+    console.log("[posts] createPost: inserting post");
+    console.log("  Data:", JSON.stringify(insertData, null, 2));
+
     // 创建 post
-    const { data, error } = await supabase
-      .from("posts")
-      .insert({
-        creator_id: user.id,
-        title: params.title || null,
-        content: params.content,
-        media_url: params.media_url || null, // 向后兼容
-        visibility: params.visibility,
-        price_cents: params.visibility === "ppv" ? params.price_cents! : null,
-        preview_enabled: params.preview_enabled || false,
-        watermark_enabled: params.watermark_enabled !== undefined ? params.watermark_enabled : true, // 默认开启
-        is_locked: params.visibility !== "free", // 向后兼容
-      })
-      .select("id")
-      .single();
+    const { data, error } = await supabase.from("posts").insert(insertData).select("id").single();
 
     if (error) {
-      console.error("[posts] createPost error:", error);
-      return null;
+      console.error("[posts] createPost error:");
+      console.error("  Code:", error.code);
+      console.error("  Message:", error.message);
+      console.error("  Details:", error.details);
+      console.error("  Hint:", error.hint);
+      return {
+        success: false,
+        error: error.message || "Database error",
+        details: {
+          code: error.code,
+          details: error.details,
+          hint: error.hint,
+        },
+      };
     }
 
     const postId = data.id;
@@ -103,10 +133,11 @@ export async function createPost(params: {
       await addPostMedia(postId, params.mediaFiles);
     }
 
-    return postId;
+    return { success: true, postId };
   } catch (err) {
     console.error("[posts] createPost exception:", err);
-    return null;
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return { success: false, error: message };
   }
 }
 
