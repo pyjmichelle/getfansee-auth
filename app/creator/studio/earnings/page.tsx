@@ -129,19 +129,19 @@ export default function EarningsPage() {
     switch (type) {
       case "subscription":
         return (
-          <Badge className="bg-[#6366F1]/10 text-[#6366F1] border-[#6366F1]/20 rounded-lg">
+          <Badge className="bg-primary/10 text-primary border-primary/20 rounded-lg">
             Subscription
           </Badge>
         );
       case "ppv_purchase":
         return (
-          <Badge className="bg-[#A855F7]/10 text-[#A855F7] border-[#A855F7]/20 rounded-lg">
+          <Badge className="bg-purple-500/10 text-purple-500 border-purple-500/20 rounded-lg">
             PPV
           </Badge>
         );
       case "commission":
         return (
-          <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-[#10B981]/20 rounded-lg">
+          <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 rounded-lg">
             Commission
           </Badge>
         );
@@ -157,7 +157,7 @@ export default function EarningsPage() {
         <main className="container max-w-6xl mx-auto px-4 py-6">
           <div className="animate-pulse space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-[#121212] rounded-3xl"></div>
+              <div key={i} className="h-24 bg-muted rounded-3xl"></div>
             ))}
           </div>
         </main>
@@ -174,7 +174,7 @@ export default function EarningsPage() {
           asChild
           variant="ghost"
           size="sm"
-          className="mb-6 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
+          className="mb-6 border-border bg-card hover:bg-card rounded-xl"
         >
           <Link href="/creator/studio">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -187,7 +187,7 @@ export default function EarningsPage() {
             <h1 className="text-3xl font-bold text-foreground mb-2">Earnings</h1>
             <p className="text-muted-foreground">Track your revenue and payouts</p>
           </div>
-          <Button variant="outline" className="bg-card border-border hover:bg-[#1A1A1A] rounded-xl">
+          <Button variant="outline" className="bg-card border-border hover:bg-card rounded-xl">
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
@@ -200,9 +200,7 @@ export default function EarningsPage() {
             size="sm"
             onClick={() => setTimeRange("7d")}
             className={`rounded-xl ${
-              timeRange === "7d"
-                ? "bg-primary-gradient"
-                : "border-border bg-card hover:bg-[#1A1A1A]"
+              timeRange === "7d" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
             }`}
           >
             7 Days
@@ -212,9 +210,7 @@ export default function EarningsPage() {
             size="sm"
             onClick={() => setTimeRange("30d")}
             className={`rounded-xl ${
-              timeRange === "30d"
-                ? "bg-primary-gradient"
-                : "border-border bg-card hover:bg-[#1A1A1A]"
+              timeRange === "30d" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
             }`}
           >
             30 Days
@@ -224,9 +220,7 @@ export default function EarningsPage() {
             size="sm"
             onClick={() => setTimeRange("90d")}
             className={`rounded-xl ${
-              timeRange === "90d"
-                ? "bg-primary-gradient"
-                : "border-border bg-card hover:bg-[#1A1A1A]"
+              timeRange === "90d" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
             }`}
           >
             90 Days
@@ -236,9 +230,7 @@ export default function EarningsPage() {
             size="sm"
             onClick={() => setTimeRange("all")}
             className={`rounded-xl ${
-              timeRange === "all"
-                ? "bg-primary-gradient"
-                : "border-border bg-card hover:bg-[#1A1A1A]"
+              timeRange === "all" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
             }`}
           >
             All Time
@@ -261,7 +253,7 @@ export default function EarningsPage() {
 
           <div className="bg-card border border-border rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-[#6366F1]/10 text-[#6366F1] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                 <TrendingUp className="w-5 h-5" />
               </div>
               <div>
@@ -273,7 +265,7 @@ export default function EarningsPage() {
 
           <div className="bg-card border border-border rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-[#F59E0B]/10 text-[#F59E0B] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center">
                 <Clock className="w-5 h-5" />
               </div>
               <div>
@@ -298,7 +290,7 @@ export default function EarningsPage() {
 
         {/* Next Payout */}
         {pendingBalance > 0 && (
-          <div className="bg-card border border-[#6366F1]/20 rounded-3xl p-6 mb-8 bg-[#6366F1]/5">
+          <div className="bg-card border border-primary/20 rounded-3xl p-6 mb-8 bg-primary/5">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-foreground mb-1">Pending Settlement</h3>
@@ -332,13 +324,13 @@ export default function EarningsPage() {
                 return (
                   <div
                     key={transaction.id}
-                    className="flex items-center gap-4 p-4 bg-[#121212] rounded-xl hover:bg-[#1A1A1A] transition-colors"
+                    className="flex items-center gap-4 p-4 bg-muted rounded-xl hover:bg-card transition-colors"
                   >
                     <div
                       className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                         transaction.status === "completed"
                           ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                          : "bg-[#F59E0B]/10 text-[#F59E0B]"
+                          : "bg-amber-500/10 text-amber-500"
                       }`}
                     >
                       <DollarSign className="w-5 h-5" />

@@ -204,7 +204,7 @@ export default function NotificationsPage() {
         <div className="container max-w-2xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-[#121212] rounded-3xl"></div>
+              <div key={i} className="h-20 bg-muted rounded-3xl"></div>
             ))}
           </div>
         </div>
@@ -231,7 +231,7 @@ export default function NotificationsPage() {
               variant="outline"
               size="sm"
               onClick={markAllAsRead}
-              className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
+              className="border-border bg-card hover:bg-card rounded-xl"
             >
               <Check className="w-4 h-4 mr-2" />
               Mark all read
@@ -245,7 +245,7 @@ export default function NotificationsPage() {
             variant={filter === "all" ? "default" : "outline"}
             onClick={() => setFilter("all")}
             className={`rounded-xl ${
-              filter === "all" ? "bg-primary-gradient" : "border-border bg-card hover:bg-[#1A1A1A]"
+              filter === "all" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
             }`}
           >
             All
@@ -254,9 +254,7 @@ export default function NotificationsPage() {
             variant={filter === "unread" ? "default" : "outline"}
             onClick={() => setFilter("unread")}
             className={`rounded-xl ${
-              filter === "unread"
-                ? "bg-primary-gradient"
-                : "border-border bg-card hover:bg-[#1A1A1A]"
+              filter === "unread" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
             }`}
           >
             Unread ({unreadCount})
@@ -281,8 +279,8 @@ export default function NotificationsPage() {
             {filteredNotifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`bg-card border border-border rounded-3xl p-4 md:p-6 cursor-pointer transition-all hover:bg-[#1A1A1A] ${
-                  !notification.read ? "border-[#6366F1]/30" : ""
+                className={`bg-card border border-border rounded-3xl p-4 md:p-6 cursor-pointer transition-all hover:bg-card ${
+                  !notification.read ? "border-primary/30" : ""
                 }`}
                 onClick={async () => {
                   await markAsRead(notification.id);
@@ -300,8 +298,8 @@ export default function NotificationsPage() {
                   <div
                     className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
                       !notification.read
-                        ? "bg-[#6366F1]/10 text-[#6366F1]"
-                        : "bg-[#1F1F1F] text-muted-foreground"
+                        ? "bg-primary/10 text-primary"
+                        : "bg-border text-muted-foreground"
                     }`}
                   >
                     {getNotificationIcon(notification.type)}

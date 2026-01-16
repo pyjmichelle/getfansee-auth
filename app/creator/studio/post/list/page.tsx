@@ -116,19 +116,19 @@ export default function CreatorPostListPage() {
   const getVisibilityBadge = (visibility: string, priceCents: number | null) => {
     if (visibility === "free") {
       return (
-        <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-[#10B981]/20 rounded-lg">
+        <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 rounded-lg">
           Free
         </Badge>
       );
     } else if (visibility === "subscribers") {
       return (
-        <Badge className="bg-[#6366F1]/10 text-[#6366F1] border-[#6366F1]/20 rounded-lg">
+        <Badge className="bg-primary/10 text-primary border-primary/20 rounded-lg">
           Subscribers
         </Badge>
       );
     } else {
       return (
-        <Badge className="bg-[#A855F7]/10 text-[#A855F7] border-[#A855F7]/20 rounded-lg">
+        <Badge className="bg-purple-500/10 text-purple-500 border-purple-500/20 rounded-lg">
           PPV ${((priceCents || 0) / 100).toFixed(2)}
         </Badge>
       );
@@ -142,7 +142,7 @@ export default function CreatorPostListPage() {
         <main className="container max-w-4xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-[#121212] rounded-3xl"></div>
+              <div key={i} className="h-48 bg-muted rounded-3xl"></div>
             ))}
           </div>
         </main>
@@ -189,12 +189,12 @@ export default function CreatorPostListPage() {
             {posts.map((post) => (
               <div
                 key={post.id}
-                className="bg-card border border-border rounded-3xl p-6 hover:border-[#262626] transition-colors"
+                className="bg-card border border-border rounded-3xl p-6 hover:border-border transition-colors"
               >
                 <div className="flex flex-col md:flex-row gap-6">
                   {/* Media Preview */}
                   {post.media && post.media.length > 0 && (
-                    <div className="md:w-48 aspect-video md:aspect-auto rounded-xl overflow-hidden bg-[#121212]">
+                    <div className="md:w-48 aspect-video md:aspect-auto rounded-xl overflow-hidden bg-muted">
                       {post.media[0].media_type === "image" ? (
                         <img
                           src={post.media[0].media_url}
@@ -255,7 +255,7 @@ export default function CreatorPostListPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="flex-1 md:flex-none border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
+                      className="flex-1 md:flex-none border-border bg-card hover:bg-card rounded-xl"
                       asChild
                     >
                       <Link href={`/creator/studio/post/edit/${post.id}`}>
@@ -294,7 +294,7 @@ export default function CreatorPostListPage() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl">
+              <AlertDialogCancel className="border-border bg-card hover:bg-card rounded-xl">
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction

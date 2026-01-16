@@ -134,7 +134,7 @@ export default function ReportPageClient({ initialType, initialId }: ReportPageC
         <Button
           variant="ghost"
           size="sm"
-          className="mb-6 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
+          className="mb-6 border-border bg-card hover:bg-card rounded-xl"
           onClick={() => router.back()}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -148,8 +148,8 @@ export default function ReportPageClient({ initialType, initialId }: ReportPageC
 
         <Card className="bg-card border border-border rounded-3xl p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex items-start gap-3 p-4 bg-[#F59E0B]/10 border border-[#F59E0B]/20 rounded-xl">
-              <AlertTriangle className="w-5 h-5 text-[#F59E0B] flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+              <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
               <div className="text-sm text-muted-foreground">
                 <p className="font-medium text-foreground mb-1">Reporting {type}</p>
                 <p>
@@ -197,7 +197,7 @@ export default function ReportPageClient({ initialType, initialId }: ReportPageC
                 variant="outline"
                 onClick={() => router.back()}
                 disabled={isSubmitting}
-                className="flex-1 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
+                className="flex-1 border-border bg-card hover:bg-card rounded-xl"
               >
                 Cancel
               </Button>

@@ -168,9 +168,9 @@ export default function EditPostPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse space-y-4 w-full max-w-2xl px-4">
-          <div className="h-8 w-48 bg-[#121212] rounded"></div>
-          <div className="h-64 bg-[#121212] rounded-3xl"></div>
-          <div className="h-12 w-full bg-[#121212] rounded-xl"></div>
+          <div className="h-8 w-48 bg-muted rounded"></div>
+          <div className="h-64 bg-muted rounded-3xl"></div>
+          <div className="h-12 w-full bg-muted rounded-xl"></div>
         </div>
       </div>
     );
@@ -208,7 +208,7 @@ export default function EditPostPage() {
         </div>
 
         {error && (
-          <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-3xl p-6 mb-8">
+          <div className="bg-destructive/10 border border-destructive/20 rounded-3xl p-6 mb-8">
             <p className="text-destructive font-medium">错误</p>
             <p className="text-sm text-muted-foreground mt-1">{error}</p>
           </div>
@@ -217,7 +217,7 @@ export default function EditPostPage() {
         <div className="bg-card border border-border rounded-3xl p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Locked Visibility & Price Info */}
-            <div className="bg-[#121212] border border-border rounded-xl p-4 space-y-3">
+            <div className="bg-muted border border-border rounded-xl p-4 space-y-3">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Lock className="w-4 h-4" />
                 <span className="text-sm font-medium">价格和可见性已锁定（不可修改）</span>
@@ -226,10 +226,10 @@ export default function EditPostPage() {
                 <Badge
                   className={
                     post.visibility === "free"
-                      ? "bg-green-500/10 text-green-600 dark:text-green-400 border-[#10B981]/20 rounded-lg"
+                      ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 rounded-lg"
                       : post.visibility === "subscribers"
-                        ? "bg-[#6366F1]/10 text-[#6366F1] border-[#6366F1]/20 rounded-lg"
-                        : "bg-[#A855F7]/10 text-[#A855F7] border-[#A855F7]/20 rounded-lg"
+                        ? "bg-primary/10 text-primary border-primary/20 rounded-lg"
+                        : "bg-purple-500/10 text-purple-500 border-purple-500/20 rounded-lg"
                   }
                 >
                   {post.visibility === "free"
@@ -279,7 +279,7 @@ export default function EditPostPage() {
             <div className="space-y-2">
               <Label>Media (可选，支持多文件，新上传的文件会追加到现有媒体)</Label>
               {post.media && post.media.length > 0 && (
-                <div className="mb-3 p-3 bg-[#121212] rounded-lg">
+                <div className="mb-3 p-3 bg-muted rounded-lg">
                   <p className="text-xs text-muted-foreground mb-2">
                     现有媒体 ({post.media.length} 个文件)
                   </p>
@@ -317,7 +317,7 @@ export default function EditPostPage() {
                 variant="outline"
                 onClick={() => router.push("/creator/studio/post/list")}
                 disabled={isSaving}
-                className="flex-1 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
+                className="flex-1 border-border bg-card hover:bg-card rounded-xl"
               >
                 Cancel
               </Button>

@@ -132,19 +132,19 @@ export default function ContentReviewPage() {
   const getVisibilityBadge = (visibility: string, priceCents: number | null) => {
     if (visibility === "free") {
       return (
-        <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-[#10B981]/20 rounded-lg">
+        <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 rounded-lg">
           Free
         </Badge>
       );
     } else if (visibility === "subscribers") {
       return (
-        <Badge className="bg-[#6366F1]/10 text-[#6366F1] border-[#6366F1]/20 rounded-lg">
+        <Badge className="bg-primary/10 text-primary border-primary/20 rounded-lg">
           Subscribers
         </Badge>
       );
     } else {
       return (
-        <Badge className="bg-[#A855F7]/10 text-[#A855F7] border-[#A855F7]/20 rounded-lg">
+        <Badge className="bg-purple-500/10 text-purple-500 border-purple-500/20 rounded-lg">
           PPV ${((priceCents || 0) / 100).toFixed(2)}
         </Badge>
       );
@@ -158,7 +158,7 @@ export default function ContentReviewPage() {
         <main className="container max-w-6xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-[#121212] rounded-3xl"></div>
+              <div key={i} className="h-48 bg-muted rounded-3xl"></div>
             ))}
           </div>
         </main>
@@ -185,7 +185,7 @@ export default function ContentReviewPage() {
             {posts.map((post) => (
               <div
                 key={post.id}
-                className="bg-card border border-border rounded-3xl p-6 hover:border-[#262626] transition-colors"
+                className="bg-card border border-border rounded-3xl p-6 hover:border-border transition-colors"
               >
                 <div className="flex items-start gap-6">
                   <Avatar className="w-12 h-12">
@@ -222,7 +222,7 @@ export default function ContentReviewPage() {
                         {post.media.slice(0, 4).map((media) => (
                           <div
                             key={media.id}
-                            className="aspect-video bg-[#121212] rounded-xl overflow-hidden"
+                            className="aspect-video bg-muted rounded-xl overflow-hidden"
                           >
                             {media.media_type === "image" ? (
                               <img
@@ -248,7 +248,7 @@ export default function ContentReviewPage() {
                         asChild
                         variant="outline"
                         size="sm"
-                        className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
+                        className="border-border bg-card hover:bg-card rounded-xl"
                       >
                         <Link href={`/post/${post.id}`}>
                           <Eye className="w-4 h-4 mr-2" />
@@ -259,7 +259,7 @@ export default function ContentReviewPage() {
                         onClick={() => setDeletingPostId(post.id)}
                         variant="outline"
                         size="sm"
-                        className="border-[#F43F5E] text-destructive hover:bg-[#F43F5E]/10 rounded-xl"
+                        className="border-destructive text-destructive hover:bg-destructive/10 rounded-xl"
                       >
                         <Trash2 className="w-4 h-4 mr-2" />
                         Delete
@@ -299,7 +299,7 @@ export default function ContentReviewPage() {
               </div>
             </div>
             <AlertDialogFooter>
-              <AlertDialogCancel className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl">
+              <AlertDialogCancel className="border-border bg-card hover:bg-card rounded-xl">
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction

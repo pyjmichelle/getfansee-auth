@@ -129,19 +129,19 @@ export default function SubscribersPage() {
     switch (status) {
       case "active":
         return (
-          <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-[#10B981]/20 rounded-lg">
+          <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 rounded-lg">
             Active
           </Badge>
         );
       case "will_cancel":
         return (
-          <Badge className="bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20 rounded-lg">
+          <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 rounded-lg">
             Expiring Soon
           </Badge>
         );
       case "canceled":
         return (
-          <Badge className="bg-[#F43F5E]/10 text-destructive border-[#F43F5E]/20 rounded-lg">
+          <Badge className="bg-destructive/10 text-destructive border-destructive/20 rounded-lg">
             Cancelled
           </Badge>
         );
@@ -163,7 +163,7 @@ export default function SubscribersPage() {
         <main className="container max-w-6xl mx-auto px-4 py-6">
           <div className="animate-pulse space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-[#121212] rounded-3xl"></div>
+              <div key={i} className="h-24 bg-muted rounded-3xl"></div>
             ))}
           </div>
         </main>
@@ -180,7 +180,7 @@ export default function SubscribersPage() {
           asChild
           variant="ghost"
           size="sm"
-          className="mb-6 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
+          className="mb-6 border-border bg-card hover:bg-card rounded-xl"
         >
           <Link href="/creator/studio">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -205,7 +205,7 @@ export default function SubscribersPage() {
           </div>
           <div className="bg-card border border-border rounded-3xl p-6">
             <p className="text-sm text-muted-foreground mb-1">Expiring Soon</p>
-            <p className="text-3xl font-bold text-[#F59E0B]">{willCancelCount}</p>
+            <p className="text-3xl font-bold text-amber-500">{willCancelCount}</p>
           </div>
         </div>
 
@@ -226,9 +226,7 @@ export default function SubscribersPage() {
               size="sm"
               onClick={() => setFilter("all")}
               className={`rounded-xl ${
-                filter === "all"
-                  ? "bg-primary-gradient"
-                  : "border-border bg-card hover:bg-[#1A1A1A]"
+                filter === "all" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
               }`}
             >
               All
@@ -238,9 +236,7 @@ export default function SubscribersPage() {
               size="sm"
               onClick={() => setFilter("active")}
               className={`rounded-xl ${
-                filter === "active"
-                  ? "bg-primary-gradient"
-                  : "border-border bg-card hover:bg-[#1A1A1A]"
+                filter === "active" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
               }`}
             >
               Active
@@ -252,7 +248,7 @@ export default function SubscribersPage() {
               className={`rounded-xl ${
                 filter === "will_cancel"
                   ? "bg-primary-gradient"
-                  : "border-border bg-card hover:bg-[#1A1A1A]"
+                  : "border-border bg-card hover:bg-card"
               }`}
             >
               Expiring
@@ -264,7 +260,7 @@ export default function SubscribersPage() {
               className={`rounded-xl ${
                 filter === "canceled"
                   ? "bg-primary-gradient"
-                  : "border-border bg-card hover:bg-[#1A1A1A]"
+                  : "border-border bg-card hover:bg-card"
               }`}
             >
               Cancelled
@@ -287,7 +283,7 @@ export default function SubscribersPage() {
               return (
                 <div
                   key={subscriber.id}
-                  className="bg-card border border-border rounded-3xl p-4 md:p-6 hover:border-[#262626] transition-colors"
+                  className="bg-card border border-border rounded-3xl p-4 md:p-6 hover:border-border transition-colors"
                 >
                   <div className="flex items-center gap-4">
                     <Avatar className="w-12 h-12">

@@ -175,9 +175,9 @@ export default function NewPostPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse space-y-4 w-full max-w-2xl px-4">
-          <div className="h-8 w-48 bg-[#121212] rounded"></div>
-          <div className="h-64 bg-[#121212] rounded-3xl"></div>
-          <div className="h-12 w-full bg-[#121212] rounded-xl"></div>
+          <div className="h-8 w-48 bg-muted rounded"></div>
+          <div className="h-64 bg-muted rounded-3xl"></div>
+          <div className="h-12 w-full bg-muted rounded-xl"></div>
         </div>
       </div>
     );
@@ -213,7 +213,7 @@ export default function NewPostPage() {
         </div>
 
         {error && (
-          <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-3xl p-6 mb-8">
+          <div className="bg-destructive/10 border border-destructive/20 rounded-3xl p-6 mb-8">
             <p className="text-destructive font-medium">错误</p>
             <p className="text-sm text-muted-foreground mt-1">{error}</p>
           </div>
@@ -401,7 +401,7 @@ export default function NewPostPage() {
                 variant="outline"
                 onClick={() => router.push("/home")}
                 disabled={isSaving}
-                className="flex-1 rounded-xl border-border bg-card hover:bg-[#1A1A1A]"
+                className="flex-1 rounded-xl border-border bg-card hover:bg-card"
               >
                 取消
               </Button>

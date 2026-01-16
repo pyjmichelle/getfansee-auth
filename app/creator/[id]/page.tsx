@@ -135,25 +135,25 @@ export default function CreatorProfilePage() {
           {/* Shimmer 骨架屏 */}
           <div className="animate-pulse space-y-8">
             {/* Header Skeleton */}
-            <div className="h-64 bg-[#121212] rounded-3xl"></div>
+            <div className="h-64 bg-muted rounded-3xl"></div>
             <div className="flex items-center gap-4 -mt-16 px-8">
-              <div className="w-32 h-32 rounded-full bg-[#121212] border-4 border-[#050505]"></div>
+              <div className="w-32 h-32 rounded-full bg-muted border-4 border-background"></div>
               <div className="flex-1 space-y-3">
-                <div className="h-6 w-48 bg-[#121212] rounded"></div>
-                <div className="h-4 w-64 bg-[#121212] rounded"></div>
+                <div className="h-6 w-48 bg-muted rounded"></div>
+                <div className="h-4 w-64 bg-muted rounded"></div>
               </div>
             </div>
             {/* Tabs Skeleton */}
             <div className="flex gap-8 border-b border-border">
-              <div className="h-10 w-20 bg-[#121212] rounded"></div>
-              <div className="h-10 w-20 bg-[#121212] rounded"></div>
-              <div className="h-10 w-20 bg-[#121212] rounded"></div>
+              <div className="h-10 w-20 bg-muted rounded"></div>
+              <div className="h-10 w-20 bg-muted rounded"></div>
+              <div className="h-10 w-20 bg-muted rounded"></div>
             </div>
             {/* Posts Skeleton */}
             {[1, 2, 3].map((i) => (
               <div key={i} className="space-y-4 pb-8 border-b border-border">
-                <div className="h-48 bg-[#121212] rounded-3xl"></div>
-                <div className="h-4 w-3/4 bg-[#121212] rounded"></div>
+                <div className="h-48 bg-muted rounded-3xl"></div>
+                <div className="h-4 w-3/4 bg-muted rounded"></div>
               </div>
             ))}
           </div>
@@ -262,7 +262,7 @@ export default function CreatorProfilePage() {
             <div className="flex items-end gap-6">
               <div className="relative">
                 <div className="absolute -inset-1 bg-primary-gradient rounded-full blur-md opacity-50"></div>
-                <Avatar className="relative w-24 h-24 md:w-32 md:h-32 border-4 border-[#050505]">
+                <Avatar className="relative w-24 h-24 md:w-32 md:h-32 border-4 border-background">
                   <AvatarImage src={creatorProfile.avatar_url || "/placeholder.svg"} />
                   <AvatarFallback className="text-3xl md:text-4xl bg-card text-foreground">
                     {creatorProfile.display_name?.[0]?.toUpperCase() || "C"}
@@ -287,7 +287,7 @@ export default function CreatorProfilePage() {
                     variant="outline"
                     onClick={handleCancelSubscription}
                     disabled={isSubscribing}
-                    className="rounded-xl border-border bg-card hover:bg-[#1A1A1A] min-w-[160px]"
+                    className="rounded-xl border-border bg-card hover:bg-card min-w-[160px]"
                   >
                     {isSubscribing ? "处理中..." : "Cancel Subscription"}
                   </Button>
@@ -304,7 +304,7 @@ export default function CreatorProfilePage() {
                 <Button
                   variant="outline"
                   asChild
-                  className="rounded-xl border-border bg-card hover:bg-[#1A1A1A] min-w-[160px] text-muted-foreground"
+                  className="rounded-xl border-border bg-card hover:bg-card min-w-[160px] text-muted-foreground"
                 >
                   <Link href={`/report?type=user&id=${creatorId}`}>
                     <AlertTriangle className="w-4 h-4 mr-2" />
@@ -544,7 +544,7 @@ export default function CreatorProfilePage() {
                 variant="outline"
                 onClick={handleCancelSubscription}
                 disabled={isSubscribing}
-                className="w-full rounded-xl border-border bg-card hover:bg-[#1A1A1A] h-12"
+                className="w-full rounded-xl border-border bg-card hover:bg-card h-12"
               >
                 {isSubscribing ? "处理中..." : "Cancel Subscription"}
               </Button>

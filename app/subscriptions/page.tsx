@@ -226,7 +226,7 @@ export default function SubscriptionsPage() {
             {subscriptions.map((subscription) => (
               <div
                 key={subscription.id}
-                className="bg-card border border-border rounded-3xl p-6 hover:border-[#262626] transition-colors"
+                className="bg-card border border-border rounded-3xl p-6 hover:border-border transition-colors"
               >
                 <div className="flex items-start justify-between gap-4">
                   <Link
@@ -267,7 +267,7 @@ export default function SubscriptionsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
+                        className="border-border bg-card hover:bg-card rounded-xl"
                         onClick={() => setCancellingSubscriptionId(subscription.id)}
                       >
                         Cancel
@@ -316,7 +316,7 @@ export default function SubscriptionsPage() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl">
+                <AlertDialogCancel className="border-border bg-card hover:bg-card rounded-xl">
                   Keep Subscription
                 </AlertDialogCancel>
                 <AlertDialogAction

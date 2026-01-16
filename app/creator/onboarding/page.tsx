@@ -197,7 +197,7 @@ export default function CreatorOnboardingPage() {
         </div>
 
         {error && (
-          <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-3xl p-4 mb-6">
+          <div className="bg-destructive/10 border border-destructive/20 rounded-3xl p-4 mb-6">
             <p className="text-destructive font-medium">错误</p>
             <p className="text-sm text-muted-foreground mt-1">{error}</p>
           </div>
@@ -265,7 +265,7 @@ export default function CreatorOnboardingPage() {
                   variant="outline"
                   onClick={() => router.push("/home")}
                   disabled={isSaving}
-                  className="flex-1 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
+                  className="flex-1 border-border bg-card hover:bg-card rounded-xl"
                 >
                   取消
                 </Button>
@@ -282,13 +282,13 @@ export default function CreatorOnboardingPage() {
           ) : (
             <div className="space-y-6">
               {verificationStatus?.status === "pending" && (
-                <div className="bg-[#F59E0B]/10 border border-[#F59E0B]/20 rounded-xl p-4">
-                  <p className="text-sm text-[#F59E0B]">您的身份验证申请正在审核中，请耐心等待。</p>
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
+                  <p className="text-sm text-amber-500">您的身份验证申请正在审核中，请耐心等待。</p>
                 </div>
               )}
 
               {verificationStatus?.status === "rejected" && (
-                <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-xl p-4">
+                <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-4">
                   <p className="text-sm text-destructive font-medium mb-2">验证被拒绝</p>
                   {verificationStatus.rejection_reason && (
                     <p className="text-sm text-muted-foreground">
@@ -300,7 +300,7 @@ export default function CreatorOnboardingPage() {
               )}
 
               {verificationStatus?.status === "approved" && (
-                <div className="bg-green-500/10 border border-[#10B981]/20 rounded-xl p-4">
+                <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4">
                   <p className="text-sm text-green-600 dark:text-green-400 font-medium">
                     身份验证已通过
                   </p>
@@ -412,7 +412,7 @@ export default function CreatorOnboardingPage() {
                     <Label>
                       证件照片 <span className="text-destructive">*</span>
                     </Label>
-                    <div className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-[#262626] transition-colors">
+                    <div className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-border transition-colors">
                       <input
                         type="file"
                         accept="image/jpeg,image/jpg,image/png,image/webp"
@@ -442,7 +442,7 @@ export default function CreatorOnboardingPage() {
                         {kycData.id_doc_files.map((file, index) => (
                           <div
                             key={index}
-                            className="text-xs text-muted-foreground bg-[#121212] px-2 py-1 rounded"
+                            className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded"
                           >
                             {file.name}
                           </div>
@@ -457,7 +457,7 @@ export default function CreatorOnboardingPage() {
                       variant="outline"
                       onClick={() => setCurrentStep("profile")}
                       disabled={isSubmittingKYC}
-                      className="flex-1 border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
+                      className="flex-1 border-border bg-card hover:bg-card rounded-xl"
                     >
                       上一步
                     </Button>

@@ -258,7 +258,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
             <h1 className="text-6xl font-bold text-primary-gradient bg-primary-gradient bg-clip-text text-transparent">
               GetFanSee
             </h1>
-            <p className="text-2xl text-[#E5E5E5] font-light">
+            <p className="text-2xl text-foreground font-light">
               Connect with creators.
               <br />
               Support their work.
@@ -602,7 +602,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full h-12 text-base font-medium bg-card border-border hover:bg-[#1A1A1A] rounded-xl"
+                    className="w-full h-12 text-base font-medium bg-card border-border hover:bg-card rounded-xl"
                     onClick={handleGoogleAuth}
                     disabled={isLoading}
                   >
@@ -684,7 +684,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
 
               <form onSubmit={handleLoginSubmit} className="space-y-6">
                 {error && (
-                  <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 text-destructive text-sm px-4 py-3 rounded-xl">
+                  <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm px-4 py-3 rounded-xl">
                     {error}
                   </div>
                 )}
@@ -745,7 +745,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 text-base font-medium bg-card border-border hover:bg-[#1A1A1A] rounded-xl"
+                  className="w-full h-12 text-base font-medium bg-card border-border hover:bg-card rounded-xl"
                   onClick={handleGoogleAuth}
                   disabled={isLoading}
                 >
@@ -783,12 +783,12 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
 
               <form onSubmit={handleSignupSubmit} className="space-y-6">
                 {error && (
-                  <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 text-destructive text-sm px-4 py-3 rounded-xl">
+                  <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm px-4 py-3 rounded-xl">
                     {error}
                   </div>
                 )}
                 {info && (
-                  <div className="bg-green-500/10 border border-[#10B981]/20 text-green-600 dark:text-green-400 text-sm px-4 py-3 rounded-xl space-y-3">
+                  <div className="bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 text-sm px-4 py-3 rounded-xl space-y-3">
                     <p>{info}</p>
                     {info.includes("Check your email") && (
                       <div className="flex flex-col gap-2 pt-2">
@@ -976,7 +976,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 text-base font-medium bg-card border-border hover:bg-[#1A1A1A] rounded-xl"
+                  className="w-full h-12 text-base font-medium bg-card border-border hover:bg-card rounded-xl"
                   onClick={handleGoogleAuth}
                   disabled={isLoading}
                 >

@@ -179,10 +179,10 @@ export default function WalletPage() {
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
         <main className="container max-w-4xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-8">
-            <div className="h-32 bg-[#121212] rounded-3xl"></div>
+            <div className="h-32 bg-muted rounded-3xl"></div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-24 bg-[#121212] rounded-xl"></div>
+                <div key={i} className="h-24 bg-muted rounded-xl"></div>
               ))}
             </div>
           </div>
@@ -199,7 +199,7 @@ export default function WalletPage() {
         {/* 余额显示 */}
         <div className="mb-12 text-center">
           <div className="inline-block relative">
-            <div className="absolute -inset-4 bg-[#6366F1]/20 blur-2xl rounded-full"></div>
+            <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full"></div>
             <div className="relative">
               <p className="text-sm text-muted-foreground mb-2">Wallet Balance</p>
               <h1 className="text-6xl md:text-7xl font-bold text-foreground mb-2">
@@ -225,8 +225,8 @@ export default function WalletPage() {
                   relative p-6 rounded-xl border-2 transition-all duration-300
                   ${
                     selectedAmount === amount
-                      ? "border-[#6366F1] bg-[#6366F1]/10 shadow-primary-glow"
-                      : "border-border bg-card hover:border-[#6366F1]/50"
+                      ? "border-primary bg-primary/10 shadow-primary-glow"
+                      : "border-border bg-card hover:border-primary/50"
                   }
                 `}
               >
@@ -280,7 +280,7 @@ export default function WalletPage() {
                         ${
                           getTransactionType(transaction.type) === "recharge"
                             ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                            : "bg-[#F43F5E]/10 text-destructive"
+                            : "bg-destructive/10 text-destructive"
                         }
                       `}
                     >

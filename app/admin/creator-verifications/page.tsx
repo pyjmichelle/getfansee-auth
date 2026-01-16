@@ -132,7 +132,7 @@ export default function CreatorVerificationsPage() {
         <main className="container max-w-6xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-[#121212] rounded-3xl"></div>
+              <div key={i} className="h-48 bg-muted rounded-3xl"></div>
             ))}
           </div>
         </main>
@@ -159,7 +159,7 @@ export default function CreatorVerificationsPage() {
             {verifications.map((verification) => (
               <div
                 key={verification.id}
-                className="bg-card border border-border rounded-3xl p-6 hover:border-[#262626] transition-colors"
+                className="bg-card border border-border rounded-3xl p-6 hover:border-border transition-colors"
               >
                 <div className="flex items-start gap-6">
                   <Avatar className="w-16 h-16">
@@ -175,7 +175,7 @@ export default function CreatorVerificationsPage() {
                         {verification.user?.display_name ||
                           `User ${verification.user_id.slice(0, 8)}`}
                       </h3>
-                      <Badge className="bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20 rounded-lg">
+                      <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 rounded-lg">
                         Pending
                       </Badge>
                     </div>
@@ -215,7 +215,7 @@ export default function CreatorVerificationsPage() {
                             href={url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="relative aspect-video bg-[#121212] rounded-xl overflow-hidden hover:opacity-80 transition-opacity"
+                            className="relative aspect-video bg-muted rounded-xl overflow-hidden hover:opacity-80 transition-opacity"
                           >
                             <img
                               src={url}
@@ -242,7 +242,7 @@ export default function CreatorVerificationsPage() {
                         onClick={() => setReviewingId(verification.id)}
                         disabled={isReviewing}
                         variant="outline"
-                        className="flex-1 border-[#F43F5E] text-destructive hover:bg-[#F43F5E]/10 rounded-xl"
+                        className="flex-1 border-destructive text-destructive hover:bg-destructive/10 rounded-xl"
                       >
                         <X className="w-4 h-4 mr-2" />
                         Reject
@@ -281,7 +281,7 @@ export default function CreatorVerificationsPage() {
               </div>
             </div>
             <AlertDialogFooter>
-              <AlertDialogCancel className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl">
+              <AlertDialogCancel className="border-border bg-card hover:bg-card rounded-xl">
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction

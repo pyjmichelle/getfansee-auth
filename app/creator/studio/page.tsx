@@ -372,7 +372,7 @@ export default function CreatorStudioPage() {
               <Card key={post.id} className="rounded-2xl border-border overflow-hidden">
                 <div className="flex flex-col md:flex-row">
                   {/* Media Preview */}
-                  <div className="relative bg-[#121212] md:w-48 aspect-video md:aspect-auto">
+                  <div className="relative bg-muted md:w-48 aspect-video md:aspect-auto">
                     <img
                       src={post.mediaUrl || "/placeholder.svg"}
                       alt="Post preview"

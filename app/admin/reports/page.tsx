@@ -153,7 +153,7 @@ export default function ReportsPage() {
         <main className="container max-w-6xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-[#121212] rounded-3xl"></div>
+              <div key={i} className="h-48 bg-muted rounded-3xl"></div>
             ))}
           </div>
         </main>
@@ -180,7 +180,7 @@ export default function ReportsPage() {
             {reports.map((report) => (
               <div
                 key={report.id}
-                className="bg-card border border-border rounded-3xl p-6 hover:border-[#262626] transition-colors"
+                className="bg-card border border-border rounded-3xl p-6 hover:border-border transition-colors"
               >
                 <div className="flex items-start gap-6">
                   <Avatar className="w-12 h-12">
@@ -198,7 +198,7 @@ export default function ReportsPage() {
                           {getReportTypeLabel(report.reported_type)}
                         </span>
                       </div>
-                      <Badge className="bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20 rounded-lg">
+                      <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 rounded-lg">
                         Pending
                       </Badge>
                       <span className="text-xs text-muted-foreground flex items-center gap-1">
@@ -236,7 +236,7 @@ export default function ReportsPage() {
                           asChild
                           variant="outline"
                           size="sm"
-                          className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
+                          className="border-border bg-card hover:bg-card rounded-xl"
                         >
                           <Link href={`/post/${report.reported_id}`}>View Post</Link>
                         </Button>
@@ -246,7 +246,7 @@ export default function ReportsPage() {
                           asChild
                           variant="outline"
                           size="sm"
-                          className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl"
+                          className="border-border bg-card hover:bg-card rounded-xl"
                         >
                           <Link href={`/creator/${report.reported_id}`}>View User</Link>
                         </Button>
@@ -258,7 +258,7 @@ export default function ReportsPage() {
                         }}
                         variant="outline"
                         size="sm"
-                        className="border-[#F43F5E] text-destructive hover:bg-[#F43F5E]/10 rounded-xl"
+                        className="border-destructive text-destructive hover:bg-destructive/10 rounded-xl"
                       >
                         {report.reported_type === "post" ? "Delete Content" : "Ban User"}
                       </Button>
@@ -269,7 +269,7 @@ export default function ReportsPage() {
                         }}
                         variant="outline"
                         size="sm"
-                        className="border-[#10B981] text-green-600 dark:text-green-400 hover:bg-green-500/10 rounded-xl"
+                        className="border-green-500 text-green-600 dark:text-green-400 hover:bg-green-500/10 rounded-xl"
                       >
                         No Violation
                       </Button>
@@ -323,7 +323,7 @@ export default function ReportsPage() {
               </div>
             </div>
             <AlertDialogFooter>
-              <AlertDialogCancel className="border-border bg-card hover:bg-[#1A1A1A] rounded-xl">
+              <AlertDialogCancel className="border-border bg-card hover:bg-card rounded-xl">
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction
