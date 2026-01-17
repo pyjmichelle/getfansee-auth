@@ -1,36 +1,15 @@
 {
   "app": {
+    "[project]/Downloads/authentication-flow-design (1)/app/_not-found/page": [
+      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2"
+    ],
     "[project]/Downloads/authentication-flow-design (1)/app/auth/page": [
-      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2"
-    ],
-    "[project]/Downloads/authentication-flow-design (1)/app/creator/new-post/page": [
-      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2"
-    ],
-    "[project]/Downloads/authentication-flow-design (1)/app/creator/onboarding/page": [
-      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2"
-    ],
-    "[project]/Downloads/authentication-flow-design (1)/app/creator/studio/page": [
-      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2"
-    ],
-    "[project]/Downloads/authentication-flow-design (1)/app/creator/upgrade/page": [
       "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2"
     ],
     "[project]/Downloads/authentication-flow-design (1)/app/home/page": [
       "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2"
     ],
-    "[project]/Downloads/authentication-flow-design (1)/app/me/page": [
-      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2"
-    ],
     "[project]/Downloads/authentication-flow-design (1)/app/page": [
-      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2"
-    ],
-    "[project]/Downloads/authentication-flow-design (1)/app/purchases/page": [
-      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2"
-    ],
-    "[project]/Downloads/authentication-flow-design (1)/app/search/page": [
-      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2"
-    ],
-    "[project]/Downloads/authentication-flow-design (1)/app/subscriptions/page": [
       "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2"
     ]
   },

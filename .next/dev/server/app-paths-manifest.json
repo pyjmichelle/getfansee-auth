@@ -1,18 +1,6 @@
 {
-  "/api/feed/route": "app/api/feed/route.js",
-  "/api/posts/[id]/like/route": "app/api/posts/[id]/like/route.js",
-  "/api/profile/route": "app/api/profile/route.js",
-  "/api/tags/route": "app/api/tags/route.js",
-  "/api/user/route": "app/api/user/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/auth/page": "app/auth/page.js",
-  "/creator/new-post/page": "app/creator/new-post/page.js",
-  "/creator/onboarding/page": "app/creator/onboarding/page.js",
-  "/creator/studio/page": "app/creator/studio/page.js",
-  "/creator/upgrade/page": "app/creator/upgrade/page.js",
   "/home/page": "app/home/page.js",
-  "/me/page": "app/me/page.js",
-  "/page": "app/page.js",
-  "/purchases/page": "app/purchases/page.js",
-  "/search/page": "app/search/page.js",
-  "/subscriptions/page": "app/subscriptions/page.js"
+  "/page": "app/page.js"
 }

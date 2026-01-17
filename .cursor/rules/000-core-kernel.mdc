@@ -1,0 +1,49 @@
+---
+description: CORE KERNEL - Absolute law for Planning, Testing, and Standards.
+globs: *
+alwaysApply: true
+---
+# PROJECT ZERO KERNEL (v4.0)
+
+## 1. STOP and READ (Planning)
+Before writing ONE line of code:
+- Check `docs/planning/sprint-4.0-mvp.md`
+- If the task is not planned, refuse until planned
+- Code to FULFILL the plan, not to improvise
+
+## 2. VERIFY OR DIE (Testing)
+- "I have fixed it" is NOT acceptable
+- "Here is the passing test log" IS acceptable
+- Logic changes -> Run `pnpm exec playwright test tests/e2e/smoke.spec.ts`
+- UI changes -> Run diagnostic script for console errors
+- ALWAYS provide test output as proof
+
+## 3. CLEAN CODE (Standards)
+- No console.log clutter (use proper logger)
+- No `any` types in TypeScript
+- shadcn UI: Use `cn()` and components from `@/components/ui`
+- Follow `.cursor/skills/shadcn-ui.skill.md` for UI patterns
+
+## 4. NO HALLUCINATIONS
+- Unsure about Supabase/Stripe API? -> SEARCH DOCS using Browser Tool
+- Never guess API responses or database schemas
+- Verify before implementing
+
+## 5. AGENT DISPATCH
+When to use specific agents:
+- UI/UX issues -> `chief-frontend-architect`
+- API/Database issues -> `chief-backend-platform`
+- Testing issues -> `chief-quality-officer`
+- Security concerns -> `chief-security-architect`
+- Payment/Billing -> `chief-payments-risk`
+
+## 6. FILE ORGANIZATION
+- Tests go in `tests/` directory (unit, integration, e2e)
+- Legacy reports go in `docs/archive/legacy_reports/`
+- Deployment docs go in `docs/deployment/`
+- Planning docs go in `docs/planning/`
+
+## 7. BEFORE COMMIT
+- Run `pnpm lint` - must pass
+- Run `pnpm exec playwright test tests/e2e/smoke.spec.ts` - must pass
+- No unresolved TypeScript errors
