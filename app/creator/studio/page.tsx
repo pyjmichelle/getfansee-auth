@@ -24,15 +24,20 @@ import { getProfile } from "@/lib/profile";
 import { ensureProfile } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import dynamic from "next/dynamic";
+
+// 延迟加载图表组件以提高首屏加载速度
+const StudioChart = dynamic(
+  () => import("@/components/studio-chart").then((mod) => mod.StudioChart),
+  {
+    loading: () => (
+      <div className="w-full h-[300px] flex items-center justify-center bg-muted/50 rounded-lg">
+        <Skeleton className="w-full h-full" />
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 const supabase = getSupabaseBrowserClient();
 
@@ -171,7 +176,7 @@ export default function CreatorStudioPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
+        {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
         <main className="py-6 sm:py-8 lg:py-12">
           <CenteredContainer maxWidth="7xl">
             <div className="space-y-8">
@@ -196,8 +201,8 @@ export default function CreatorStudioPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
+    <div className="min-h-screen bg-background" data-testid="page-ready">
+      {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
 
       <main className="py-6 sm:py-8 lg:py-12">
         <CenteredContainer maxWidth="7xl">
@@ -255,7 +260,10 @@ export default function CreatorStudioPage() {
           </div>
 
           {/* Stats Grid - 使用 StatCard 组件 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8"
+            data-testid="creator-stats"
+          >
             <StatCard
               title="Total Revenue"
               value={`$${stats.revenue.value.toFixed(2)}`}
@@ -282,56 +290,21 @@ export default function CreatorStudioPage() {
             />
           </div>
 
-          {/* Chart - 平滑面积图，渐变紫色线条 */}
+          {/* Chart - 平滑面积图，渐变紫色线条（延迟加载） */}
           <Card className="rounded-xl border shadow-sm mb-8">
             <CardHeader>
               <CardTitle className="text-xl">Revenue & Subscribers</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={chartData}>
-                  <defs>
-                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#A855F7" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#A855F7" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="colorSubscribers" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#6366F1" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" />
-                  <XAxis dataKey="date" stroke="#999999" />
-                  <YAxis stroke="#999999" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0D0D0D",
-                      border: "1px solid #1F1F1F",
-                      borderRadius: "12px",
-                      color: "#E5E5E5",
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="#A855F7"
-                    fillOpacity={1}
-                    fill="url(#colorRevenue)"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="subscribers"
-                    stroke="#6366F1"
-                    fillOpacity={1}
-                    fill="url(#colorSubscribers)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              <StudioChart data={chartData} />
             </CardContent>
           </Card>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
+            data-testid="creator-nav"
+          >
             <Button
               asChild
               variant="outline"
@@ -447,6 +420,8 @@ export default function CreatorStudioPage() {
                         variant="outline"
                         className="flex-1 md:flex-none rounded-xl min-h-[40px] transition-all duration-200"
                         aria-label="Edit post"
+                        disabled
+                        title="Coming soon"
                       >
                         Edit
                       </Button>
@@ -455,8 +430,9 @@ export default function CreatorStudioPage() {
                         variant="ghost"
                         className="flex-1 md:flex-none rounded-xl min-h-[40px] transition-all duration-200"
                         aria-label="View post"
+                        asChild
                       >
-                        View
+                        <Link href={`/posts/${post.id}`}>View</Link>
                       </Button>
                     </div>
                   </div>

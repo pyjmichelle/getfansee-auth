@@ -1,17 +1,29 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { listFeed } from "@/lib/posts";
 import { canViewPost } from "@/lib/paywall";
 import { getCurrentUser } from "@/lib/auth-server";
+import { getMockPostsWithCreators, shouldUseMockData } from "@/lib/mock-data";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 获取 feed 数据
-    const posts = await listFeed(20);
+    // Parse pagination params
+    const { searchParams } = new URL(request.url);
+    const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 50);
+    const offset = parseInt(searchParams.get("offset") || "0");
+
+    // Get feed data
+    let posts = await listFeed(limit, offset);
+
+    // If no posts and mock data is enabled, use mock posts
+    if (posts.length === 0 && shouldUseMockData()) {
+      const mockPosts = getMockPostsWithCreators();
+      posts = mockPosts.slice(offset, offset + limit) as any;
+    }
 
     // 在服务端检查每个 post 的可见性状态
     const unlockedStates: Record<string, boolean> = {};
@@ -37,6 +49,11 @@ export async function GET() {
     return NextResponse.json({
       posts,
       unlockedStates,
+      pagination: {
+        limit,
+        offset,
+        hasMore: posts.length === limit, // 如果返回数量等于 limit，可能还有更多
+      },
     });
   } catch (err: unknown) {
     console.error("[api] feed error:", err);

@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-01-18T17:05:27.275Z",
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "passRate": "100.0%"
+  },
+  "results": [
+    {
+      "id": "search-opens-modal",
+      "route": "/home",
+      "authState": "fan",
+      "status": "PASS",
+      "action": "Click search button",
+      "expectation": "Search modal should open",
+      "actualResult": "Modal opened successfully",
+      "beforeScreenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/search-opens-modal-before.png",
+      "afterScreenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/search-opens-modal-after.png"
+    },
+    {
+      "id": "new-post-submit-disabled-empty",
+      "route": "/creator/new-post",
+      "authState": "creator",
+      "status": "PASS",
+      "action": "Click submit with empty form",
+      "expectation": "Error message should appear or button should be disabled",
+      "actualResult": "Error message displayed",
+      "beforeScreenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/new-post-submit-disabled-empty-before.png",
+      "afterScreenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/new-post-submit-disabled-empty-after.png"
+    }
+  ]
+}

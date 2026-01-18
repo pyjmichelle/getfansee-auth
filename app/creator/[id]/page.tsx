@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { NavHeader } from "@/components/nav-header";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // 所有服务器端函数都通过 API 调用，不直接导入
 import { type Post } from "@/lib/types";
@@ -12,9 +12,22 @@ import { MediaDisplay } from "@/components/media-display";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
+import { cn } from "@/lib/utils";
+
+import {
+  Image as ImageIcon,
+  Heart,
+  FileText,
+  AlertTriangle,
+  Lock,
+  Share2,
+  Check,
+  Copy,
+} from "lucide-react";
+import { ReportButton } from "@/components/report-button";
+import { toast } from "sonner";
 
 const supabase = getSupabaseBrowserClient();
-import { Image as ImageIcon, Heart, FileText, AlertTriangle } from "lucide-react";
 
 export default function CreatorProfilePage() {
   const params = useParams();
@@ -118,7 +131,7 @@ export default function CreatorProfilePage() {
         }
       } catch (err) {
         console.error("[creator] loadData error", err);
-        setError("加载失败，请重试");
+        setError("Failed to load, please try again");
       } finally {
         setIsLoading(false);
       }
@@ -130,7 +143,7 @@ export default function CreatorProfilePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
+        {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Shimmer 骨架屏 */}
           <div className="animate-pulse space-y-8">
@@ -167,7 +180,7 @@ export default function CreatorProfilePage() {
   if (error || !creatorProfile) {
     return (
       <div className="min-h-screen bg-background">
-        {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
+        {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
         <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Card className="rounded-xl border shadow-sm">
             <CardContent className="p-6">
@@ -249,9 +262,26 @@ export default function CreatorProfilePage() {
     }
   };
 
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/creator/${creatorId}`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Link copied to clipboard!");
+    } catch (err) {
+      // Fallback for browsers that don't support clipboard API
+      const textarea = document.createElement("textarea");
+      textarea.value = shareUrl;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      toast.success("Link copied to clipboard!");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
+      {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 封面图 Banner */}
@@ -305,12 +335,21 @@ export default function CreatorProfilePage() {
                     {isSubscribing ? "Processing..." : "Subscribe"}
                   </Button>
                 )}
-                <Button variant="outline" asChild className="rounded-lg min-w-[160px] min-h-[44px]">
-                  <Link href={`/report?type=user&id=${creatorId}`}>
-                    <AlertTriangle className="w-4 h-4 mr-2" aria-hidden="true" />
-                    Report
-                  </Link>
+                <Button
+                  variant="outline"
+                  onClick={handleShare}
+                  className="rounded-lg min-w-[160px] min-h-[44px]"
+                  data-testid="share-button"
+                >
+                  <Share2 className="w-4 h-4 mr-2" aria-hidden="true" />
+                  Share
                 </Button>
+                <ReportButton
+                  targetType="user"
+                  targetId={creatorId}
+                  variant="outline"
+                  className="rounded-lg min-w-[160px] min-h-[44px]"
+                />
               </div>
             )}
           </div>

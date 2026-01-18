@@ -1,0 +1,251 @@
+{
+  "timestamp": "2026-01-18T17:04:12.474Z",
+  "summary": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "passRate": "100.0%"
+  },
+  "results": [
+    {
+      "id": "home-posts",
+      "route": "/home",
+      "authState": "fan",
+      "status": "PASS",
+      "checks": [
+        {
+          "selector": "[data-testid=\"post-card\"]",
+          "description": "Post card should be visible",
+          "found": 20,
+          "required": 1,
+          "passed": true
+        }
+      ],
+      "finalUrl": "http://127.0.0.1:3000/home",
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/home-posts.png"
+    },
+    {
+      "id": "wallet-balance",
+      "route": "/me/wallet",
+      "authState": "fan",
+      "status": "PASS",
+      "checks": [
+        {
+          "selector": "[data-testid=\"wallet-balance\"]",
+          "description": "Wallet balance section should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        }
+      ],
+      "finalUrl": "http://127.0.0.1:3000/me/wallet",
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/wallet-balance.png"
+    },
+    {
+      "id": "new-post-form",
+      "route": "/creator/new-post",
+      "authState": "creator",
+      "status": "PASS",
+      "checks": [
+        {
+          "selector": "[data-testid=\"post-title\"]",
+          "description": "Post title input should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        },
+        {
+          "selector": "[data-testid=\"post-content\"]",
+          "description": "Post content textarea should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        },
+        {
+          "selector": "[data-testid=\"upload-zone\"]",
+          "description": "Upload zone should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        },
+        {
+          "selector": "[data-testid=\"visibility-toggle\"]",
+          "description": "Visibility toggle should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        },
+        {
+          "selector": "[data-testid=\"submit-button\"]",
+          "description": "Submit button should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        }
+      ],
+      "finalUrl": "http://127.0.0.1:3000/creator/new-post",
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/new-post-form.png"
+    },
+    {
+      "id": "creator-studio",
+      "route": "/creator/studio",
+      "authState": "creator",
+      "status": "PASS",
+      "checks": [
+        {
+          "selector": "[data-testid=\"creator-stats\"]",
+          "description": "Creator stats section should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        },
+        {
+          "selector": "[data-testid=\"creator-nav\"]",
+          "description": "Creator navigation should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        }
+      ],
+      "finalUrl": "http://127.0.0.1:3000/creator/studio",
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/creator-studio.png"
+    },
+    {
+      "id": "creator-earnings",
+      "route": "/creator/studio/earnings",
+      "authState": "creator",
+      "status": "PASS",
+      "checks": [
+        {
+          "selector": "[data-testid=\"earnings-balance\"]",
+          "description": "Earnings balance section should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        },
+        {
+          "selector": "[data-testid=\"earnings-history\"]",
+          "description": "Earnings history section should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        }
+      ],
+      "finalUrl": "http://127.0.0.1:3000/creator/studio/earnings",
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/creator-earnings.png"
+    },
+    {
+      "id": "search-modal",
+      "route": "/home",
+      "authState": "fan",
+      "status": "PASS",
+      "checks": [
+        {
+          "selector": "[data-testid=\"search-button\"], [data-testid=\"search-button-mobile\"]",
+          "description": "Search button should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        }
+      ],
+      "finalUrl": "http://127.0.0.1:3000/home",
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/search-modal.png"
+    },
+    {
+      "id": "age-gate",
+      "route": "/auth",
+      "authState": "anonymous",
+      "status": "PASS",
+      "checks": [
+        {
+          "selector": "[data-testid=\"age-gate-yes\"], [data-testid=\"age-gate-modal\"], [data-slot=\"alert-dialog-overlay\"]",
+          "description": "Age gate modal should be visible for anonymous users",
+          "found": 3,
+          "required": 1,
+          "passed": true
+        }
+      ],
+      "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/age-gate.png"
+    },
+    {
+      "id": "checkout-disclaimer",
+      "route": "/me/wallet",
+      "authState": "fan",
+      "status": "PASS",
+      "checks": [
+        {
+          "selector": "[data-testid=\"checkout-disclaimer\"]",
+          "description": "Checkout disclaimer should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        },
+        {
+          "selector": "[data-testid=\"terms-link\"]",
+          "description": "Terms link should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        },
+        {
+          "selector": "[data-testid=\"privacy-link\"]",
+          "description": "Privacy link should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        },
+        {
+          "selector": "[data-testid=\"no-refund\"]",
+          "description": "No refund notice should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        },
+        {
+          "selector": "[data-testid=\"balance-value\"]",
+          "description": "Balance value should be visible",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        }
+      ],
+      "finalUrl": "http://127.0.0.1:3000/me/wallet",
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/checkout-disclaimer.png"
+    },
+    {
+      "id": "upload-file-input",
+      "route": "/creator/new-post",
+      "authState": "creator",
+      "status": "PASS",
+      "checks": [
+        {
+          "selector": "[data-testid=\"upload-zone\"]",
+          "description": "Upload zone with file input should exist",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        }
+      ],
+      "finalUrl": "http://127.0.0.1:3000/creator/new-post",
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/upload-file-input.png"
+    },
+    {
+      "id": "search-modal-opens",
+      "route": "/home",
+      "authState": "fan",
+      "status": "PASS",
+      "checks": [
+        {
+          "selector": "[data-testid=\"search-modal\"]",
+          "description": "Search modal opens after click",
+          "found": 1,
+          "required": 1,
+          "passed": true
+        }
+      ],
+      "finalUrl": "http://127.0.0.1:3000/home",
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/search-modal.png"
+    }
+  ]
+}

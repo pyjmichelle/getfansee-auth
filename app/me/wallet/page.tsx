@@ -39,6 +39,7 @@ export default function WalletPage() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [isRecharging, setIsRecharging] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "success" | "failed">("idle");
 
   const rechargeAmounts = [10, 25, 50, 100, 200, 500];
 
@@ -111,7 +112,7 @@ export default function WalletPage() {
 
   const handleRecharge = async () => {
     if (!selectedAmount || !currentUserId) {
-      toast.error("请选择充值金额");
+      toast.error("Please select an amount");
       return;
     }
 
@@ -132,7 +133,8 @@ export default function WalletPage() {
       const result = await response.json();
 
       if (result.success) {
-        toast.success(`成功充值 $${selectedAmount}`);
+        toast.success(`Successfully recharged $${selectedAmount}`);
+        setPaymentStatus("success");
         setSelectedAmount(null);
 
         // 更新余额显示
@@ -141,12 +143,17 @@ export default function WalletPage() {
         // 重新加载交易记录
         const transactionsData = await getTransactions(currentUserId);
         setTransactions(transactionsData);
+
+        // Reset status after 3 seconds
+        setTimeout(() => setPaymentStatus("idle"), 3000);
       } else {
-        toast.error(result.error || "充值失败，请重试");
+        toast.error(result.error || "Recharge failed, please try again");
+        setPaymentStatus("failed");
+        setTimeout(() => setPaymentStatus("idle"), 3000);
       }
     } catch (err: any) {
       console.error("[wallet] recharge error:", err);
-      toast.error(err.message || "充值失败，请重试");
+      toast.error(err.message || "Recharge failed, please try again");
     } finally {
       setIsRecharging(false);
     }
@@ -177,7 +184,7 @@ export default function WalletPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
+        {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
         <main className="py-6 sm:py-8 lg:py-12">
           <CenteredContainer maxWidth="4xl">
             <div className="animate-pulse space-y-8">
@@ -195,18 +202,21 @@ export default function WalletPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
+    <div className="min-h-screen bg-background" data-testid="page-ready">
+      {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
 
       <main className="py-6 sm:py-8 lg:py-12">
         <CenteredContainer maxWidth="4xl">
           {/* 余额显示 */}
-          <div className="mb-12 text-center">
+          <div className="mb-12 text-center" data-testid="wallet-balance">
             <div className="inline-block relative">
               <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full"></div>
               <div className="relative">
                 <p className="text-sm text-muted-foreground mb-2">Wallet Balance</p>
-                <h1 className="text-6xl md:text-7xl font-bold text-foreground mb-2">
+                <h1
+                  className="text-6xl md:text-7xl font-bold text-foreground mb-2"
+                  data-testid="balance-value"
+                >
                   ${availableBalance.toFixed(2)}
                 </h1>
                 <div className="flex items-center justify-center gap-2 text-muted-foreground">
@@ -247,14 +257,64 @@ export default function WalletPage() {
               ))}
             </div>
 
+            {/* Payment Status Indicators (for testing) */}
+            {paymentStatus === "success" && (
+              <div
+                className="mt-4 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-center"
+                data-testid="payment-success"
+              >
+                Payment successful! Your balance has been updated.
+              </div>
+            )}
+            {paymentStatus === "failed" && (
+              <div
+                className="mt-4 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-center"
+                data-testid="payment-fail"
+              >
+                Payment failed. Please try again.
+              </div>
+            )}
+
+            {/* Checkout Disclaimer */}
+            <div
+              className="mt-6 p-4 rounded-xl bg-muted/50 border border-border text-sm space-y-2"
+              data-testid="checkout-disclaimer"
+            >
+              <p className="font-medium text-foreground" data-testid="no-refund">
+                Digital goods. No refunds.
+              </p>
+              <p className="text-muted-foreground">
+                You must be 18 years or older to use this service. All purchases are final.
+              </p>
+              <p className="text-muted-foreground">
+                By clicking "Recharge", you agree to our{" "}
+                <a
+                  href="/terms"
+                  className="text-primary underline hover:no-underline"
+                  data-testid="terms-link"
+                >
+                  Terms of Service
+                </a>{" "}
+                and{" "}
+                <a
+                  href="/privacy"
+                  className="text-primary underline hover:no-underline"
+                  data-testid="privacy-link"
+                >
+                  Privacy Policy
+                </a>
+                .
+              </p>
+            </div>
+
             <Button
               onClick={handleRecharge}
               disabled={!selectedAmount || isRecharging}
-              className="w-full mt-6 rounded-xl min-h-[44px] transition-all duration-200"
+              className="w-full mt-4 rounded-xl min-h-[44px] transition-all duration-200"
               aria-label={`Recharge $${selectedAmount || 0}`}
             >
               {isRecharging ? (
-                "处理中..."
+                "Processing..."
               ) : (
                 <>
                   <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -278,6 +338,7 @@ export default function WalletPage() {
                   <div
                     key={transaction.id}
                     className="bg-card border border-border rounded-xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition-all duration-200"
+                    data-testid="order-row"
                   >
                     <div className="flex items-center gap-4">
                       <div

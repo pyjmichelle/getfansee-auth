@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "start": "next start",
     "export": "next export -o out",
     "lint": "eslint . --ext .ts,.tsx --max-warnings=200 || true",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
@@ -25,6 +26,7 @@
     "test:e2e:smoke": "playwright test e2e/smoke.spec.ts",
     "test:e2e:full": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "e2e:docker": "docker run --rm -it --ipc=host -v $(pwd):/work -w /work mcr.microsoft.com/playwright:v1.57.0-noble /bin/bash -c 'npm ci && npx playwright test --project=chromium'",
     "test:server-health": "tsx scripts/test-server-health.ts",
     "create-test-users": "tsx scripts/create-test-users.ts",
     "seed-feed": "tsx scripts/seed-feed-data.ts",
@@ -38,7 +40,21 @@
     "test:unit:watch": "vitest watch",
     "test:unit:coverage": "vitest run --coverage",
     "test:frontend": "tsx scripts/agent-browser-test.ts",
-    "test:frontend:headed": "HEADED=true tsx scripts/agent-browser-test.ts"
+    "test:frontend:headed": "HEADED=true tsx scripts/agent-browser-test.ts",
+    "test:frontend:smoke": "tsx scripts/agent-browser-smoke.ts",
+    "test:frontend:smoke:external": "PLAYWRIGHT_SKIP_SERVER=true tsx scripts/agent-browser-smoke.ts",
+    "test:session:export:fan": "ROLE=fan tsx scripts/auth/export-storage-state.ts",
+    "test:session:export:creator": "ROLE=creator tsx scripts/auth/export-storage-state.ts",
+    "test:session:auto:fan": "ROLE=fan tsx scripts/auth/auto-login.ts",
+    "test:session:auto:creator": "ROLE=creator tsx scripts/auth/auto-login.ts",
+    "test:session:auto:all": "pnpm test:session:auto:fan && pnpm test:session:auto:creator",
+    "audit:full": "tsx scripts/full-site-audit.ts",
+    "qa:loop": "bash scripts/qa/loop.sh",
+    "qa:mvp": "tsx scripts/qa/run-mvp-qa.ts",
+    "qa:all": "pnpm -s lint || true && pnpm -s type-check && pnpm -s test:frontend:smoke && pnpm -s audit:full",
+    "test:gate:ui": "tsx scripts/qa/gate-ui.ts",
+    "test:gate:deadclick": "tsx scripts/qa/gate-deadclick.ts",
+    "qa:gate": "pnpm test:session:auto:all && pnpm test:gate:ui && pnpm test:gate:deadclick && pnpm audit:full"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

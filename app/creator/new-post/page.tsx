@@ -65,13 +65,13 @@ export default function NewPostPage() {
         // 加载 profile（通过 API）
         const profileResponse = await fetch("/api/profile");
         if (!profileResponse.ok) {
-          setError("无法加载 profile");
+          setError("Unable to load profile");
           return;
         }
         const profileData = await profileResponse.json();
         const profile = profileData.profile;
         if (!profile) {
-          setError("无法加载 profile");
+          setError("Unable to load profile");
           return;
         }
 
@@ -83,11 +83,11 @@ export default function NewPostPage() {
 
         // 检查是否为 creator
         if (profile.role !== "creator") {
-          setError("只有 creator 可以发帖");
+          setError("Only creators can post");
         }
       } catch (err) {
         console.error("[new-post] checkAuth error", err);
-        setError("加载失败，请重试");
+        setError("Failed to load, please try again");
       } finally {
         setIsLoading(false);
       }
@@ -100,12 +100,12 @@ export default function NewPostPage() {
     e.preventDefault();
 
     if (!currentUserId) {
-      setError("用户未登录");
+      setError("User not logged in");
       return;
     }
 
     if (!formData.content.trim()) {
-      setError("Content 是必填项");
+      setError("Content is required");
       return;
     }
 
@@ -113,7 +113,7 @@ export default function NewPostPage() {
     if (formData.visibility === "ppv") {
       const priceValue = parseFloat(formData.price);
       if (!formData.price.trim() || isNaN(priceValue) || priceValue < 1.0) {
-        setError("PPV 价格不能低于 $1.00");
+        setError("PPV price must be at least $1.00");
         return;
       }
     }
@@ -157,34 +157,29 @@ export default function NewPostPage() {
           }
         }
 
-        toast.success("Post 创建成功！");
+        toast.success("Post created successfully!");
         setTimeout(() => {
           router.push("/home");
         }, 500);
       } else {
-        setError(result.error || "创建失败，请重试");
+        setError(result.error || "Failed to create, please try again");
       }
     } catch (err) {
       console.error("[new-post] handleSubmit error", err);
-      setError("创建失败，请重试");
+      setError("Failed to create, please try again");
     } finally {
       setIsSaving(false);
     }
   };
 
+  // Show minimal loading state during auth check - don't render any components that make API calls
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <NavHeader user={currentUser} notificationCount={0} />
-        <main className="py-6 sm:py-8 lg:py-12">
-          <CenteredContainer maxWidth="2xl">
-            <div className="animate-pulse space-y-4">
-              <div className="h-8 w-48 bg-muted rounded"></div>
-              <div className="h-64 bg-muted rounded-xl"></div>
-              <div className="h-12 w-full bg-muted rounded-xl"></div>
-            </div>
-          </CenteredContainer>
-        </main>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse space-y-4 text-center">
+          <div className="h-8 w-48 bg-muted rounded mx-auto"></div>
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
       </div>
     );
   }
@@ -192,20 +187,20 @@ export default function NewPostPage() {
   if (error && currentUser?.role !== "creator") {
     return (
       <div className="min-h-screen bg-background">
-        {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
+        {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
         <main className="py-6 sm:py-8 lg:py-12">
           <CenteredContainer maxWidth="2xl">
             <Card className="p-6 rounded-xl border shadow-sm">
               <div className="text-center">
                 <h1 className="text-2xl font-bold text-foreground mb-4">Become a Creator</h1>
                 <p className="text-muted-foreground mb-6">
-                  只有 creator 可以发帖。请先成为 creator。
+                  Only creators can post. Please become a creator first.
                 </p>
                 <Button
                   onClick={() => router.push("/home")}
                   className="rounded-xl min-h-[44px] transition-all duration-200"
                 >
-                  返回首页
+                  Back to Home
                 </Button>
               </div>
             </Card>
@@ -216,19 +211,19 @@ export default function NewPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
+    <div className="min-h-screen bg-background" data-testid="page-ready">
+      {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
 
       <main className="py-6 sm:py-8 lg:py-12">
         <CenteredContainer maxWidth="2xl">
           <div className="mb-8">
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">Create New Post</h1>
-            <p className="text-lg text-muted-foreground">分享你的内容</p>
+            <p className="text-lg text-muted-foreground">Share your content with your audience</p>
           </div>
 
           {error && (
             <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-6 mb-8">
-              <p className="text-destructive font-medium">错误</p>
+              <p className="text-destructive font-medium">Error</p>
               <p className="text-sm text-muted-foreground mt-1">{error}</p>
             </div>
           )}
@@ -237,7 +232,7 @@ export default function NewPostPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Title */}
               <div className="space-y-2">
-                <Label htmlFor="title">Title (可选)</Label>
+                <Label htmlFor="title">Title (optional)</Label>
                 <Input
                   id="title"
                   type="text"
@@ -246,6 +241,7 @@ export default function NewPostPage() {
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   disabled={isSaving}
                   className="min-h-[44px] rounded-xl"
+                  data-testid="post-title"
                 />
               </div>
 
@@ -263,16 +259,17 @@ export default function NewPostPage() {
                   required
                   disabled={isSaving}
                   className="rounded-xl resize-none"
+                  data-testid="post-content"
                 />
               </div>
 
               {/* Multi Media Upload */}
-              <div className="space-y-2">
-                <Label>Media (可选，支持多文件)</Label>
+              <div className="space-y-2" data-testid="upload-zone">
+                <Label>Media (optional, multiple files supported)</Label>
                 <MultiMediaUpload
                   onUploadComplete={(files) => {
                     setMediaFiles(files);
-                    toast.success(`已上传 ${files.length} 个文件`);
+                    toast.success(`Uploaded ${files.length} file(s)`);
                   }}
                   onUploadError={(error) => {
                     setError(error);
@@ -282,24 +279,29 @@ export default function NewPostPage() {
                 />
                 {mediaFiles.length > 0 && (
                   <p className="text-xs text-muted-foreground mt-2">
-                    已上传 {mediaFiles.length} 个文件
+                    {mediaFiles.length} file(s) uploaded
                   </p>
                 )}
               </div>
 
-              {/* Tags */}
-              <div className="space-y-2">
-                <Label>Tags (可选，最多 5 个)</Label>
-                <TagSelector
-                  selectedTags={selectedTags}
-                  onTagsChange={setSelectedTags}
-                  maxTags={5}
-                />
-                <p className="text-xs text-muted-foreground">添加标签帮助用户发现你的内容</p>
-              </div>
+              {/* Tags - Only render after auth is complete and user is creator */}
+              {!isLoading && currentUser?.role === "creator" && (
+                <div className="space-y-2">
+                  <Label>Tags (optional, up to 5)</Label>
+                  <TagSelector
+                    category="content"
+                    selectedTags={selectedTags}
+                    onChange={setSelectedTags}
+                    maxTags={5}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Add tags to help users discover your content
+                  </p>
+                </div>
+              )}
 
               {/* Visibility */}
-              <div className="space-y-3">
+              <div className="space-y-3" data-testid="visibility-toggle">
                 <Label>Visibility</Label>
                 <div className="flex flex-col gap-3">
                   <label className="flex items-center space-x-2 cursor-pointer">
@@ -318,7 +320,7 @@ export default function NewPostPage() {
                       disabled={isSaving}
                       className="w-4 h-4"
                     />
-                    <span className="text-sm">Free - 所有人可见</span>
+                    <span className="text-sm">Free - Visible to everyone</span>
                   </label>
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
@@ -336,7 +338,7 @@ export default function NewPostPage() {
                       disabled={isSaving}
                       className="w-4 h-4"
                     />
-                    <span className="text-sm">Subscribers-only - 仅订阅者可见</span>
+                    <span className="text-sm">Subscribers-only - Only subscribers can view</span>
                   </label>
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
@@ -350,7 +352,7 @@ export default function NewPostPage() {
                       disabled={isSaving}
                       className="w-4 h-4"
                     />
-                    <span className="text-sm">Pay-per-post - 需要单独解锁</span>
+                    <span className="text-sm">Pay-per-view - Requires individual unlock</span>
                   </label>
                 </div>
               </div>
@@ -372,8 +374,11 @@ export default function NewPostPage() {
                     disabled={isSaving}
                     required
                     className="min-h-[44px] rounded-xl"
+                    data-testid="price-input"
                   />
-                  <p className="text-xs text-muted-foreground">设置解锁此 post 的价格（美元）</p>
+                  <p className="text-xs text-muted-foreground">
+                    Set the price to unlock this post (USD)
+                  </p>
                 </div>
               )}
 
@@ -381,8 +386,10 @@ export default function NewPostPage() {
               {mediaFiles.some((f) => f.type === "video") && (
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="preview_enabled">Enable Preview (视频前 10 秒)</Label>
-                    <p className="text-sm text-muted-foreground">允许未订阅用户预览视频前 10 秒</p>
+                    <Label htmlFor="preview_enabled">Enable Preview (first 10 seconds)</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Allow non-subscribers to preview the first 10 seconds
+                    </p>
                   </div>
                   <Switch
                     id="preview_enabled"
@@ -399,9 +406,9 @@ export default function NewPostPage() {
               {mediaFiles.some((f) => f.type === "image") && (
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="watermark_enabled">Enable Watermark (图片左上角)</Label>
+                    <Label htmlFor="watermark_enabled">Enable Watermark (top-left corner)</Label>
                     <p className="text-sm text-muted-foreground">
-                      为图片添加水印（仅图片，Creator 可开关）
+                      Add watermark to images (creators can toggle)
                     </p>
                   </div>
                   <Switch
@@ -425,15 +432,16 @@ export default function NewPostPage() {
                   className="flex-1 rounded-xl min-h-[44px] transition-all duration-200"
                   aria-label="Cancel post creation"
                 >
-                  取消
+                  Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSaving}
                   className="flex-1 rounded-xl min-h-[44px] transition-all duration-200"
                   aria-label="Publish post"
+                  data-testid="submit-button"
                 >
-                  {isSaving ? "发布中..." : "发布"}
+                  {isSaving ? "Publishing..." : "Publish"}
                 </Button>
               </div>
             </form>

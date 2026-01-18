@@ -47,6 +47,7 @@ export function HomeFeedClient({
   const [isLoading, setIsLoading] = useState(false);
 
   const currentUser = {
+    id: currentUserId,
     username: userProfile?.display_name || "user",
     role: (userProfile?.role || "fan") as "fan" | "creator",
     avatar: userProfile?.avatar_url || "/fan-user-avatar.jpg",
@@ -79,7 +80,7 @@ export function HomeFeedClient({
       setPostViewStates(states);
     } catch (err) {
       console.error("[home] reloadFeed error", err);
-      setError("加载失败");
+      setError("Failed to load");
     } finally {
       setIsLoading(false);
     }
@@ -96,15 +97,15 @@ export function HomeFeedClient({
       const data = await response.json();
       if (data.success) {
         await reloadFeed();
-        toast.success("订阅成功");
+        toast.success("Subscribed successfully");
       } else {
-        setError(data.error || "订阅失败");
-        toast.error(data.error || "订阅失败");
+        setError(data.error || "Subscription failed");
+        toast.error(data.error || "Subscription failed");
       }
     } catch (err) {
       console.error("[home] subscribe error", err);
-      setError("订阅失败");
-      toast.error("订阅失败");
+      setError("Subscription failed");
+      toast.error("Subscription failed");
     } finally {
       setSubscribingCreators((prev) => {
         const next = new Set(prev);
@@ -122,33 +123,33 @@ export function HomeFeedClient({
     addUnlockedPost(postId);
     setPostViewStates((prev) => new Map(prev).set(postId, true));
     setPaywallPost(null);
-    toast.success("解锁成功");
+    toast.success("Unlocked successfully");
   };
 
   const handleShare = async (post: Post) => {
     const url = `${window.location.origin}/posts/${post.id}`;
     try {
       await navigator.clipboard.writeText(url);
-      toast.success("链接已复制到剪贴板");
+      toast.success("Link copied to clipboard");
     } catch (err) {
-      toast.error("复制失败");
+      toast.error("Failed to copy");
     }
   };
 
   if (isLoading && posts.length === 0) {
     return (
       <div className="min-h-screen bg-background">
-        <NavHeader currentUser={currentUser} />
+        <NavHeader user={currentUser!} />
         <CenteredContainer className="py-12">
-          <LoadingState type="spinner" text="加载中..." />
+          <LoadingState type="spinner" text="Loading..." />
         </CenteredContainer>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <NavHeader currentUser={currentUser} />
+    <div className="min-h-screen bg-background" data-testid="page-ready">
+      <NavHeader user={currentUser!} />
 
       <CenteredContainer maxWidth="7xl" className="py-6 sm:py-8 lg:py-10">
         {error && (
@@ -189,16 +190,35 @@ export function HomeFeedClient({
           {/* 主内容区 */}
           <main className="lg:col-span-6">
             {posts.length === 0 ? (
-              <Card className="rounded-xl border shadow-sm">
+              <Card className="rounded-xl border shadow-sm" data-testid="empty-state">
                 <CardContent className="py-16 text-center">
                   <Users
                     className="h-16 w-16 mx-auto text-muted-foreground mb-4"
                     aria-hidden="true"
                   />
                   <h3 className="text-xl font-semibold mb-2">No Content Yet</h3>
-                  <p className="text-muted-foreground max-w-sm mx-auto">
-                    Follow some creators to see their content in your feed
+                  <p className="text-muted-foreground max-w-sm mx-auto mb-6">
+                    Follow some creators to see their content in your feed, or explore trending
+                    content to discover new creators.
                   </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button
+                      onClick={() => router.push("/discover")}
+                      className="rounded-lg min-h-[44px]"
+                    >
+                      <TrendingUp className="w-4 h-4 mr-2" />
+                      Explore Creators
+                    </Button>
+                    {currentUser?.role === "fan" && (
+                      <Button
+                        variant="outline"
+                        onClick={() => router.push("/creator/upgrade")}
+                        className="rounded-lg min-h-[44px]"
+                      >
+                        Become a Creator
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ) : (
@@ -211,6 +231,7 @@ export function HomeFeedClient({
                     <Card
                       key={post.id}
                       className="rounded-xl border shadow-sm hover:shadow-md transition-all duration-200"
+                      data-testid="post-card"
                     >
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between gap-4">
@@ -220,16 +241,16 @@ export function HomeFeedClient({
                           >
                             <Avatar className="h-10 w-10 ring-2 ring-background">
                               <AvatarImage
-                                src={post.creator_avatar || undefined}
-                                alt={post.creator_name || "Creator"}
+                                src={post.creator?.avatar_url || undefined}
+                                alt={post.creator?.display_name || "Creator"}
                               />
                               <AvatarFallback className="bg-primary/10 text-primary">
-                                {post.creator_name?.[0]?.toUpperCase() || "C"}
+                                {post.creator?.display_name?.[0]?.toUpperCase() || "C"}
                               </AvatarFallback>
                             </Avatar>
                             <div className="min-w-0 flex-1">
                               <p className="font-semibold truncate">
-                                {post.creator_name || "Creator"}
+                                {post.creator?.display_name || "Creator"}
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 {formatDistanceToNow(new Date(post.created_at), {
@@ -261,9 +282,9 @@ export function HomeFeedClient({
                           </Link>
                         )}
 
-                        {post.description && (
+                        {post.content && (
                           <p className="text-muted-foreground mb-4 line-clamp-3 text-sm">
-                            {post.description}
+                            {post.content}
                           </p>
                         )}
 
@@ -271,9 +292,10 @@ export function HomeFeedClient({
                           <Link href={`/posts/${post.id}`}>
                             <div className="rounded-lg overflow-hidden cursor-pointer hover:opacity-95 transition-opacity">
                               <MediaDisplay
-                                media={post.media || []}
-                                postId={post.id}
-                                isUnlocked={true}
+                                post={post}
+                                canView={true}
+                                isCreator={false}
+                                creatorDisplayName={post.creator?.display_name}
                               />
                             </div>
                           </Link>
@@ -286,7 +308,9 @@ export function HomeFeedClient({
                               />
                               <p className="text-base font-semibold mb-1">Locked Content</p>
                               <p className="text-sm text-muted-foreground mb-4">
-                                {post.price ? `$${post.price}` : "Subscribe to unlock"}
+                                {post.price_cents
+                                  ? `$${(post.price_cents / 100).toFixed(2)}`
+                                  : "Subscribe to unlock"}
                               </p>
                               <Button
                                 onClick={() => handleUnlock(post)}
@@ -304,7 +328,7 @@ export function HomeFeedClient({
                           <PostLikeButton
                             postId={post.id}
                             initialLikesCount={post.likes_count || 0}
-                            initialIsLiked={false}
+                            userId={currentUser?.id || undefined}
                           />
                           <Button
                             variant="ghost"
@@ -349,8 +373,19 @@ export function HomeFeedClient({
 
       {paywallPost && (
         <PaywallModal
-          post={paywallPost}
-          onClose={() => setPaywallPost(null)}
+          open={!!paywallPost}
+          onOpenChange={(open) => !open && setPaywallPost(null)}
+          type={paywallPost.visibility === "subscribers" ? "subscribe" : "ppv"}
+          creatorName={paywallPost.creator?.display_name || "Creator"}
+          creatorAvatar={paywallPost.creator?.avatar_url}
+          price={(paywallPost.price_cents || 0) / 100}
+          benefits={
+            paywallPost.visibility === "subscribers"
+              ? ["Access to all subscriber content", "New posts notifications"]
+              : ["Unlock this content permanently", "Full quality access"]
+          }
+          postId={paywallPost.id}
+          creatorId={paywallPost.creator_id}
           onSuccess={() => handlePaywallSuccess(paywallPost.id)}
         />
       )}

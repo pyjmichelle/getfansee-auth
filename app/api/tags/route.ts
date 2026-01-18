@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-server";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { createClient } from "@/lib/supabase-server";
+import { MOCK_TAGS, shouldUseMockData } from "@/lib/mock-data";
 
 /**
  * GET /api/tags?category=content|creator
- * 获取所有标签
+ * Get all tags
  */
 export async function GET(request: NextRequest) {
   try {
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
 
-    const supabase = getSupabaseBrowserClient();
+    const supabase = await createClient();
     let query = supabase.from("tags").select("*").order("name");
 
     if (category === "content" || category === "creator") {
@@ -27,7 +28,18 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error("[api/tags] GET error:", error);
+      // If error and mock data enabled, return mock tags
+      if (shouldUseMockData()) {
+        const mockTags = category ? MOCK_TAGS.filter((t) => t.category === category) : MOCK_TAGS;
+        return NextResponse.json({ success: true, tags: mockTags });
+      }
       return NextResponse.json({ success: false, error: "Failed to fetch tags" }, { status: 500 });
+    }
+
+    // If no tags and mock data enabled, return mock tags
+    if ((!tags || tags.length === 0) && shouldUseMockData()) {
+      const mockTags = category ? MOCK_TAGS.filter((t) => t.category === category) : MOCK_TAGS;
+      return NextResponse.json({ success: true, tags: mockTags });
     }
 
     return NextResponse.json({ success: true, tags });

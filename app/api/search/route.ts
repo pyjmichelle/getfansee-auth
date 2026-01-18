@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-server";
 import { createClient } from "@supabase/supabase-js";
+import { searchMockCreators, getMockPostsWithCreators, shouldUseMockData } from "@/lib/mock-data";
 
-// 使用 Service Role Key 进行搜索
+// Use Service Role Key for search
 function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -17,7 +18,7 @@ function getSupabaseAdmin() {
 
 /**
  * GET /api/search?q=keyword&type=all|creators|posts
- * 搜索 Creators 和 Posts
+ * Search Creators and Posts
  */
 export async function GET(request: NextRequest) {
   try {
@@ -41,9 +42,8 @@ export async function GET(request: NextRequest) {
     const supabase = getSupabaseAdmin();
     const results: any = { success: true };
 
-    // 搜索 Creators
+    // Search Creators
     if (searchType === "all" || searchType === "creators") {
-      // 使用 PostgreSQL ILIKE 进行不区分大小写的搜索
       const { data: creators, error: creatorsError } = await supabase
         .from("profiles")
         .select("id, display_name, avatar_url, bio, role")
@@ -57,9 +57,14 @@ export async function GET(request: NextRequest) {
       } else {
         results.creators = creators || [];
       }
+
+      // If no results and mock data enabled, use mock creators
+      if (results.creators.length === 0 && shouldUseMockData()) {
+        results.creators = searchMockCreators(query);
+      }
     }
 
-    // 搜索 Posts
+    // Search Posts
     if (searchType === "all" || searchType === "posts") {
       const { data: posts, error: postsError } = await supabase
         .from("posts")
@@ -88,6 +93,17 @@ export async function GET(request: NextRequest) {
         results.posts = [];
       } else {
         results.posts = posts || [];
+      }
+
+      // If no results and mock data enabled, use mock posts
+      if (results.posts.length === 0 && shouldUseMockData()) {
+        const mockPosts = getMockPostsWithCreators();
+        const lowerQuery = query.toLowerCase();
+        results.posts = mockPosts.filter(
+          (p) =>
+            p.title.toLowerCase().includes(lowerQuery) ||
+            p.content.toLowerCase().includes(lowerQuery)
+        );
       }
     }
 

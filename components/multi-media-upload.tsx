@@ -32,7 +32,7 @@ export function MultiMediaUpload({
 
       // 验证文件数量
       if (uploadedFiles.length + fileArray.length > maxFiles) {
-        onUploadError?.(`最多只能上传 ${maxFiles} 个文件`);
+        onUploadError?.(`Maximum ${maxFiles} files allowed`);
         return;
       }
 
@@ -40,7 +40,7 @@ export function MultiMediaUpload({
       for (const file of fileArray) {
         const validation = validateFile(file);
         if (!validation.valid) {
-          onUploadError?.(validation.error || "文件验证失败");
+          onUploadError?.(validation.error || "File validation failed");
           return;
         }
       }
@@ -97,7 +97,7 @@ export function MultiMediaUpload({
         setUploadProgress(new Map());
       } catch (err: any) {
         console.error("[MultiMediaUpload] upload error:", err);
-        onUploadError?.(err.message || "上传失败");
+        onUploadError?.(err.message || "Upload failed");
         setUploadProgress(new Map());
       } finally {
         setIsUploading(false);
@@ -173,15 +173,16 @@ export function MultiMediaUpload({
             onChange={handleFileSelect}
             className="hidden"
             disabled={isUploading}
+            data-testid="file-input"
           />
 
           <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-sm font-medium mb-1">点击或拖拽文件到此处上传</p>
+          <p className="text-sm font-medium mb-1">Click or drag files here to upload</p>
           <p className="text-xs text-muted-foreground">
-            支持图片 (jpg, png, webp) 和视频 (mp4, mov)
+            Supports images (jpg, png, webp) and videos (mp4, mov)
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            图片最大 20MB，视频最大 2GB，最多 {maxFiles} 个文件
+            Images max 20MB, videos max 2GB, up to {maxFiles} files
           </p>
         </div>
       ) : (
@@ -213,19 +214,19 @@ export function MultiMediaUpload({
               {isUploading ? (
                 <div className="flex items-center justify-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                  <span className="text-sm text-muted-foreground">上传中...</span>
+                  <span className="text-sm text-muted-foreground">Uploading...</span>
                 </div>
               ) : (
                 <div className="flex items-center justify-center gap-2">
                   <Upload className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">添加更多文件</span>
+                  <span className="text-sm text-muted-foreground">Add more files</span>
                 </div>
               )}
             </div>
           )}
 
           {/* 已上传文件列表 */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4" data-testid="upload-preview">
             {uploadedFiles.map((file, index) => {
               const progress = uploadProgress.get(index);
               const isUploadingFile = progress && progress.percentage < 100;

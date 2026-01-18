@@ -93,10 +93,10 @@ export default function ProfilePage() {
     try {
       const avatarUrl = await uploadAvatar(file, currentUserId);
       setAvatar(avatarUrl);
-      toast.success("头像上传成功");
+      toast.success("Avatar uploaded successfully");
     } catch (err: any) {
       console.error("[me] avatar upload error:", err);
-      toast.error(err.message || "头像上传失败");
+      toast.error(err.message || "Failed to upload avatar");
     } finally {
       setIsUploadingAvatar(false);
     }
@@ -107,7 +107,7 @@ export default function ProfilePage() {
 
     // 验证昵称唯一性（可选，这里简化处理）
     if (username.trim().length > 0 && username.trim().length < 2) {
-      toast.error("昵称至少需要 2 个字符");
+      toast.error("Username must be at least 2 characters");
       return;
     }
 
@@ -125,13 +125,13 @@ export default function ProfilePage() {
       });
 
       if (!updateResponse.ok) {
-        toast.error("保存失败，请重试");
+        toast.error("Failed to save, please try again");
         return;
       }
 
       const updateData = await updateResponse.json();
       if (!updateData.success) {
-        toast.error("保存失败，请重试");
+        toast.error("Failed to save, please try again");
         return;
       }
 
@@ -143,10 +143,10 @@ export default function ProfilePage() {
           avatar: avatar || currentUser.avatar,
         });
       }
-      toast.success("资料更新成功");
+      toast.success("Profile updated successfully");
     } catch (err) {
       console.error("[me] handleSave error:", err);
-      alert("保存失败，请重试");
+      alert("Failed to save, please try again");
     } finally {
       setIsSaving(false);
     }
@@ -169,17 +169,17 @@ export default function ProfilePage() {
       });
 
       if (!createResponse.ok) {
-        alert("创建 creator profile 失败，请重试");
+        alert("Failed to create creator profile, please try again");
         return;
       }
 
       if (currentUser) {
         setCurrentUser({ ...currentUser, role: "creator" });
       }
-      alert("Creator profile 创建成功！");
+      alert("Creator profile created successfully!");
     } catch (err) {
       console.error("[me] handleCreateCreator error:", err);
-      alert("创建失败，请重试");
+      alert("Failed to create, please try again");
     } finally {
       setIsCreatingCreator(false);
     }
@@ -193,13 +193,13 @@ export default function ProfilePage() {
       // 检查是否为 creator（通过 API）
       const profileResponse = await fetch("/api/profile");
       if (!profileResponse.ok) {
-        alert("请先创建 creator profile");
+        alert("Please create a creator profile first");
         return;
       }
       const profileData = await profileResponse.json();
       const profile = profileData.profile;
       if (!profile || profile.role !== "creator") {
-        alert("请先创建 creator profile");
+        alert("Please create a creator profile first");
         return;
       }
 
@@ -231,14 +231,14 @@ export default function ProfilePage() {
 
       if (error) {
         console.error("[me] seed posts error:", error);
-        alert("创建 demo posts 失败，请重试");
+        alert("Failed to create demo posts, please try again");
         return;
       }
 
-      alert("Demo posts 创建成功！");
+      alert("Demo posts created successfully!");
     } catch (err) {
       console.error("[me] handleSeedPosts error:", err);
-      alert("创建失败，请重试");
+      alert("Failed to create, please try again");
     } finally {
       setIsSeeding(false);
     }
@@ -252,7 +252,7 @@ export default function ProfilePage() {
   if (isLoading || !currentUser) {
     return (
       <div className="min-h-screen bg-background">
-        <NavHeader user={currentUser} notificationCount={0} />
+        <NavHeader user={currentUser!} notificationCount={0} />
         <CenteredContainer className="py-12">
           <LoadingState type="spinner" text="Loading profile..." />
         </CenteredContainer>
@@ -264,17 +264,17 @@ export default function ProfilePage() {
     if (!currentUserId) return;
 
     if (!oldPassword || !newPassword || !confirmPassword) {
-      toast.error("请填写所有密码字段");
+      toast.error("Please fill in all password fields");
       return;
     }
 
     if (newPassword.length < 8) {
-      toast.error("新密码至少需要 8 个字符");
+      toast.error("New password must be at least 8 characters");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast.error("新密码和确认密码不匹配");
+      toast.error("New password and confirmation do not match");
       return;
     }
 
@@ -292,22 +292,22 @@ export default function ProfilePage() {
 
       if (!updateResponse.ok) {
         const errorData = await updateResponse.json();
-        toast.error(errorData.error || "密码修改失败，请检查旧密码是否正确");
+        toast.error(errorData.error || "Failed to change password, please check your old password");
         return;
       }
 
       const updateData = await updateResponse.json();
       if (updateData.success) {
-        toast.success("密码修改成功");
+        toast.success("Password changed successfully");
         setOldPassword("");
         setNewPassword("");
         setConfirmPassword("");
       } else {
-        toast.error("密码修改失败，请检查旧密码是否正确");
+        toast.error("Failed to change password, please check your old password");
       }
     } catch (err) {
       console.error("[me] handlePasswordChange error:", err);
-      toast.error("密码修改失败，请重试");
+      toast.error("Failed to change password, please try again");
     } finally {
       setIsSaving(false);
     }
@@ -315,7 +315,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <NavHeader user={currentUser} notificationCount={0} />
+      <NavHeader user={currentUser!} notificationCount={0} />
 
       <main className="py-6 sm:py-8 lg:py-12">
         <CenteredContainer maxWidth="2xl">
