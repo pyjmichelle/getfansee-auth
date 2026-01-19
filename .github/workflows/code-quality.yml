@@ -60,24 +60,16 @@ jobs:
         continue-on-error: true
       
       # 5. Reviewdog - ESLint (自动在 PR 上评论问题)
-      - name: Run Reviewdog (ESLint)
-        if: github.event_name == 'pull_request'
-        uses: reviewdog/action-eslint@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          eslint_flags: '.'
-          fail_on_error: false
-          filter_mode: added
-      
-      # 6. Reviewdog - TypeScript (类型错误评论)
-      - name: Run Reviewdog (TypeScript)
-        if: github.event_name == 'pull_request'
-        uses: tsuyoshicho/action-tsc@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          fail_on_error: false
+      # 暂时禁用,等 PR 时再启用
+      # - name: Run Reviewdog (ESLint)
+      #   if: github.event_name == 'pull_request'
+      #   uses: reviewdog/action-eslint@v1
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     reporter: github-pr-review
+      #     eslint_flags: '.'
+      #     fail_on_error: false
+      #     filter_mode: added
       
       # 7. 构建验证
       - name: Build Check
