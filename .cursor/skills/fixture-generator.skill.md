@@ -30,6 +30,7 @@ triggers:
 ### 1. 用户 Fixtures
 
 #### Creator
+
 ```typescript
 {
   userId: string,
@@ -42,6 +43,7 @@ triggers:
 ```
 
 #### Fan
+
 ```typescript
 {
   userId: string,
@@ -55,6 +57,7 @@ triggers:
 ### 2. 帖子 Fixtures
 
 #### 免费帖子
+
 ```typescript
 {
   id: string,
@@ -67,6 +70,7 @@ triggers:
 ```
 
 #### 订阅帖子
+
 ```typescript
 {
   id: string,
@@ -79,6 +83,7 @@ triggers:
 ```
 
 #### PPV 帖子
+
 ```typescript
 {
   id: string,
@@ -116,36 +121,48 @@ triggers:
 ## 快速生成函数
 
 ### setupTestFixtures()
+
 生成完整的测试数据集（1 Creator + 1 Fan + 3 Posts）
 
 ### createTestCreator(options?)
+
 生成单个 Creator，可选参数：
+
 - `displayName`: 自定义显示名称
 - `kycVerified`: 是否通过 KYC（默认 true）
 
 ### createTestFan(walletBalance?)
+
 生成单个 Fan，可选参数：
+
 - `walletBalance`: 钱包余额（cents，默认 5000）
 
 ### createTestPost(creatorId, visibility, priceCents?)
+
 生成单个帖子，必需参数：
+
 - `creatorId`: Creator ID
 - `visibility`: "free" | "subscribers" | "ppv"
 - `priceCents`: PPV 价格（仅 PPV 帖子需要）
 
 ### topUpWallet(userId, amountCents)
+
 为用户钱包充值
 
 ### createTestSubscription(fanId, creatorId)
+
 创建订阅关系
 
 ### createTestPurchase(fanId, postId, priceCents)
+
 创建购买记录
 
 ## 数据清理
 
 ### teardownTestFixtures(fixtures)
+
 清理所有测试数据，包括：
+
 - 删除帖子
 - 删除订阅/购买记录
 - 删除钱包交易

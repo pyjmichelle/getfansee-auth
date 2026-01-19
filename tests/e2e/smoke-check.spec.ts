@@ -23,9 +23,7 @@ test.describe("System Health Check", () => {
     // Check for console errors (filter out known non-critical errors)
     const criticalErrors = consoleErrors.filter(
       (error) =>
-        !error.includes("favicon") &&
-        !error.includes("manifest") &&
-        !error.includes("third-party")
+        !error.includes("favicon") && !error.includes("manifest") && !error.includes("third-party")
     );
 
     // Report any errors found

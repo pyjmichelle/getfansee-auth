@@ -1,0 +1,250 @@
+{
+  "generated": "2026-01-18T00:00:00.000Z",
+  "audit_run": "full-site-audit-2026-01-18",
+  "total_issues": 11,
+  "by_priority": {
+    "P0": 7,
+    "P1": 4,
+    "P2": 0
+  },
+  "by_owner": {
+    "FE": 7,
+    "Auth": 2,
+    "BE": 2,
+    "FE+BE": 3,
+    "QA": 1
+  },
+  "issues": [
+    {
+      "id": "P0-1",
+      "priority": "P0",
+      "title": "Auth Context Not Persisting in Audit Tool",
+      "route": "All protected routes",
+      "auth_state": ["fan", "creator"],
+      "owner": ["QA", "FE"],
+      "status": "open",
+      "description": "Audit tool doesn't implement proper auth contexts. All fan/creator tests fall back to anonymous.",
+      "impact": "Cannot verify auth-dependent functionality. False positives for auth redirects.",
+      "reproduction": "pnpm audit:full - observe 'Auth state not yet implemented' warnings",
+      "fix_estimate": "2-4 hours",
+      "acceptance_criteria": [
+        "Fan context successfully logs in as fan",
+        "Creator context successfully logs in as creator",
+        "Auth cookies persist across page navigations",
+        "Protected routes load correctly for authenticated users",
+        "Re-run audit shows 0 false positive redirects"
+      ]
+    },
+    {
+      "id": "P0-2",
+      "priority": "P0",
+      "title": "Creator Studio Pages Make Premature API Calls",
+      "route": "/creator/studio, /creator/studio/earnings, /creator/studio/subscribers",
+      "auth_state": ["anonymous", "fan"],
+      "owner": ["FE"],
+      "status": "open",
+      "description": "Pages make API calls before auth check completes, resulting in 401 errors.",
+      "impact": "Console errors, network errors, poor UX",
+      "console_errors": ["Failed to load creator data", "Failed to load earnings data"],
+      "network_errors": ["GET /api/creator/studio - 401", "GET /api/earnings - 401"],
+      "reproduction": "Visit /creator/studio as anonymous - observe API 401 errors",
+      "fix_estimate": "1-2 hours per page",
+      "acceptance_criteria": [
+        "No API calls before auth check completes",
+        "Anonymous users redirected to /auth immediately",
+        "Non-creators redirected to /creator/upgrade",
+        "Creators see data loaded successfully",
+        "0 console errors",
+        "0 network errors for unauthorized users"
+      ]
+    },
+    {
+      "id": "P0-3",
+      "priority": "P0",
+      "title": "Home/Me Pages Don't Recognize Auth",
+      "route": "/home, /me, /me/wallet",
+      "auth_state": ["fan", "creator"],
+      "owner": ["Auth", "FE"],
+      "status": "open",
+      "description": "Authenticated users are redirected to /auth even with valid sessions.",
+      "impact": "Core user experience broken - users cannot access main app",
+      "reproduction": "Login as fan, visit /home - observe redirect to /auth",
+      "fix_estimate": "2-3 hours",
+      "note": "May be false positive due to P0-1 (audit tool auth not implemented)",
+      "acceptance_criteria": [
+        "Fan users see home feed",
+        "Creator users see home feed",
+        "Profile page loads user data",
+        "Wallet page loads balance",
+        "No redirects for authenticated users"
+      ]
+    },
+    {
+      "id": "P0-4",
+      "priority": "P0",
+      "title": "Creator New-Post Blocks Authenticated Users",
+      "route": "/creator/new-post",
+      "auth_state": ["fan", "creator"],
+      "owner": ["FE"],
+      "status": "partially_fixed",
+      "description": "Page redirects all users to /auth, even authenticated creators.",
+      "impact": "Creators cannot create posts",
+      "reproduction": "Login as creator, visit /creator/new-post - observe redirect",
+      "fix_estimate": "30 minutes (verify existing fix)",
+      "note": "Already fixed conditional TagSelector. Verify with proper auth context.",
+      "acceptance_criteria": [
+        "Anonymous users redirected to /auth",
+        "Fan users see upgrade prompt",
+        "Creator users see post form",
+        "No premature API calls"
+      ]
+    },
+    {
+      "id": "P0-5",
+      "priority": "P0",
+      "title": "Wallet Page Makes Premature API Call",
+      "route": "/me/wallet",
+      "auth_state": ["fan"],
+      "owner": ["FE"],
+      "status": "open",
+      "description": "Wallet page calls /api/wallet before auth check completes.",
+      "impact": "Network errors, poor UX",
+      "network_errors": ["GET /api/wallet - Failed"],
+      "reproduction": "Visit /me/wallet as anonymous - observe API call before redirect",
+      "fix_estimate": "30 minutes",
+      "acceptance_criteria": [
+        "No API calls before auth check",
+        "Anonymous users redirected immediately",
+        "Authenticated users see wallet balance",
+        "0 network errors"
+      ]
+    },
+    {
+      "id": "P0-6",
+      "priority": "P0",
+      "title": "Creator Earnings Page Fails",
+      "route": "/creator/studio/earnings",
+      "auth_state": ["fan", "creator"],
+      "owner": ["FE", "BE"],
+      "status": "open",
+      "description": "Page loads but shows error state. API returns 401.",
+      "impact": "Creators cannot view earnings",
+      "console_errors": ["Failed to load earnings data"],
+      "network_errors": ["GET /api/earnings - 401"],
+      "clickable_elements": 0,
+      "reproduction": "Visit /creator/studio/earnings - observe error state",
+      "fix_estimate": "2-3 hours",
+      "acceptance_criteria": [
+        "Fan users redirected to /creator/upgrade",
+        "Creator users see earnings data",
+        "API returns 403 for non-creators",
+        "No console errors",
+        "Proper loading states"
+      ]
+    },
+    {
+      "id": "P0-7",
+      "priority": "P0",
+      "title": "Creator Subscribers Page Fails",
+      "route": "/creator/studio/subscribers",
+      "auth_state": ["anonymous", "fan", "creator"],
+      "owner": ["FE", "BE"],
+      "status": "open",
+      "description": "All states redirect to /auth. Network error on all states.",
+      "impact": "Creators cannot view subscribers",
+      "network_errors": ["GET /api/subscribers - Failed"],
+      "reproduction": "Visit /creator/studio/subscribers - observe network error",
+      "fix_estimate": "2-3 hours",
+      "acceptance_criteria": [
+        "Anonymous redirected to /auth",
+        "Fan redirected to /creator/upgrade",
+        "Creator sees subscribers list",
+        "API endpoint works",
+        "No network errors"
+      ]
+    },
+    {
+      "id": "P1-1",
+      "priority": "P1",
+      "title": "Root Should Redirect Authenticated Users",
+      "route": "/",
+      "auth_state": ["fan", "creator"],
+      "owner": ["FE"],
+      "status": "open",
+      "description": "Authenticated users visiting root are redirected to /auth instead of /home.",
+      "impact": "Poor UX - extra redirect step",
+      "reproduction": "Login, visit / - observe redirect to /auth instead of /home",
+      "fix_estimate": "30 minutes",
+      "acceptance_criteria": ["Anonymous users see auth page", "Authenticated users see home feed"]
+    },
+    {
+      "id": "P1-2",
+      "priority": "P1",
+      "title": "Auth Page Accessible to Authenticated Users",
+      "route": "/auth",
+      "auth_state": ["fan", "creator"],
+      "owner": ["FE"],
+      "status": "open",
+      "description": "Authenticated users can access auth page. Should redirect to /home.",
+      "impact": "Poor UX - confusing for logged-in users",
+      "reproduction": "Login, visit /auth - observe auth page loads",
+      "fix_estimate": "30 minutes",
+      "acceptance_criteria": [
+        "Authenticated users redirected to /home",
+        "Anonymous users see auth form"
+      ]
+    },
+    {
+      "id": "P1-3",
+      "priority": "P1",
+      "title": "Creator Analytics Accessible Without Auth",
+      "route": "/creator/studio/analytics",
+      "auth_state": ["anonymous", "fan"],
+      "owner": ["FE"],
+      "status": "open",
+      "description": "Analytics page loads for all users without auth check. Should require creator role.",
+      "impact": "Security - analytics exposed to non-creators",
+      "reproduction": "Visit /creator/studio/analytics as anonymous - observe page loads",
+      "fix_estimate": "1 hour",
+      "acceptance_criteria": [
+        "Anonymous users redirected to /auth",
+        "Non-creators redirected to /creator/upgrade",
+        "Creators see analytics data"
+      ]
+    },
+    {
+      "id": "P1-4",
+      "priority": "P1",
+      "title": "Creator Onboarding Fails to Load",
+      "route": "/creator/onboarding",
+      "auth_state": ["creator"],
+      "owner": ["FE", "BE"],
+      "status": "open",
+      "description": "Page loads but shows error. API call fails with 401.",
+      "impact": "Creators cannot complete onboarding",
+      "console_errors": ["Failed to load onboarding status"],
+      "network_errors": ["GET /api/onboarding - 401"],
+      "clickable_elements": 0,
+      "reproduction": "Visit /creator/onboarding - observe error state",
+      "fix_estimate": "2 hours",
+      "acceptance_criteria": ["Creator sees onboarding steps", "API works correctly", "No errors"]
+    }
+  ],
+  "summary": {
+    "total_routes_tested": 20,
+    "total_scenarios": 60,
+    "successful_loads": 60,
+    "redirects": 49,
+    "console_errors": 4,
+    "network_errors": 14,
+    "pages_with_zero_clickable_elements": 6,
+    "estimated_fix_time": "18-28 hours"
+  },
+  "next_steps": [
+    "Await user confirmation",
+    "Implement P0 fixes in order",
+    "Re-run audit with proper auth contexts",
+    "Verify all issues resolved",
+    "Update backlog status"
+  ]
+}

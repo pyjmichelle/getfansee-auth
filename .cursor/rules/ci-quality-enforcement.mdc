@@ -1,0 +1,303 @@
+---
+description: CI/CD Quality Enforcement - 强制代码质量门禁
+globs: 
+  - "**/*.ts"
+  - "**/*.tsx"
+  - "**/*.js"
+  - "**/*.jsx"
+alwaysApply: true
+---
+
+# CI/CD 质量门禁规则
+
+## 🎯 核心原则
+
+**每一行代码推送到 CI 前都必须通过本地质量检查!**
+
+## ⚠️ 强制执行规则
+
+### 1. 推送前必须运行
+```bash
+pnpm check-all
+```
+
+这个命令会依次执行:
+- ✅ `pnpm type-check` - TypeScript 类型检查
+- ✅ `pnpm lint` - ESLint 代码规范
+- ✅ `pnpm format:check` - Prettier 格式检查
+- ✅ `pnpm test:unit` - 单元测试
+- ✅ `pnpm build` - 构建验证
+
+### 2. 所有检查必须通过
+- **0 TypeScript 错误**
+- **0 ESLint 错误** (警告可接受但需评估)
+- **格式符合 Prettier 规范**
+- **所有单元测试通过**
+- **构建成功无错误**
+
+### 3. Git Hook 自动保护
+- `.husky/pre-push` 会在每次推送前自动运行检查
+- 如果检查失败,推送会被阻止
+- 你会看到清晰的错误信息和修复建议
+
+## 🚫 严格禁止的行为
+
+### ❌ 绝对不允许
+1. **跳过检查推送**
+   ```bash
+   git push --no-verify  # 禁止使用!
+   ```
+
+2. **推送有明显错误的代码**
+   - 有 TypeScript 类型错误
+   - 有 ESLint 错误
+   - 构建失败
+   - 测试失败
+
+3. **在 CI 失败时合并 PR**
+   - 必须等待所有 CI 检查通过
+   - 必须解决 Reviewdog 评论的问题
+
+## ✅ 正确的工作流程
+
+### 开发阶段
+```bash
+# 1. 创建分支
+git checkout -b feature/your-feature
+
+# 2. 开发代码
+# ... 编写代码 ...
+
+# 3. 实时检查 (可选,但推荐)
+pnpm type-check  # 边开发边检查类型
+pnpm lint        # 检查代码规范
+```
+
+### 提交前检查
+```bash
+# 4. 完成开发后,运行完整检查
+pnpm check-all
+
+# 5. 如果有错误,修复它们
+pnpm lint:fix      # 自动修复 lint 问题
+pnpm format        # 自动格式化代码
+
+# 6. 再次运行检查,确保全部通过
+pnpm check-all
+# 必须看到所有步骤都是 ✅
+```
+
+### 提交和推送
+```bash
+# 7. 提交代码
+git add .
+git commit -m "feat: 你的功能描述"
+
+# 8. 推送 (pre-push hook 自动运行)
+git push origin feature/your-feature
+# 🚀 运行推送前检查...
+# ✅ 所有检查通过! 正在推送...
+```
+
+### PR 和合并
+```bash
+# 9. 在 GitHub 创建 PR
+
+# 10. 等待 CI 完成 (约 5-10 分钟)
+# - ci.yml ✅
+# - code-quality.yml ✅  
+# - pr-auto-review.yml ✅
+
+# 11. 查看自动反馈
+# - 🏷️ 自动标签 (size/type/area)
+# - 💬 Reviewdog 评论 (如果有问题)
+# - 📊 质量报告
+# - 🔒 安全扫描结果
+
+# 12. 解决所有问题后合并
+# 点击 "Merge pull request"
+```
+
+## 🛠️ 常见问题修复
+
+### 问题 1: TypeScript 类型错误
+```bash
+# 运行检查查看详细错误
+pnpm type-check
+
+# 常见修复方式:
+# - 添加正确的类型标注
+# - 修复 any 类型为具体类型
+# - 更新 interface/type 定义
+# - 检查导入路径
+```
+
+### 问题 2: ESLint 错误
+```bash
+# 自动修复能修复的问题
+pnpm lint:fix
+
+# 查看剩余问题
+pnpm lint
+
+# 手动修复无法自动修复的问题
+# 参考 ESLint 错误信息
+```
+
+### 问题 3: Prettier 格式问题
+```bash
+# 自动格式化所有文件
+pnpm format
+
+# 再次检查
+pnpm format:check
+```
+
+### 问题 4: 单元测试失败
+```bash
+# 查看详细测试输出
+pnpm test:unit
+
+# 修复失败的测试
+# 或更新测试以匹配新的实现
+
+# 再次运行
+pnpm test:unit
+```
+
+### 问题 5: 构建失败
+```bash
+# 检查环境变量
+cp .env.example .env.local
+# 填写正确的 Supabase 配置
+
+# 清理缓存
+rm -rf .next node_modules/.cache
+
+# 重新构建
+pnpm build
+```
+
+## 📊 CI 工作流说明
+
+### 1. ci.yml - 主 CI 流水线
+**触发**: Push/PR 到 main/develop
+
+**阶段**:
+1. Lint & Type Check
+2. Build
+3. QA Gate (UI + Dead Click)
+4. E2E Tests
+5. Quality Gate
+
+**必须**: 全部通过才能合并
+
+### 2. code-quality.yml - 代码质量
+**触发**: PR 或 Push
+
+**功能**:
+- 运行所有本地检查
+- Reviewdog 在 PR 上评论问题
+- 生成质量报告
+
+**特点**: 只评论新增/修改的代码
+
+### 3. pr-auto-review.yml - 自动审查
+**触发**: PR 打开/更新
+
+**功能**:
+- 自动添加标签 (size/type/area)
+- TODO/FIXME 统计
+- 大文件警告 (>500 行)
+- 依赖安全审计
+- 密钥泄露扫描
+- 自动评论汇总
+
+## 🎓 AI Agent 使用规则
+
+### 作为 AI Agent,我必须:
+
+1. **在修改代码后,提醒用户运行检查**
+   ```
+   ✅ 代码已修改完成!
+   
+   请运行以下命令验证:
+   pnpm check-all
+   ```
+
+2. **在建议提交代码前,强调检查的重要性**
+   ```
+   准备提交代码前,请确保:
+   1. pnpm check-all 全部通过
+   2. 没有 TypeScript 错误
+   3. 没有 ESLint 错误
+   4. 构建成功
+   ```
+
+3. **如果用户想跳过检查,必须警告**
+   ```
+   ⚠️ 警告: 不建议跳过检查!
+   
+   跳过检查可能导致:
+   - CI 失败
+   - 代码质量下降
+   - PR 被拒绝
+   - 团队其他成员的困扰
+   
+   请运行 pnpm check-all 确保代码质量
+   ```
+
+4. **在创建 PR 前,提供完整的检查清单**
+   ```
+   创建 PR 前检查清单:
+   - [ ] pnpm check-all 全部通过
+   - [ ] 所有测试通过
+   - [ ] 代码已格式化
+   - [ ] 没有 console.log 调试代码
+   - [ ] 没有 TODO/FIXME 未解决
+   - [ ] 已更新相关文档
+   ```
+
+## 📚 相关文档
+
+必读文档:
+- `.github/PRE_COMMIT_CHECKLIST.md` - 提交前检查清单
+- `.github/GITHUB_SECRETS_SETUP.md` - GitHub Secrets 配置
+- `.github/workflows/WORKFLOW_GUIDE.md` - CI 工作流指南
+- `CI_REVIEW_SETUP.md` - CI 审查系统配置
+- `SETUP_COMPLETE.md` - 完整设置指南
+
+## 🎯 质量标准
+
+### 代码必须满足:
+- ✅ 0 TypeScript 错误
+- ✅ 0 ESLint 错误
+- ✅ 100% 格式化
+- ✅ 所有测试通过
+- ✅ 构建成功
+- ✅ 无安全漏洞
+- ✅ 无密钥泄露
+
+### PR 必须满足:
+- ✅ 所有 CI 检查通过
+- ✅ Reviewdog 评论的问题已解决
+- ✅ 代码审查通过
+- ✅ 有适当的测试覆盖
+
+## 💪 记住
+
+**质量第一,速度第二!**
+
+宁愿多花 2 分钟运行检查,也不要花 20 分钟修复 CI 失败!
+
+**每次推送前,问自己:**
+- ✅ 我运行了 `pnpm check-all` 吗?
+- ✅ 所有检查都通过了吗?
+- ✅ 我的代码符合标准吗?
+
+**如果有任何一个是 NO,就不要推送!**
+
+---
+
+*此规则由 CI/CD 自动化系统强制执行*
+*违反规则的推送会被自动阻止*

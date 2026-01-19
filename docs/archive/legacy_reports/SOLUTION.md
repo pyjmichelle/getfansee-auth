@@ -44,6 +44,7 @@ PLAYWRIGHT_SKIP_SERVER=true pnpm exec playwright test --project=chromium
 ### 方案 3：修复 Playwright 配置（已修复）
 
 已更新 `playwright.config.ts`：
+
 - 添加 `PLAYWRIGHT_SKIP_SERVER` 环境变量支持
 - 修复 `clearStorage` 函数的安全错误
 
@@ -90,4 +91,3 @@ PLAYWRIGHT_SKIP_SERVER=true pnpm exec playwright test --project=chromium
 2. **检查端口占用**：`lsof -i:3000`
 3. **重启服务器**：`./scripts/restart-server.sh`
 4. **使用 UI 模式调试**：`pnpm exec playwright test --ui`
-

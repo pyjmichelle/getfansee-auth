@@ -6,12 +6,14 @@
 
 **症状**: CI 日志显示环境变量为空或未定义
 
-**原因**: 
+**原因**:
+
 - GitHub Secrets 中的名称：`SUPABASE`
 - CI YAML 中引用的名称：`secrets.SUPABASE_SERVICE_ROLE_KEY`
 - ❌ 不匹配！
 
 **解决方案 A** - 修改 CI YAML（推荐）:
+
 ```yaml
 # 修改前
 SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -21,6 +23,7 @@ SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE }}
 ```
 
 **解决方案 B** - 修改 GitHub Secret 名称:
+
 1. 删除现有的 `SUPABASE` Secret
 2. 创建新的 Secret，名称改为 `SUPABASE_SERVICE_ROLE_KEY`
 
@@ -31,23 +34,26 @@ SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE }}
 **症状**: 在某些分支或 PR 中无法访问 Secrets
 
 **原因**:
+
 - Secrets 默认只在 **Repository Secrets** 中可用
 - Fork 的 PR 无法访问原仓库的 Secrets（安全限制）
 - Environment Secrets 需要指定 environment
 
 **检查方法**:
+
 ```bash
 # 查看 CI 配置中是否指定了 environment
 grep -A 5 "environment:" .github/workflows/ci.yml
 ```
 
 **解决方案**:
+
 - 确保 Secrets 在 `Settings → Secrets and variables → Actions → Repository secrets` 中
 - 如果使用 Environment Secrets，需要在 job 中指定：
   ```yaml
   jobs:
     my-job:
-      environment: production  # 指定环境
+      environment: production # 指定环境
   ```
 
 ---
@@ -57,15 +63,18 @@ grep -A 5 "environment:" .github/workflows/ci.yml
 **症状**: Secret 值被截断或解析错误
 
 **原因**:
+
 - Secret 值包含 `$`, `"`, `'`, `\n` 等特殊字符
 - YAML 解析时被转义
 
 **解决方案**:
+
 - 直接粘贴原始值，不要添加引号
 - 不要在值的开头/结尾添加空格
 - JWT token 应该是一整行，不要换行
 
 **示例**:
+
 ```
 ✅ 正确: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI...
 ❌ 错误: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI..."
@@ -80,11 +89,13 @@ grep -A 5 "environment:" .github/workflows/ci.yml
 **症状**: 刚添加的 Secret 在 CI 中不可用
 
 **原因**:
+
 - 添加 Secret 后没有点击 "Add secret" 按钮
 - 浏览器缓存问题
 - GitHub 同步延迟（极少见）
 
 **解决方案**:
+
 1. 重新检查 Secret 是否在列表中
 2. 尝试编辑并重新保存
 3. 触发新的 CI run（不要重新运行旧的）
@@ -96,10 +107,12 @@ grep -A 5 "environment:" .github/workflows/ci.yml
 **症状**: CI 无法访问 Secrets
 
 **原因**:
+
 - Workflow 权限设置不正确
 - 仓库设置限制了 Actions 的权限
 
 **检查方法**:
+
 1. 仓库 `Settings → Actions → General`
 2. 检查 "Workflow permissions" 设置
 3. 确保至少是 "Read repository contents and packages permissions"
@@ -111,27 +124,31 @@ grep -A 5 "environment:" .github/workflows/ci.yml
 ### **问题分析**
 
 根据你的截图，GitHub Secrets 配置：
+
 ```
 ✅ NEXT_PUBLIC_SUPABASE_ANON_KEY
-✅ NEXT_PUBLIC_SUPABASE_URL  
+✅ NEXT_PUBLIC_SUPABASE_URL
 ✅ SUPABASE
 ```
 
 CI YAML 中引用：
+
 ```yaml
-NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}        # ✅ 匹配
+NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }} # ✅ 匹配
 NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }} # ✅ 匹配
-SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}      # ❌ 不匹配！
+SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }} # ❌ 不匹配！
 ```
 
 ### **解决方案**
 
 **选项 1: 修改 CI YAML**（已在最新提交中修复）
+
 ```yaml
 SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE }}
 ```
 
 **选项 2: 添加新的 GitHub Secret**
+
 1. 访问: https://github.com/pyjmichelle/getfansee-auth/settings/secrets/actions
 2. 点击 "New repository secret"
 3. Name: `SUPABASE_SERVICE_ROLE_KEY`
@@ -188,38 +205,43 @@ SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE }}
 ## 📚 最佳实践
 
 ### 1. **统一命名规范**
+
 ```
 ✅ 推荐: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
 ❌ 避免: SUPABASE, KEY1, MY_SECRET
 ```
 
 ### 2. **使用 Environment Secrets 进行分层**
+
 ```yaml
 jobs:
   deploy-staging:
     environment: staging
     env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}  # 从 staging environment 读取
-  
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }} # 从 staging environment 读取
+
   deploy-production:
     environment: production
     env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}  # 从 production environment 读取
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }} # 从 production environment 读取
 ```
 
 ### 3. **文档化 Secrets**
+
 在 README 或 `.github/SECRETS.md` 中记录：
+
 ```markdown
 ## Required Secrets
 
-| Name | Description | Where to get |
-|------|-------------|--------------|
-| SUPABASE_URL | Supabase project URL | Dashboard → Settings → API |
-| SUPABASE_ANON_KEY | Public anon key | Dashboard → Settings → API |
+| Name                      | Description               | Where to get               |
+| ------------------------- | ------------------------- | -------------------------- |
+| SUPABASE_URL              | Supabase project URL      | Dashboard → Settings → API |
+| SUPABASE_ANON_KEY         | Public anon key           | Dashboard → Settings → API |
 | SUPABASE_SERVICE_ROLE_KEY | Service role key (secret) | Dashboard → Settings → API |
 ```
 
 ### 4. **使用 GitHub CLI 管理 Secrets**
+
 ```bash
 # 列出所有 secrets
 gh secret list

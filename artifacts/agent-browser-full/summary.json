@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-01-18T14:09:25.306Z",
+  "totalTests": 60,
+  "successfulLoads": 55,
+  "redirects": 23,
+  "errors": 5,
+  "totalConsoleErrors": 17,
+  "totalNetworkErrors": 10,
+  "passRate": "91.7%",
+  "sessionsValid": true,
+  "fanAuthPageRatio": "5.0%",
+  "creatorAuthPageRatio": "5.0%"
+}

@@ -1,0 +1,356 @@
+{
+  "timestamp": "2026-01-18T14:28:31.170Z",
+  "summary": {
+    "total": 8,
+    "passed": 0,
+    "failed": 8,
+    "errors": 0,
+    "passRate": "0.0%",
+    "deadClicks": 0
+  },
+  "results": [
+    {
+      "id": "search-modal",
+      "name": "Search opens modal (not page navigation)",
+      "route": "/home",
+      "authState": "fan",
+      "status": "FAIL",
+      "duration": 22563,
+      "failures": [
+        {
+          "expectation": "Session validation",
+          "expected": "Valid fan session",
+          "actual": "Invalid or expired session",
+          "message": "Session validation failed for fan"
+        },
+        {
+          "expectation": "Search modal/dialog should be visible",
+          "expected": "Modal/dialog visible",
+          "actual": "Modal not found or not visible",
+          "message": "Search modal/dialog should be visible"
+        },
+        {
+          "expectation": "Search input should be visible",
+          "expected": "Selector visible: input[type=\"search\"], input[placeholder*=\"search\" i]",
+          "actual": "Selector not found or not visible",
+          "message": "Search input should be visible"
+        }
+      ],
+      "evidence": {
+        "consoleLogs": [
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  "
+        ],
+        "failedRequests": [],
+        "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/search-modal.png",
+        "trace": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/traces/search-modal.zip"
+      },
+      "finalUrl": "http://127.0.0.1:3000/home"
+    },
+    {
+      "id": "post-creation-upload",
+      "name": "Creator can see upload area on new post page",
+      "route": "/creator/new-post",
+      "authState": "creator",
+      "status": "FAIL",
+      "duration": 5942,
+      "failures": [
+        {
+          "expectation": "Session validation",
+          "expected": "Valid creator session",
+          "actual": "Invalid or expired session",
+          "message": "Session validation failed for creator"
+        },
+        {
+          "expectation": "Required selector present",
+          "expected": "Selector visible: input[type=\"file\"], [data-testid=\"file-upload\"], button:has-text(\"Upload\")",
+          "actual": "Selector not found or not visible",
+          "message": "Required selector missing: input[type=\"file\"], [data-testid=\"file-upload\"], button:has-text(\"Upload\")"
+        },
+        {
+          "expectation": "Required selector present",
+          "expected": "Selector visible: input[name=\"title\"], input[placeholder*=\"title\" i]",
+          "actual": "Selector not found or not visible",
+          "message": "Required selector missing: input[name=\"title\"], input[placeholder*=\"title\" i]"
+        },
+        {
+          "expectation": "Required selector present",
+          "expected": "Selector visible: textarea, [contenteditable=\"true\"]",
+          "actual": "Selector not found or not visible",
+          "message": "Required selector missing: textarea, [contenteditable=\"true\"]"
+        },
+        {
+          "expectation": "Upload area/button should be visible",
+          "expected": "Selector visible: input[type=\"file\"], [data-testid=\"file-upload\"], button:has-text(\"Upload\"), label:has-text(\"Upload\")",
+          "actual": "Selector not found or not visible",
+          "message": "Upload area/button should be visible"
+        },
+        {
+          "expectation": "Title input should be visible",
+          "expected": "Selector visible: input[name=\"title\"], input[placeholder*=\"title\" i]",
+          "actual": "Selector not found or not visible",
+          "message": "Title input should be visible"
+        },
+        {
+          "expectation": "Content input area should be visible",
+          "expected": "Selector visible: textarea, [contenteditable=\"true\"]",
+          "actual": "Selector not found or not visible",
+          "message": "Content input area should be visible"
+        }
+      ],
+      "evidence": {
+        "consoleLogs": [],
+        "failedRequests": [],
+        "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/post-creation-upload.png",
+        "trace": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/traces/post-creation-upload.zip"
+      },
+      "finalUrl": "http://127.0.0.1:3000/creator/new-post"
+    },
+    {
+      "id": "paywall-price-free",
+      "name": "Price input disabled when visibility=free",
+      "route": "/creator/new-post",
+      "authState": "creator",
+      "status": "FAIL",
+      "duration": 93198,
+      "failures": [
+        {
+          "expectation": "Session validation",
+          "expected": "Valid creator session",
+          "actual": "Invalid or expired session",
+          "message": "Session validation failed for creator"
+        },
+        {
+          "expectation": "Required selector present",
+          "expected": "Selector visible: select[name=\"visibility\"], [data-testid=\"visibility-select\"]",
+          "actual": "Selector not found or not visible",
+          "message": "Required selector missing: select[name=\"visibility\"], [data-testid=\"visibility-select\"]"
+        },
+        {
+          "expectation": "Required selector present",
+          "expected": "Selector visible: input[name=\"price\"], input[type=\"number\"]",
+          "actual": "Selector not found or not visible",
+          "message": "Required selector missing: input[name=\"price\"], input[type=\"number\"]"
+        },
+        {
+          "expectation": "Interaction: select",
+          "expected": "Successfully select select[name=\"visibility\"], [data-testid=\"visibility-select\"]",
+          "actual": "Error: locator.selectOption: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('select[name=\"visibility\"], [data-testid=\"visibility-select\"]').first()\n",
+          "message": "Failed to execute interaction: select on select[name=\"visibility\"], [data-testid=\"visibility-select\"]"
+        },
+        {
+          "expectation": "Price input should be disabled when visibility=free",
+          "expected": "Element disabled",
+          "actual": "Element is enabled",
+          "message": "Price input should be disabled when visibility=free"
+        }
+      ],
+      "evidence": {
+        "consoleLogs": [],
+        "failedRequests": [],
+        "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/paywall-price-free.png",
+        "trace": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/traces/paywall-price-free.zip"
+      },
+      "finalUrl": "http://127.0.0.1:3000/creator/new-post"
+    },
+    {
+      "id": "paywall-price-paid",
+      "name": "Price input enabled when visibility=paid",
+      "route": "/creator/new-post",
+      "authState": "creator",
+      "status": "FAIL",
+      "duration": 64957,
+      "failures": [
+        {
+          "expectation": "Session validation",
+          "expected": "Valid creator session",
+          "actual": "Invalid or expired session",
+          "message": "Session validation failed for creator"
+        },
+        {
+          "expectation": "Interaction: select",
+          "expected": "Successfully select select[name=\"visibility\"], [data-testid=\"visibility-select\"]",
+          "actual": "Error: locator.selectOption: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('select[name=\"visibility\"], [data-testid=\"visibility-select\"]').first()\n",
+          "message": "Failed to execute interaction: select on select[name=\"visibility\"], [data-testid=\"visibility-select\"]"
+        },
+        {
+          "expectation": "Price input should be enabled when visibility=paid",
+          "expected": "Element enabled",
+          "actual": "Element is disabled",
+          "message": "Price input should be enabled when visibility=paid"
+        }
+      ],
+      "evidence": {
+        "consoleLogs": [],
+        "failedRequests": [],
+        "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/paywall-price-paid.png",
+        "trace": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/traces/paywall-price-paid.zip"
+      },
+      "finalUrl": "http://127.0.0.1:3000/creator/new-post"
+    },
+    {
+      "id": "wallet-no-unauthorized",
+      "name": "Fan wallet page should not trigger unauthorized requests",
+      "route": "/me/wallet",
+      "authState": "fan",
+      "status": "FAIL",
+      "duration": 4406,
+      "failures": [
+        {
+          "expectation": "Session validation",
+          "expected": "Valid fan session",
+          "actual": "Invalid or expired session",
+          "message": "Session validation failed for fan"
+        },
+        {
+          "expectation": "Required selector present",
+          "expected": "Selector visible: [data-testid=\"wallet-balance\"], .balance, h1:has-text(\"Wallet\")",
+          "actual": "Selector not found or not visible",
+          "message": "Required selector missing: [data-testid=\"wallet-balance\"], .balance, h1:has-text(\"Wallet\")"
+        },
+        {
+          "expectation": "Wallet balance section should be visible",
+          "expected": "Selector visible: [data-testid=\"wallet-balance\"], .balance, h2:has-text(\"Balance\"), h3:has-text(\"Balance\")",
+          "actual": "Selector not found or not visible",
+          "message": "Wallet balance section should be visible"
+        }
+      ],
+      "evidence": {
+        "consoleLogs": [],
+        "failedRequests": [],
+        "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/wallet-no-unauthorized.png",
+        "trace": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/traces/wallet-no-unauthorized.zip"
+      },
+      "finalUrl": "http://127.0.0.1:3000/me/wallet"
+    },
+    {
+      "id": "home-feed-loads",
+      "name": "Home feed loads posts for fan",
+      "route": "/home",
+      "authState": "fan",
+      "status": "FAIL",
+      "duration": 12885,
+      "failures": [
+        {
+          "expectation": "Session validation",
+          "expected": "Valid fan session",
+          "actual": "Invalid or expired session",
+          "message": "Session validation failed for fan"
+        },
+        {
+          "expectation": "Required selector present",
+          "expected": "Selector visible: [data-testid=\"post\"], article, .post-card",
+          "actual": "Selector not found or not visible",
+          "message": "Required selector missing: [data-testid=\"post\"], article, .post-card"
+        },
+        {
+          "expectation": "At least one post should be visible",
+          "expected": "Selector visible: [data-testid=\"post\"], article, .post-card",
+          "actual": "Selector not found or not visible",
+          "message": "At least one post should be visible"
+        }
+      ],
+      "evidence": {
+        "consoleLogs": [
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  ",
+          "[warning] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  "
+        ],
+        "failedRequests": [],
+        "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/home-feed-loads.png",
+        "trace": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/traces/home-feed-loads.zip"
+      },
+      "finalUrl": "http://127.0.0.1:3000/home"
+    },
+    {
+      "id": "creator-studio-dashboard",
+      "name": "Creator can access studio dashboard",
+      "route": "/creator/studio",
+      "authState": "creator",
+      "status": "FAIL",
+      "duration": 2691,
+      "failures": [
+        {
+          "expectation": "Session validation",
+          "expected": "Valid creator session",
+          "actual": "Invalid or expired session",
+          "message": "Session validation failed for creator"
+        },
+        {
+          "expectation": "Required selector present",
+          "expected": "Selector visible: h1:has-text(\"Studio\"), h1:has-text(\"Dashboard\")",
+          "actual": "Selector not found or not visible",
+          "message": "Required selector missing: h1:has-text(\"Studio\"), h1:has-text(\"Dashboard\")"
+        },
+        {
+          "expectation": "Required selector present",
+          "expected": "Selector visible: [data-testid=\"stats\"], .stats, .analytics",
+          "actual": "Selector not found or not visible",
+          "message": "Required selector missing: [data-testid=\"stats\"], .stats, .analytics"
+        },
+        {
+          "expectation": "Studio heading should be visible",
+          "expected": "Selector visible: h1:has-text(\"Studio\"), h1:has-text(\"Dashboard\"), h2:has-text(\"Studio\")",
+          "actual": "Selector not found or not visible",
+          "message": "Studio heading should be visible"
+        }
+      ],
+      "evidence": {
+        "consoleLogs": [],
+        "failedRequests": [],
+        "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/creator-studio-dashboard.png",
+        "trace": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/traces/creator-studio-dashboard.zip"
+      },
+      "finalUrl": "http://127.0.0.1:3000/creator/studio"
+    },
+    {
+      "id": "creator-earnings",
+      "name": "Creator can view earnings",
+      "route": "/creator/studio/earnings",
+      "authState": "creator",
+      "status": "FAIL",
+      "duration": 2668,
+      "failures": [
+        {
+          "expectation": "Session validation",
+          "expected": "Valid creator session",
+          "actual": "Invalid or expired session",
+          "message": "Session validation failed for creator"
+        },
+        {
+          "expectation": "Required selector present",
+          "expected": "Selector visible: [data-testid=\"earnings\"], .earnings, h1:has-text(\"Earnings\")",
+          "actual": "Selector not found or not visible",
+          "message": "Required selector missing: [data-testid=\"earnings\"], .earnings, h1:has-text(\"Earnings\")"
+        },
+        {
+          "expectation": "Earnings section should be visible",
+          "expected": "Selector visible: [data-testid=\"earnings\"], .earnings, h2:has-text(\"Earnings\"), h3:has-text(\"Earnings\")",
+          "actual": "Selector not found or not visible",
+          "message": "Earnings section should be visible"
+        }
+      ],
+      "evidence": {
+        "consoleLogs": [],
+        "failedRequests": [],
+        "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/creator-earnings.png",
+        "trace": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa-mvp/traces/creator-earnings.zip"
+      },
+      "finalUrl": "http://127.0.0.1:3000/creator/studio/earnings"
+    }
+  ],
+  "deadClicks": []
+}

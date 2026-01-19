@@ -1,0 +1,47 @@
+# 自动标签配置文件
+
+'type: feature':
+  - 'app/**/*'
+  - 'components/**/*'
+
+'type: fix':
+  - 'lib/**/*'
+
+'type: docs':
+  - '**/*.md'
+  - 'docs/**/*'
+
+'type: test':
+  - 'tests/**/*'
+  - 'e2e/**/*'
+  - '**/*.test.ts'
+  - '**/*.spec.ts'
+
+'type: ci':
+  - '.github/**/*'
+
+'type: config':
+  - '*.config.*'
+  - 'tsconfig.json'
+  - 'package.json'
+
+'area: auth':
+  - 'app/**/login/**/*'
+  - 'app/**/signup/**/*'
+  - 'lib/auth*.ts'
+
+'area: ui':
+  - 'components/ui/**/*'
+  - 'app/**/layout.tsx'
+
+'area: api':
+  - 'app/api/**/*'
+  - 'lib/**/*server*.ts'
+
+'priority: high':
+  - 'lib/auth*.ts'
+  - 'app/api/**/*'
+
+'needs: review':
+  - 'lib/**/*'
+  - 'app/api/**/*'

@@ -1,0 +1,103 @@
+name: Code Quality Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+concurrency:
+  group: code-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-check:
+    name: Code Quality & Review
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 完整历史,用于更好的 diff 分析
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      # 1. TypeScript 类型检查
+      - name: Type Check
+        run: pnpm type-check
+        continue-on-error: true
+      
+      # 2. ESLint 检查 (基础版)
+      - name: ESLint Check
+        run: pnpm lint
+        continue-on-error: true
+      
+      # 3. Prettier 格式检查
+      - name: Format Check
+        run: pnpm format:check
+        continue-on-error: true
+      
+      # 4. 运行单元测试
+      - name: Run Unit Tests
+        run: pnpm test:unit
+        continue-on-error: true
+      
+      # 5. Reviewdog - ESLint (自动在 PR 上评论问题)
+      - name: Run Reviewdog (ESLint)
+        if: github.event_name == 'pull_request'
+        uses: reviewdog/action-eslint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          eslint_flags: '.'
+          fail_on_error: false
+          filter_mode: added
+      
+      # 6. Reviewdog - TypeScript (类型错误评论)
+      - name: Run Reviewdog (TypeScript)
+        if: github.event_name == 'pull_request'
+        uses: tsuyoshicho/action-tsc@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          fail_on_error: false
+      
+      # 7. 构建验证
+      - name: Build Check
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          CI: true
+      
+      # 8. 生成代码质量报告
+      - name: Generate Quality Report
+        if: always()
+        run: |
+          echo "## 📊 代码质量报告" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ 检查项目" >> $GITHUB_STEP_SUMMARY
+          echo "- TypeScript 类型检查" >> $GITHUB_STEP_SUMMARY
+          echo "- ESLint 代码规范" >> $GITHUB_STEP_SUMMARY
+          echo "- Prettier 格式检查" >> $GITHUB_STEP_SUMMARY
+          echo "- 单元测试" >> $GITHUB_STEP_SUMMARY
+          echo "- 构建验证" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 详细结果请查看上方各步骤" >> $GITHUB_STEP_SUMMARY

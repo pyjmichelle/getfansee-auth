@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
 
     // Parse pagination params
     const { searchParams } = new URL(request.url);
-    const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 50);
-    const offset = parseInt(searchParams.get("offset") || "0");
+    const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 50);
+    const offset = parseInt(searchParams.get("offset") || "0", 10);
 
     // Get feed data
     let posts = await listFeed(limit, offset);

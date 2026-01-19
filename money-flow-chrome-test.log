@@ -1,0 +1,211 @@
+[Playwright Config] CI: true
+[Playwright Config] Base URL: https://mvp.getfansee.com
+
+Running 4 tests using 1 worker
+
+(node:57494) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57494) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Playwright Config] CI: [33mtrue[39m
+[Playwright Config] Base URL: https://mvp.getfansee.com
+[money-flow] Test fixtures created: {
+  creator: [32m'e2e-creator-1768662730321@example.com'[39m,
+  fan: [32m'e2e-fan-1768662730321@example.com'[39m,
+  ppvPostId: [32m'e0ccae8a-cbbf-4744-951e-75a2039d2034'[39m
+}
+  ✘  1 [chromium] › tests/e2e/money-flow.spec.ts:40:7 › Money Flow - 护城河测试 › E2E-1: PPV 解锁完整流程 - Creator 发布 PPV → Fan 看到锁 → 解锁成功 (1ms)
+(node:57614) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57614) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Playwright Config] CI: [33mtrue[39m
+[Playwright Config] Base URL: https://mvp.getfansee.com
+[money-flow] Test fixtures created: {
+  creator: [32m'e2e-creator-1768662741997@example.com'[39m,
+  fan: [32m'e2e-fan-1768662741997@example.com'[39m,
+  ppvPostId: [32m'21aab7db-646a-46ed-ae23-012656cadc09'[39m
+}
+  ✘  2 [chromium] › tests/e2e/money-flow.spec.ts:81:7 › Money Flow - 护城河测试 › E2E-2: 余额不足 → 提示充值 → 跳转钱包 (0ms)
+(node:57704) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57704) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Playwright Config] CI: [33mtrue[39m
+[Playwright Config] Base URL: https://mvp.getfansee.com
+[money-flow] Test fixtures created: {
+  creator: [32m'e2e-creator-1768662752339@example.com'[39m,
+  fan: [32m'e2e-fan-1768662752339@example.com'[39m,
+  ppvPostId: [32m'70aa47a2-0c6f-4f89-ad6d-a2e0c51e273f'[39m
+}
+  ✘  3 [chromium] › tests/e2e/money-flow.spec.ts:148:7 › Money Flow - 护城河测试 › E2E-3: 购买后刷新仍可见（权限持久） (1ms)
+(node:57840) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57840) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Playwright Config] CI: [33mtrue[39m
+[Playwright Config] Base URL: https://mvp.getfansee.com
+  ✘  4 [chromium] › tests/e2e/money-flow.spec.ts:188:7 › 钱包充值流程 › 钱包充值 → 余额更新 (1ms)
+
+
+  1) [chromium] › tests/e2e/money-flow.spec.ts:40:7 › Money Flow - 护城河测试 › E2E-1: PPV 解锁完整流程 - Creator 发布 PPV → Fan 看到锁 → 解锁成功 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument,OptimizationHints --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/s6/3bm11tf51yng3kp878_9wmgw0000gn/T/playwright_chromiumdev_profile-E6lQyR --remote-debugging-pipe --no-startup-window
+    <launched> pid=57549
+    [pid=57549][err] [0117/231216.354949:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57549][err] [0117/231216.355522:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57549][err] [0117/231216.355624:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57549][err] [0117/231216.356737:ERROR:third_party/crashpad/crashpad/util/file/file_io.cc:103] ReadExactly: expected 8, observed 0
+    [pid=57549][err] [0117/231216.359518:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57549][err] [0117/231216.359767:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57549][err] [0117/231216.359870:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    Call log:
+    [2m  - <launching> /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument,OptimizationHints --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/s6/3bm11tf51yng3kp878_9wmgw0000gn/T/playwright_chromiumdev_profile-E6lQyR --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=57549[22m
+    [2m  - [pid=57549][err] [0117/231216.354949:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57549][err] [0117/231216.355522:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57549][err] [0117/231216.355624:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57549][err] [0117/231216.356737:ERROR:third_party/crashpad/crashpad/util/file/file_io.cc:103] ReadExactly: expected 8, observed 0[22m
+    [2m  - [pid=57549][err] [0117/231216.359518:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57549][err] [0117/231216.359767:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57549][err] [0117/231216.359870:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57549] <gracefully close start>[22m
+    [2m  - [pid=57549] <kill>[22m
+    [2m  - [pid=57549] <will force kill>[22m
+    [2m  - [pid=57549] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=57549] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=57549] starting temporary directories cleanup[22m
+    [2m  - [pid=57549] finished temporary directories cleanup[22m
+    [2m  - [pid=57549] <gracefully close end>[22m
+
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/fixtureRunner.js:98:33)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/fixtureRunner.js:60:109)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/testInfo.js:311:17)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/workerMain.js:315:30)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/workerMain.js:310:7)
+
+  2) [chromium] › tests/e2e/money-flow.spec.ts:81:7 › Money Flow - 护城河测试 › E2E-2: 余额不足 → 提示充值 → 跳转钱包 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument,OptimizationHints --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/s6/3bm11tf51yng3kp878_9wmgw0000gn/T/playwright_chromiumdev_profile-NKkzMr --remote-debugging-pipe --no-startup-window
+    <launched> pid=57655
+    [pid=57655][err] [0117/231226.468008:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57655][err] [0117/231226.469013:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57655][err] [0117/231226.469158:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57655][err] [0117/231226.470050:ERROR:third_party/crashpad/crashpad/util/file/file_io.cc:103] ReadExactly: expected 8, observed 0
+    [pid=57655][err] [0117/231226.470409:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57655][err] [0117/231226.470491:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57655][err] [0117/231226.470576:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    Call log:
+    [2m  - <launching> /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument,OptimizationHints --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/s6/3bm11tf51yng3kp878_9wmgw0000gn/T/playwright_chromiumdev_profile-NKkzMr --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=57655[22m
+    [2m  - [pid=57655][err] [0117/231226.468008:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57655][err] [0117/231226.469013:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57655][err] [0117/231226.469158:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57655][err] [0117/231226.470050:ERROR:third_party/crashpad/crashpad/util/file/file_io.cc:103] ReadExactly: expected 8, observed 0[22m
+    [2m  - [pid=57655][err] [0117/231226.470409:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57655][err] [0117/231226.470491:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57655][err] [0117/231226.470576:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57655] <gracefully close start>[22m
+    [2m  - [pid=57655] <kill>[22m
+    [2m  - [pid=57655] <will force kill>[22m
+    [2m  - [pid=57655] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=57655] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=57655] starting temporary directories cleanup[22m
+    [2m  - [pid=57655] finished temporary directories cleanup[22m
+    [2m  - [pid=57655] <gracefully close end>[22m
+
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/fixtureRunner.js:98:33)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/fixtureRunner.js:60:109)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/testInfo.js:311:17)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/workerMain.js:315:30)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/workerMain.js:310:7)
+
+  3) [chromium] › tests/e2e/money-flow.spec.ts:148:7 › Money Flow - 护城河测试 › E2E-3: 购买后刷新仍可见（权限持久） ──
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument,OptimizationHints --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/s6/3bm11tf51yng3kp878_9wmgw0000gn/T/playwright_chromiumdev_profile-upHlkA --remote-debugging-pipe --no-startup-window
+    <launched> pid=57779
+    [pid=57779][err] [0117/231237.731729:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57779][err] [0117/231237.733692:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57779][err] [0117/231237.734295:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57779][err] [0117/231237.735324:ERROR:third_party/crashpad/crashpad/util/file/file_io.cc:103] ReadExactly: expected 8, observed 0
+    [pid=57779][err] [0117/231237.735665:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57779][err] [0117/231237.735752:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57779][err] [0117/231237.735837:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    Call log:
+    [2m  - <launching> /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument,OptimizationHints --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/s6/3bm11tf51yng3kp878_9wmgw0000gn/T/playwright_chromiumdev_profile-upHlkA --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=57779[22m
+    [2m  - [pid=57779][err] [0117/231237.731729:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57779][err] [0117/231237.733692:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57779][err] [0117/231237.734295:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57779][err] [0117/231237.735324:ERROR:third_party/crashpad/crashpad/util/file/file_io.cc:103] ReadExactly: expected 8, observed 0[22m
+    [2m  - [pid=57779][err] [0117/231237.735665:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57779][err] [0117/231237.735752:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57779][err] [0117/231237.735837:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57779] <gracefully close start>[22m
+    [2m  - [pid=57779] <kill>[22m
+    [2m  - [pid=57779] <will force kill>[22m
+    [2m  - [pid=57779] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=57779] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=57779] starting temporary directories cleanup[22m
+    [2m  - [pid=57779] finished temporary directories cleanup[22m
+    [2m  - [pid=57779] <gracefully close end>[22m
+
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/fixtureRunner.js:98:33)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/fixtureRunner.js:60:109)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/testInfo.js:311:17)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/workerMain.js:315:30)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/workerMain.js:310:7)
+
+  4) [chromium] › tests/e2e/money-flow.spec.ts:188:7 › 钱包充值流程 › 钱包充值 → 余额更新 ────────────────────────
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument,OptimizationHints --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/s6/3bm11tf51yng3kp878_9wmgw0000gn/T/playwright_chromiumdev_profile-7PaRiT --remote-debugging-pipe --no-startup-window
+    <launched> pid=57841
+    [pid=57841][err] [0117/231242.962918:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57841][err] [0117/231242.963195:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57841][err] [0117/231242.963304:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57841][err] [0117/231242.963568:ERROR:third_party/crashpad/crashpad/util/file/file_io.cc:103] ReadExactly: expected 8, observed 0
+    [pid=57841][err] [0117/231242.963941:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57841][err] [0117/231242.964029:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    [pid=57841][err] [0117/231242.964123:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)
+    Call log:
+    [2m  - <launching> /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-features=AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument,OptimizationHints --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --enable-automation --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/s6/3bm11tf51yng3kp878_9wmgw0000gn/T/playwright_chromiumdev_profile-7PaRiT --remote-debugging-pipe --no-startup-window[22m
+    [2m  - <launched> pid=57841[22m
+    [2m  - [pid=57841][err] [0117/231242.962918:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57841][err] [0117/231242.963195:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57841][err] [0117/231242.963304:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57841][err] [0117/231242.963568:ERROR:third_party/crashpad/crashpad/util/file/file_io.cc:103] ReadExactly: expected 8, observed 0[22m
+    [2m  - [pid=57841][err] [0117/231242.963941:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57841][err] [0117/231242.964029:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:41] getxattr size com.googlecode.crashpad.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57841][err] [0117/231242.964123:ERROR:third_party/crashpad/crashpad/util/mac/xattr.cc:66] setxattr org.chromium.crashpad.database.initialized on file /Users/puyijun/Library/Application Support/Google/Chrome/Crashpad: Operation not permitted (1)[22m
+    [2m  - [pid=57841] <gracefully close start>[22m
+    [2m  - [pid=57841] <kill>[22m
+    [2m  - [pid=57841] <will force kill>[22m
+    [2m  - [pid=57841] exception while trying to kill process: Error: kill EPERM[22m
+    [2m  - [pid=57841] <process did exit: exitCode=null, signal=SIGABRT>[22m
+    [2m  - [pid=57841] starting temporary directories cleanup[22m
+    [2m  - [pid=57841] finished temporary directories cleanup[22m
+    [2m  - [pid=57841] <gracefully close end>[22m
+
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/fixtureRunner.js:98:33)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/fixtureRunner.js:60:109)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/testInfo.js:311:17)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/workerMain.js:315:30)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/playwright/lib/worker/workerMain.js:310:7)
+
+  4 failed
+    [chromium] › tests/e2e/money-flow.spec.ts:40:7 › Money Flow - 护城河测试 › E2E-1: PPV 解锁完整流程 - Creator 发布 PPV → Fan 看到锁 → 解锁成功 
+    [chromium] › tests/e2e/money-flow.spec.ts:81:7 › Money Flow - 护城河测试 › E2E-2: 余额不足 → 提示充值 → 跳转钱包 
+    [chromium] › tests/e2e/money-flow.spec.ts:148:7 › Money Flow - 护城河测试 › E2E-3: 购买后刷新仍可见（权限持久） ───
+    [chromium] › tests/e2e/money-flow.spec.ts:188:7 › 钱包充值流程 › 钱包充值 → 余额更新 ─────────────────────────

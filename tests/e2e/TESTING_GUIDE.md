@@ -69,14 +69,16 @@ PLAYWRIGHT_SKIP_SERVER=true pnpm exec playwright test fan-journey.spec.ts:27 --p
 ## 常见错误
 
 ### 错误：测试超时
+
 - **原因**：服务器未响应
 - **解决**：重启服务器或检查服务器日志
 
 ### 错误：无法连接到服务器
+
 - **原因**：服务器未启动或端口被占用
 - **解决**：运行 `pnpm test:server-health` 检查状态
 
 ### 错误：Playwright 卡住
+
 - **原因**：等待服务器启动但服务器已卡住
 - **解决**：使用 `PLAYWRIGHT_SKIP_SERVER=true` 跳过自动启动
-

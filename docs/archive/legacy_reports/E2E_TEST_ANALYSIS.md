@@ -11,25 +11,31 @@
 ## 🔍 问题分析
 
 ### **现象**
+
 虽然有 14 个测试通过，但 Playwright 返回了 `exit code 1`，导致 CI 失败。
 
 ### **可能的原因**
 
 #### 1️⃣ **Flaky Tests（不稳定的测试）**
+
 测试在第一次运行时失败，重试后才通过。Playwright 默认会标记这种情况为失败。
 
 **证据**:
+
 - Playwright 配置了 `retries: 2`（CI 环境重试 2 次）
 - 某些测试可能在重试后才通过
 
 #### 2️⃣ **测试超时**
+
 某些测试运行时间过长（总共 28.6 分钟），可能触发超时。
 
 **当前配置**:
+
 - 没有设置全局 `timeout`
 - 默认超时时间可能不够（30秒）
 
 #### 3️⃣ **跳过的测试被标记为失败**
+
 6 个测试被 `test.skip()` 跳过，某些 CI 配置会将跳过视为失败。
 
 ---
@@ -45,13 +51,13 @@ export default defineConfig({
   expect: {
     timeout: 10 * 1000, // 断言 10 秒
   },
-  
+
   // 改进 reporter
   reporter: [
     ["html"],
     ["list"], // CI 中显示详细日志
   ],
-  
+
   // 允许 flaky tests 不失败（可选）
   // retries: process.env.CI ? 3 : 0, // 增加重试次数
 });
@@ -61,12 +67,13 @@ export default defineConfig({
 
 ```yaml
 e2e-tests:
-  continue-on-error: true  # 允许失败，不阻塞 CI
+  continue-on-error: true # 允许失败，不阻塞 CI
 ```
 
 ### **方案 3: 只运行稳定的测试**
 
 创建一个 `e2e/stable/` 目录，只测试核心流程：
+
 - 用户注册/登录
 - Creator onboarding
 - 基本的内容发布和查看
@@ -173,11 +180,13 @@ e2e-tests:
 ## 📈 预期改进
 
 ### **改进前**
+
 - 28.6 分钟运行时间
 - exit code 1（失败）
 - 阻塞 CI 流程
 
 ### **改进后**
+
 - ~20 分钟运行时间（优化后）
 - exit code 0（成功）
 - 稳定的 CI 流程

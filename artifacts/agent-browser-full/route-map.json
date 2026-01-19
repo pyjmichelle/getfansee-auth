@@ -1,0 +1,111 @@
+{
+  "generated": "2026-01-18T16:27:01.905Z",
+  "totalRoutes": 20,
+  "routes": [
+    {
+      "path": "/",
+      "isDynamic": false
+    },
+    {
+      "path": "/auth",
+      "isDynamic": false
+    },
+    {
+      "path": "/home",
+      "isDynamic": false,
+      "requiresAuth": true
+    },
+    {
+      "path": "/me",
+      "isDynamic": false,
+      "requiresAuth": true
+    },
+    {
+      "path": "/me/wallet",
+      "isDynamic": false,
+      "requiresAuth": true
+    },
+    {
+      "path": "/purchases",
+      "isDynamic": false,
+      "requiresAuth": true
+    },
+    {
+      "path": "/subscriptions",
+      "isDynamic": false,
+      "requiresAuth": true
+    },
+    {
+      "path": "/search",
+      "isDynamic": false
+    },
+    {
+      "path": "/support",
+      "isDynamic": false
+    },
+    {
+      "path": "/creator/new-post",
+      "isDynamic": false,
+      "requiresAuth": true,
+      "requiresRole": "creator"
+    },
+    {
+      "path": "/creator/upgrade",
+      "isDynamic": false,
+      "requiresAuth": true
+    },
+    {
+      "path": "/creator/onboarding",
+      "isDynamic": false,
+      "requiresAuth": true
+    },
+    {
+      "path": "/creator/studio",
+      "isDynamic": false,
+      "requiresAuth": true,
+      "requiresRole": "creator"
+    },
+    {
+      "path": "/creator/studio/analytics",
+      "isDynamic": false,
+      "requiresAuth": true,
+      "requiresRole": "creator"
+    },
+    {
+      "path": "/creator/studio/earnings",
+      "isDynamic": false,
+      "requiresAuth": true,
+      "requiresRole": "creator"
+    },
+    {
+      "path": "/creator/studio/subscribers",
+      "isDynamic": false,
+      "requiresAuth": true,
+      "requiresRole": "creator"
+    },
+    {
+      "path": "/creator/studio/post/list",
+      "isDynamic": false,
+      "requiresAuth": true,
+      "requiresRole": "creator"
+    },
+    {
+      "path": "/admin/reports",
+      "isDynamic": false,
+      "requiresAuth": true,
+      "requiresRole": "admin"
+    },
+    {
+      "path": "/admin/content-review",
+      "isDynamic": false,
+      "requiresAuth": true,
+      "requiresRole": "admin"
+    },
+    {
+      "path": "/admin/creator-verifications",
+      "isDynamic": false,
+      "requiresAuth": true,
+      "requiresRole": "admin"
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 /**
  * 使用 agent-browser 进行前端功能测试
- * 
+ *
  * 这个脚本验证所有核心 UI 功能是否正常工作
- * 
+ *
  * 运行方式: pnpm tsx scripts/agent-browser-test.ts
  */
 
@@ -67,7 +67,7 @@ async function runTests() {
   log("📋", "测试 2: 认证页面");
   run(`open ${BASE_URL}/auth`);
   const authSnapshot = run("snapshot -i");
-  
+
   if (authSnapshot.includes("Email") && authSnapshot.includes("Password")) {
     success("认证页面表单元素");
     passed++;
@@ -80,13 +80,13 @@ async function runTests() {
   // 测试 3: Tab 切换
   // ============================================
   log("📋", "测试 3: Tab 切换功能");
-  
+
   // 找到 Sign up tab 并点击
   const signUpMatch = authSnapshot.match(/tab "Sign up" \[ref=(e\d+)\]/);
   if (signUpMatch) {
     run(`click @${signUpMatch[1]}`);
     const signupSnapshot = run("snapshot -i");
-    
+
     if (signupSnapshot.includes("Sign up with email") || signupSnapshot.includes("age")) {
       success("Tab 切换到注册");
       passed++;
@@ -103,23 +103,23 @@ async function runTests() {
   // 测试 4: 表单输入
   // ============================================
   log("📋", "测试 4: 表单输入");
-  
+
   // 重新获取快照找到 email 输入框
   const formSnapshot = run("snapshot -i");
   const emailMatch = formSnapshot.match(/textbox "Email[^"]*" \[ref=(e\d+)\]/);
-  
+
   if (emailMatch) {
     const emailRef = emailMatch[1];
     run(`fill @${emailRef} "test@example.com"`);
-    
+
     // 填写后重新获取快照，获取新的 ref
     const afterFillSnapshot = run("snapshot -i");
     const newEmailMatch = afterFillSnapshot.match(/textbox "Email[^"]*" \[ref=(e\d+)\]/);
-    
+
     if (newEmailMatch) {
       const newEmailRef = newEmailMatch[1];
       const inputValue = run(`get value @${newEmailRef}`);
-      
+
       if (inputValue.includes("test@example.com")) {
         success("表单输入");
         passed++;
@@ -143,7 +143,7 @@ async function runTests() {
   log("📋", "测试 5: Home 页面（未登录重定向）");
   run(`open ${BASE_URL}/home`);
   const homeUrl = run("get url");
-  
+
   if (homeUrl.includes("/auth") || homeUrl.includes("/home")) {
     success("Home 页面访问控制");
     passed++;
@@ -158,7 +158,7 @@ async function runTests() {
   log("📋", "测试 6: Creator Onboarding 页面");
   run(`open ${BASE_URL}/creator/onboarding`);
   const onboardingSnapshot = run("snapshot -i");
-  
+
   // 页面应该存在某些内容
   if (onboardingSnapshot.length > 10) {
     success("Creator Onboarding 页面加载");
@@ -174,7 +174,7 @@ async function runTests() {
   log("📋", "测试 7: Creator Upgrade 页面");
   run(`open ${BASE_URL}/creator/upgrade`);
   const upgradeSnapshot = run("snapshot -i");
-  
+
   if (upgradeSnapshot.length > 10) {
     success("Creator Upgrade 页面加载");
     passed++;
@@ -189,7 +189,7 @@ async function runTests() {
   log("📋", "测试 8: 个人中心页面");
   run(`open ${BASE_URL}/me`);
   const meUrl = run("get url");
-  
+
   // 未登录应该重定向到 auth
   if (meUrl.includes("/auth") || meUrl.includes("/me")) {
     success("个人中心页面访问控制");
@@ -205,7 +205,7 @@ async function runTests() {
   log("📋", "测试 9: 订阅页面");
   run(`open ${BASE_URL}/subscriptions`);
   const subUrl = run("get url");
-  
+
   if (subUrl.includes("/auth") || subUrl.includes("/subscriptions")) {
     success("订阅页面访问");
     passed++;
@@ -220,7 +220,7 @@ async function runTests() {
   log("📋", "测试 10: 购买记录页面");
   run(`open ${BASE_URL}/purchases`);
   const purchasesUrl = run("get url");
-  
+
   if (purchasesUrl.includes("/auth") || purchasesUrl.includes("/purchases")) {
     success("购买记录页面访问");
     passed++;
@@ -235,7 +235,7 @@ async function runTests() {
   log("📋", "测试 11: JavaScript 错误检查");
   run(`open ${BASE_URL}/auth`);
   const errors = run("errors");
-  
+
   if (!errors || errors === "" || errors.includes("No errors")) {
     success("无 JavaScript 错误");
     passed++;

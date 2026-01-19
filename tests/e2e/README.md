@@ -141,4 +141,3 @@ pnpm exec playwright test --reporter=html
 ```
 
 确保 CI 环境中配置了必要的环境变量和 Supabase 凭据。
-

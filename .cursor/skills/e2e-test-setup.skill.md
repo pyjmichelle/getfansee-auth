@@ -12,6 +12,7 @@ triggers:
 ## 功能说明
 
 自动设置 E2E 测试所需的完整环境，包括：
+
 - 验证环境变量配置
 - 创建测试用户（Creator 和 Fan）
 - 初始化测试数据（帖子、钱包余额）
@@ -29,6 +30,7 @@ triggers:
 ### 1. 验证环境变量
 
 检查以下环境变量是否已配置：
+
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
@@ -37,12 +39,14 @@ triggers:
 ### 2. 创建测试用户
 
 使用 `e2e/shared/fixtures.ts` 中的 `setupTestFixtures()` 函数：
+
 - 创建 1 个 Creator（已验证 KYC）
 - 创建 1 个 Fan（钱包余额 $50）
 
 ### 3. 创建测试帖子
 
 为 Creator 创建 3 种类型的帖子：
+
 - 免费帖子（visibility: "free"）
 - 订阅帖子（visibility: "subscribers"）
 - PPV 帖子（visibility: "ppv", price: $5.00）
@@ -50,6 +54,7 @@ triggers:
 ### 4. 注入测试 Cookie
 
 使用 `injectTestCookie(page)` 函数为 Playwright 页面注入测试模式 cookie：
+
 ```typescript
 await page.context().addCookies([
   {
@@ -70,6 +75,7 @@ await page.context().addCookies([
 ## 输出
 
 返回测试数据对象：
+
 ```typescript
 {
   creator: { userId, email, password, displayName },

@@ -1,0 +1,56 @@
+{
+  "timestamp": "2026-01-17T17:23:52.302Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "results": [
+    {
+      "route": "/auth",
+      "success": true,
+      "errors": [],
+      "interactions": [],
+      "duration": 4366,
+      "snapshot": null,
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser/auth.png"
+    },
+    {
+      "route": "/home",
+      "success": true,
+      "errors": [],
+      "interactions": [],
+      "duration": 4228,
+      "snapshot": null,
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser/home.png"
+    },
+    {
+      "route": "/creator/new-post",
+      "success": true,
+      "errors": [],
+      "interactions": [],
+      "duration": 4655,
+      "snapshot": null,
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser/creator-new-post.png"
+    },
+    {
+      "route": "/me/wallet",
+      "success": true,
+      "errors": [],
+      "interactions": [],
+      "duration": 4422,
+      "snapshot": null,
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser/me-wallet.png"
+    },
+    {
+      "route": "/creator/upgrade",
+      "success": true,
+      "errors": [],
+      "interactions": [],
+      "duration": 3939,
+      "snapshot": null,
+      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser/creator-upgrade.png"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "totalErrors": 0
+  }
+}

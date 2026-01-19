@@ -131,7 +131,10 @@ async function confirmAndInjectSession(
       await injectSupabaseSession(page, email, password, BASE_URL);
       return true;
     } catch (err) {
-      console.warn(`[helpers] injectSupabaseSession attempt ${attempt + 1}/${retries} failed:`, err);
+      console.warn(
+        `[helpers] injectSupabaseSession attempt ${attempt + 1}/${retries} failed:`,
+        err
+      );
       if (attempt < retries - 1) {
         await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
       }

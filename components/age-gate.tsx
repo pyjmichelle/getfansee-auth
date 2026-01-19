@@ -31,7 +31,7 @@ export function AgeGate({ children }: AgeGateProps) {
 
   // Check if current route is exempt
   const isExemptRoute = EXEMPT_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(route + "/")
+    (route) => pathname === route || pathname?.startsWith(route + "/")
   );
 
   useEffect(() => {

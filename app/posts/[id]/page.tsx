@@ -26,7 +26,7 @@ const supabase = getSupabaseBrowserClient();
 export default function PostDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const postId = params.id as string;
+  const postId = params?.id as string;
 
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);

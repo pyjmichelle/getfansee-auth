@@ -22,7 +22,7 @@ const supabase = getSupabaseBrowserClient();
 export default function SearchPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialQuery = searchParams.get("q") || "";
+  const initialQuery = searchParams?.get("q") || "";
 
   const [query, setQuery] = useState(initialQuery);
   const [searchType, setSearchType] = useState<"all" | "creators" | "posts">("all");

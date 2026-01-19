@@ -133,32 +133,39 @@ export async function ensureProfile() {
   }
 }
 
-export async function signUpWithEmail(email: string, password: string) {
-  // 如果邮箱验证关闭，不需要设置 emailRedirectTo，让 Supabase 立即返回 session
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    // 不设置 options，让 Supabase 根据配置决定是否返回 session
-    // 如果邮箱验证关闭，Supabase 会立即返回 session
-  });
+export async function signUpWithEmail(
+  email: string,
+  password: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    // 如果邮箱验证关闭，不需要设置 emailRedirectTo，让 Supabase 立即返回 session
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      // 不设置 options，让 Supabase 根据配置决定是否返回 session
+      // 如果邮箱验证关闭，Supabase 会立即返回 session
+    });
 
-  // 添加详细的调试日志（始终打印，方便排查问题）
-  console.log("[auth] signUpWithEmail response:", {
-    hasUser: !!data?.user,
-    hasSession: !!data?.session,
-    userId: data?.user?.id || "none",
-    userEmail: data?.user?.email || "none",
-    error: error?.message || "none",
-    errorCode: error?.status || "none",
-  });
+    // 添加详细的调试日志（始终打印，方便排查问题）
+    console.log("[auth] signUpWithEmail response:", {
+      hasUser: !!data?.user,
+      hasSession: !!data?.session,
+      userId: data?.user?.id || "none",
+      userEmail: data?.user?.email || "none",
+      error: error?.message || "none",
+      errorCode: error?.status || "none",
+    });
 
-  if (error) {
-    console.error("[auth] signUp error:", error);
-    throw error;
+    if (error) {
+      console.error("[auth] signUp error:", error);
+      return { success: false, error: error.message };
+    }
+
+    // 返回成功
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message || "Unknown error" };
   }
-
-  // 返回完整的数据，包括 user 和 session（如果有）
-  return data;
 }
 
 export async function signInWithEmail(email: string, password: string) {
@@ -217,16 +224,23 @@ export async function signInWithMagicLink(email: string) {
   return data;
 }
 
-export async function signInWithGoogle() {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo:
-        typeof window !== "undefined" ? `${window.location.origin}/auth/verify` : undefined,
-    },
-  });
-  if (error) throw error;
-  return data;
+export async function signInWithGoogle(): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo:
+          typeof window !== "undefined" ? `${window.location.origin}/auth/verify` : undefined,
+      },
+    });
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    // OAuth 重定向开始，视为成功
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message || "Unknown error" };
+  }
 }
 
 export async function signOut() {

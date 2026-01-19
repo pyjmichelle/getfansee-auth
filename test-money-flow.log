@@ -1,0 +1,123 @@
+[Playwright Config] CI: true
+[Playwright Config] Base URL: https://mvp.getfansee.com
+
+Running 4 tests using 1 worker
+
+(node:21851) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:21851) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Playwright Config] CI: [33mtrue[39m
+[Playwright Config] Base URL: https://mvp.getfansee.com
+[money-flow] Test fixtures created: {
+  creator: [32m'e2e-creator-1768641207933@example.com'[39m,
+  fan: [32m'e2e-fan-1768641207933@example.com'[39m,
+  ppvPostId: [32m'52a06744-7b25-4c0e-baff-8130d731157e'[39m
+}
+  ✘  1 [chromium] › tests/e2e/money-flow.spec.ts:40:7 › Money Flow - 护城河测试 › E2E-1: PPV 解锁完整流程 - Creator 发布 PPV → Fan 看到锁 → 解锁成功 (0ms)
+(node:21939) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:21939) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Playwright Config] CI: [33mtrue[39m
+[Playwright Config] Base URL: https://mvp.getfansee.com
+[money-flow] Test fixtures created: {
+  creator: [32m'e2e-creator-1768641217677@example.com'[39m,
+  fan: [32m'e2e-fan-1768641217677@example.com'[39m,
+  ppvPostId: [32m'30316d84-fee3-44b1-bc59-b84ef4ef6ba8'[39m
+}
+  ✘  2 [chromium] › tests/e2e/money-flow.spec.ts:81:7 › Money Flow - 护城河测试 › E2E-2: 余额不足 → 提示充值 → 跳转钱包 (1ms)
+(node:22023) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22023) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Playwright Config] CI: [33mtrue[39m
+[Playwright Config] Base URL: https://mvp.getfansee.com
+[money-flow] Test fixtures created: {
+  creator: [32m'e2e-creator-1768641227808@example.com'[39m,
+  fan: [32m'e2e-fan-1768641227808@example.com'[39m,
+  ppvPostId: [32m'd930742d-07c4-4d13-81dd-acaebb1ca159'[39m
+}
+  ✘  3 [chromium] › tests/e2e/money-flow.spec.ts:148:7 › Money Flow - 护城河测试 › E2E-3: 购买后刷新仍可见（权限持久） (0ms)
+(node:22099) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22099) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Playwright Config] CI: [33mtrue[39m
+[Playwright Config] Base URL: https://mvp.getfansee.com
+  ✘  4 [chromium] › tests/e2e/money-flow.spec.ts:188:7 › 钱包充值流程 › 钱包充值 → 余额更新 (1ms)
+
+
+  1) [chromium] › tests/e2e/money-flow.spec.ts:40:7 › Money Flow - 护城河测试 › E2E-1: PPV 解锁完整流程 - Creator 发布 PPV → Fan 看到锁 → 解锁成功 
+
+    Error: browserType.launch: Executable doesn't exist at /Users/puyijun/Library/Caches/ms-playwright/chromium_headless_shell-1200/chrome-headless-shell-mac-x64/chrome-headless-shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     pnpm exec playwright install                                        ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/fixtureRunner.js:98:33)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/fixtureRunner.js:60:109)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:17)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:315:30)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:310:7)
+
+  2) [chromium] › tests/e2e/money-flow.spec.ts:81:7 › Money Flow - 护城河测试 › E2E-2: 余额不足 → 提示充值 → 跳转钱包 
+
+    Error: browserType.launch: Executable doesn't exist at /Users/puyijun/Library/Caches/ms-playwright/chromium_headless_shell-1200/chrome-headless-shell-mac-x64/chrome-headless-shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     pnpm exec playwright install                                        ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/fixtureRunner.js:98:33)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/fixtureRunner.js:60:109)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:17)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:315:30)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:310:7)
+
+  3) [chromium] › tests/e2e/money-flow.spec.ts:148:7 › Money Flow - 护城河测试 › E2E-3: 购买后刷新仍可见（权限持久） ──
+
+    Error: browserType.launch: Executable doesn't exist at /Users/puyijun/Library/Caches/ms-playwright/chromium_headless_shell-1200/chrome-headless-shell-mac-x64/chrome-headless-shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     pnpm exec playwright install                                        ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/fixtureRunner.js:98:33)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/fixtureRunner.js:60:109)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:17)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:315:30)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:310:7)
+
+  4) [chromium] › tests/e2e/money-flow.spec.ts:188:7 › 钱包充值流程 › 钱包充值 → 余额更新 ────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at /Users/puyijun/Library/Caches/ms-playwright/chromium_headless_shell-1200/chrome-headless-shell-mac-x64/chrome-headless-shell
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     pnpm exec playwright install                                        ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/fixtureRunner.js:98:33)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/fixtureRunner.js:60:109)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/testInfo.js:311:17)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:315:30)
+        at /Users/puyijun/Downloads/authentication-flow-design (1)/node_modules/.pnpm/playwright@1.57.0/node_modules/playwright/lib/worker/workerMain.js:310:7)
+
+  4 failed
+    [chromium] › tests/e2e/money-flow.spec.ts:40:7 › Money Flow - 护城河测试 › E2E-1: PPV 解锁完整流程 - Creator 发布 PPV → Fan 看到锁 → 解锁成功 
+    [chromium] › tests/e2e/money-flow.spec.ts:81:7 › Money Flow - 护城河测试 › E2E-2: 余额不足 → 提示充值 → 跳转钱包 
+    [chromium] › tests/e2e/money-flow.spec.ts:148:7 › Money Flow - 护城河测试 › E2E-3: 购买后刷新仍可见（权限持久） ───
+    [chromium] › tests/e2e/money-flow.spec.ts:188:7 › 钱包充值流程 › 钱包充值 → 余额更新 ─────────────────────────

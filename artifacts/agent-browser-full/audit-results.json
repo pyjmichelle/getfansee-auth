@@ -1,0 +1,7107 @@
+[
+  {
+    "route": "/",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/root.png",
+    "timestamp": "2026-01-18T13:59:50.932Z"
+  },
+  {
+    "route": "/auth",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/auth.png",
+    "timestamp": "2026-01-18T13:59:53.840Z"
+  },
+  {
+    "route": "/home",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/home.png",
+    "timestamp": "2026-01-18T13:59:56.747Z"
+  },
+  {
+    "route": "/me",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/me.png",
+    "timestamp": "2026-01-18T13:59:59.673Z"
+  },
+  {
+    "route": "/me/wallet",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/me_wallet.png",
+    "timestamp": "2026-01-18T14:00:02.640Z"
+  },
+  {
+    "route": "/purchases",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/purchases.png",
+    "timestamp": "2026-01-18T14:00:06.517Z"
+  },
+  {
+    "route": "/subscriptions",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/subscriptions.png",
+    "timestamp": "2026-01-18T14:00:09.496Z"
+  },
+  {
+    "route": "/search",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/search.png",
+    "timestamp": "2026-01-18T14:00:12.867Z"
+  },
+  {
+    "route": "/support",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/support.png",
+    "timestamp": "2026-01-18T14:00:15.817Z"
+  },
+  {
+    "route": "/creator/new-post",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_new-post.png",
+    "timestamp": "2026-01-18T14:00:18.770Z"
+  },
+  {
+    "route": "/creator/upgrade",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/upgrade",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "john_doe",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "3",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Start Your Application",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Apply Now",
+        "selector": "a[href]:nth-of-type(7)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_upgrade.png",
+    "timestamp": "2026-01-18T14:00:21.677Z"
+  },
+  {
+    "route": "/creator/onboarding",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_onboarding.png",
+    "timestamp": "2026-01-18T14:00:24.752Z"
+  },
+  {
+    "route": "/creator/studio",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio.png",
+    "timestamp": "2026-01-18T14:00:28.098Z"
+  },
+  {
+    "route": "/creator/studio/analytics",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/studio/analytics",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "sophia_creative",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "7 Days",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "30 Days",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "90 Days",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "All Time",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "5",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Back to Studio",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio_analytics.png",
+    "timestamp": "2026-01-18T14:00:30.968Z"
+  },
+  {
+    "route": "/creator/studio/earnings",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio_earnings.png",
+    "timestamp": "2026-01-18T14:00:33.898Z"
+  },
+  {
+    "route": "/creator/studio/subscribers",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio_subscribers.png",
+    "timestamp": "2026-01-18T14:00:36.808Z"
+  },
+  {
+    "route": "/creator/studio/post/list",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio_post_list.png",
+    "timestamp": "2026-01-18T14:00:40.089Z"
+  },
+  {
+    "route": "/admin/reports",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/admin_reports.png",
+    "timestamp": "2026-01-18T14:00:43.266Z"
+  },
+  {
+    "route": "/admin/content-review",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/admin_content-review.png",
+    "timestamp": "2026-01-18T14:00:46.361Z"
+  },
+  {
+    "route": "/admin/creator-verifications",
+    "authState": "anonymous",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/admin_creator-verifications.png",
+    "timestamp": "2026-01-18T14:00:49.473Z"
+  },
+  {
+    "route": "/",
+    "authState": "fan",
+    "httpStatus": 0,
+    "finalUrl": "",
+    "consoleErrors": [
+      "page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to \"http://127.0.0.1:3000/\", waiting until \"networkidle\"\n"
+    ],
+    "networkErrors": [],
+    "clickableElements": [],
+    "screenshotPath": "",
+    "timestamp": "2026-01-18T14:01:19.535Z"
+  },
+  {
+    "route": "/auth",
+    "authState": "fan",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/auth.png",
+    "timestamp": "2026-01-18T14:01:22.450Z"
+  },
+  {
+    "route": "/home",
+    "authState": "fan",
+    "httpStatus": 0,
+    "finalUrl": "",
+    "consoleErrors": [
+      "page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to \"http://127.0.0.1:3000/home\", waiting until \"networkidle\"\n"
+    ],
+    "networkErrors": [],
+    "clickableElements": [],
+    "screenshotPath": "",
+    "timestamp": "2026-01-18T14:01:52.510Z"
+  },
+  {
+    "route": "/me",
+    "authState": "fan",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/me",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Edit Profile",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Change Password",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Create my creator profile",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Log Out",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/me.png",
+    "timestamp": "2026-01-18T14:01:57.925Z"
+  },
+  {
+    "route": "/me/wallet",
+    "authState": "fan",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/me/wallet",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$10Recharge",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$25Recharge",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$50Recharge",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$100Recharge",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$200Recharge",
+        "selector": "button:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$500Recharge",
+        "selector": "button:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Recharge $0",
+        "selector": "button:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/me_wallet.png",
+    "timestamp": "2026-01-18T14:02:05.354Z"
+  },
+  {
+    "route": "/purchases",
+    "authState": "fan",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/purchases",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766247610912Creator",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View Content",
+        "selector": "a[href]:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Sophia CreativeCreator",
+        "selector": "a[href]:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View Content",
+        "selector": "a[href]:nth-of-type(9)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/purchases.png",
+    "timestamp": "2026-01-18T14:02:18.015Z"
+  },
+  {
+    "route": "/subscriptions",
+    "authState": "fan",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/subscriptions",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Discover Creators",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/subscriptions.png",
+    "timestamp": "2026-01-18T14:02:26.475Z"
+  },
+  {
+    "route": "/search",
+    "authState": "fan",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/search",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "All",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Creators (0)",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Posts (0)",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/search.png",
+    "timestamp": "2026-01-18T14:02:35.713Z"
+  },
+  {
+    "route": "/support",
+    "authState": "fan",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/support",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Submit Ticket",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/support.png",
+    "timestamp": "2026-01-18T14:02:41.387Z"
+  },
+  {
+    "route": "/creator/new-post",
+    "authState": "fan",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/new-post",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "返回首页",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_new-post.png",
+    "timestamp": "2026-01-18T14:02:47.632Z"
+  },
+  {
+    "route": "/creator/upgrade",
+    "authState": "fan",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/upgrade",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "john_doe",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "3",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Start Your Application",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Apply Now",
+        "selector": "a[href]:nth-of-type(7)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_upgrade.png",
+    "timestamp": "2026-01-18T14:02:50.555Z"
+  },
+  {
+    "route": "/creator/onboarding",
+    "authState": "fan",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/onboarding",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "取消",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "下一步",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_onboarding.png",
+    "timestamp": "2026-01-18T14:02:56.264Z"
+  },
+  {
+    "route": "/creator/studio",
+    "authState": "fan",
+    "httpStatus": 0,
+    "finalUrl": "",
+    "consoleErrors": [
+      "page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to \"http://127.0.0.1:3000/creator/studio\", waiting until \"networkidle\"\n"
+    ],
+    "networkErrors": [],
+    "clickableElements": [],
+    "screenshotPath": "",
+    "timestamp": "2026-01-18T14:03:26.330Z"
+  },
+  {
+    "route": "/creator/studio/analytics",
+    "authState": "fan",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/studio/analytics",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "sophia_creative",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "7 Days",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "30 Days",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "90 Days",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "All Time",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "5",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Back to Studio",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio_analytics.png",
+    "timestamp": "2026-01-18T14:03:29.189Z"
+  },
+  {
+    "route": "/creator/studio/earnings",
+    "authState": "fan",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/home",
+    "finalUrl": "http://127.0.0.1:3000/home",
+    "consoleErrors": [],
+    "networkErrors": ["GET http://127.0.0.1:3000/home?_rsc=zf9lj - net::ERR_ABORTED"],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(13)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(14)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(17)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(18)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(19)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(20)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(23)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(25)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(26)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(27)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(28)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(29)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(30)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(31)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(32)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(33)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(34)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(35)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(36)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(37)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(38)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(39)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(40)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(41)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(42)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(43)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(44)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(45)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(46)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(47)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(48)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(49)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(50)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(51)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(52)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(53)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(54)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(55)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(56)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(57)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(58)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(59)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(60)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(61)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(62)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(63)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(64)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(65)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(66)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(67)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(68)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(69)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(70)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(71)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(72)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(73)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(74)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "JJulienabout 1 hour ago",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "111",
+        "selector": "a[href]:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "JJulienabout 20 hours ago",
+        "selector": "a[href]:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Subscriber-Only Content",
+        "selector": "a[href]:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "JJulienabout 20 hours ago",
+        "selector": "a[href]:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Premium PPV Content - $4.99",
+        "selector": "a[href]:nth-of-type(13)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(14)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "JJulienabout 20 hours ago",
+        "selector": "a[href]:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Exclusive PPV Content - $9.99",
+        "selector": "a[href]:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(17)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686386812691 day ago",
+        "selector": "a[href]:nth-of-type(18)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638681269",
+        "selector": "a[href]:nth-of-type(19)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686386772901 day ago",
+        "selector": "a[href]:nth-of-type(20)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638677290",
+        "selector": "a[href]:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686386724141 day ago",
+        "selector": "a[href]:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638672414",
+        "selector": "a[href]:nth-of-type(23)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686385591511 day ago",
+        "selector": "a[href]:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638559151",
+        "selector": "a[href]:nth-of-type(25)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686385558611 day ago",
+        "selector": "a[href]:nth-of-type(26)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638555861",
+        "selector": "a[href]:nth-of-type(27)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686385509931 day ago",
+        "selector": "a[href]:nth-of-type(28)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638550993",
+        "selector": "a[href]:nth-of-type(29)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "TTest Creator2 days ago",
+        "selector": "a[href]:nth-of-type(30)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Success Test Post",
+        "selector": "a[href]:nth-of-type(31)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(32)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(33)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(34)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(35)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(36)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(37)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(38)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(39)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(40)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(41)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(42)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(43)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(44)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(45)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(46)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(47)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(48)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(49)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(50)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio_earnings.png",
+    "timestamp": "2026-01-18T14:03:52.974Z"
+  },
+  {
+    "route": "/creator/studio/subscribers",
+    "authState": "fan",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/home",
+    "finalUrl": "http://127.0.0.1:3000/home",
+    "consoleErrors": [],
+    "networkErrors": ["GET http://127.0.0.1:3000/home?_rsc=h50ay - net::ERR_ABORTED"],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(13)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(14)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(17)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(18)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(19)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(20)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(23)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(25)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(26)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(27)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(28)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(29)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(30)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(31)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(32)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(33)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(34)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(35)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(36)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(37)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(38)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(39)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(40)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(41)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(42)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(43)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(44)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(45)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(46)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(47)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(48)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(49)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(50)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(51)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(52)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(53)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(54)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(55)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(56)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(57)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(58)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(59)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(60)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(61)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(62)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(63)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(64)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(65)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(66)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(67)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(68)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(69)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(70)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(71)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(72)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(73)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(74)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "JJulienabout 1 hour ago",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "111",
+        "selector": "a[href]:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "JJulienabout 20 hours ago",
+        "selector": "a[href]:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Subscriber-Only Content",
+        "selector": "a[href]:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "JJulienabout 20 hours ago",
+        "selector": "a[href]:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Premium PPV Content - $4.99",
+        "selector": "a[href]:nth-of-type(13)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(14)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "JJulienabout 20 hours ago",
+        "selector": "a[href]:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Exclusive PPV Content - $9.99",
+        "selector": "a[href]:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(17)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686386812691 day ago",
+        "selector": "a[href]:nth-of-type(18)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638681269",
+        "selector": "a[href]:nth-of-type(19)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686386772901 day ago",
+        "selector": "a[href]:nth-of-type(20)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638677290",
+        "selector": "a[href]:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686386724141 day ago",
+        "selector": "a[href]:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638672414",
+        "selector": "a[href]:nth-of-type(23)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686385591511 day ago",
+        "selector": "a[href]:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638559151",
+        "selector": "a[href]:nth-of-type(25)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686385558611 day ago",
+        "selector": "a[href]:nth-of-type(26)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638555861",
+        "selector": "a[href]:nth-of-type(27)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686385509931 day ago",
+        "selector": "a[href]:nth-of-type(28)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638550993",
+        "selector": "a[href]:nth-of-type(29)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "TTest Creator2 days ago",
+        "selector": "a[href]:nth-of-type(30)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Success Test Post",
+        "selector": "a[href]:nth-of-type(31)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(32)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(33)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(34)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(35)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(36)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(37)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(38)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(39)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(40)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(41)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(42)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(43)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(44)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(45)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(46)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(47)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(48)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(49)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(50)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio_subscribers.png",
+    "timestamp": "2026-01-18T14:04:23.832Z"
+  },
+  {
+    "route": "/creator/studio/post/list",
+    "authState": "fan",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/home",
+    "finalUrl": "http://127.0.0.1:3000/home",
+    "consoleErrors": [],
+    "networkErrors": ["GET http://127.0.0.1:3000/home?_rsc=1p9n2 - net::ERR_ABORTED"],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(13)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(14)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(17)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(18)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(19)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(20)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(23)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(25)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(26)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(27)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(28)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(29)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(30)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(31)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(32)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(33)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(34)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(35)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(36)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(37)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(38)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(39)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Subscribe",
+        "selector": "button:nth-of-type(40)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Unlock Now",
+        "selector": "button:nth-of-type(41)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(42)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(43)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(44)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(45)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(46)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(47)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(48)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(49)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(50)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(51)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(52)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(53)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(54)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(55)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(56)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(57)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(58)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(59)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(60)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(61)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(62)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(63)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(64)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(65)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(66)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(67)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(68)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(69)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(70)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(71)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Like",
+        "selector": "button:nth-of-type(72)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Comment",
+        "selector": "button:nth-of-type(73)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(74)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "JJulienabout 1 hour ago",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "111",
+        "selector": "a[href]:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "JJulienabout 20 hours ago",
+        "selector": "a[href]:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Subscriber-Only Content",
+        "selector": "a[href]:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "JJulienabout 20 hours ago",
+        "selector": "a[href]:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Premium PPV Content - $4.99",
+        "selector": "a[href]:nth-of-type(13)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(14)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "JJulienabout 20 hours ago",
+        "selector": "a[href]:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Exclusive PPV Content - $9.99",
+        "selector": "a[href]:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(17)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686386812691 day ago",
+        "selector": "a[href]:nth-of-type(18)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638681269",
+        "selector": "a[href]:nth-of-type(19)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686386772901 day ago",
+        "selector": "a[href]:nth-of-type(20)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638677290",
+        "selector": "a[href]:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686386724141 day ago",
+        "selector": "a[href]:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638672414",
+        "selector": "a[href]:nth-of-type(23)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686385591511 day ago",
+        "selector": "a[href]:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638559151",
+        "selector": "a[href]:nth-of-type(25)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686385558611 day ago",
+        "selector": "a[href]:nth-of-type(26)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638555861",
+        "selector": "a[href]:nth-of-type(27)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "CCreator 17686385509931 day ago",
+        "selector": "a[href]:nth-of-type(28)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Acceptance Test Post 1768638550993",
+        "selector": "a[href]:nth-of-type(29)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "TTest Creator2 days ago",
+        "selector": "a[href]:nth-of-type(30)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Success Test Post",
+        "selector": "a[href]:nth-of-type(31)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(32)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(33)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(34)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(35)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(36)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(37)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(38)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(39)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(40)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(41)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(42)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(43)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(44)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(45)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(46)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(47)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(48)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGeo Blocked Creator22 days ago",
+        "selector": "a[href]:nth-of-type(49)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "No media available",
+        "selector": "a[href]:nth-of-type(50)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio_post_list.png",
+    "timestamp": "2026-01-18T14:04:51.457Z"
+  },
+  {
+    "route": "/admin/reports",
+    "authState": "fan",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/admin/reports",
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 400 ()",
+      "[reports] listPendingReports error: {code: PGRST200, details: Searched for a foreign key relationship between 'r…n the schema 'public', but no matches were found., hint: Perhaps you meant 'posts' instead of 'reports'., message: Could not find a relationship between 'reports' and 'profiles' in the schema cache}"
+    ],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/admin_reports.png",
+    "timestamp": "2026-01-18T14:04:56.046Z"
+  },
+  {
+    "route": "/admin/content-review",
+    "authState": "fan",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/admin/content-review",
+    "consoleErrors": [],
+    "networkErrors": [
+      "GET https://example.com/test-video.mp4 - net::ERR_BLOCKED_BY_ORB",
+      "GET https://example.com/test-image.jpg - net::ERR_BLOCKED_BY_ORB",
+      "GET https://example.com/test-video.mp4 - net::ERR_BLOCKED_BY_ORB"
+    ],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(13)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(14)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(17)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(18)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(19)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(20)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(23)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(25)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(26)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(27)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(28)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(29)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(30)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(31)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(32)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(33)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(34)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(35)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(36)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(37)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(38)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(39)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(40)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(41)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(42)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(43)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(44)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(45)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(46)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(47)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(48)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(49)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(50)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(51)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(52)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Julien",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Julien",
+        "selector": "a[href]:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Julien",
+        "selector": "a[href]:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Julien",
+        "selector": "a[href]:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(13)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1768638681269",
+        "selector": "a[href]:nth-of-type(14)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1768638677290",
+        "selector": "a[href]:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(17)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1768638672414",
+        "selector": "a[href]:nth-of-type(18)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(19)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1768638559151",
+        "selector": "a[href]:nth-of-type(20)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1768638555861",
+        "selector": "a[href]:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(23)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1768638550993",
+        "selector": "a[href]:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(25)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator",
+        "selector": "a[href]:nth-of-type(26)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(27)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(28)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(29)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(30)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(31)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(32)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(33)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(34)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(35)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(36)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(37)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(38)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(39)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(40)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(41)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(42)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(43)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(44)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(45)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(46)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(47)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(48)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(49)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(50)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(51)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(52)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(53)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(54)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(55)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(56)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(57)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(58)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(59)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 3",
+        "selector": "a[href]:nth-of-type(60)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(61)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 3",
+        "selector": "a[href]:nth-of-type(62)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(63)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 3",
+        "selector": "a[href]:nth-of-type(64)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(65)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 3",
+        "selector": "a[href]:nth-of-type(66)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(67)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "abc",
+        "selector": "a[href]:nth-of-type(68)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(69)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "abc",
+        "selector": "a[href]:nth-of-type(70)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(71)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "abc",
+        "selector": "a[href]:nth-of-type(72)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(73)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248672888",
+        "selector": "a[href]:nth-of-type(74)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(75)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248672888",
+        "selector": "a[href]:nth-of-type(76)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(77)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248672888",
+        "selector": "a[href]:nth-of-type(78)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(79)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248672888",
+        "selector": "a[href]:nth-of-type(80)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(81)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1766248668428",
+        "selector": "a[href]:nth-of-type(82)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(83)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "test-visibility-creator-1766248663023",
+        "selector": "a[href]:nth-of-type(84)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(85)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "test-visibility-creator-1766248663023",
+        "selector": "a[href]:nth-of-type(86)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(87)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "test-visibility-creator-1766248663023",
+        "selector": "a[href]:nth-of-type(88)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(89)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248629068",
+        "selector": "a[href]:nth-of-type(90)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(91)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248629068",
+        "selector": "a[href]:nth-of-type(92)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(93)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248629068",
+        "selector": "a[href]:nth-of-type(94)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(95)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248629068",
+        "selector": "a[href]:nth-of-type(96)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(97)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1766248625490",
+        "selector": "a[href]:nth-of-type(98)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(99)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "test-visibility-creator-1766248621734",
+        "selector": "a[href]:nth-of-type(100)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(101)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "test-visibility-creator-1766248621734",
+        "selector": "a[href]:nth-of-type(102)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(103)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "test-visibility-creator-1766248621734",
+        "selector": "a[href]:nth-of-type(104)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(105)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/admin_content-review.png",
+    "timestamp": "2026-01-18T14:05:10.291Z"
+  },
+  {
+    "route": "/admin/creator-verifications",
+    "authState": "fan",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/admin/creator-verifications",
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 400 ()",
+      "[kyc] listPendingVerifications error: {code: PGRST200, details: Searched for a foreign key relationship between 'c…n the schema 'public', but no matches were found., hint: Perhaps you meant 'creator_tags' instead of 'creator_verifications'., message: Could not find a relationship between 'creator_verifications' and 'profiles' in the schema cache}"
+    ],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Fan",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/admin_creator-verifications.png",
+    "timestamp": "2026-01-18T14:05:15.526Z"
+  },
+  {
+    "route": "/",
+    "authState": "creator",
+    "httpStatus": 0,
+    "finalUrl": "",
+    "consoleErrors": [
+      "page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to \"http://127.0.0.1:3000/\", waiting until \"networkidle\"\n"
+    ],
+    "networkErrors": [],
+    "clickableElements": [],
+    "screenshotPath": "",
+    "timestamp": "2026-01-18T14:05:45.591Z"
+  },
+  {
+    "route": "/auth",
+    "authState": "creator",
+    "httpStatus": 200,
+    "redirectTo": "http://127.0.0.1:3000/auth?mode=login",
+    "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Login",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign Up",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Sign In",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Google",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/auth.png",
+    "timestamp": "2026-01-18T14:05:48.495Z"
+  },
+  {
+    "route": "/home",
+    "authState": "creator",
+    "httpStatus": 0,
+    "finalUrl": "",
+    "consoleErrors": [
+      "page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to \"http://127.0.0.1:3000/home\", waiting until \"networkidle\"\n"
+    ],
+    "networkErrors": [],
+    "clickableElements": [],
+    "screenshotPath": "",
+    "timestamp": "2026-01-18T14:06:18.558Z"
+  },
+  {
+    "route": "/me",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/me",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Edit Profile",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Change Password",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Seed demo posts",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Log Out",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/me.png",
+    "timestamp": "2026-01-18T14:06:24.484Z"
+  },
+  {
+    "route": "/me/wallet",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/me/wallet",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_CLOSED",
+      "Failed to load resource: the server responded with a status of 406 ()",
+      "Failed to load resource: the server responded with a status of 403 ()",
+      "[wallet] getWalletBalance: create wallet error: {code: 42501, details: null, hint: null, message: new row violates row-level security policy for table \"wallet_accounts\"}"
+    ],
+    "networkErrors": [
+      "GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/profiles?select=is_banned%2Cban_until&id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674 - net::ERR_CONNECTION_CLOSED"
+    ],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$10Recharge",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$25Recharge",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$50Recharge",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$100Recharge",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$200Recharge",
+        "selector": "button:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$500Recharge",
+        "selector": "button:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Recharge $0",
+        "selector": "button:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/me_wallet.png",
+    "timestamp": "2026-01-18T14:06:48.156Z"
+  },
+  {
+    "route": "/purchases",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/purchases",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Browse Content",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/purchases.png",
+    "timestamp": "2026-01-18T14:07:11.560Z"
+  },
+  {
+    "route": "/subscriptions",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/subscriptions",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Discover Creators",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/subscriptions.png",
+    "timestamp": "2026-01-18T14:07:20.845Z"
+  },
+  {
+    "route": "/search",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/search",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "All",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Creators (0)",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Posts (0)",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/search.png",
+    "timestamp": "2026-01-18T14:07:39.284Z"
+  },
+  {
+    "route": "/support",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/support",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Submit Ticket",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/support.png",
+    "timestamp": "2026-01-18T14:07:43.241Z"
+  },
+  {
+    "route": "/creator/new-post",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/new-post",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Audio",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Behind the Scenes",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Exclusive",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Live Stream",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Photo Set",
+        "selector": "button:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Q&A",
+        "selector": "button:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Tutorial",
+        "selector": "button:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Video",
+        "selector": "button:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "取消",
+        "selector": "button:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "发布",
+        "selector": "button:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_new-post.png",
+    "timestamp": "2026-01-18T14:07:51.924Z"
+  },
+  {
+    "route": "/creator/upgrade",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/upgrade",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "john_doe",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Become a Creator",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "3",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Start Your Application",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Apply Now",
+        "selector": "a[href]:nth-of-type(7)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_upgrade.png",
+    "timestamp": "2026-01-18T14:07:54.842Z"
+  },
+  {
+    "route": "/creator/onboarding",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/onboarding",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "取消",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "下一步",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_onboarding.png",
+    "timestamp": "2026-01-18T14:08:00.838Z"
+  },
+  {
+    "route": "/creator/studio",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/studio",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "7 Days",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "30 Days",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "90 Days",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Edit",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "New Post",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "AnalyticsDetailed performance metrics",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "SubscribersManage your subscriber base",
+        "selector": "a[href]:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "EarningsView revenue and payouts",
+        "selector": "a[href]:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View All",
+        "selector": "a[href]:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(10)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio.png",
+    "timestamp": "2026-01-18T14:08:32.927Z"
+  },
+  {
+    "route": "/creator/studio/analytics",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/studio/analytics",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "sophia_creative",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "7 Days",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "30 Days",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "90 Days",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "All Time",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "5",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Back to Studio",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio_analytics.png",
+    "timestamp": "2026-01-18T14:08:35.793Z"
+  },
+  {
+    "route": "/creator/studio/earnings",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/studio/earnings",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Export",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "7 Days",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "30 Days",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "90 Days",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "All Time",
+        "selector": "button:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Back to Studio",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio_earnings.png",
+    "timestamp": "2026-01-18T14:08:42.728Z"
+  },
+  {
+    "route": "/creator/studio/subscribers",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/studio/subscribers",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "All",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Active",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Expiring",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Cancelled",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Back to Studio",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio_subscribers.png",
+    "timestamp": "2026-01-18T14:08:49.853Z"
+  },
+  {
+    "route": "/creator/studio/post/list",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/creator/studio/post/list",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "New Post",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Edit",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio_post_list.png",
+    "timestamp": "2026-01-18T14:08:56.272Z"
+  },
+  {
+    "route": "/admin/reports",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/admin/reports",
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 400 ()",
+      "[reports] listPendingReports error: {code: PGRST200, details: Searched for a foreign key relationship between 'r…n the schema 'public', but no matches were found., hint: Perhaps you meant 'posts' instead of 'reports'., message: Could not find a relationship between 'reports' and 'profiles' in the schema cache}"
+    ],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/admin_reports.png",
+    "timestamp": "2026-01-18T14:09:02.463Z"
+  },
+  {
+    "route": "/admin/content-review",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/admin/content-review",
+    "consoleErrors": [],
+    "networkErrors": [
+      "GET https://example.com/test-image.jpg - net::ERR_BLOCKED_BY_ORB",
+      "GET https://example.com/test-video.mp4 - net::ERR_BLOCKED_BY_ORB",
+      "GET https://example.com/test-video.mp4 - net::ERR_BLOCKED_BY_ORB"
+    ],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(13)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(14)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(17)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(18)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(19)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(20)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(23)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(25)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(26)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(27)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(28)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(29)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(30)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(31)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(32)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(33)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(34)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(35)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(36)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(37)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(38)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(39)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(40)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(41)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(42)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(43)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(44)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(45)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(46)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(47)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(48)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(49)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(50)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(51)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Delete",
+        "selector": "button:nth-of-type(52)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Julien",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Julien",
+        "selector": "a[href]:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Julien",
+        "selector": "a[href]:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Julien",
+        "selector": "a[href]:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1768638681269",
+        "selector": "a[href]:nth-of-type(13)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(14)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1768638677290",
+        "selector": "a[href]:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1768638672414",
+        "selector": "a[href]:nth-of-type(17)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(18)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1768638559151",
+        "selector": "a[href]:nth-of-type(19)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(20)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1768638555861",
+        "selector": "a[href]:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1768638550993",
+        "selector": "a[href]:nth-of-type(23)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator",
+        "selector": "a[href]:nth-of-type(25)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(26)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(27)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(28)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(29)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(30)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(31)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(32)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(33)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(34)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(35)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(36)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(37)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(38)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(39)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(40)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(41)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(42)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(43)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(44)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(45)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(46)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(47)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(48)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(49)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(50)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(51)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(52)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(53)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(54)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(55)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(56)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Geo Blocked Creator",
+        "selector": "a[href]:nth-of-type(57)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(58)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 3",
+        "selector": "a[href]:nth-of-type(59)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(60)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 3",
+        "selector": "a[href]:nth-of-type(61)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(62)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 3",
+        "selector": "a[href]:nth-of-type(63)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(64)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 3",
+        "selector": "a[href]:nth-of-type(65)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(66)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "abc",
+        "selector": "a[href]:nth-of-type(67)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(68)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "abc",
+        "selector": "a[href]:nth-of-type(69)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(70)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "abc",
+        "selector": "a[href]:nth-of-type(71)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(72)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248672888",
+        "selector": "a[href]:nth-of-type(73)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(74)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248672888",
+        "selector": "a[href]:nth-of-type(75)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(76)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248672888",
+        "selector": "a[href]:nth-of-type(77)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(78)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248672888",
+        "selector": "a[href]:nth-of-type(79)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(80)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1766248668428",
+        "selector": "a[href]:nth-of-type(81)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(82)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "test-visibility-creator-1766248663023",
+        "selector": "a[href]:nth-of-type(83)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(84)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "test-visibility-creator-1766248663023",
+        "selector": "a[href]:nth-of-type(85)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(86)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "test-visibility-creator-1766248663023",
+        "selector": "a[href]:nth-of-type(87)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(88)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248629068",
+        "selector": "a[href]:nth-of-type(89)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(90)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248629068",
+        "selector": "a[href]:nth-of-type(91)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(92)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248629068",
+        "selector": "a[href]:nth-of-type(93)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(94)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Test Creator 1766248629068",
+        "selector": "a[href]:nth-of-type(95)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(96)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Creator 1766248625490",
+        "selector": "a[href]:nth-of-type(97)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(98)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "test-visibility-creator-1766248621734",
+        "selector": "a[href]:nth-of-type(99)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(100)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "test-visibility-creator-1766248621734",
+        "selector": "a[href]:nth-of-type(101)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(102)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "test-visibility-creator-1766248621734",
+        "selector": "a[href]:nth-of-type(103)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "View",
+        "selector": "a[href]:nth-of-type(104)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/admin_content-review.png",
+    "timestamp": "2026-01-18T14:09:20.537Z"
+  },
+  {
+    "route": "/admin/creator-verifications",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://127.0.0.1:3000/admin/creator-verifications",
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 400 ()",
+      "[kyc] listPendingVerifications error: {code: PGRST200, details: Searched for a foreign key relationship between 'c…n the schema 'public', but no matches were found., hint: Perhaps you meant 'creator_tags' instead of 'creator_verifications'., message: Could not find a relationship between 'creator_verifications' and 'profiles' in the schema cache}"
+    ],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Test Creator",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search creators...",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/admin_creator-verifications.png",
+    "timestamp": "2026-01-18T14:09:25.301Z"
+  }
+]

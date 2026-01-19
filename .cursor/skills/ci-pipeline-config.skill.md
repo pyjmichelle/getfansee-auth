@@ -49,8 +49,8 @@ on:
     branches: [main, develop]
 
 env:
-  NODE_VERSION: '20'
-  PNPM_VERSION: '10'
+  NODE_VERSION: "20"
+  PNPM_VERSION: "10"
 
 jobs:
   lint-and-type-check:
@@ -58,24 +58,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-      
+          cache: "pnpm"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Run ESLint
         run: pnpm lint
-      
+
       - name: Run TypeScript type check
         run: pnpm type-check
 
@@ -85,24 +85,24 @@ jobs:
     needs: lint-and-type-check
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-      
+          cache: "pnpm"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Run unit tests
         run: pnpm test:unit --coverage
-      
+
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
@@ -117,32 +117,32 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      NEXT_PUBLIC_TEST_MODE: 'true'
+      NEXT_PUBLIC_TEST_MODE: "true"
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-      
+          cache: "pnpm"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Start dev server
         run: pnpm dev &
         env:
           PORT: 3000
-      
+
       - name: Wait for server
         run: npx wait-on http://localhost:3000 --timeout 60000
-      
+
       - name: Run integration tests
         run: pnpm vitest run tests/integration
 
@@ -154,30 +154,30 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      NEXT_PUBLIC_TEST_MODE: 'true'
+      NEXT_PUBLIC_TEST_MODE: "true"
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-      
+          cache: "pnpm"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Install Playwright browsers
         run: pnpm playwright install --with-deps chromium
-      
+
       - name: Run E2E tests
         run: pnpm test:e2e
-      
+
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
@@ -192,27 +192,27 @@ jobs:
     needs: e2e-tests
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-      
+          cache: "pnpm"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build application
         run: pnpm build
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-      
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -254,7 +254,7 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
-      
+
       - name: Generate test report
         run: |
           echo "## 🧪 Test Results" > report.md
@@ -269,7 +269,7 @@ jobs:
           echo "| E2E Tests | ✅ | 45.2s |" >> report.md
           echo "" >> report.md
           echo "[View full Playwright report](https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }})" >> report.md
-      
+
       - name: Comment PR
         uses: actions/github-script@v7
         with:
@@ -287,21 +287,25 @@ jobs:
 ## 质量门禁规则
 
 ### 1. 代码质量
+
 - ✅ ESLint 无错误
 - ✅ TypeScript 类型检查通过
 - ✅ Prettier 格式化检查通过
 
 ### 2. 测试覆盖率
+
 - ✅ 单元测试覆盖率 >= 80%
 - ✅ 集成测试覆盖率 >= 70%
 - ✅ E2E 测试通过率 >= 90%
 
 ### 3. 构建
+
 - ✅ Next.js 构建成功
 - ✅ 无构建警告
 - ✅ Bundle 大小 < 500KB
 
 ### 4. 性能
+
 - ✅ 测试执行时间 < 5 分钟
 - ✅ 构建时间 < 3 分钟
 
@@ -320,6 +324,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJxxx...
 在 GitHub 仓库设置中配置：
 
 ### main 分支
+
 - ✅ 需要 PR 审查（至少 1 人）
 - ✅ 需要通过所有状态检查
 - ✅ 需要分支是最新的
@@ -327,6 +332,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJxxx...
 - ✅ 禁止强制推送
 
 ### develop 分支
+
 - ✅ 需要通过所有状态检查
 - ✅ 允许直接推送（开发环境）
 

@@ -164,8 +164,8 @@ export async function createComment(
       content: comment.content,
       created_at: comment.created_at,
       user: {
-        display_name: comment.profiles?.display_name || "Anonymous",
-        avatar_url: comment.profiles?.avatar_url,
+        display_name: (comment.profiles as any)?.display_name || "Anonymous",
+        avatar_url: (comment.profiles as any)?.avatar_url,
       },
     };
   } catch (err) {

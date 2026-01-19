@@ -30,6 +30,7 @@ pnpm vitest run tests/integration/api/wallet.test.ts
 ### 1. Posts API (`/api/posts`)
 
 #### POST /api/posts
+
 - ✅ 创建免费帖子
 - ✅ 创建订阅帖子
 - ✅ 创建 PPV 帖子（价格 >= $1.00）
@@ -37,27 +38,32 @@ pnpm vitest run tests/integration/api/wallet.test.ts
 - ❌ 拒绝未认证用户创建帖子
 
 #### GET /api/posts/[id]
+
 - ✅ 获取帖子详情
 - ❌ 返回 404 对于不存在的帖子
 - ✅ 根据权限返回不同内容（预览 vs 完整）
 
 #### PUT /api/posts/[id]
+
 - ✅ 更新帖子标题和内容
 - ✅ 更新帖子可见性
 - ❌ 拒绝非 Creator 更新
 
 #### DELETE /api/posts/[id]/delete
+
 - ✅ 删除帖子
 - ❌ 拒绝非 Creator 删除
 
 ### 2. Paywall API
 
 #### POST /api/subscribe
+
 - ✅ 成功订阅 Creator
 - ❌ 拒绝重复订阅
 - ❌ 拒绝余额不足的订阅
 
 #### POST /api/unlock
+
 - ✅ 成功解锁 PPV 帖子
 - ❌ 拒绝重复购买
 - ❌ 拒绝余额不足的购买
@@ -65,20 +71,24 @@ pnpm vitest run tests/integration/api/wallet.test.ts
 - ✅ 正确记录交易
 
 #### GET /api/subscription/status
+
 - ✅ 返回订阅状态
 - ✅ 返回订阅到期时间
 
 #### POST /api/subscription/cancel
+
 - ✅ 取消订阅
 - ❌ 拒绝取消不存在的订阅
 
 ### 3. Wallet API
 
 #### GET /api/wallet/balance
+
 - ✅ 返回用户钱包余额
 - ✅ 返回 0 对于没有钱包的用户
 
 #### GET /api/wallet/transactions
+
 - ✅ 返回交易历史
 - ✅ 按时间倒序排列
 - ✅ 返回空数组对于没有交易的用户
@@ -86,10 +96,12 @@ pnpm vitest run tests/integration/api/wallet.test.ts
 ### 4. Profile API
 
 #### GET /api/profile
+
 - ✅ 返回用户 profile
 - ❌ 返回 401 对于未登录用户
 
 #### PUT /api/profile/update
+
 - ✅ 更新用户信息
 - ✅ 更新头像
 - ❌ 拒绝无效数据
@@ -97,16 +109,19 @@ pnpm vitest run tests/integration/api/wallet.test.ts
 ### 5. Creator API
 
 #### POST /api/creator/create
+
 - ✅ 升级为 Creator
 - ❌ 拒绝重复升级
 
 #### GET /api/creator/[id]
+
 - ✅ 返回 Creator 信息
 - ❌ 返回 404 对于不存在的 Creator
 
 ## 测试流程
 
 ### 1. 前置准备
+
 ```typescript
 beforeAll(async () => {
   // 创建测试用户和数据
@@ -115,6 +130,7 @@ beforeAll(async () => {
 ```
 
 ### 2. 执行测试
+
 ```typescript
 it("should create free post", async () => {
   const response = await fetch(`${BASE_URL}/api/posts`, {
@@ -137,6 +153,7 @@ it("should create free post", async () => {
 ```
 
 ### 3. 清理数据
+
 ```typescript
 afterAll(async () => {
   await teardownTestFixtures(fixtures);
@@ -146,6 +163,7 @@ afterAll(async () => {
 ## 断言规范
 
 ### 成功响应
+
 ```typescript
 expect(response.status).toBe(200);
 expect(data.success).toBe(true);
@@ -153,6 +171,7 @@ expect(data.result).toBeDefined();
 ```
 
 ### 错误响应
+
 ```typescript
 expect(response.status).toBe(400); // or 401, 404, 500
 expect(data.success).toBe(false);
@@ -162,6 +181,7 @@ expect(data.error).toContain("Expected error message");
 ## 运行报告
 
 测试完成后生成报告：
+
 - 总测试数
 - 通过数
 - 失败数

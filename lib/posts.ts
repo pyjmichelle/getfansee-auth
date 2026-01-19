@@ -344,6 +344,7 @@ export async function getPost(postId: string): Promise<Post | null> {
  */
 export async function listFeed(
   limit: number = 20,
+  offset: number = 0,
   visitorCountry?: string | null
 ): Promise<Post[]> {
   try {

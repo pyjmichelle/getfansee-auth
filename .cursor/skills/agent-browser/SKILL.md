@@ -51,28 +51,28 @@ agent-browser screenshot x.png # 截图
 
 ## 常用命令
 
-| 命令 | 说明 |
-|------|------|
-| `open <url>` | 导航到 URL |
-| `snapshot -i` | 获取交互元素快照 |
-| `click @eX` | 点击元素 |
-| `fill @eX "text"` | 填写输入框 |
-| `type @eX "text"` | 输入文本（不清空） |
-| `check @eX` | 勾选复选框 |
-| `uncheck @eX` | 取消勾选 |
-| `select @eX "value"` | 选择下拉选项 |
-| `hover @eX` | 悬停元素 |
-| `press Enter` | 按键 |
-| `get text @eX` | 获取文本 |
-| `get value @eX` | 获取输入值 |
-| `get title` | 获取页面标题 |
-| `get url` | 获取当前 URL |
-| `is visible @eX` | 检查是否可见 |
-| `wait <selector>` | 等待元素出现 |
-| `wait <ms>` | 等待毫秒数 |
-| `screenshot [path]` | 截图 |
-| `errors` | 查看 JS 错误 |
-| `close` | 关闭浏览器 |
+| 命令                 | 说明               |
+| -------------------- | ------------------ |
+| `open <url>`         | 导航到 URL         |
+| `snapshot -i`        | 获取交互元素快照   |
+| `click @eX`          | 点击元素           |
+| `fill @eX "text"`    | 填写输入框         |
+| `type @eX "text"`    | 输入文本（不清空） |
+| `check @eX`          | 勾选复选框         |
+| `uncheck @eX`        | 取消勾选           |
+| `select @eX "value"` | 选择下拉选项       |
+| `hover @eX`          | 悬停元素           |
+| `press Enter`        | 按键               |
+| `get text @eX`       | 获取文本           |
+| `get value @eX`      | 获取输入值         |
+| `get title`          | 获取页面标题       |
+| `get url`            | 获取当前 URL       |
+| `is visible @eX`     | 检查是否可见       |
+| `wait <selector>`    | 等待元素出现       |
+| `wait <ms>`          | 等待毫秒数         |
+| `screenshot [path]`  | 截图               |
+| `errors`             | 查看 JS 错误       |
+| `close`              | 关闭浏览器         |
 
 ## 测试模式
 
@@ -191,14 +191,15 @@ pnpm tsx scripts/agent-browser-test.ts
 
 ## 与 Playwright 对比
 
-| 场景 | agent-browser | Playwright |
-|------|---------------|------------|
-| 快速手动测试 | ✅ CLI 直接运行 | ❌ 需要写代码 |
-| AI Agent 集成 | ✅ 优化的输出格式 | ⚠️ 需要解析 |
-| 完整 E2E 套件 | ⚠️ 脚本化 | ✅ 更强大 |
-| CI 集成 | ✅ 可以 | ✅ 原生支持 |
+| 场景          | agent-browser     | Playwright    |
+| ------------- | ----------------- | ------------- |
+| 快速手动测试  | ✅ CLI 直接运行   | ❌ 需要写代码 |
+| AI Agent 集成 | ✅ 优化的输出格式 | ⚠️ 需要解析   |
+| 完整 E2E 套件 | ⚠️ 脚本化         | ✅ 更强大     |
+| CI 集成       | ✅ 可以           | ✅ 原生支持   |
 
 建议：
+
 - **快速验证/探索**：使用 agent-browser
 - **完整测试套件**：使用 Playwright
 - **两者可以互补使用**

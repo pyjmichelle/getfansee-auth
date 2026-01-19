@@ -22,9 +22,7 @@ export default defineConfig({
   /* 使用单个 worker */
   workers: 1,
   /* Reporter */
-  reporter: process.env.CI 
-    ? [["html"], ["github"]]
-    : [["html"], ["list"]],
+  reporter: process.env.CI ? [["html"], ["github"]] : [["html"], ["list"]],
   /* Global timeout - 增加到 2 分钟 */
   timeout: 120 * 1000,
   /* Expect timeout */

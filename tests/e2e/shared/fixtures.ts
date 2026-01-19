@@ -56,9 +56,7 @@ export interface TestFixtures {
  */
 export async function setupTestFixtures(): Promise<TestFixtures> {
   if (!adminClient) {
-    throw new Error(
-      "Admin client not available. Ensure SUPABASE_SERVICE_ROLE_KEY is set."
-    );
+    throw new Error("Admin client not available. Ensure SUPABASE_SERVICE_ROLE_KEY is set.");
   }
 
   const timestamp = Date.now();
@@ -68,13 +66,12 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
   const creatorPassword = "TestPassword123!";
   const creatorDisplayName = `Test Creator ${timestamp}`;
 
-  const { data: creatorAuth, error: creatorError } =
-    await adminClient.auth.admin.createUser({
-      email: creatorEmail,
-      password: creatorPassword,
-      email_confirm: true,
-      user_metadata: { role: "creator" },
-    });
+  const { data: creatorAuth, error: creatorError } = await adminClient.auth.admin.createUser({
+    email: creatorEmail,
+    password: creatorPassword,
+    email_confirm: true,
+    user_metadata: { role: "creator" },
+  });
 
   if (creatorError && !creatorError.message?.includes("already registered")) {
     throw new Error(`Failed to create creator: ${creatorError.message}`);
@@ -207,11 +204,7 @@ async function createTestPost(
     postData.price_cents = 0;
   }
 
-  const { data, error } = await adminClient
-    .from("posts")
-    .insert(postData)
-    .select("id")
-    .single();
+  const { data, error } = await adminClient.from("posts").insert(postData).select("id").single();
 
   if (error) {
     throw new Error(`Failed to create ${visibility} post: ${error.message}`);
@@ -313,10 +306,7 @@ export async function topUpWallet(userId: string, amountCents: number): Promise<
 /**
  * 创建订阅关系（用于测试订阅功能）
  */
-export async function createTestSubscription(
-  fanId: string,
-  creatorId: string
-): Promise<string> {
+export async function createTestSubscription(fanId: string, creatorId: string): Promise<string> {
   if (!adminClient) {
     throw new Error("Admin client not available");
   }

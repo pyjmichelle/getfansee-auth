@@ -1,0 +1,151 @@
+name: PR Auto Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  # Job 1: 基础信息和标签
+  pr-info:
+    name: PR Information
+    runs-on: ubuntu-latest
+    steps:
+      - name: PR Size Labeler
+        uses: codelytv/pr-size-labeler@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          xs_label: 'size/xs'
+          xs_max_size: 10
+          s_label: 'size/s'
+          s_max_size: 100
+          m_label: 'size/m'
+          m_max_size: 500
+          l_label: 'size/l'
+          l_max_size: 1000
+          xl_label: 'size/xl'
+      
+      - name: Auto Label by Files
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+          sync-labels: true
+
+  # Job 2: 代码复杂度和质量检查
+  complexity-check:
+    name: Code Complexity Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Check for TODO/FIXME
+        run: |
+          echo "## 🔍 代码审查发现" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          TODO_COUNT=$(grep -r "TODO" --include="*.ts" --include="*.tsx" . | wc -l || echo "0")
+          FIXME_COUNT=$(grep -r "FIXME" --include="*.ts" --include="*.tsx" . | wc -l || echo "0")
+          
+          echo "### 📝 待办事项统计" >> $GITHUB_STEP_SUMMARY
+          echo "- TODO 注释: $TODO_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "- FIXME 注释: $FIXME_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "$TODO_COUNT" -gt 5 ]; then
+            echo "⚠️ 警告: TODO 注释较多,请及时处理" >> $GITHUB_STEP_SUMMARY
+          fi
+      
+      - name: Check Large Files
+        run: |
+          echo "### 📦 大文件检查" >> $GITHUB_STEP_SUMMARY
+          find . -name "*.ts" -o -name "*.tsx" | while read file; do
+            lines=$(wc -l < "$file")
+            if [ "$lines" -gt 500 ]; then
+              echo "⚠️ 大文件: $file ($lines 行)" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+  # Job 3: 安全检查
+  security-check:
+    name: Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+      
+      - name: Audit Dependencies
+        run: |
+          echo "## 🔒 安全审计" >> $GITHUB_STEP_SUMMARY
+          pnpm audit --json > audit.json || true
+          
+          if [ -f audit.json ]; then
+            CRITICAL=$(cat audit.json | jq '.metadata.vulnerabilities.critical // 0')
+            HIGH=$(cat audit.json | jq '.metadata.vulnerabilities.high // 0')
+            
+            echo "### 漏洞统计" >> $GITHUB_STEP_SUMMARY
+            echo "- 严重: $CRITICAL" >> $GITHUB_STEP_SUMMARY
+            echo "- 高危: $HIGH" >> $GITHUB_STEP_SUMMARY
+            
+            if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "⚠️ **发现安全漏洞,请运行 \`pnpm audit fix\` 修复**" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+      
+      - name: Check for Secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --only-verified
+
+  # Job 4: PR 评论汇总
+  pr-comment:
+    name: PR Summary Comment
+    runs-on: ubuntu-latest
+    needs: [pr-info, complexity-check, security-check]
+    if: always() && github.event_name == 'pull_request'
+    steps:
+      - name: Comment PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr_number = context.payload.pull_request.number;
+            const comment = `## 🤖 自动代码审查报告
+            
+            ✅ 已完成以下检查:
+            - PR 大小标签
+            - 文件类型标签
+            - 代码复杂度检查
+            - TODO/FIXME 统计
+            - 依赖安全审计
+            - 密钥泄露扫描
+            
+            📊 详细结果请查看 [Actions 运行日志](${context.payload.repository.html_url}/actions/runs/${context.runId})
+            
+            ---
+            💡 提示: 请确保所有 CI 检查通过后再合并
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: pr_number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

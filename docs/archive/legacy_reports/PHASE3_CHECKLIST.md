@@ -7,7 +7,7 @@
 - ✅ **SQL Migration**: `migrations/009_phase3_storage.sql`
   - 创建 `media` bucket（如果不存在）
   - 配置 file_size_limit: 200MB
-  - 配置 allowed_mime_types: image/_, video/_
+  - 配置 allowed*mime_types: image/*, video/\_
   - INSERT policy: 只允许登录用户写入自己的目录 (`userId/yyyy-mm/*`)
   - SELECT policy: 用户可以查看自己上传的文件
   - DELETE policy: 用户可以删除自己上传的文件
@@ -149,6 +149,6 @@ pnpm test:e2e
 
 ---
 
-**完成时间**: ******\_\_\_******  
-**测试人员**: ******\_\_\_******  
-**备注**: ******\_\_\_******
+**完成时间**: **\*\***\_\_\_**\*\***  
+**测试人员**: **\*\***\_\_\_**\*\***  
+**备注**: **\*\***\_\_\_**\*\***

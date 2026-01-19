@@ -50,7 +50,7 @@ test.describe("Fan 端完整流程测试", () => {
     test("使用 Fixtures Fan 登录", async ({ page }) => {
       // 使用 fixtures 中的 Fan 账号登录
       await injectSupabaseSession(page, fixtures.fan.email, fixtures.fan.password, BASE_URL);
-      
+
       // 导航到首页
       await page.goto(`${BASE_URL}/home`);
       await waitForPageLoad(page);

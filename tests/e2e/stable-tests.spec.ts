@@ -1,6 +1,6 @@
 /**
  * 稳定的 E2E 测试 - 验证所有核心功能
- * 
+ *
  * 这些测试不依赖 Supabase Admin API，只通过 UI 操作验证功能。
  * 每个测试都是独立的，不依赖其他测试的状态。
  */
@@ -25,10 +25,12 @@ async function waitForPageLoad(page: Page) {
 // 清除浏览器存储
 async function clearStorage(page: Page) {
   await page.context().clearCookies();
-  await page.evaluate(() => {
-    localStorage.clear();
-    sessionStorage.clear();
-  }).catch(() => {});
+  await page
+    .evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    })
+    .catch(() => {});
 }
 
 // ============================================
@@ -43,7 +45,7 @@ test.describe("1. 页面可访问性", () => {
   test("1.2 认证页面可访问", async ({ page }) => {
     const response = await page.goto(`${BASE_URL}/auth`);
     expect(response?.status()).toBeLessThan(500);
-    
+
     // 验证登录表单存在
     await expect(page.locator('input[type="email"]').first()).toBeVisible({ timeout: 10000 });
     await expect(page.locator('input[type="password"]').first()).toBeVisible({ timeout: 10000 });
@@ -52,7 +54,7 @@ test.describe("1. 页面可访问性", () => {
   test("1.3 Home 页面可访问（会重定向到 auth）", async ({ page }) => {
     await clearStorage(page);
     const response = await page.goto(`${BASE_URL}/home`);
-    
+
     // 未登录时应该重定向到 auth 或显示 home 页面
     const url = page.url();
     expect(url.includes("/auth") || url.includes("/home") || url === BASE_URL + "/").toBe(true);
@@ -70,14 +72,14 @@ test.describe("2. 认证流程", () => {
   test("2.1 登录表单验证", async ({ page }) => {
     await page.goto(`${BASE_URL}/auth`);
     await waitForPageLoad(page);
-    
+
     // 验证表单元素存在
     const emailInput = page.locator('input[type="email"]').first();
     const passwordInput = page.locator('input[type="password"]').first();
-    
+
     await expect(emailInput).toBeVisible({ timeout: 5000 });
     await expect(passwordInput).toBeVisible({ timeout: 5000 });
-    
+
     // 验证有登录按钮
     const loginButton = page.getByRole("button", { name: /log in|sign in|continue/i }).first();
     await expect(loginButton).toBeVisible({ timeout: 5000 });
@@ -86,14 +88,14 @@ test.describe("2. 认证流程", () => {
   test("2.2 注册表单验证", async ({ page }) => {
     await page.goto(`${BASE_URL}/auth?mode=signup`);
     await waitForPageLoad(page);
-    
+
     // 验证表单元素存在
     const emailInput = page.locator('input[type="email"]').first();
     const passwordInput = page.locator('input[type="password"]').first();
-    
+
     await expect(emailInput).toBeVisible({ timeout: 5000 });
     await expect(passwordInput).toBeVisible({ timeout: 5000 });
-    
+
     // 验证有注册按钮
     const signupButton = page.getByRole("button", { name: /sign up|register|create/i }).first();
     await expect(signupButton).toBeVisible({ timeout: 5000 });
@@ -102,16 +104,16 @@ test.describe("2. 认证流程", () => {
   test("2.3 登录错误处理 - 空表单提交", async ({ page }) => {
     await page.goto(`${BASE_URL}/auth`);
     await waitForPageLoad(page);
-    
+
     // 不填写任何内容，直接点击登录
     const loginButton = page.getByRole("button", { name: /log in|sign in|continue/i }).first();
-    
+
     if (await loginButton.isEnabled()) {
       await loginButton.click();
-      
+
       // 等待验证错误或 HTML5 验证
       await page.waitForTimeout(1000);
-      
+
       // 验证没有跳转（还在 auth 页面）
       expect(page.url()).toContain("/auth");
     }
@@ -120,18 +122,18 @@ test.describe("2. 认证流程", () => {
   test("2.4 登录错误处理 - 错误凭据", async ({ page }) => {
     await page.goto(`${BASE_URL}/auth`);
     await waitForPageLoad(page);
-    
+
     // 填写不存在的凭据
     await page.locator('input[type="email"]').first().fill("nonexistent@test.com");
     await page.locator('input[type="password"]').first().fill("WrongPassword123!");
-    
+
     // 点击登录
     const loginButton = page.getByRole("button", { name: /log in|sign in|continue/i }).first();
     await loginButton.click();
-    
+
     // 等待响应
     await page.waitForTimeout(3000);
-    
+
     // 验证显示错误或仍在 auth 页面
     const url = page.url();
     expect(url).toContain("/auth");
@@ -139,52 +141,52 @@ test.describe("2. 认证流程", () => {
 
   test("2.5 用户注册流程", async ({ page }) => {
     const testEmail = generateTestEmail("register");
-    
+
     await page.goto(`${BASE_URL}/auth?mode=signup`);
     await waitForPageLoad(page);
-    
+
     // 填写注册表单
     await page.locator('input[type="email"]').first().fill(testEmail);
     await page.locator('input[type="password"]').first().fill(TEST_PASSWORD);
-    
+
     // 勾选年龄确认（如果存在）
     const ageCheckbox = page.locator('input[type="checkbox"]').first();
     if (await ageCheckbox.isVisible()) {
       await ageCheckbox.check();
     }
-    
+
     // 点击注册
     const signupButton = page.getByRole("button", { name: /sign up|register|create/i }).first();
     await signupButton.click();
-    
+
     // 等待导航完成或页面稳定
     await page.waitForLoadState("networkidle").catch(() => {});
     await page.waitForTimeout(2000);
-    
+
     // 验证结果：检查 URL 或等待页面稳定后检查内容
     const url = page.url();
-    
+
     // 如果已跳转到 home，注册成功
     if (url.includes("/home")) {
       expect(true).toBe(true);
       return;
     }
-    
+
     // 否则检查页面内容
     try {
       await page.waitForLoadState("domcontentloaded");
       const pageContent = await page.content();
-      
-      const isSuccess = 
+
+      const isSuccess =
         pageContent.toLowerCase().includes("check your email") ||
         pageContent.toLowerCase().includes("verification") ||
         pageContent.toLowerCase().includes("验证");
-      
-      const isValidError = 
+
+      const isValidError =
         pageContent.toLowerCase().includes("already") ||
         pageContent.toLowerCase().includes("exists") ||
         pageContent.toLowerCase().includes("error");
-      
+
       // 注册应该成功、显示验证提示、或显示错误
       expect(isSuccess || isValidError || url.includes("/auth")).toBe(true);
     } catch {
@@ -202,11 +204,11 @@ test.describe("3. 核心页面功能", () => {
     await clearStorage(page);
     await page.goto(`${BASE_URL}/home`);
     await waitForPageLoad(page);
-    
+
     // 未登录时会重定向到 /auth，已登录时显示 feed
     // 两种情况都应该有页面内容
     const url = page.url();
-    
+
     if (url.includes("/auth")) {
       // 重定向到 auth - 验证登录表单存在
       await expect(page.locator('input[type="email"]').first()).toBeVisible({ timeout: 10000 });
@@ -219,7 +221,7 @@ test.describe("3. 核心页面功能", () => {
 
   test("3.2 个人中心页面可访问", async ({ page }) => {
     const response = await page.goto(`${BASE_URL}/me`);
-    
+
     // 页面应该加载（可能重定向到 auth）
     expect(response?.status()).toBeLessThan(500);
   });
@@ -290,12 +292,16 @@ test.describe("6. 导航和路由", () => {
     await clearStorage(page);
     await page.goto(`${BASE_URL}/me`);
     await waitForPageLoad(page);
-    
+
     // 应该重定向到 auth 或显示登录提示
     const url = page.url();
     const isRedirected = url.includes("/auth") || url.includes("login");
-    const hasLoginPrompt = await page.locator('input[type="password"]').first().isVisible().catch(() => false);
-    
+    const hasLoginPrompt = await page
+      .locator('input[type="password"]')
+      .first()
+      .isVisible()
+      .catch(() => false);
+
     expect(isRedirected || hasLoginPrompt || url.includes("/me")).toBe(true);
   });
 
@@ -312,35 +318,43 @@ test.describe("7. UI 元素", () => {
   test("7.1 认证页面 Tab 切换正常", async ({ page }) => {
     await page.goto(`${BASE_URL}/auth`);
     await waitForPageLoad(page);
-    
+
     // 查找 Tab 切换按钮
-    const signUpTab = page.locator('button:has-text("Sign Up"), [role="tab"]:has-text("Sign Up"), a:has-text("Sign Up")').first();
-    const signInTab = page.locator('button:has-text("Sign In"), [role="tab"]:has-text("Sign In"), button:has-text("Log In")').first();
-    
+    const signUpTab = page
+      .locator(
+        'button:has-text("Sign Up"), [role="tab"]:has-text("Sign Up"), a:has-text("Sign Up")'
+      )
+      .first();
+    const signInTab = page
+      .locator(
+        'button:has-text("Sign In"), [role="tab"]:has-text("Sign In"), button:has-text("Log In")'
+      )
+      .first();
+
     // 验证至少有一个 Tab 存在
     const hasSignUpTab = await signUpTab.isVisible().catch(() => false);
     const hasSignInTab = await signInTab.isVisible().catch(() => false);
-    
+
     // 页面应该有切换功能或已经在正确的模式
     expect(hasSignUpTab || hasSignInTab || page.url().includes("mode=")).toBe(true);
   });
 
   test("7.2 页面无 JavaScript 错误", async ({ page }) => {
     const errors: string[] = [];
-    
+
     page.on("pageerror", (error) => {
       errors.push(error.message);
     });
-    
+
     await page.goto(BASE_URL);
     await waitForPageLoad(page);
     await page.waitForTimeout(2000);
-    
+
     // 允许一些常见的非致命错误
     const criticalErrors = errors.filter(
       (e) => !e.includes("ResizeObserver") && !e.includes("Non-Error")
     );
-    
+
     // 不应该有严重的 JavaScript 错误
     expect(criticalErrors.length).toBeLessThan(3);
   });

@@ -43,7 +43,46 @@ When to use specific agents:
 - Deployment docs go in `docs/deployment/`
 - Planning docs go in `docs/planning/`
 
-## 7. BEFORE COMMIT
-- Run `pnpm lint` - must pass
-- Run `pnpm exec playwright test tests/e2e/smoke.spec.ts` - must pass
-- No unresolved TypeScript errors
+## 7. CI/CD & CODE QUALITY GATES (MANDATORY) 🚀
+**CRITICAL**: 每次推送到 CI 前必须通过所有检查!
+
+### Pre-Push 检查 (必须通过)
+```bash
+pnpm check-all  # 一键运行所有检查
+```
+
+包含以下检查:
+1. ✅ `pnpm type-check` - TypeScript 类型检查 (0 errors)
+2. ✅ `pnpm lint` - ESLint 代码规范 (0 errors, warnings 可接受)
+3. ✅ `pnpm format:check` - Prettier 格式检查
+4. ✅ `pnpm test:unit` - 单元测试 (all pass)
+5. ✅ `pnpm build` - 构建验证 (must succeed)
+
+### Git Hook 自动保护
+- **Pre-commit**: `lint-staged` 检查暂存区文件
+- **Pre-push**: 自动运行 `pnpm check-all`
+- ⛔ 检查失败会阻止推送
+
+### 禁止行为 ❌
+- ❌ 禁止推送未通过本地检查的代码
+- ❌ 禁止使用 `git push --no-verify` 跳过检查
+- ❌ 禁止在 PR 未通过 CI 时合并
+
+### 标准工作流程
+1. 开发完成 → 运行 `pnpm check-all`
+2. 修复所有问题 → 再次运行确认通过
+3. `git add .` → `git commit -m "feat: 描述"`
+4. `git push` (自动触发 pre-push hook)
+5. 创建 PR → 等待 CI 通过 (3 个工作流)
+6. 所有检查 ✅ → 合并 PR
+
+### CI 工作流
+- `ci.yml`: 主流水线 (Lint → Build → QA → E2E)
+- `code-quality.yml`: Reviewdog 自动评论
+- `pr-auto-review.yml`: 标签 + 安全扫描
+
+### 文档
+- `.github/PRE_COMMIT_CHECKLIST.md` - 检查清单
+- `.github/GITHUB_SECRETS_SETUP.md` - GitHub Secrets 配置
+- `CI_REVIEW_SETUP.md` - CI 系统配置
+- `SETUP_COMPLETE.md` - 完整配置指南
