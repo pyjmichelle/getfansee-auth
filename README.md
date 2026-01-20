@@ -1,6 +1,15 @@
 # getfansee-auth
 
+![CI Status](https://github.com/pyjmichelle/getfansee-auth/actions/workflows/ci.yml/badge.svg)
+![Code Quality](https://github.com/pyjmichelle/getfansee-auth/actions/workflows/code-quality.yml/badge.svg)
+
 All AI-assisted development must follow [docs/agents](./docs/agents) and [docs/sop](./docs/sop).
+
+## 📚 快速开始
+
+- **开发工作流程**: 查看 [QUICK_START_WORKFLOW.md](./QUICK_START_WORKFLOW.md) ⚡
+- **详细指南**: 查看 [DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md)
+- **部署指南**: 查看 [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 
 ## CI/CD Setup
 
