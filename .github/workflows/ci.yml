@@ -142,6 +142,20 @@ jobs:
           echo "🔧 Creating test users for QA gate..."
           pnpm tsx scripts/create-test-users.ts || echo "⚠️  Test users may already exist, continuing..."
 
+      - name: Create test sessions
+        run: |
+          echo "🔐 Creating test sessions for QA gate..."
+          echo "Running: pnpm test:session:auto:all"
+          pnpm test:session:auto:all || {
+            echo "❌ Session creation failed"
+            echo "Checking if session files exist..."
+            ls -la artifacts/agent-browser-full/sessions/ || echo "Sessions directory does not exist"
+            exit 1
+          }
+          echo "✅ Session creation completed"
+          echo "Verifying session files..."
+          ls -la artifacts/agent-browser-full/sessions/ || echo "⚠️  No session files found"
+
       - name: Run QA Gate
         run: pnpm qa:gate
 
