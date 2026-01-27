@@ -36,6 +36,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           configuration-path: .github/labeler.yml
           sync-labels: true
+        continue-on-error: true
 
   # Job 2: 代码复杂度和质量检查
   complexity-check:
