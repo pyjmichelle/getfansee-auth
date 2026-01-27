@@ -421,10 +421,41 @@ async function main() {
     console.log(`\nReport: ${reportPath}`);
 
     // Exit with appropriate code
-    process.exit(failed > 0 ? 1 : 0);
+    if (failed > 0) {
+      console.error("\n" + "=".repeat(60));
+      console.error("❌ DEAD CLICK GATE FAILED");
+      console.error("=".repeat(60));
+      console.error(`Failed checks: ${failed}`);
+      console.error("\nFailed results:");
+      results
+        .filter((r) => r.status === "FAIL")
+        .forEach((r) => {
+          console.error(`\n  ❌ ${r.id} (${r.route}, ${r.authState})`);
+          console.error(`     Action: ${r.action}`);
+          console.error(`     Expectation: ${r.expectation}`);
+          console.error(`     Actual: ${r.actualResult}`);
+        });
+      console.error(`\nFull report: ${reportPath}`);
+      process.exit(1);
+    } else {
+      console.log("\n" + "=".repeat(60));
+      console.log("✅ DEAD CLICK GATE PASSED");
+      console.log("=".repeat(60));
+      process.exit(0);
+    }
+  } catch (error: any) {
+    console.error("\n" + "=".repeat(60));
+    console.error("❌ DEAD CLICK GATE ERROR");
+    console.error("=".repeat(60));
+    console.error(`Error: ${error.message}`);
+    console.error(`Stack: ${error.stack}`);
+    process.exit(1);
   } finally {
     await browser.close();
   }
 }
 
-main();
+main().catch((error) => {
+  console.error("Fatal error:", error);
+  process.exit(1);
+});
