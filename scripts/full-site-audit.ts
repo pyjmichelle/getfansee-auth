@@ -412,8 +412,42 @@ async function main() {
   const allResults: AuditResult[] = [];
 
   try {
-    // Start server
-    devServer = await startDevServer();
+    // In CI, server is already running, skip starting our own
+    if (process.env.CI === "true") {
+      console.log("\nℹ️  CI environment detected - using existing server");
+      console.log(`   Verifying server at ${BASE_URL}/api/health...`);
+
+      // Verify server is available
+      const maxRetries = 10;
+      let serverReady = false;
+      for (let i = 0; i < maxRetries; i++) {
+        try {
+          const response = await fetch(`${BASE_URL}/api/health`, {
+            method: "GET",
+            signal: AbortSignal.timeout(5000),
+          });
+          if (response.ok || response.status === 200) {
+            serverReady = true;
+            console.log(`  ✓ Server is ready`);
+            break;
+          }
+        } catch (err) {
+          // Not ready yet
+        }
+        if (i < maxRetries - 1) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+      }
+
+      if (!serverReady) {
+        throw new Error(
+          `Server at ${BASE_URL} is not responding. Check CI workflow webServer step.`
+        );
+      }
+    } else {
+      // Start server for local development
+      devServer = await startDevServer();
+    }
 
     // Launch browser
     console.log("\n🌐 Launching browser...");
