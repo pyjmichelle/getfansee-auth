@@ -418,7 +418,7 @@ async function main() {
       console.log(`   Verifying server at ${BASE_URL}/api/health...`);
 
       // Verify server is available
-      const maxRetries = 10;
+      const maxRetries = 15;
       let serverReady = false;
       for (let i = 0; i < maxRetries; i++) {
         try {
@@ -428,20 +428,27 @@ async function main() {
           });
           if (response.ok || response.status === 200) {
             serverReady = true;
-            console.log(`  ✓ Server is ready`);
+            console.log(`  ✓ Server is ready (attempt ${i + 1}/${maxRetries})`);
             break;
           }
-        } catch (err) {
-          // Not ready yet
+        } catch (err: any) {
+          if (i < maxRetries - 1) {
+            console.log(`   Attempt ${i + 1}/${maxRetries} failed: ${err.message}`);
+          }
         }
         if (i < maxRetries - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 2000));
         }
       }
 
       if (!serverReady) {
+        console.error(`\n❌ Server at ${BASE_URL} is not responding after ${maxRetries} attempts`);
+        console.error(`   This may indicate:`);
+        console.error(`   1. Server failed to start in CI`);
+        console.error(`   2. Server is still starting (increase wait time)`);
+        console.error(`   3. Network/port issue in CI environment`);
         throw new Error(
-          `Server at ${BASE_URL} is not responding. Check CI workflow webServer step.`
+          `Server at ${BASE_URL} is not responding. Check CI workflow server startup step.`
         );
       }
     } else {
