@@ -47,7 +47,9 @@ fi
 # Step 5: E2E Tests (Chromium only for speed)
 echo ""
 echo "🎭 [5/5] Running E2E tests (chromium)..."
-if [ -f "playwright.config.ts" ]; then
+if [ -n "$SKIP_QA_GATE" ]; then
+  echo "⏭️  Skipping E2E tests (set by SKIP_QA_GATE - will run in CI)"
+elif [ -f "playwright.config.ts" ]; then
   pnpm exec playwright test --project=chromium --reporter=line
   echo "✅ E2E tests passed"
 else
