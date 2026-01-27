@@ -428,15 +428,57 @@ async function main() {
       console.error("=".repeat(60));
       console.error(`Failed checks: ${failed}`);
       console.error("\nFailed results:");
-      results
-        .filter((r) => r.status === "FAIL")
-        .forEach((r) => {
+
+      // Separate session failures from actual dead click failures
+      const sessionFailures = results.filter(
+        (r) =>
+          r.status === "FAIL" &&
+          (r.actualResult.includes("session required") ||
+            r.actualResult.includes("Session validation failed"))
+      );
+      const deadClickFailures = results.filter(
+        (r) =>
+          r.status === "FAIL" &&
+          !r.actualResult.includes("session required") &&
+          !r.actualResult.includes("Session validation failed")
+      );
+
+      if (sessionFailures.length > 0) {
+        console.error("\n⚠️  Session-related failures (may be transient):");
+        sessionFailures.forEach((r) => {
+          console.error(`\n  ⚠️  ${r.id} (${r.route}, ${r.authState})`);
+          console.error(`     Action: ${r.action}`);
+          console.error(`     Expectation: ${r.expectation}`);
+          console.error(`     Actual: ${r.actualResult}`);
+        });
+      }
+
+      if (deadClickFailures.length > 0) {
+        console.error("\n❌ Actual dead click failures:");
+        deadClickFailures.forEach((r) => {
           console.error(`\n  ❌ ${r.id} (${r.route}, ${r.authState})`);
           console.error(`     Action: ${r.action}`);
           console.error(`     Expectation: ${r.expectation}`);
           console.error(`     Actual: ${r.actualResult}`);
         });
+      }
+
       console.error(`\nFull report: ${reportPath}`);
+
+      // In CI, if only session failures (no actual dead click failures), provide guidance but still fail
+      // This helps identify if it's a session creation issue vs actual dead click problem
+      if (
+        deadClickFailures.length === 0 &&
+        sessionFailures.length > 0 &&
+        process.env.CI === "true"
+      ) {
+        console.error("\n💡 Note: All failures are session-related.");
+        console.error("   This suggests session creation failed. Check:");
+        console.error("   1. Test accounts exist in Supabase");
+        console.error("   2. test:session:auto:all step completed successfully");
+        console.error("   3. Session files exist in artifacts/agent-browser-full/sessions/");
+      }
+
       process.exit(1);
     } else {
       console.log("\n" + "=".repeat(60));
