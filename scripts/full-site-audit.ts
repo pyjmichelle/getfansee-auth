@@ -212,11 +212,41 @@ async function createAuthContext(browser: Browser, state: AuthState): Promise<Br
 
   if (!fs.existsSync(sessionPath)) {
     console.error(`\n❌ FATAL: Session file not found: ${sessionPath}`);
-    console.error(`\nYou must create session files first:`);
-    console.error(`  1. Start dev server: pnpm dev`);
-    console.error(`  2. Export fan session: pnpm test:session:export:fan`);
-    console.error(`  3. Export creator session: pnpm test:session:export:creator`);
-    console.error(`  4. Then run: pnpm audit:full`);
+
+    if (process.env.CI === "true") {
+      console.error(`\n[CI Debug] Session file missing in CI environment`);
+      console.error(`   Expected path: ${sessionPath}`);
+      console.error(`   Artifacts directory: ${ARTIFACTS_DIR}`);
+      console.error(
+        `   Sessions directory exists: ${fs.existsSync(path.join(ARTIFACTS_DIR, "sessions"))}`
+      );
+
+      // List what's actually in the sessions directory
+      const sessionsDir = path.join(ARTIFACTS_DIR, "sessions");
+      if (fs.existsSync(sessionsDir)) {
+        console.error(`   Files in sessions directory:`);
+        try {
+          const files = fs.readdirSync(sessionsDir);
+          files.forEach((file) => {
+            console.error(`     - ${file}`);
+          });
+        } catch (err: any) {
+          console.error(`     Error reading directory: ${err.message}`);
+        }
+      } else {
+        console.error(`   Sessions directory does not exist`);
+      }
+
+      console.error(`\n   This suggests the "Create test sessions" step failed.`);
+      console.error(`   Check the CI logs for the "Create test sessions" step.`);
+    } else {
+      console.error(`\nYou must create session files first:`);
+      console.error(`  1. Start dev server: pnpm dev`);
+      console.error(`  2. Export fan session: pnpm test:session:export:fan`);
+      console.error(`  3. Export creator session: pnpm test:session:export:creator`);
+      console.error(`  4. Then run: pnpm audit:full`);
+    }
+
     throw new Error(`Missing session file: ${state}.json`);
   }
 
