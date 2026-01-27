@@ -7,7 +7,22 @@ import { UnlockProvider } from "@/contexts/unlock-context";
 import { AgeGate } from "@/components/age-gate";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+// Configure Inter font with fallback for CI/offline environments
+// In CI or test mode, font download may fail, so we use system font fallback
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  fallback: [
+    "system-ui",
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "Segoe UI",
+    "Roboto",
+    "sans-serif",
+  ],
+  // Reduce font loading attempts in CI/test environments
+  adjustFontFallback: true,
+});
 
 export const metadata: Metadata = {
   title: "GetFanSee - Where fans get closer",
