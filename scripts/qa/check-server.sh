@@ -7,6 +7,34 @@ BASE_URL="http://127.0.0.1:$PORT"
 
 echo "🔍 Checking if dev server is running on port $PORT..."
 
+# In CI, we trust that the server is already started by the CI workflow
+# Just verify it's responding, skip port checks which can be flaky
+if [ "$CI" = "true" ]; then
+  echo "ℹ️  CI environment detected - skipping port check, verifying server response..."
+  
+  # Retry health check with backoff (CI servers may need a moment)
+  MAX_RETRIES=5
+  RETRY_COUNT=0
+  
+  while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    if curl -sf "$BASE_URL/api/health" > /dev/null 2>&1; then
+      echo "✅ Server is running and responding on port $PORT"
+      exit 0
+    fi
+    
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+    if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+      echo "   Retrying health check... ($RETRY_COUNT/$MAX_RETRIES)"
+      sleep 1
+    fi
+  done
+  
+  echo "❌ Server not responding after $MAX_RETRIES attempts"
+  echo "   This may indicate the server failed to start in CI"
+  exit 1
+fi
+
+# Local development: check port and health
 # Check if port is listening (lsof preferred; fallback to ss/netstat)
 if command -v lsof > /dev/null 2>&1; then
   if ! lsof -i:$PORT -sTCP:LISTEN > /dev/null 2>&1; then
