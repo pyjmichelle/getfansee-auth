@@ -276,21 +276,40 @@ async function autoLogin(role: "fan" | "creator") {
     try {
       const authResponse = await page.waitForResponse(
         (response) => response.url().includes("/auth/v1/token"),
-        { timeout: 20000 }
+        { timeout: 30000 }
       );
       authTokenStatus = authResponse.status();
       console.log(`   [Auth Token Response] ${authTokenStatus}`);
     } catch {
       console.warn("   [Auth Token Response] timeout waiting for /auth/v1/token");
+      // In CI, give more time for network delays
+      if (process.env.CI === "true") {
+        console.warn("   [CI Mode] Waiting additional 5s for network stabilization...");
+        await page.waitForTimeout(5000);
+      }
     }
 
     const errorAlert = page.locator('[role="alert"], .alert-destructive').first();
     let loginOutcome: "navigated" | "error" | "timeout" = "timeout";
+    // In CI, give more time for navigation
+    const navigationTimeout = process.env.CI === "true" ? 45000 : 30000;
     try {
-      await page.waitForURL((url) => !url.toString().includes("/auth"), { timeout: 30000 });
+      await page.waitForURL((url) => !url.toString().includes("/auth"), {
+        timeout: navigationTimeout,
+      });
       loginOutcome = "navigated";
     } catch {
       loginOutcome = "timeout";
+      // In CI, wait a bit more and check again
+      if (process.env.CI === "true") {
+        console.warn("   [CI Mode] Initial navigation timeout, waiting 3s and rechecking...");
+        await page.waitForTimeout(3000);
+        const currentUrl = page.url();
+        if (!currentUrl.includes("/auth")) {
+          loginOutcome = "navigated";
+          console.log(`   [CI Mode] Navigation succeeded after retry: ${currentUrl}`);
+        }
+      }
     }
 
     // Check current state after submission
