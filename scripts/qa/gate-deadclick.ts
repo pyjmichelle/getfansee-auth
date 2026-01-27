@@ -9,8 +9,9 @@
 import { chromium, Browser, BrowserContext, Page } from "playwright";
 import * as fs from "fs";
 import * as path from "path";
+import { getBaseUrl } from "../_shared/env";
 
-const BASE_URL = process.env.BASE_URL || "http://127.0.0.1:3000";
+const BASE_URL = getBaseUrl();
 const ARTIFACTS_DIR = path.join(process.cwd(), "artifacts", "qa");
 const SESSIONS_DIR = path.join(process.cwd(), "artifacts", "agent-browser-full", "sessions");
 
@@ -87,7 +88,7 @@ function ensureArtifactsDir() {
 async function createAuthContext(
   browser: Browser,
   state: "anonymous" | "fan" | "creator"
-): Promise<BrowserContext> {
+): Promise<BrowserContext | null> {
   const baseOptions = {
     viewport: { width: 1280, height: 720 },
     baseURL: BASE_URL,
@@ -100,9 +101,10 @@ async function createAuthContext(
   const sessionPath = path.join(SESSIONS_DIR, `${state}.json`);
 
   if (!fs.existsSync(sessionPath)) {
-    console.error(`\n❌ Session file not found: ${sessionPath}`);
-    console.error(`   Run: pnpm test:session:auto:${state}`);
-    throw new Error(`Missing session file: ${state}.json`);
+    console.warn(`\n⚠️  Session file not found: ${sessionPath}`);
+    console.warn(`   Skipping authenticated ${state} checks`);
+    console.warn(`   To enable: pnpm test:session:auto:${state}`);
+    return null;
   }
 
   const sessionData = JSON.parse(fs.readFileSync(sessionPath, "utf-8"));
@@ -157,6 +159,12 @@ async function runDeadClickCheck(browser: Browser, check: DeadClickCheck): Promi
     console.log(`   Expect: ${check.expectation.description}`);
 
     context = await createAuthContext(browser, check.authState);
+    if (!context) {
+      console.log(`   ⏭️  Skipping (session not available)`);
+      result.status = "FAIL";
+      result.actualResult = `${check.authState} session not available`;
+      return result;
+    }
     page = await context.newPage();
 
     // Verify session if not anonymous

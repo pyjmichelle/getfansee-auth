@@ -132,15 +132,8 @@ test.describe("边界情况和错误处理测试", () => {
 
         // 尝试创建付费内容
         await page.goto(`${BASE_URL}/creator/new-post`);
-        await waitForVisible(
-          page,
-          'textarea[name="content"], textarea[placeholder*="content" i]',
-          5000
-        );
-
-        const contentInput = page
-          .locator('textarea[name="content"], textarea[placeholder*="content" i]')
-          .first();
+        const contentInput = page.getByTestId("post-content");
+        await expect(contentInput).toBeVisible({ timeout: 5000 });
         await contentInput.fill("Test PPV Post");
 
         // 设置可见性为 PPV

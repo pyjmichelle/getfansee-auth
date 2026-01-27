@@ -9,8 +9,9 @@
 import { chromium, Browser, BrowserContext, Page } from "playwright";
 import * as fs from "fs";
 import * as path from "path";
+import { getBaseUrl } from "../_shared/env";
 
-const BASE_URL = process.env.BASE_URL || "http://127.0.0.1:3000";
+const BASE_URL = getBaseUrl();
 const ARTIFACTS_DIR = path.join(process.cwd(), "artifacts", "qa");
 const SESSIONS_DIR = path.join(process.cwd(), "artifacts", "agent-browser-full", "sessions");
 
@@ -198,7 +199,7 @@ function ensureArtifactsDir() {
 async function createAuthContext(
   browser: Browser,
   state: "anonymous" | "fan" | "creator"
-): Promise<BrowserContext> {
+): Promise<BrowserContext | null> {
   const baseOptions = {
     viewport: { width: 1280, height: 720 },
     baseURL: BASE_URL,
@@ -211,9 +212,10 @@ async function createAuthContext(
   const sessionPath = path.join(SESSIONS_DIR, `${state}.json`);
 
   if (!fs.existsSync(sessionPath)) {
-    console.error(`\n❌ Session file not found: ${sessionPath}`);
-    console.error(`   Run: pnpm test:session:auto:${state}`);
-    throw new Error(`Missing session file: ${state}.json`);
+    console.warn(`\n⚠️  Session file not found: ${sessionPath}`);
+    console.warn(`   Skipping authenticated ${state} checks`);
+    console.warn(`   To enable: pnpm test:session:auto:${state}`);
+    return null;
   }
 
   const sessionData = JSON.parse(fs.readFileSync(sessionPath, "utf-8"));
@@ -265,6 +267,18 @@ async function runUICheck(browser: Browser, check: UICheck): Promise<CheckResult
     console.log(`   Route: ${check.route} (${check.authState})`);
 
     context = await createAuthContext(browser, check.authState);
+    if (!context) {
+      console.log(`   ⏭️  Skipping (session not available)`);
+      result.status = "FAIL";
+      result.checks.push({
+        selector: "session",
+        description: `${check.authState} session required`,
+        found: 0,
+        required: 1,
+        passed: false,
+      });
+      return result;
+    }
     page = await context.newPage();
 
     // Verify session if not anonymous
@@ -418,6 +432,11 @@ async function checkSearchModal(browser: Browser): Promise<CheckResult> {
     console.log(`   Route: /home (fan)`);
 
     context = await createAuthContext(browser, "fan");
+    if (!context) {
+      console.log(`   ⏭️  Skipping (fan session not available)`);
+      result.status = "FAIL";
+      return result;
+    }
     page = await context.newPage();
 
     // Verify session
@@ -467,11 +486,19 @@ async function checkSearchModal(browser: Browser): Promise<CheckResult> {
 
     // Click search button
     await searchButton.click();
-    await page.waitForTimeout(1000);
+    await Promise.race([
+      page.waitForURL("**/search**", { timeout: 5000 }),
+      page
+        .locator('[data-testid="search-modal"]')
+        .first()
+        .waitFor({ state: "visible", timeout: 5000 }),
+    ]).catch(() => {});
 
-    // Check if modal opened
     const searchModal = page.locator('[data-testid="search-modal"]').first();
+    const searchPage = page.locator('[data-testid="search-page"]').first();
     const modalVisible = await searchModal.isVisible().catch(() => false);
+    const searchPageVisible = await searchPage.isVisible().catch(() => false);
+    const navigatedToSearch = page.url().includes("/search");
 
     result.checks.push({
       selector: '[data-testid="search-modal"]',
@@ -481,11 +508,19 @@ async function checkSearchModal(browser: Browser): Promise<CheckResult> {
       passed: modalVisible,
     });
 
-    if (!modalVisible) {
+    result.checks.push({
+      selector: '[data-testid="search-page"]',
+      description: "Search page loads after click",
+      found: searchPageVisible && navigatedToSearch ? 1 : 0,
+      required: 1,
+      passed: searchPageVisible && navigatedToSearch,
+    });
+
+    if (!modalVisible && !(searchPageVisible && navigatedToSearch)) {
       result.status = "FAIL";
-      console.log(`   ❌ Search modal did not open`);
+      console.log(`   ❌ Search modal/page did not open`);
     } else {
-      console.log(`   ✓ Search modal opened successfully`);
+      console.log(`   ✓ Search destination opened successfully`);
     }
 
     // Take screenshot

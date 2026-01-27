@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { unlockPost } from "@/lib/paywall";
 
@@ -14,7 +15,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "postId is required" }, { status: 400 });
     }
 
-    const result = await unlockPost(postId, priceCents);
+    const idempotencyKey = request.headers.get("Idempotency-Key") ?? randomUUID();
+    const result = await unlockPost(postId, priceCents, idempotencyKey);
 
     return NextResponse.json(result);
   } catch (err: unknown) {

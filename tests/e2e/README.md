@@ -87,7 +87,7 @@ pnpm exec playwright test --reporter=html
 
 ## 测试数据管理
 
-- 测试使用时间戳生成唯一的测试邮箱（`e2e-{prefix}-{timestamp}@example.com`）
+- 测试使用时间戳和随机后缀生成唯一邮箱（`e2e-{prefix}-{timestamp}-{random}@example.com`）
 - 测试密码统一为 `TestPassword123!`
 - 每个测试前会自动清除 cookies 和 localStorage
 

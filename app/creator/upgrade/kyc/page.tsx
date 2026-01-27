@@ -57,7 +57,10 @@ export default function KYCPage() {
         );
       case "failed":
         return (
-          <Badge variant="secondary" className="text-red-600 bg-red-100 dark:bg-red-950">
+          <Badge
+            variant="secondary"
+            className="text-[var(--color-pink-600)] bg-pink-100 dark:bg-pink-950"
+          >
             Rejected
           </Badge>
         );

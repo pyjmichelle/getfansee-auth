@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-server";
-import { getCreatorStats, getCreatorChartData, getRecentPosts } from "@/lib/creator-stats";
+import {
+  getCreatorStats,
+  getCreatorChartData,
+  getRecentPosts,
+  type CreatorStats,
+  type ChartDataPoint,
+} from "@/lib/creator-stats";
+type RecentPost = Awaited<ReturnType<typeof getRecentPosts>>[number];
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,15 +21,16 @@ export async function GET(request: NextRequest) {
     const includeChart = searchParams.get("includeChart") === "true";
     const includePosts = searchParams.get("includePosts") === "true";
 
-    console.log("[api/creator/stats] Fetching stats for creator:", {
-      creatorId: user.id,
-      timeRange,
-    });
-
     // 获取统计数据
     const stats = await getCreatorStats(user.id, timeRange);
 
-    const response: any = { success: true, stats };
+    interface StatsResponse {
+      success: boolean;
+      stats: CreatorStats;
+      chartData?: ChartDataPoint[];
+      recentPosts?: RecentPost[];
+    }
+    const response: StatsResponse = { success: true, stats };
 
     // 可选：包含图表数据
     if (includeChart) {

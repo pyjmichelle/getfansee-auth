@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { NavHeader } from "@/components/nav-header";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
@@ -108,18 +107,18 @@ export default function CreatorVerificationsPage() {
       );
 
       if (success) {
-        toast.success(approve ? "验证已通过" : "验证已拒绝");
+        toast.success(approve ? "Verification approved" : "Verification rejected");
         // 重新加载列表
         const pending = await listPendingVerifications();
         setVerifications(pending);
         setReviewingId(null);
         setRejectionReason("");
       } else {
-        toast.error("操作失败，请重试");
+        toast.error("Action failed. Please try again");
       }
     } catch (err) {
       console.error("[admin-verifications] review error:", err);
-      toast.error("操作失败，请重试");
+      toast.error("Action failed. Please try again");
     } finally {
       setIsReviewing(false);
     }
@@ -175,7 +174,7 @@ export default function CreatorVerificationsPage() {
                         {verification.user?.display_name ||
                           `User ${verification.user_id.slice(0, 8)}`}
                       </h3>
-                      <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 rounded-lg">
+                      <Badge className="bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)] border-[var(--border-purple-500-20)] rounded-lg">
                         Pending
                       </Badge>
                     </div>
@@ -274,7 +273,7 @@ export default function CreatorVerificationsPage() {
                   id="rejection_reason"
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
-                  placeholder="例如：证件照片不清晰，信息不匹配等"
+                  placeholder="e.g., ID photos are unclear, information doesn't match, etc."
                   className="bg-card border-border rounded-xl"
                   rows={4}
                 />

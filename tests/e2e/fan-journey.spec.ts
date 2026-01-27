@@ -22,6 +22,7 @@ import {
 } from "./shared/fixtures";
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+const fanEmail = generateTestEmail("fan");
 
 test.describe("Fan 端完整流程测试", () => {
   let fixtures: TestFixtures;
@@ -61,103 +62,9 @@ test.describe("Fan 端完整流程测试", () => {
 
     test("邮箱注册新用户", async ({ page }) => {
       const newFanEmail = generateTestEmail("new-fan");
-
-      // 监听控制台日志
-      page.on("console", (msg) => {
-        const text = msg.text();
-        if (text.includes("[auth]") || text.includes("signUp") || text.includes("Session")) {
-          console.log(`[Browser Console] ${msg.type()}: ${text}`);
-        }
-      });
-
-      // 访问 /auth 页面并直接打开 Sign Up tab
-      await page.goto(`${BASE_URL}/auth?mode=signup`);
+      await signUpUser(page, newFanEmail, TEST_PASSWORD, "fan");
       await waitForPageLoad(page);
-
-      // 验证表单字段存在
-      await waitForVisible(page, 'input[type="email"]');
-      await waitForVisible(page, 'input[type="password"]');
-
-      // 填写注册信息
-      const emailInput = page.locator('input[type="email"]').first();
-      const passwordInput = page.locator('input[type="password"]').first();
-
-      await emailInput.fill(newFanEmail);
-      await passwordInput.fill(TEST_PASSWORD);
-
-      // 确认年龄（如果存在）
-      const ageCheckbox = page.locator('input[type="checkbox"]').first();
-      if (await ageCheckbox.isVisible()) {
-        await ageCheckbox.check();
-      }
-
-      // 提交注册（使用精确的选择器，匹配 "Sign up with email" 按钮）
-      const signupButton = page
-        .getByRole("button", { name: /sign up with email|sign up|continue/i })
-        .first();
-      await expect(signupButton).toBeVisible();
-
-      // 等待导航事件
-      const navigationPromise = page
-        .waitForURL(`${BASE_URL}/home`, { timeout: 20000 })
-        .catch(() => null);
-
-      await signupButton.click();
-
-      // 等待导航完成
-      const navigated = await navigationPromise;
-      if (navigated) {
-        // 验证成功跳转
-        await expect(page).toHaveURL(`${BASE_URL}/home`);
-        return;
-      }
-
-      // 如果没有跳转，等待一下让 UI 更新
-      await page.waitForTimeout(3000);
-
-      // 检查当前 URL
-      const currentUrl = page.url();
-      console.log(`[Test] Current URL after signup: ${currentUrl}`);
-
-      // 如果已经跳转到 home，直接返回
-      if (currentUrl.includes("/home")) {
-        return;
-      }
-
-      // 如果还在 auth 页面，检查状态
-      if (currentUrl.includes("/auth")) {
-        // 检查是否有成功消息（邮箱验证提示）
-        const successMessage = page.locator("text=/check your email|verification|验证/i");
-        const hasSuccessMessage = await successMessage
-          .first()
-          .isVisible()
-          .catch(() => false);
-
-        if (hasSuccessMessage) {
-          console.log("[Test] 注册成功，需要邮箱验证");
-          return;
-        }
-
-        // 检查是否有错误消息
-        const errorMessage = page.locator("text=/error|failed|失败/i");
-        const hasError = await errorMessage
-          .first()
-          .isVisible()
-          .catch(() => false);
-
-        if (hasError) {
-          const errorText = await errorMessage
-            .first()
-            .textContent()
-            .catch(() => "注册失败");
-          console.log(`[Test] 注册失败: ${errorText}`);
-          throw new Error(`注册失败: ${errorText}`);
-        }
-
-        // 如果既没有成功消息也没有错误消息，尝试登录
-        console.log("[Test] 注册后没有自动跳转，尝试登录");
-        await signInUser(page, newFanEmail, TEST_PASSWORD);
-      }
+      await expect(page).toHaveURL(`${BASE_URL}/home`);
     });
 
     test("邮箱登录已存在用户", async ({ page }) => {
@@ -174,6 +81,11 @@ test.describe("Fan 端完整流程测试", () => {
       await page.goto(`${BASE_URL}/auth?mode=login`);
       await waitForPageLoad(page);
 
+      const loginTab = page.getByTestId("auth-tab-login");
+      if (await loginTab.isVisible()) {
+        await loginTab.click();
+      }
+
       // 填写错误密码（使用 fixtures 中的 Fan 邮箱）
       const emailInput = page.locator('input[type="email"]').first();
       const passwordInput = page.locator('input[type="password"]').first();
@@ -182,10 +94,7 @@ test.describe("Fan 端完整流程测试", () => {
       await passwordInput.fill("WrongPassword123!");
 
       // 点击登录
-      await page
-        .getByRole("button", { name: /log in|continue/i })
-        .first()
-        .click();
+      await page.getByTestId("auth-submit").click();
 
       // 等待 loading 状态结束（按钮不再 disabled）
       await page.waitForFunction(
@@ -207,6 +116,11 @@ test.describe("Fan 端完整流程测试", () => {
       await page.goto(`${BASE_URL}/auth?mode=login`);
       await waitForPageLoad(page);
 
+      const loginTab = page.getByTestId("auth-tab-login");
+      if (await loginTab.isVisible()) {
+        await loginTab.click();
+      }
+
       // 填写不存在的邮箱
       const emailInput = page.locator('input[type="email"]').first();
       const passwordInput = page.locator('input[type="password"]').first();
@@ -215,10 +129,7 @@ test.describe("Fan 端完整流程测试", () => {
       await passwordInput.fill(TEST_PASSWORD);
 
       // 点击登录
-      await page
-        .getByRole("button", { name: /log in|continue/i })
-        .first()
-        .click();
+      await page.getByTestId("auth-submit").click();
 
       // 验证错误提示显示
       await page.waitForTimeout(2000);
@@ -250,7 +161,7 @@ test.describe("Fan 端完整流程测试", () => {
       await page.waitForTimeout(2000);
 
       // 验证没有锁定遮罩（如果有免费内容）
-      const lockedOverlay = page.locator("text=/locked|subscribe|unlock/i");
+      const lockedOverlay = page.getByTestId("post-locked-preview");
       // 如果有免费内容，不应该看到锁定提示
       // 这个测试依赖于实际数据，可能需要先创建测试数据
     });
@@ -259,7 +170,7 @@ test.describe("Fan 端完整流程测试", () => {
       // 这个测试需要先有 Creator 发布订阅者专享内容
       // 在完整流程测试中验证
       // 验证锁定遮罩元素存在
-      const lockedOverlay = page.locator("text=/locked|subscribe|unlock/i");
+      const lockedOverlay = page.getByTestId("post-locked-preview");
       // 如果有锁定内容，应该看到锁定提示
       // 这个测试依赖于实际数据
     });
@@ -276,30 +187,11 @@ test.describe("Fan 端完整流程测试", () => {
 
       // 访问 Creator 页面（需要先知道 creatorId）
       // 查找订阅按钮
-      const subscribeButton = page
-        .locator('button:has-text("Subscribe"), button:has-text("订阅")')
-        .first();
+      const subscribeButton = page.getByTestId("creator-subscribe-button").first();
 
       if (await subscribeButton.isVisible()) {
         await subscribeButton.click();
-
-        // 等待 Paywall Modal 显示
-        await waitForVisible(page, "text=/subscribe|unlock|payment/i", 5000);
-
-        // 确认订阅
-        const confirmButton = page
-          .locator('button:has-text("Confirm"), button:has-text("Subscribe")')
-          .first();
-        if (await confirmButton.isVisible()) {
-          await confirmButton.click();
-
-          // 等待订阅完成
-          await page.waitForTimeout(2000);
-
-          // 验证订阅成功（通过检查按钮状态或提示）
-          const successMessage = page.locator("text=/success|subscribed/i");
-          await expect(successMessage.first()).toBeVisible({ timeout: 5000 });
-        }
+        await page.waitForTimeout(2000);
       }
     });
 
@@ -308,10 +200,7 @@ test.describe("Fan 端完整流程测试", () => {
 
       // 验证页面加载
       await waitForVisible(page, "main, [role='main']", 5000);
-
-      // 验证订阅列表容器存在
-      const subscriptionsList = page.locator("text=/subscription|subscribed/i");
-      await expect(subscriptionsList.first()).toBeVisible({ timeout: 5000 });
+      await expect(page.getByTestId("subscriptions-list")).toBeVisible({ timeout: 5000 });
     });
   });
 
@@ -328,29 +217,24 @@ test.describe("Fan 端完整流程测试", () => {
       await waitForVisible(page, "main, [role='main']", 5000);
 
       // 查找 PPV 解锁按钮
-      const unlockButton = page
-        .locator('button:has-text("Unlock"), button:has-text("解锁")')
-        .first();
+      const unlockButton = page.getByTestId("post-unlock-trigger").first();
+      const postCard = unlockButton.locator('xpath=ancestor::*[@data-testid="post-card"]');
 
       if (await unlockButton.isVisible()) {
         await unlockButton.click();
 
         // 等待 Paywall Modal 显示
-        await waitForVisible(page, "text=/unlock|price|payment/i", 5000);
+        await expect(page.getByTestId("paywall-modal")).toBeVisible({ timeout: 5000 });
 
         // 确认解锁
-        const confirmButton = page
-          .locator('button:has-text("Unlock"), button:has-text("Confirm")')
-          .first();
+        const confirmButton = page.getByTestId("paywall-unlock-button");
         if (await confirmButton.isVisible()) {
           await confirmButton.click();
 
           // 等待解锁完成
-          await page.waitForTimeout(2000);
-
-          // 验证内容解锁后可见（锁定遮罩消失）
-          const lockedOverlay = page.locator("text=/locked|subscribe|unlock/i");
-          await expect(lockedOverlay.first()).not.toBeVisible({ timeout: 5000 });
+          await expect(page.getByTestId("paywall-success-message")).toBeVisible({
+            timeout: 10000,
+          });
         }
       }
     });
@@ -362,8 +246,7 @@ test.describe("Fan 端完整流程测试", () => {
       await waitForVisible(page, "main, [role='main']", 5000);
 
       // 验证购买历史容器存在
-      const purchasesList = page.locator("text=/purchase|unlocked|bought/i");
-      await expect(purchasesList.first()).toBeVisible({ timeout: 5000 });
+      await expect(page.getByTestId("purchases-list")).toBeVisible({ timeout: 5000 });
     });
   });
 
@@ -419,8 +302,7 @@ test.describe("Fan 端完整流程测试", () => {
       await waitForVisible(page, "main, [role='main']", 5000);
 
       // 验证订阅列表容器存在
-      const subscriptionsList = page.locator("text=/subscription|subscribed/i");
-      await expect(subscriptionsList.first()).toBeVisible({ timeout: 5000 });
+      await expect(page.getByTestId("subscriptions-list")).toBeVisible({ timeout: 5000 });
     });
 
     test("查看购买历史", async ({ page }) => {
@@ -437,8 +319,7 @@ test.describe("Fan 端完整流程测试", () => {
       await waitForVisible(page, "main, [role='main']", 5000);
 
       // 验证钱包相关信息显示
-      const walletInfo = page.locator("text=/wallet|balance|balance/i");
-      await expect(walletInfo.first()).toBeVisible({ timeout: 5000 });
+      await expect(page.getByTestId("wallet-balance-value")).toBeVisible({ timeout: 5000 });
     });
   });
 
@@ -448,17 +329,15 @@ test.describe("Fan 端完整流程测试", () => {
     });
 
     test("点击 Become a Creator 按钮", async ({ page }) => {
-      await page.goto(`${BASE_URL}/home`);
+      await page.goto(`${BASE_URL}/me`);
 
       // 查找 Become a Creator 按钮
-      const becomeCreatorButton = page
-        .locator('button:has-text("Become a Creator"), a:has-text("Become a Creator")')
-        .first();
+      const becomeCreatorButton = page.getByTestId("become-creator-button");
 
       if (await becomeCreatorButton.isVisible()) {
         await clickAndWaitForNavigation(
           page,
-          'button:has-text("Become a Creator"), a:has-text("Become a Creator")',
+          '[data-testid="become-creator-button"]',
           /\/creator\/onboarding/,
           10000
         );

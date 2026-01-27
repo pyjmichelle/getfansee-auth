@@ -42,22 +42,18 @@ jobs:
       # 1. TypeScript 类型检查
       - name: Type Check
         run: pnpm type-check
-        continue-on-error: true
       
       # 2. ESLint 检查 (基础版)
       - name: ESLint Check
         run: pnpm lint
-        continue-on-error: true
       
       # 3. Prettier 格式检查
       - name: Format Check
         run: pnpm format:check
-        continue-on-error: true
       
       # 4. 运行单元测试 (跳过 - 无测试文件)
       # - name: Run Unit Tests
       #   run: pnpm test:unit
-      #   continue-on-error: true
       
       # 5. Reviewdog - ESLint (自动在 PR 上评论问题)
       # 暂时禁用,等 PR 时再启用

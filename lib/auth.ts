@@ -9,6 +9,11 @@ export type AppUser = {
   email: string;
 };
 
+type AuthError = Error & {
+  code?: string;
+  error_description?: string;
+};
+
 /**
  * 获取当前登录用户
  * 使用 getSession() 而不是 getUser()，避免在没有 session 时抛出错误
@@ -25,15 +30,7 @@ export async function getCurrentUser(): Promise<AppUser | null> {
     return null;
   }
 
-  // 添加调试日志
-  if (process.env.NODE_ENV === "development") {
-    console.log("[auth] getCurrentUser:", {
-      hasSession: !!session,
-      hasUser: !!session?.user,
-      userId: session?.user?.id || "none",
-      email: session?.user?.email || "none",
-    });
-  }
+  // Removed debug console.log - vercel-react-best-practices (use proper logger in production)
 
   if (!session?.user || !session.user.email) return null;
 
@@ -98,9 +95,17 @@ export async function ensureProfile() {
       // 生成默认头像 URL（使用 UI Avatars 服务）
       const defaultAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split("@")[0])}&background=random&color=fff&size=128`;
 
+      // 生成 username（从 email 或 ID 生成唯一标识）
+      const baseUsername = user.email
+        .split("@")[0]
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, "_");
+      const username = `${baseUsername}_${user.id.substring(0, 8)}`;
+
       const { error: insertError } = await supabase.from("profiles").insert({
         id: user.id,
         email: user.email,
+        username: username,
         display_name: user.email.split("@")[0],
         role: "fan",
         age_verified: false,
@@ -112,7 +117,6 @@ export async function ensureProfile() {
         console.error("[auth] ensureProfile insert error", insertError);
         // 不抛出错误，允许登录继续（profile 可以在后续创建）
       } else {
-        console.log("[auth] ensureProfile: Profile created successfully");
         if (referrerId && typeof window !== "undefined") {
           // 绑定成功后清除 Cookie（在客户端执行）
           try {
@@ -124,8 +128,6 @@ export async function ensureProfile() {
           }
         }
       }
-    } else {
-      console.log("[auth] ensureProfile: Profile already exists");
     }
   } catch (err) {
     console.error("[auth] ensureProfile unexpected error:", err);
@@ -139,21 +141,11 @@ export async function signUpWithEmail(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // 如果邮箱验证关闭，不需要设置 emailRedirectTo，让 Supabase 立即返回 session
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       // 不设置 options，让 Supabase 根据配置决定是否返回 session
       // 如果邮箱验证关闭，Supabase 会立即返回 session
-    });
-
-    // 添加详细的调试日志（始终打印，方便排查问题）
-    console.log("[auth] signUpWithEmail response:", {
-      hasUser: !!data?.user,
-      hasSession: !!data?.session,
-      userId: data?.user?.id || "none",
-      userEmail: data?.user?.email || "none",
-      error: error?.message || "none",
-      errorCode: error?.status || "none",
     });
 
     if (error) {
@@ -163,8 +155,8 @@ export async function signUpWithEmail(
 
     // 返回成功
     return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err?.message || "Unknown error" };
+  } catch (err: unknown) {
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
 }
 
@@ -175,22 +167,12 @@ export async function signInWithEmail(email: string, password: string) {
       password,
     });
 
-    // 验证证据：打印 session 状态和 user.id
-    if (process.env.NODE_ENV === "development") {
-      console.log("[auth] signIn response:", {
-        hasUser: !!data?.user,
-        hasSession: !!data?.session,
-        userId: data?.user?.id || "none",
-        error: error?.message || "none",
-      });
-    }
-
     if (error) {
       console.error("[auth] signInWithPassword error:", error);
       // 确保错误信息被正确传递
-      const authError = new Error(error.message || "登录失败");
-      (authError as any).code = error.status || error.name;
-      (authError as any).error_description = error.message;
+      const authError: AuthError = new Error(error.message || "登录失败");
+      authError.code = error.status ? String(error.status) : error.name;
+      authError.error_description = error.message;
       throw authError;
     }
 
@@ -201,11 +183,14 @@ export async function signInWithEmail(email: string, password: string) {
     }
 
     return data;
-  } catch (err: any) {
+  } catch (err: unknown) {
     // 如果是网络错误，包装成更友好的错误
-    if (err?.message?.includes("Failed to fetch") || err?.name === "NetworkError") {
-      const networkError = new Error("网络连接失败，请检查网络连接或稍后重试");
-      (networkError as any).code = "network_error";
+    if (
+      err instanceof Error &&
+      (err.message.includes("Failed to fetch") || err.name === "NetworkError")
+    ) {
+      const networkError: AuthError = new Error("网络连接失败，请检查网络连接或稍后重试");
+      networkError.code = "network_error";
       throw networkError;
     }
     throw err;
@@ -226,7 +211,10 @@ export async function signInWithMagicLink(email: string) {
 
 export async function signInWithGoogle(): Promise<{ success: boolean; error?: string }> {
   try {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    if (process.env.NEXT_PUBLIC_TEST_MODE === "true") {
+      return { success: false, error: "Google OAuth is disabled in test mode." };
+    }
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo:
@@ -238,8 +226,8 @@ export async function signInWithGoogle(): Promise<{ success: boolean; error?: st
     }
     // OAuth 重定向开始，视为成功
     return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err?.message || "Unknown error" };
+  } catch (err: unknown) {
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
 }
 

@@ -7,26 +7,59 @@ export type AppUser = {
   email: string;
 };
 
+function isRetryableAuthError(error: unknown): boolean {
+  const message =
+    typeof error === "object" && error && "message" in error
+      ? String((error as { message?: unknown }).message)
+      : String(error);
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("fetch failed") ||
+    normalized.includes("econnreset") ||
+    normalized.includes("socket") ||
+    normalized.includes("timeout") ||
+    normalized.includes("retryable")
+  );
+}
+
+async function getUserWithRetries(supabase: Awaited<ReturnType<typeof getSupabaseServerClient>>) {
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+    if (!error) {
+      return { user, error: null };
+    }
+    lastError = error;
+    if (!isRetryableAuthError(error) || attempt === 2) {
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+  }
+  return { user: null, error: lastError };
+}
+
 export async function getCurrentUser(): Promise<AppUser | null> {
   const supabase = await getSupabaseServerClient();
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession();
+  const { user, error } = await getUserWithRetries(supabase);
 
   if (error) {
-    console.error("[auth-server] getSession error", error);
+    // better-auth-best-practices: 不泄露详细错误信息
+    console.error("[auth-server] getUser error", error);
+    // 不向调用者暴露具体错误，只返回 null
     return null;
   }
 
-  if (!session?.user || !session.user.email) {
+  if (!user || !user.email) {
     return null;
   }
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("is_banned, ban_until")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .single();
 
   if (profile) {
@@ -34,12 +67,13 @@ export async function getCurrentUser(): Promise<AppUser | null> {
     const isBanned = profile.is_banned || (profile.ban_until && new Date(profile.ban_until) > now);
 
     if (isBanned) {
+      // better-auth-best-practices: 被禁用户自动登出
       await supabase.auth.signOut();
       return null;
     }
   }
 
-  return { id: session.user.id, email: session.user.email };
+  return { id: user.id, email: user.email };
 }
 
 export async function ensureProfile() {

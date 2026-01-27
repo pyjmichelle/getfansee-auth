@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
+import { getCurrentUser } from "@/lib/auth-server";
+import { resolveSubscriptionUserColumn } from "@/lib/subscriptions";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -8,9 +10,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const postId = resolvedParams.id;
 
     // 获取当前用户
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
@@ -50,10 +50,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
     // 3. 订阅内容 - 检查是否已订阅
     else if (post.visibility === "subscribers") {
+      const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
       const { data: subscription } = await supabase
         .from("subscriptions")
         .select("id")
-        .eq("fan_id", user.id)
+        .eq(subscriptionUserColumn, user.id)
         .eq("creator_id", post.creator_id)
         .eq("status", "active")
         .single();
@@ -77,11 +78,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       post: post,
       canView: canView,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[GET /api/posts/[id]] Error:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal server error" },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }

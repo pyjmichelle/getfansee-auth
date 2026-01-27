@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { NavHeader } from "@/components/nav-header";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
@@ -96,7 +95,7 @@ export default function ContentReviewPage() {
       } = await supabase.auth.getSession();
 
       if (!session) {
-        toast.error("请先登录");
+        toast.error("Please log in first");
         return;
       }
 
@@ -110,11 +109,11 @@ export default function ContentReviewPage() {
 
       if (error) {
         console.error("[admin-content-review] delete error:", error);
-        toast.error("删除失败，请重试");
+        toast.error("Delete failed. Please try again");
         return;
       }
 
-      toast.success("内容已删除");
+      toast.success("Content deleted");
       // 重新加载列表（通过 API）
       const response = await fetch("/api/admin/posts?limit=50");
       if (response.ok) {
@@ -125,7 +124,7 @@ export default function ContentReviewPage() {
       setDeletionReason("");
     } catch (err) {
       console.error("[admin-content-review] delete exception:", err);
-      toast.error("删除失败，请重试");
+      toast.error("Delete failed. Please try again");
     }
   };
 
@@ -144,7 +143,7 @@ export default function ContentReviewPage() {
       );
     } else {
       return (
-        <Badge className="bg-purple-500/10 text-purple-500 border-purple-500/20 rounded-lg">
+        <Badge className="glass bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)] border-[var(--border-purple-500-20)] rounded-lg">
           PPV ${((priceCents || 0) / 100).toFixed(2)}
         </Badge>
       );
@@ -202,10 +201,12 @@ export default function ContentReviewPage() {
                           {post.creator?.display_name || "Creator"}
                         </h3>
                       </Link>
-                      {getVisibilityBadge(post.visibility, post.price_cents)}
+                      {getVisibilityBadge(post.visibility ?? "free", post.price_cents ?? null)}
                       <span className="text-xs text-muted-foreground flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
-                        {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                        {post.created_at
+                          ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true })
+                          : "Unknown date"}
                       </span>
                     </div>
 
@@ -292,7 +293,7 @@ export default function ContentReviewPage() {
                   id="deletion_reason"
                   value={deletionReason}
                   onChange={(e) => setDeletionReason(e.target.value)}
-                  placeholder="例如：违规内容、版权问题等"
+                  placeholder="e.g., Violates content policy, copyright issues, etc."
                   className="bg-card border-border rounded-xl"
                   rows={3}
                 />

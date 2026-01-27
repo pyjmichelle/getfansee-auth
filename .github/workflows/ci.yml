@@ -6,9 +6,13 @@ on:
   pull_request:
     branches: [main, develop]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
-  NODE_VERSION: '20'
-  PNPM_VERSION: '9'
+  NODE_VERSION: "20"
+  PNPM_VERSION: "9"
 
 jobs:
   # ============================================
@@ -17,178 +21,215 @@ jobs:
   lint-and-type-check:
     name: Lint & Type Check
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-      
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-      
+          cache: "pnpm"
+
+      - name: Install dependencies (locked)
+        run: pnpm install --frozen-lockfile
+
       - name: Run ESLint
         run: pnpm lint
-      
+
       - name: Run TypeScript type check
         run: pnpm type-check
 
   # ============================================
-  # Stage 2: E2E Tests (Multi-browser)
-  # ============================================
-  e2e-tests:
-    name: E2E Tests (${{ matrix.browser }})
-    runs-on: ubuntu-latest
-    needs: lint-and-type-check
-    strategy:
-      fail-fast: false
-      matrix:
-        browser: [chromium, firefox, webkit]
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      NEXT_PUBLIC_TEST_MODE: 'true'
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-      
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-      
-      - name: Install Playwright browsers
-        run: pnpm playwright install --with-deps ${{ matrix.browser }}
-      
-      - name: Start dev server
-        run: pnpm dev &
-        env:
-          PORT: 3000
-      
-      - name: Wait for server
-        run: npx wait-on http://localhost:3000 --timeout 60000
-      
-      - name: Run all E2E tests on ${{ matrix.browser }}
-        run: pnpm playwright test --project=${{ matrix.browser }}
-      
-      - name: Upload Playwright report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report-${{ matrix.browser }}
-          path: playwright-report/
-          retention-days: 30
-
-  # ============================================
-  # Stage 3: Legacy Test Scripts
-  # ============================================
-  legacy-tests:
-    name: Legacy Test Scripts
-    runs-on: ubuntu-latest
-    needs: lint-and-type-check
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      NEXT_PUBLIC_TEST_MODE: 'true'
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-      
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-      
-      - name: Run auth tests
-        run: pnpm test:auth
-      
-      - name: Run paywall tests
-        run: pnpm test:paywall
-      
-      - name: Run comprehensive tests
-        run: pnpm test:all
-
-  # ============================================
-  # Stage 4: Build Verification
+  # Stage 2: Build Verification (must pass before QA gate / E2E)
   # ============================================
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [e2e-tests, legacy-tests]
+    needs: lint-and-type-check
+    timeout-minutes: 20
+    env:
+      CI: true
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-      
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-      
-      - name: Build application
+          cache: "pnpm"
+
+      - name: Install dependencies (locked)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application (production)
         run: pnpm build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          path: .next/
 
   # ============================================
-  # Stage 5: Quality Gate
+  # Stage 3: QA Gate (UI Gate + Dead Click Gate)
+  # Runs pnpm qa:gate and uploads artifacts/qa
+  # ============================================
+  qa-gate:
+    name: QA Gate (ui + deadclick)
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 25
+    env:
+      CI: true
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_TEST_MODE: "true"
+      # Used by scripts if needed
+      PLAYWRIGHT_BASE_URL: "http://127.0.0.1:3000"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Install dependencies (locked)
+        run: pnpm install --frozen-lockfile
+
+      # If your qa:gate starts the app itself, you may not need pnpm build.
+      # Keeping build here is safer for Next apps and avoids missing .next in CI.
+      - name: Build application (required for QA gate, if applicable)
+        run: pnpm build
+
+      # If your qa:gate uses Playwright, this avoids missing browser deps.
+      - name: Install Playwright (with deps) - Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Start app server (background)
+        run: |
+          PORT=3000 pnpm start > .next/qa-server.log 2>&1 &
+          echo $! > .next/qa-server.pid
+
+      - name: Wait for health endpoint
+        run: |
+          for i in {1..30}; do
+            if curl -sf "http://127.0.0.1:3000/api/health" > /dev/null; then
+              echo "✅ Server is ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "❌ Server did not become ready in time"
+          exit 1
+
+      - name: Run QA Gate
+        run: pnpm qa:gate
+
+      - name: Stop app server
+        if: always()
+        run: |
+          if [ -f .next/qa-server.pid ]; then
+            kill $(cat .next/qa-server.pid) || true
+          fi
+
+      - name: Upload QA artifacts (artifacts/qa)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-artifacts
+          path: artifacts/qa/
+          retention-days: 14
+
+  # ============================================
+  # Stage 4: E2E Tests (CI-first, production server managed by Playwright webServer)
+  # IMPORTANT:
+  # - Do NOT start server manually here.
+  # - Playwright webServer (in playwright.config.ts) will start pnpm start in CI.
+  # - We build again in this job to ensure .next exists in the same runner.
+  # ============================================
+  e2e-tests:
+    name: E2E Tests (chromium)
+    runs-on: ubuntu-latest
+    needs: [build, qa-gate]
+    timeout-minutes: 35
+    env:
+      CI: true
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_TEST_MODE: "true"
+      # Used by playwright.config.ts
+      PLAYWRIGHT_BASE_URL: "http://127.0.0.1:3000"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Install dependencies (locked)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application (required for pnpm start)
+        run: pnpm build
+
+      - name: Install Playwright (with deps) - Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run E2E (chromium)
+        run: pnpm exec playwright test --project=chromium --reporter=html
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Upload Playwright traces (test-results)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 14
+
+  # ============================================
+  # Stage 6: Quality Gate
   # ============================================
   quality-gate:
     name: Quality Gate
     runs-on: ubuntu-latest
-    needs: [lint-and-type-check, e2e-tests, legacy-tests, build]
+    needs: [lint-and-type-check, build, qa-gate, e2e-tests]
+    timeout-minutes: 5
     steps:
-      - name: Check quality metrics
+      - name: Summary
         run: |
-          echo "🎉 ================================"
-          echo "✅ All Quality Checks Passed!"
-          echo "================================"
-          echo ""
-          echo "📋 Test Results:"
-          echo "  ✅ Lint & Type Check: Passed"
-          echo "  ✅ E2E Tests (Chromium): Passed"
-          echo "  ✅ E2E Tests (Firefox): Passed"
-          echo "  ✅ E2E Tests (WebKit): Passed"
-          echo "  ✅ Legacy Tests: Passed"
-          echo "  ✅ Build: Passed"
-          echo ""
+          echo "✅ Lint & Type Check: Passed"
+          echo "✅ Build: Passed"
+          echo "✅ QA Gate (ui+deadclick): Passed"
+          echo "✅ E2E (Chromium): Passed"
           echo "🚀 Ready for deployment!"

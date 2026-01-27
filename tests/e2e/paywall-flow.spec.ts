@@ -9,12 +9,14 @@ const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
 
 // 测试用户凭据（使用时间戳确保唯一性）
 const timestamp = Date.now();
-const fanEmail = `e2e-fan-${timestamp}@example.com`;
+const random = Math.random().toString(36).slice(2, 8);
+const uniqueSuffix = `${timestamp}-${random}`;
+const fanEmail = `e2e-fan-${uniqueSuffix}@example.com`;
 const fanPassword = "TestPassword123!";
-const creatorEmail = `e2e-creator-${timestamp}@example.com`;
+const creatorEmail = `e2e-creator-${uniqueSuffix}@example.com`;
 const creatorPassword = "CreatorPassword123!";
 
-import { clearStorage, waitForPageLoad } from "./shared/helpers";
+import { clearStorage, signUpUser, waitForPageLoad } from "./shared/helpers";
 
 test.describe("Paywall Flow E2E", () => {
   test.beforeEach(async ({ page }) => {
@@ -26,71 +28,36 @@ test.describe("Paywall Flow E2E", () => {
     page,
   }) => {
     // 1. 注册 Fan 用户
-    await page.goto(`${BASE_URL}/auth?mode=signup`);
+    await signUpUser(page, fanEmail, fanPassword, "fan");
     await waitForPageLoad(page);
-    await page.fill('input[type="email"]', fanEmail);
-    await page.fill('input[type="password"]', fanPassword);
-    await page
-      .getByRole("button", { name: /sign up/i })
-      .first()
-      .click();
-
-    // 等待注册完成（可能需要邮箱验证，这里假设直接登录成功）
-    await page.waitForURL(`${BASE_URL}/home`, { timeout: 10000 }).catch(async () => {
-      // 如果跳转到验证页面，尝试登录
-      if (page.url().includes("/auth")) {
-        await page.goto(`${BASE_URL}/auth?mode=login`);
-        await waitForPageLoad(page);
-        await page.fill('input[type="email"]', fanEmail);
-        await page.fill('input[type="password"]', fanPassword);
-        await page
-          .getByRole("button", { name: /log in|continue/i })
-          .first()
-          .click();
-      }
-    });
 
     // 2. 注册 Creator 用户（新标签页）
     const creatorPage = await page.context().newPage();
-    await creatorPage.goto(`${BASE_URL}/auth?mode=signup`);
+    await signUpUser(creatorPage, creatorEmail, creatorPassword, "creator");
     await waitForPageLoad(creatorPage);
-    await creatorPage.fill('input[type="email"]', creatorEmail);
-    await creatorPage.fill('input[type="password"]', creatorPassword);
-    await creatorPage
-      .getByRole("button", { name: /sign up/i })
-      .first()
-      .click();
 
-    await creatorPage.waitForURL(`${BASE_URL}/home`, { timeout: 10000 }).catch(async () => {
-      if (creatorPage.url().includes("/auth")) {
-        await creatorPage.goto(`${BASE_URL}/auth?mode=login`);
-        await waitForPageLoad(creatorPage);
-        await creatorPage.fill('input[type="email"]', creatorEmail);
-        await creatorPage.fill('input[type="password"]', creatorPassword);
-        await creatorPage
-          .getByRole("button", { name: /log in|continue/i })
-          .first()
-          .click();
-      }
-    });
+    // 3. Creator 成为 Creator（如果按钮可见）
+    await creatorPage.goto(`${BASE_URL}/me`);
+    const becomeCreatorButton = creatorPage.getByTestId("become-creator-button");
+    if (await becomeCreatorButton.isVisible()) {
+      await becomeCreatorButton.click();
+      await creatorPage
+        .waitForURL(/\/creator\/(onboarding|upgrade)/, { timeout: 5000 })
+        .catch(() => {});
+    }
 
-    // 3. Creator 成为 Creator
-    await creatorPage.click('button:has-text("Become a Creator")');
-    await creatorPage.waitForURL(`${BASE_URL}/creator/onboarding`, { timeout: 5000 });
-
-    await creatorPage.fill('input[name="display_name"]', `Creator ${timestamp}`);
+    await creatorPage.fill('input[name="display_name"]', `Creator ${uniqueSuffix}`);
     await creatorPage.fill('textarea[name="bio"]', "E2E Test Creator");
     await creatorPage.click('button:has-text("Save")');
 
     await creatorPage.waitForURL(`${BASE_URL}/home`, { timeout: 5000 });
 
     // 4. Creator 创建 Post（上传图片）
-    await creatorPage.click('button:has-text("Creator Dashboard")');
     await creatorPage.click('a[href="/creator/new-post"]');
     await creatorPage.waitForURL(`${BASE_URL}/creator/new-post`, { timeout: 5000 });
 
     // 上传图片
-    const fileInput = creatorPage.locator('input[type="file"]');
+    const fileInput = creatorPage.getByTestId("upload-zone").locator('input[type="file"]');
     await fileInput.setInputFiles({
       name: "test-image.jpg",
       mimeType: "image/jpeg",
@@ -101,7 +68,7 @@ test.describe("Paywall Flow E2E", () => {
     await creatorPage.waitForSelector('img[src*="supabase"]', { timeout: 30000 });
 
     // 填写 post 内容
-    await creatorPage.fill('textarea[name="content"]', `E2E Test Post ${timestamp}`);
+    await creatorPage.getByTestId("post-content").fill(`E2E Test Post ${uniqueSuffix}`);
 
     // 设置为 locked
     await creatorPage.click('input[type="checkbox"][id="is_locked"]');
@@ -115,12 +82,17 @@ test.describe("Paywall Flow E2E", () => {
     await page.waitForSelector("text=E2E Test Post", { timeout: 10000 });
 
     // 验证 locked 内容不可见
-    const lockedContent = page.locator("text=This content is locked");
+    const lockedContent = page.getByTestId("post-locked-preview").first();
     await expect(lockedContent).toBeVisible();
 
     // 6. Fan 订阅 Creator
-    await page.click('button:has-text("Subscribe to unlock")');
-    await page.waitForTimeout(2000); // 等待订阅完成
+    const subscribeButton = page.getByTestId("creator-subscribe-button").first();
+    if (await subscribeButton.isVisible()) {
+      await subscribeButton.click();
+      await expect(page.getByTestId("paywall-modal")).toBeVisible({ timeout: 10000 });
+      await page.getByTestId("paywall-subscribe-button").click();
+      await expect(page.getByTestId("paywall-success-message")).toBeVisible({ timeout: 15000 });
+    }
 
     // 7. 验证 locked 内容现在可见
     await page.reload();

@@ -14,10 +14,11 @@ import { chromium, Browser, Page, BrowserContext } from "playwright";
 import { spawn, ChildProcess } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
+import { getBaseUrl, getPort } from "./_shared/env";
 
 // Configuration
-const PORT = process.env.PORT || "3000";
-const BASE_URL = `http://127.0.0.1:${PORT}`;
+const PORT = String(getPort());
+const BASE_URL = getBaseUrl();
 const ARTIFACTS_DIR = path.join(process.cwd(), "artifacts", "agent-browser-full");
 const SERVER_LOG_PATH = path.join(ARTIFACTS_DIR, "server.log");
 const SERVER_TIMEOUT = 120000;
@@ -269,7 +270,7 @@ async function auditRoute(
 
   try {
     const response = await page.goto(url, {
-      waitUntil: "networkidle",
+      waitUntil: "domcontentloaded",
       timeout: 30000,
     });
 

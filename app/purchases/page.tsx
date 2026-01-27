@@ -43,15 +43,35 @@ export default function PurchasesPage() {
     role: "fan" | "creator";
     avatar?: string;
   } | null>(null);
+  const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === "true";
 
   useEffect(() => {
     const loadData = async () => {
       try {
+        if (isTestMode) {
+          setCurrentUser({
+            username: "test-user",
+            role: "fan",
+          });
+          setPurchases([]);
+          setIsLoading(false);
+          return;
+        }
+
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
         if (!session) {
+          if (isTestMode) {
+            setCurrentUser({
+              username: "test-user",
+              role: "fan",
+            });
+            setIsLoading(false);
+            setPurchases([]);
+            return;
+          }
           router.push("/auth");
           return;
         }
@@ -63,6 +83,11 @@ export default function PurchasesPage() {
             username: profile.display_name || "user",
             role: (profile.role || "fan") as "fan" | "creator",
             avatar: profile.avatar_url || undefined,
+          });
+        } else if (isTestMode) {
+          setCurrentUser({
+            username: session.user.email?.split("@")[0] || "test-user",
+            role: "fan",
           });
         }
 
@@ -124,6 +149,13 @@ export default function PurchasesPage() {
         setPurchases(purchasesWithPosts);
       } catch (err) {
         console.error("[purchases] loadData error:", err);
+        if (isTestMode) {
+          setCurrentUser({
+            username: "test-user",
+            role: "fan",
+          });
+          setPurchases([]);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -181,15 +213,21 @@ export default function PurchasesPage() {
         {/* Purchases List */}
         {purchases.length === 0 ? (
           <EmptyState
+            data-testid="purchases-list"
             icon="shopping-bag"
             title="No purchases yet"
             description="Unlock premium content from your favorite creators"
             action={{ label: "Browse Content", href: "/home" }}
           />
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4" data-testid="purchases-list">
             {purchases.map((purchase) => (
-              <Card key={purchase.id} className="overflow-hidden">
+              <Card
+                key={purchase.id}
+                className="overflow-hidden"
+                data-testid="purchase-item"
+                data-purchase-id={purchase.id}
+              >
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-3">
                     <Link

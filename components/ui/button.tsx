@@ -5,21 +5,28 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-50 disabled:hover:scale-100 disabled:active:scale-100 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-[transform,opacity,box-shadow,background-color] duration-300 motion-safe:transition-[transform,opacity,box-shadow,background-color] motion-reduce:transition-none hover:scale-[1.02] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-[3px] focus-visible:ring-primary/50 focus-visible:outline-none aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
-        default: "bg-primary-gradient text-white hover:shadow-primary-glow hover-glow rounded-xl",
+        default:
+          "bg-primary-gradient text-white font-semibold hover:shadow-primary-glow hover-glow rounded-xl shadow-lg backdrop-blur-sm",
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 rounded-xl",
         outline:
-          "border border-border bg-card shadow-xs hover:bg-[#1A1A1A] hover:border-[#2F2F2F] rounded-xl",
-        secondary: "bg-card text-foreground border border-border hover:bg-[#1A1A1A] rounded-xl",
-        ghost: "hover:bg-white/5 hover:text-foreground rounded-xl",
-        link: "text-primary underline-offset-4 hover:underline",
-        gradient: "bg-primary-gradient text-white hover:shadow-primary-glow hover-glow rounded-xl",
+          "border-2 border-border/50 glass hover:border-accent/50 hover:shadow-accent-glow/30 active:bg-[rgba(15,15,15,0.9)] rounded-xl",
+        secondary:
+          "glass text-foreground border-2 border-border/50 hover:border-accent/30 hover:shadow-sm active:bg-[rgba(15,15,15,0.9)] rounded-xl",
+        ghost: "hover:glass hover:text-foreground active:bg-[rgba(255,255,255,0.05)] rounded-xl",
+        link: "text-primary underline-offset-4 hover:underline font-medium",
+        gradient:
+          "bg-primary-gradient text-white font-bold hover:shadow-primary-glow hover-glow rounded-xl shadow-lg backdrop-blur-sm",
         "accent-gradient":
-          "bg-accent-gradient text-white hover:shadow-accent-glow hover-glow rounded-xl",
+          "bg-accent-gradient text-foreground font-bold hover:shadow-accent-glow hover-glow rounded-xl shadow-lg backdrop-blur-sm",
+        "subscribe-gradient":
+          "bg-subscribe-gradient text-white font-bold hover:shadow-subscribe-glow hover-glow rounded-xl shadow-lg backdrop-blur-sm",
+        "unlock-gradient":
+          "bg-unlock-gradient text-white font-bold hover:shadow-unlock-glow hover-glow rounded-xl shadow-lg backdrop-blur-sm",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
