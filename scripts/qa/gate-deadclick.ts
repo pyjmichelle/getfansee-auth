@@ -137,12 +137,29 @@ async function verifySession(page: Page, expectedRole: "fan" | "creator"): Promi
     });
 
     if (!response || response.status() !== 200) {
+      if (process.env.CI === "true") {
+        console.warn(
+          `   [CI Debug] Session verification failed: /api/profile returned status ${response?.status() || "no response"}`
+        );
+      }
       return false;
     }
 
     const data = await response.json();
-    return data.profile?.role === expectedRole;
-  } catch (e) {
+    const actualRole = data.profile?.role;
+    const isValid = actualRole === expectedRole;
+
+    if (!isValid && process.env.CI === "true") {
+      console.warn(
+        `   [CI Debug] Session verification failed: expected role "${expectedRole}", got "${actualRole}"`
+      );
+    }
+
+    return isValid;
+  } catch (e: any) {
+    if (process.env.CI === "true") {
+      console.warn(`   [CI Debug] Session verification error: ${e.message}`);
+    }
     return false;
   }
 }
