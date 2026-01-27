@@ -56,7 +56,8 @@
     "qa:all": "pnpm -s lint && pnpm -s type-check && pnpm -s test:frontend:smoke && pnpm -s audit:full",
     "test:gate:ui": "tsx scripts/qa/gate-ui.ts",
     "test:gate:deadclick": "tsx scripts/qa/gate-deadclick.ts",
-    "qa:gate": "bash scripts/qa/check-server.sh && pnpm test:session:auto:all && pnpm test:gate:ui && pnpm test:gate:deadclick && pnpm audit:full"
+    "qa:gate": "bash scripts/qa/check-server.sh && pnpm test:gate:ui && pnpm test:gate:deadclick && pnpm audit:full",
+    "qa:gate:with-sessions": "bash scripts/qa/check-server.sh && pnpm test:session:auto:all && pnpm test:gate:ui && pnpm test:gate:deadclick && pnpm audit:full"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
