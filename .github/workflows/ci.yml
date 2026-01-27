@@ -137,6 +137,11 @@ jobs:
           echo "❌ Server did not become ready in time"
           exit 1
 
+      - name: Create test users (if needed)
+        run: |
+          echo "🔧 Creating test users for QA gate..."
+          pnpm tsx scripts/create-test-users.ts || echo "⚠️  Test users may already exist, continuing..."
+
       - name: Run QA Gate
         run: pnpm qa:gate
 

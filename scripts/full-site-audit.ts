@@ -27,12 +27,12 @@ const SERVER_TIMEOUT = 120000;
 const TEST_USERS = {
   fan: {
     email: "test-fan@example.com",
-    password: "TestFan123!",
+    password: "TestPassword123!",
     role: "fan" as const,
   },
   creator: {
     email: "test-creator@example.com",
-    password: "TestCreator123!",
+    password: "TestPassword123!",
     role: "creator" as const,
   },
 };

@@ -1,0 +1,27 @@
+
+> my-v0-project@0.1.0 build /Users/puyijun/Downloads/authentication-flow-design (1)
+> next build
+
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Environments: .env.local
+
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 5.3s
+   Running TypeScript ...
+Failed to compile.
+
+./playwright.config.ts:69:9
+Type error: No overload matches this call.
+  The last overload gave the following error.
+    Property 'expires' is missing in type '{ name: string; value: string; domain: string; path: string; httpOnly: false; secure: boolean; sameSite: "Lax"; }' but required in type '{ name: string; value: string; domain: string; path: string; expires: number; httpOnly: boolean; secure: boolean; sameSite: "Lax" | "Strict" | "None"; }'.
+
+[0m [90m 67 |[39m     storageState[33m:[39m {
+ [90m 68 |[39m       cookies[33m:[39m [
+[31m[1m>[22m[39m[90m 69 |[39m         {
+ [90m    |[39m         [31m[1m^[22m[39m
+ [90m 70 |[39m           name[33m:[39m [32m"playwright-test-mode"[39m[33m,[39m
+ [90m 71 |[39m           value[33m:[39m [32m"1"[39m[33m,[39m
+ [90m 72 |[39m           domain[33m:[39m parsedUrl[33m.[39mhostname[33m,[39m[0m
+Next.js build worker exited with code: 1 and signal: null
+ ELIFECYCLE  Command failed with exit code 1.

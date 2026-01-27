@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-17T17:23:52.302Z",
+  "timestamp": "2026-01-25T09:07:02.490Z",
   "baseUrl": "http://127.0.0.1:3000",
   "results": [
     {
@@ -7,7 +7,7 @@
       "success": true,
       "errors": [],
       "interactions": [],
-      "duration": 4366,
+      "duration": 4515,
       "snapshot": null,
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser/auth.png"
     },
@@ -16,7 +16,7 @@
       "success": true,
       "errors": [],
       "interactions": [],
-      "duration": 4228,
+      "duration": 3932,
       "snapshot": null,
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser/home.png"
     },
@@ -25,7 +25,7 @@
       "success": true,
       "errors": [],
       "interactions": [],
-      "duration": 4655,
+      "duration": 3850,
       "snapshot": null,
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser/creator-new-post.png"
     },
@@ -34,7 +34,7 @@
       "success": true,
       "errors": [],
       "interactions": [],
-      "duration": 4422,
+      "duration": 4138,
       "snapshot": null,
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser/me-wallet.png"
     },
@@ -43,7 +43,7 @@
       "success": true,
       "errors": [],
       "interactions": [],
-      "duration": 3939,
+      "duration": 3784,
       "snapshot": null,
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser/creator-upgrade.png"
     }

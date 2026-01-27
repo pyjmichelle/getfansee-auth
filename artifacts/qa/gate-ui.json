@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-18T17:04:12.474Z",
+  "timestamp": "2026-01-26T12:48:44.463Z",
   "summary": {
     "total": 10,
     "passed": 10,
@@ -21,7 +21,7 @@
           "passed": true
         }
       ],
-      "finalUrl": "http://127.0.0.1:3000/home",
+      "finalUrl": "http://localhost:3000/home",
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/home-posts.png"
     },
     {
@@ -38,7 +38,7 @@
           "passed": true
         }
       ],
-      "finalUrl": "http://127.0.0.1:3000/me/wallet",
+      "finalUrl": "http://localhost:3000/me/wallet",
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/wallet-balance.png"
     },
     {
@@ -83,7 +83,7 @@
           "passed": true
         }
       ],
-      "finalUrl": "http://127.0.0.1:3000/creator/new-post",
+      "finalUrl": "http://localhost:3000/creator/new-post",
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/new-post-form.png"
     },
     {
@@ -107,7 +107,7 @@
           "passed": true
         }
       ],
-      "finalUrl": "http://127.0.0.1:3000/creator/studio",
+      "finalUrl": "http://localhost:3000/creator/studio",
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/creator-studio.png"
     },
     {
@@ -131,7 +131,7 @@
           "passed": true
         }
       ],
-      "finalUrl": "http://127.0.0.1:3000/creator/studio/earnings",
+      "finalUrl": "http://localhost:3000/creator/studio/earnings",
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/creator-earnings.png"
     },
     {
@@ -148,7 +148,7 @@
           "passed": true
         }
       ],
-      "finalUrl": "http://127.0.0.1:3000/home",
+      "finalUrl": "http://localhost:3000/home",
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/search-modal.png"
     },
     {
@@ -165,7 +165,7 @@
           "passed": true
         }
       ],
-      "finalUrl": "http://127.0.0.1:3000/auth?mode=login",
+      "finalUrl": "http://localhost:3000/auth?mode=login",
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/age-gate.png"
     },
     {
@@ -210,7 +210,7 @@
           "passed": true
         }
       ],
-      "finalUrl": "http://127.0.0.1:3000/me/wallet",
+      "finalUrl": "http://localhost:3000/me/wallet",
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/checkout-disclaimer.png"
     },
     {
@@ -227,7 +227,7 @@
           "passed": true
         }
       ],
-      "finalUrl": "http://127.0.0.1:3000/creator/new-post",
+      "finalUrl": "http://localhost:3000/creator/new-post",
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/upload-file-input.png"
     },
     {
@@ -242,9 +242,16 @@
           "found": 1,
           "required": 1,
           "passed": true
+        },
+        {
+          "selector": "[data-testid=\"search-page\"]",
+          "description": "Search page loads after click",
+          "found": 0,
+          "required": 1,
+          "passed": false
         }
       ],
-      "finalUrl": "http://127.0.0.1:3000/home",
+      "finalUrl": "http://localhost:3000/home",
       "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/search-modal.png"
     }
   ]

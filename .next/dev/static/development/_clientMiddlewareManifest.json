@@ -10,9 +10,5 @@
   {
     "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/creator\\/studio(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(\\\\.json)?[\\/#\\?]?$",
     "originalSource": "/creator/studio/:path*"
-  },
-  {
-    "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/creator\\/upgrade(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(\\\\.json)?[\\/#\\?]?$",
-    "originalSource": "/creator/upgrade/:path*"
   }
 ]

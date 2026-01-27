@@ -1,0 +1,45 @@
+[Playwright Config] CI: true
+[Playwright Config] Base URL: http://localhost:3000
+[WebServer] 
+[WebServer] > my-v0-project@0.1.0 build /Users/puyijun/Downloads/authentication-flow-design (1)
+[WebServer] > next build
+[WebServer] 
+[WebServer]    ▲ Next.js 16.0.10 (Turbopack)
+[WebServer]    - Environments: .env.local
+[WebServer] 
+[WebServer]  ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[WebServer]    Creating an optimized production build ...
+[WebServer] Turbopack build encountered 1 warnings:
+[WebServer] [next]/internal/font/google/inter_5972bc34.module.css
+[WebServer] Error while requesting resource
+[WebServer] There was an issue establishing a connection while requesting https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap
+[WebServer] 
+[WebServer] Import trace:
+[WebServer]   Server Component:
+[WebServer]     [next]/internal/font/google/inter_5972bc34.module.css
+[WebServer]     [next]/internal/font/google/inter_5972bc34.js
+[WebServer]     ./app/layout.tsx
+[WebServer] 
+[WebServer] 
+[WebServer] 
+[WebServer] > Build error occurred
+[WebServer] Error: Turbopack build failed with 1 errors:
+[WebServer] [next]/internal/font/google/inter_5972bc34.module.css
+[WebServer] next/font: error:
+[WebServer] Failed to fetch `Inter` from Google Fonts.
+[WebServer] 
+[WebServer] Import trace:
+[WebServer]   Server Component:
+[WebServer]     [next]/internal/font/google/inter_5972bc34.module.css
+[WebServer]     [next]/internal/font/google/inter_5972bc34.js
+[WebServer]     ./app/layout.tsx
+[WebServer] 
+[WebServer] 
+[WebServer]     at ignore-listed frames
+[WebServer]  ELIFECYCLE  Command failed with exit code 1.
+
+Error: Process from config.webServer was not able to start. Exit code: 1
+::error ::Error: Process from config.webServer was not able to start. Exit code: 1
+
+
+::notice title=🎭 Playwright Run Summary::

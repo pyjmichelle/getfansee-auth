@@ -357,6 +357,24 @@ async function autoLogin(role: "fan" | "creator") {
       await page.screenshot({ path: errorScreenshot, fullPage: true });
       console.error(`   Screenshot: ${errorScreenshot}`);
 
+      // In CI, provide more context
+      if (process.env.CI === "true") {
+        console.error(`\n   🔍 CI Environment Debug Info:`);
+        console.error(`   - BASE_URL: ${BASE_URL}`);
+        console.error(
+          `   - NEXT_PUBLIC_SUPABASE_URL: ${process.env.NEXT_PUBLIC_SUPABASE_URL ? "set" : "not set"}`
+        );
+        console.error(
+          `   - NEXT_PUBLIC_SUPABASE_ANON_KEY: ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "set" : "not set"}`
+        );
+        console.error(`   - Test account email: ${account.email}`);
+        console.error(`   - This may indicate:`);
+        console.error(`     1. Network connectivity issues with Supabase`);
+        console.error(`     2. Test account credentials are incorrect`);
+        console.error(`     3. Test account does not exist in database`);
+        console.error(`     4. Server is not responding correctly`);
+      }
+
       process.exit(1);
     }
 
@@ -413,6 +431,17 @@ async function autoLogin(role: "fan" | "creator") {
       const errorScreenshot = path.join(SESSIONS_DIR, `${role}-verification-failed.png`);
       await page.screenshot({ path: errorScreenshot, fullPage: true });
       console.error(`   Screenshot saved: ${errorScreenshot}`);
+
+      // In CI, provide more context
+      if (process.env.CI === "true") {
+        console.error(`\n   🔍 CI Environment Debug Info:`);
+        console.error(`   - Expected page: ${account.testPage}`);
+        console.error(`   - Actual URL: ${finalUrl}`);
+        console.error(`   - This may indicate:`);
+        console.error(`     1. Session cookies are invalid`);
+        console.error(`     2. User profile is missing or incorrect role`);
+        console.error(`     3. Middleware is redirecting due to auth check failure`);
+      }
 
       process.exit(1);
     }

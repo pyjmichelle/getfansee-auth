@@ -215,20 +215,29 @@ async function createAuthContext(
     console.warn(`\n⚠️  Session file not found: ${sessionPath}`);
     console.warn(`   Skipping authenticated ${state} checks`);
     console.warn(`   To enable: pnpm test:session:auto:${state}`);
+    console.warn(`   This is expected in CI if session creation failed`);
     return null;
   }
 
-  const sessionData = JSON.parse(fs.readFileSync(sessionPath, "utf-8"));
-  const cookieCount = sessionData.cookies?.length || 0;
+  try {
+    const sessionData = JSON.parse(fs.readFileSync(sessionPath, "utf-8"));
+    const cookieCount = sessionData.cookies?.length || 0;
 
-  if (cookieCount === 0) {
-    throw new Error(`Invalid session file: ${state}.json (no cookies)`);
+    if (cookieCount === 0) {
+      console.warn(`\n⚠️  Session file exists but has no cookies: ${sessionPath}`);
+      console.warn(`   This may indicate a login failure`);
+      return null;
+    }
+
+    return await browser.newContext({
+      ...baseOptions,
+      storageState: sessionPath,
+    });
+  } catch (error: any) {
+    console.error(`\n❌ Error loading session file: ${error.message}`);
+    console.error(`   Path: ${sessionPath}`);
+    return null;
   }
-
-  return await browser.newContext({
-    ...baseOptions,
-    storageState: sessionPath,
-  });
 }
 
 async function verifySession(page: Page, expectedRole: "fan" | "creator"): Promise<boolean> {
@@ -269,15 +278,30 @@ async function runUICheck(browser: Browser, check: UICheck): Promise<CheckResult
     context = await createAuthContext(browser, check.authState);
     if (!context) {
       console.log(`   ⏭️  Skipping (session not available)`);
-      result.status = "FAIL";
-      result.checks.push({
-        selector: "session",
-        description: `${check.authState} session required`,
-        found: 0,
-        required: 1,
-        passed: false,
-      });
-      return result;
+      // In CI, if session creation failed, we should fail the check
+      // but provide clear error message
+      if (process.env.CI === "true") {
+        result.status = "FAIL";
+        result.checks.push({
+          selector: "session",
+          description: `${check.authState} session required but not available. Check test:session:auto:${check.authState} step.`,
+          found: 0,
+          required: 1,
+          passed: false,
+        });
+        return result;
+      } else {
+        // In local dev, just skip
+        result.status = "FAIL";
+        result.checks.push({
+          selector: "session",
+          description: `${check.authState} session required (run: pnpm test:session:auto:${check.authState})`,
+          found: 0,
+          required: 1,
+          passed: false,
+        });
+        return result;
+      }
     }
     page = await context.newPage();
 

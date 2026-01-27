@@ -1,0 +1,12 @@
+{"location":"auto-login.ts:START","message":"开始登录","data":{"url":"http://127.0.0.1:3000/auth","role":"fan"},"timestamp":1769010298610,"sessionId":"debug-session","hypothesisId":"START"}
+{"location":"auto-login.ts:TAB","message":"Login tab clicked","data":{},"timestamp":1769010301286,"sessionId":"debug-session","hypothesisId":"D"}
+{"location":"auto-login.ts:EMAIL","message":"Email filled","data":{"email":"test-fan@example.com"},"timestamp":1769010301325,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"auto-login.ts:PASSWORD","message":"Password filled","data":{"passwordLength":16},"timestamp":1769010301381,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"auto-login.ts:SUBMIT","message":"Submit clicked","data":{},"timestamp":1769010301928,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"auto-login.ts:AFTER_SUBMIT","message":"After submit state","data":{"url":"http://127.0.0.1:3000/auth?mode=login","hasError":true,"hasInvalid":false},"timestamp":1769010303939,"sessionId":"debug-session","hypothesisId":"C"}
+{"location":"auto-login.ts:START","message":"开始登录","data":{"url":"http://127.0.0.1:3000/auth","role":"fan"},"timestamp":1769010358095,"sessionId":"debug-session","hypothesisId":"START"}
+{"location":"auto-login.ts:TAB","message":"Login tab clicked","data":{},"timestamp":1769010360708,"sessionId":"debug-session","hypothesisId":"D"}
+{"location":"auto-login.ts:EMAIL","message":"Email filled","data":{"email":"test-fan@example.com"},"timestamp":1769010360751,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"auto-login.ts:PASSWORD","message":"Password filled","data":{"passwordLength":16},"timestamp":1769010360813,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"auto-login.ts:SUBMIT","message":"Submit clicked","data":{},"timestamp":1769010361356,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"auto-login.ts:AFTER_SUBMIT","message":"After submit state","data":{"url":"http://127.0.0.1:3000/auth?mode=login","hasError":true,"hasInvalid":false},"timestamp":1769010363372,"sessionId":"debug-session","hypothesisId":"C"}
