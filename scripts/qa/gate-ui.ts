@@ -284,11 +284,13 @@ async function runUICheck(browser: Browser, check: UICheck): Promise<CheckResult
         result.status = "FAIL";
         result.checks.push({
           selector: "session",
-          description: `${check.authState} session required but not available. Check test:session:auto:${check.authState} step.`,
+          description: `${check.authState} session required but not available. Check test:session:auto:${check.authState} step. Session creation may have failed - check CI logs.`,
           found: 0,
           required: 1,
           passed: false,
         });
+        // In CI, continue to next check instead of exiting immediately
+        // This allows other checks (like anonymous) to still run
         return result;
       } else {
         // In local dev, just skip
@@ -628,9 +630,30 @@ async function main() {
       console.error("=".repeat(60));
       console.error(`Failed checks: ${failed}`);
       console.error("\nFailed results:");
-      results
-        .filter((r) => r.status === "FAIL")
-        .forEach((r) => {
+
+      // Separate session failures from actual UI failures
+      const sessionFailures = results.filter(
+        (r) => r.status === "FAIL" && r.checks.some((c) => c.selector === "session")
+      );
+      const uiFailures = results.filter(
+        (r) => r.status === "FAIL" && !r.checks.some((c) => c.selector === "session")
+      );
+
+      if (sessionFailures.length > 0) {
+        console.error("\n⚠️  Session-related failures (may be transient):");
+        sessionFailures.forEach((r) => {
+          console.error(`\n  ⚠️  ${r.id} (${r.route}, ${r.authState})`);
+          r.checks
+            .filter((c) => !c.passed)
+            .forEach((c) => {
+              console.error(`     - ${c.description}`);
+            });
+        });
+      }
+
+      if (uiFailures.length > 0) {
+        console.error("\n❌ Actual UI failures:");
+        uiFailures.forEach((r) => {
           console.error(`\n  ❌ ${r.id} (${r.route}, ${r.authState})`);
           r.checks
             .filter((c) => !c.passed)
@@ -638,7 +661,20 @@ async function main() {
               console.error(`     - ${c.description}: Found ${c.found}, Required ${c.required}`);
             });
         });
+      }
+
       console.error(`\nFull report: ${reportPath}`);
+
+      // In CI, if only session failures (no actual UI failures), provide guidance but still fail
+      // This helps identify if it's a session creation issue vs actual UI problem
+      if (uiFailures.length === 0 && sessionFailures.length > 0 && process.env.CI === "true") {
+        console.error("\n💡 Note: All failures are session-related.");
+        console.error("   This suggests session creation failed. Check:");
+        console.error("   1. Test accounts exist in Supabase");
+        console.error("   2. test:session:auto:all step completed successfully");
+        console.error("   3. Session files exist in artifacts/agent-browser-full/sessions/");
+      }
+
       process.exit(1);
     } else {
       console.log("\n" + "=".repeat(60));

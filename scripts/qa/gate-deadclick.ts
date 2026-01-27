@@ -173,11 +173,12 @@ async function runDeadClickCheck(browser: Browser, check: DeadClickCheck): Promi
       // In CI, if session creation failed, we should fail the check
       if (process.env.CI === "true") {
         result.status = "FAIL";
-        result.actualResult = `${check.authState} session required but not available. Check test:session:auto:${check.authState} step.`;
+        result.actualResult = `${check.authState} session required but not available. Check test:session:auto:${check.authState} step. Session creation may have failed - check CI logs.`;
       } else {
         result.status = "FAIL";
         result.actualResult = `${check.authState} session not available (run: pnpm test:session:auto:${check.authState})`;
       }
+      // In CI, continue to next check instead of exiting immediately
       return result;
     }
     page = await context.newPage();
