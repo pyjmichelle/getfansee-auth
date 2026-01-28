@@ -399,6 +399,21 @@ async function runUICheck(browser: Browser, check: UICheck): Promise<CheckResult
       }
     }
 
+    // For wallet page in CI, wait for balance section (data may load from API)
+    if (
+      process.env.CI === "true" &&
+      (check.id === "wallet-balance" || check.id === "checkout-disclaimer")
+    ) {
+      const walletTimeout = 15000;
+      try {
+        await page.waitForSelector('[data-testid="wallet-balance-section"]', {
+          timeout: walletTimeout,
+        });
+      } catch (e) {
+        console.log(`   ⚠️  Wallet balance section did not appear within ${walletTimeout}ms`);
+      }
+    }
+
     result.finalUrl = page.url();
 
     // Check each selector
