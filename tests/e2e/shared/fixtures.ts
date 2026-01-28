@@ -278,18 +278,19 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
     "upsert:profiles:fan"
   );
 
-  // 创建钱包并充值 $50
+  // 创建钱包并充值 $50（应用使用 wallet_accounts，非 user_wallets）
   const walletBalance = 5000; // 50.00 USD in cents
   await withAdminRetries(
     () =>
-      adminClient.from("user_wallets").upsert(
+      adminClient.from("wallet_accounts").upsert(
         {
-          id: fanUserId,
-          balance_cents: walletBalance,
+          user_id: fanUserId,
+          available_balance_cents: walletBalance,
+          pending_balance_cents: 0,
         },
-        { onConflict: "id" }
+        { onConflict: "user_id" }
       ),
-    "upsert:user_wallets:fan"
+    "upsert:wallet_accounts:fan"
   );
 
   // 3. 创建测试帖子
@@ -405,8 +406,16 @@ export async function teardownTestFixtures(fixtures?: TestFixtures | null): Prom
         "delete:purchases"
       );
       await withAdminRetries(
+        () => adminClient.from("transactions").delete().eq("user_id", userId),
+        "delete:transactions"
+      );
+      await withAdminRetries(
         () => adminClient.from("wallet_transactions").delete().eq("user_id", userId),
         "delete:wallet_transactions"
+      );
+      await withAdminRetries(
+        () => adminClient.from("wallet_accounts").delete().eq("user_id", userId),
+        "delete:wallet_accounts"
       );
       await withAdminRetries(
         () => adminClient.from("user_wallets").delete().eq("id", userId),
@@ -453,38 +462,44 @@ export async function topUpWallet(userId: string, amountCents: number): Promise<
     throw new Error("Admin client not available");
   }
 
-  // 更新钱包余额
+  // 应用使用 wallet_accounts (user_id, available_balance_cents)
   const { data: wallet } = await withAdminRetries(
-    () => adminClient.from("user_wallets").select("balance_cents").eq("id", userId).single(),
-    "select:user_wallets"
+    () =>
+      adminClient
+        .from("wallet_accounts")
+        .select("available_balance_cents")
+        .eq("user_id", userId)
+        .maybeSingle(),
+    "select:wallet_accounts"
   );
 
-  const currentBalance = wallet?.balance_cents || 0;
+  const currentBalance = wallet?.available_balance_cents ?? 0;
   const newBalance = currentBalance + amountCents;
 
   await withAdminRetries(
     () =>
-      adminClient.from("user_wallets").upsert(
+      adminClient.from("wallet_accounts").upsert(
         {
-          id: userId,
-          balance_cents: newBalance,
+          user_id: userId,
+          available_balance_cents: newBalance,
+          pending_balance_cents: 0,
         },
-        { onConflict: "id" }
+        { onConflict: "user_id" }
       ),
-    "upsert:user_wallets"
+    "upsert:wallet_accounts"
   );
 
-  // 记录交易
+  // 记录交易（应用使用 transactions 表）
   await withAdminRetries(
     () =>
-      adminClient.from("wallet_transactions").insert({
+      adminClient.from("transactions").insert({
         user_id: userId,
         amount_cents: amountCents,
         type: "deposit",
         status: "completed",
-        description: "E2E Test Top-up",
+        metadata: { source: "e2e-topup" },
       }),
-    "insert:wallet_transactions"
+    "insert:transactions"
   );
 }
 

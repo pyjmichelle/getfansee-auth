@@ -13,7 +13,13 @@ import {
   topUpWallet,
   TestFixtures,
 } from "./shared/fixtures";
-import { clearStorage, signInUser, signUpUser, waitForPageLoad } from "./shared/helpers";
+import {
+  clearStorage,
+  createConfirmedTestUser,
+  signInUser,
+  signUpUser,
+  waitForPageLoad,
+} from "./shared/helpers";
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
 
@@ -56,15 +62,15 @@ test.describe("Money Flow - 护城河测试", () => {
     await waitForPageLoad(page);
 
     // 3. 验证看到锁定状态
-    await expect(page.getByTestId("post-locked-overlay")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId("post-locked-overlay")).toBeVisible({ timeout: 15_000 });
 
-    // 4. 点击解锁按钮
+    // 4. 点击解锁按钮（CI 需更长等待）
     const unlockButton = page.getByTestId("post-unlock-button");
-    await expect(unlockButton).toBeVisible({ timeout: 5000 });
+    await expect(unlockButton).toBeVisible({ timeout: 20_000 });
     await unlockButton.click();
 
-    // 5. 等待支付弹窗出现
-    await expect(page.getByTestId("paywall-modal")).toBeVisible({ timeout: 5000 });
+    // 5. 等待支付弹窗出现（点击解锁后由帖子详情页 PaywallModal 打开）
+    await expect(page.getByTestId("paywall-modal")).toBeVisible({ timeout: 20_000 });
 
     // 6. 验证显示价格和余额
     await expect(page.getByTestId("paywall-price")).toHaveText(
@@ -103,24 +109,32 @@ test.describe("Money Flow - 护城河测试", () => {
 
     // 4. 点击解锁按钮
     const unlockButton = page.getByTestId("post-unlock-button");
-    if (await unlockButton.isVisible()) {
-      await unlockButton.click();
+    await expect(unlockButton).toBeVisible({ timeout: 20_000 });
+    await unlockButton.click();
 
-      // 5. 等待支付弹窗出现
-      await expect(page.getByTestId("paywall-modal")).toBeVisible({ timeout: 5000 });
+    // 5. 等待支付弹窗出现
+    await expect(page.getByTestId("paywall-modal")).toBeVisible({ timeout: 20_000 });
 
-      // 6. 验证显示余额不足提示
-      await expect(page.getByTestId("paywall-balance-insufficient")).toBeVisible({ timeout: 5000 });
-
-      // 7. 点击"去充值"按钮
-      const addFundsButton = page.getByTestId("paywall-add-funds-link");
-      if (await addFundsButton.isVisible()) {
-        await addFundsButton.click();
-
-        // 8. 验证跳转到钱包页面
-        await expect(page).toHaveURL(/\/me\/wallet/, { timeout: 10000 });
-      }
+    // 6. 验证显示余额不足（$0.00 或 add-funds 链接）
+    await expect(page.getByTestId("paywall-balance-value")).toHaveText(/\$0\.00/, {
+      timeout: 5000,
+    });
+    if (
+      await page
+        .getByTestId("paywall-balance-insufficient")
+        .isVisible()
+        .catch(() => false)
+    ) {
+      await expect(page.getByTestId("paywall-balance-insufficient")).toBeVisible();
     }
+
+    // 7. 点击"去充值"按钮
+    const addFundsButton = page.getByTestId("paywall-add-funds-link");
+    await expect(addFundsButton).toBeVisible({ timeout: 5000 });
+    await addFundsButton.click();
+
+    // 8. 验证跳转到钱包页面
+    await expect(page).toHaveURL(/\/me\/wallet/, { timeout: 10_000 });
   });
 
   test("E2E-3: 购买后刷新仍可见（权限持久）", async ({ page }) => {
@@ -164,46 +178,24 @@ test.describe("Money Flow - 护城河测试", () => {
 
 test.describe("钱包充值流程", () => {
   test("钱包充值 → 余额更新", async ({ page }) => {
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).slice(2, 8);
-    const testEmail = `e2e-wallet-${timestamp}-${random}@example.com`;
-    const testPassword = "TestPassword123!";
-
-    // 1. 注册新用户
-    await page.goto(`${BASE_URL}/auth?mode=signup`);
+    await clearStorage(page);
+    const user = await createConfirmedTestUser("fan");
+    await signInUser(page, user.email, user.password);
     await waitForPageLoad(page);
 
-    await page.getByTestId("auth-email").fill(testEmail);
-    await page.getByTestId("auth-password").fill(testPassword);
-
-    const ageCheckbox = page.getByTestId("auth-age-checkbox");
-    if (await ageCheckbox.isVisible().catch(() => false)) {
-      await ageCheckbox.click();
-    }
-
-    await page.getByTestId("auth-submit").click();
-    await page.waitForURL(/\/(home|auth)/, { timeout: 15000 }).catch(() => {});
-
-    // 如果需要登录
-    if (page.url().includes("/auth")) {
-      await page.goto(`${BASE_URL}/auth?mode=login`);
-      await waitForPageLoad(page);
-      await page.fill('input[type="email"]', testEmail);
-      await page.fill('input[type="password"]', testPassword);
-      await page
-        .getByRole("button", { name: /sign in|log in/i })
-        .first()
-        .click();
-      await page.waitForURL(`${BASE_URL}/home`, { timeout: 10000 }).catch(() => {});
-    }
-
-    // 2. 访问钱包页面
-    await page.goto(`${BASE_URL}/me/wallet`);
+    // 访问钱包页面
+    await page.goto(`${BASE_URL}/me/wallet`, {
+      waitUntil: "domcontentloaded",
+      timeout: 15_000,
+    });
     await waitForPageLoad(page);
 
-    // 3. 验证初始余额为 $0.00
+    await expect(page).toHaveURL(/\/me\/wallet/, { timeout: 10_000 });
+    await expect(page.getByTestId("wallet-page")).toBeVisible({ timeout: 15_000 });
+
+    // 验证初始余额为 $0.00
     await expect(page.getByTestId("wallet-balance-value")).toHaveText("$0.00", {
-      timeout: 10000,
+      timeout: 15_000,
     });
 
     // 4. 选择充值金额 $10

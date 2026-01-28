@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { PostLikeButton } from "@/components/post-like-button";
 import { CommentList } from "@/components/comments/comment-list";
 import { MediaDisplay } from "@/components/media-display";
+import { PaywallModal } from "@/components/paywall-modal";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { BottomNavigation } from "@/components/bottom-navigation";
@@ -39,6 +40,7 @@ export default function PostDetailPage() {
     avatar?: string;
   } | null>(null);
   const [canView, setCanView] = useState(false);
+  const [showPaywallModal, setShowPaywallModal] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -107,6 +109,17 @@ export default function PostDetailPage() {
     } else {
       navigator.clipboard.writeText(url);
       toast.success("Link copied to clipboard");
+    }
+  };
+
+  const refetchCanView = async () => {
+    if (!postId) return;
+    try {
+      const res = await fetch(`/api/posts/${postId}`);
+      const data = await res.json();
+      if (data?.success && data.canView) setCanView(true);
+    } catch {
+      // ignore
     }
   };
 
@@ -252,10 +265,11 @@ export default function PostDetailPage() {
                       ? "post-subscribe-button"
                       : "post-unlock-button"
                   }
+                  onClick={() => setShowPaywallModal(true)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      // Handle unlock/subscribe
+                      setShowPaywallModal(true);
                     }
                   }}
                   aria-label={
@@ -299,6 +313,28 @@ export default function PostDetailPage() {
           />
         )}
       </main>
+
+      {post && (
+        <PaywallModal
+          open={showPaywallModal}
+          onOpenChange={setShowPaywallModal}
+          type={post.visibility === "subscribers" ? "subscribe" : "ppv"}
+          creatorName={post.creator?.display_name || "Creator"}
+          price={post.visibility === "ppv" ? (post.price_cents ?? 0) / 100 : 9.99}
+          benefits={
+            post.visibility === "subscribers"
+              ? ["Exclusive content", "Direct support", "Early access"]
+              : ["Instant access to this post", "Unlock all media"]
+          }
+          postId={post.visibility === "ppv" ? post.id : undefined}
+          creatorId={post.creator_id}
+          contentPreview={post.title || undefined}
+          onSuccess={async () => {
+            setShowPaywallModal(false);
+            await refetchCanView();
+          }}
+        />
+      )}
 
       <BottomNavigation notificationCount={0} />
     </div>
