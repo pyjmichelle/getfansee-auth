@@ -63,7 +63,7 @@ const UI_CHECKS: UICheck[] = [
     authState: "fan",
     selectors: [
       {
-        selector: '[data-testid="wallet-balance"]',
+        selector: '[data-testid="wallet-balance-section"]',
         description: "Wallet balance section should be visible",
       },
     ],
@@ -171,7 +171,7 @@ const UI_CHECKS: UICheck[] = [
         description: "No refund notice should be visible",
       },
       {
-        selector: '[data-testid="balance-value"]',
+        selector: '[data-testid="wallet-balance-value"]',
         description: "Balance value should be visible",
       },
     ],

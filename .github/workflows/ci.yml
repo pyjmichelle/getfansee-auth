@@ -154,10 +154,26 @@ jobs:
           }
           echo "✅ Session creation completed"
           echo "Verifying session files..."
-          ls -la artifacts/agent-browser-full/sessions/ || echo "⚠️  No session files found"
+          ls -la artifacts/agent-browser-full/sessions/
+          for f in fan.json creator.json; do
+            if [ ! -f "artifacts/agent-browser-full/sessions/$f" ]; then
+              echo "❌ Missing session file: $f"
+              exit 1
+            fi
+          done
+          echo "✅ fan.json and creator.json present"
 
-      - name: Run QA Gate
-        run: pnpm qa:gate
+      - name: QA Gate - Check server
+        run: bash scripts/qa/check-server.sh
+
+      - name: QA Gate - UI (gate-ui)
+        run: pnpm test:gate:ui
+
+      - name: QA Gate - Dead Click (gate-deadclick)
+        run: pnpm test:gate:deadclick
+
+      - name: QA Gate - Full site audit (audit:full)
+        run: pnpm audit:full
 
       - name: Stop app server
         if: always()
