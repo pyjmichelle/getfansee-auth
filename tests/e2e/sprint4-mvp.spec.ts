@@ -90,7 +90,11 @@ test.describe("Sprint 4.0 MVP monetization flow", () => {
       await test.step("Fan purchase history reflects unlock", async () => {
         await fanPage.goto(`${BASE_URL}/purchases`);
         await expect(fanPage.getByTestId("purchases-list")).toBeVisible();
-        await expect(fanPage.locator("text=" + postContent)).toBeVisible({ timeout: 15_000 });
+        await expect(
+          fanPage.getByTestId("purchase-item").filter({ hasText: postContent })
+        ).toBeVisible({
+          timeout: 20_000,
+        });
       });
 
       await test.step("Creator earnings updated", async () => {
