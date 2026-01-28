@@ -2,7 +2,7 @@
 
 ## 当前状态（一句话）
 
-- **代码推送**：`feature/add-readme-badge` 上共 **32 个 commit** 已全部**成功推送到远程**。
+- **代码推送**：`feature/add-readme-badge` 上共 **33 个 commit** 已全部**成功推送到远程**（含 comments 修复 + atomic-unlock 轮询修复）。
 - **合并到 main**：**尚未合并**，所以 Vercel 生产环境还看不到这些改动。
 - **你“真正能看见”的时间**：**PR 合并到 main 之后约 1～3 分钟**（Vercel 自动部署）。
 

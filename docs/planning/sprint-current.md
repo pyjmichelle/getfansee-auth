@@ -35,6 +35,11 @@
   - pnpm qa:gate
   - pnpm exec playwright test --project=chromium
 
+### 已做（backfill）
+
+- **lib/comments.ts**：post_comments 无直接 FK 到 profiles，改为两次查询（评论 + profiles）合并，避免 PostgREST 关系错误。
+- **atomic-unlock E2E**：购买/交易校验改为轮询 15s + `credentials: "same-origin"`，缓解 CI 下时序与 cookie 问题。
+
 ---
 
 ### P1 – Kernel & Planning normalization
