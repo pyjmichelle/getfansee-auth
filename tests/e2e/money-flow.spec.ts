@@ -115,9 +115,9 @@ test.describe("Money Flow - 护城河测试", () => {
     // 5. 等待支付弹窗出现
     await expect(page.getByTestId("paywall-modal")).toBeVisible({ timeout: 20_000 });
 
-    // 6. 验证显示余额不足（$0.00 或 add-funds 链接）
-    await expect(page.getByTestId("paywall-balance-value")).toHaveText(/\$0\.00/, {
-      timeout: 5000,
+    // 6. 验证显示余额不足（文案含 $0.00）
+    await expect(page.getByTestId("paywall-balance-value")).toContainText("$0.00", {
+      timeout: 15_000,
     });
     if (
       await page

@@ -79,18 +79,22 @@ test.describe("Atomic PPV Unlock Tests", () => {
     const contentElement = page.locator('[data-testid="post-content"]').first();
     await expect(contentElement).toBeVisible();
 
-    // 6. Verify database consistency (via API)
-    const response = await page.request.get("/api/purchases");
-    const purchases = await response.json();
+    // 6. Verify database consistency (via API, 使用页面上下文以携带 cookie)
+    const purchases = await page.evaluate(async () => {
+      const res = await fetch("/api/purchases");
+      const json = await res.json();
+      return json;
+    });
     const purchaseList = Array.isArray(purchases?.data) ? purchases.data : [];
 
     expect(purchaseList).toHaveLength(1);
     expect(purchaseList[0].post_id).toBe(fixtures.posts.ppv.id);
     expect(purchaseList[0].amount).toBe(PPV_PRICE);
 
-    // Verify transaction exists (optional: related_id depends on unlock_ppv RPC shape)
-    const txResponse = await page.request.get("/api/transactions");
-    const transactions = await txResponse.json();
+    const transactions = await page.evaluate(async () => {
+      const res = await fetch("/api/transactions");
+      return res.json();
+    });
     const txList = Array.isArray(transactions?.data) ? transactions.data : [];
     const relatedTx = txList.filter(
       (tx: { related_id?: string }) => tx.related_id === purchaseList[0].id
@@ -140,11 +144,10 @@ test.describe("Atomic PPV Unlock Tests", () => {
     // Should be charged exactly once
     expect(finalBalance).toBe(initialBalance - PPV_PRICE);
 
-    // Verify only 1 purchase record
-    const response = await page.request.get("/api/purchases");
-    const purchases = await response.json();
-
-    // Should have exactly 1 purchase (idempotency worked)
+    const purchases = await page.evaluate(async () => {
+      const res = await fetch("/api/purchases");
+      return res.json();
+    });
     expect(purchases.data || []).toHaveLength(1);
   });
 
@@ -171,8 +174,7 @@ test.describe("Atomic PPV Unlock Tests", () => {
     // Wait for paywall modal
     await expect(page.getByTestId("paywall-modal")).toBeVisible({ timeout: 15_000 });
 
-    // Should show insufficient balance warning
-    await expect(page.getByTestId("paywall-balance-value")).toHaveText(/\\$0\\.00/);
+    await expect(page.getByTestId("paywall-balance-value")).toContainText("$0.00");
 
     // Should show "Add Funds" button instead of "Unlock" button
     await expect(page.getByTestId("paywall-add-funds-link")).toBeVisible();

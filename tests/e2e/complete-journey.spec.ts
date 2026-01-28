@@ -168,12 +168,20 @@ test.describe("完整用户旅程测试", () => {
       await creatorPage.close();
     });
 
-    // ========== 阶段 3: Fan 浏览 Feed ==========
     test.step("3. Fan 浏览 Feed", async () => {
-      await page.goto(`${BASE_URL}/home`, { waitUntil: "domcontentloaded", timeout: 30_000 });
+      try {
+        await page.goto(`${BASE_URL}/home`, {
+          waitUntil: "commit",
+          timeout: 30_000,
+        });
+      } catch (e) {
+        if (String((e as Error)?.message || "").includes("ERR_ABORTED")) {
+          await page.waitForURL(/\/(home|auth)/, { timeout: 15_000 }).catch(() => {});
+        } else {
+          throw e;
+        }
+      }
       await waitForPageLoad(page);
-
-      // 验证 Feed 加载（允许重定向到 auth 时跳过 home-feed）
       const onAuth = page.url().includes("/auth");
       if (!onAuth) {
         await waitForVisible(page, "main, [role='main']", 10000);

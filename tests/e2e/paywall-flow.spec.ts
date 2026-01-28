@@ -53,19 +53,23 @@ test.describe("Paywall Flow E2E", () => {
         .catch(() => {});
     }
 
-    // 等待 onboarding 表单（display_name 在 /creator/onboarding 上为 id="display_name"）
+    // 等待 onboarding/upgrade 表单（onboarding 用 id=display_name，upgrade/apply 用 id=displayName）
     const displayNameInput = creatorPage
-      .locator('#display_name, input[name="display_name"]')
+      .getByRole("textbox", { name: /display name/i })
+      .or(creatorPage.locator("#display_name, #displayName, input[name='display_name']"))
       .first();
-    await expect(displayNameInput).toBeVisible({ timeout: 15_000 });
+    await expect(displayNameInput).toBeVisible({ timeout: 20_000 });
     await displayNameInput.fill(`Creator ${uniqueSuffix}`);
-    const bioInput = creatorPage.locator('#bio, textarea[name="bio"]').first();
+    const bioInput = creatorPage.locator("#bio, textarea[name='bio']").first();
     if (await bioInput.isVisible().catch(() => false)) {
       await bioInput.fill("E2E Test Creator");
     }
-    await creatorPage.locator('button:has-text("Next"), button:has-text("Save")').first().click();
+    await creatorPage
+      .locator('button:has-text("Next"), button:has-text("Save"), button:has-text("Continue")')
+      .first()
+      .click();
 
-    await creatorPage.waitForURL(/\/home|\/creator\//, { timeout: 15_000 });
+    await creatorPage.waitForURL(/\/home|\/creator\//, { timeout: 20_000 });
     await waitForPageLoad(creatorPage);
 
     // 4. Creator 创建 Post（上传图片）

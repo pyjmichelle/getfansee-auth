@@ -59,13 +59,6 @@ export function PaywallModal({
         return;
       }
 
-      if (isTestMode) {
-        setBalance(Math.max(price, 50));
-        setBalanceError(null);
-        setIsBalanceLoading(false);
-        return;
-      }
-
       setIsBalanceLoading(true);
       setBalanceError(null);
 
@@ -81,12 +74,20 @@ export function PaywallModal({
 
         const wallet = await getWalletBalance(user.id);
         if (!mounted) return;
-        setBalance(wallet?.available ?? 0);
+        const available = wallet?.available ?? 0;
+        setBalance(available);
+        if (isTestMode && available === 0) {
+          setBalanceError(null);
+        }
       } catch (err) {
         console.error("[PaywallModal] Failed to load wallet balance:", err);
         if (mounted) {
           setBalance(null);
           setBalanceError("Unable to load balance");
+          if (isTestMode) {
+            setBalance(Math.max(price, 50));
+            setBalanceError(null);
+          }
         }
       } finally {
         if (mounted) {
