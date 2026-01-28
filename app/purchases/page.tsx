@@ -48,16 +48,6 @@ export default function PurchasesPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        if (isTestMode) {
-          setCurrentUser({
-            username: "test-user",
-            role: "fan",
-          });
-          setPurchases([]);
-          setIsLoading(false);
-          return;
-        }
-
         const {
           data: { session },
         } = await supabase.auth.getSession();
