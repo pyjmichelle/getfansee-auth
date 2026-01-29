@@ -26,6 +26,7 @@ test.describe("完整用户旅程测试", () => {
   });
 
   test("完整流程：Fan 注册 → Creator 注册并发布 → Fan 订阅 → Fan 解锁 PPV", async ({ page }) => {
+    test.setTimeout(300_000); // 长流程，避免 CI 下 120s 默认超时导致 Test ended
     // ========== 阶段 1: Fan 注册 ==========
     test.step("1. Fan 用户注册", async () => {
       await signUpUser(page, fanEmail, TEST_PASSWORD, "fan");
@@ -83,7 +84,7 @@ test.describe("完整用户旅程测试", () => {
         await nextButton.click();
 
         // 等待进入 KYC 或完成
-        await creatorPage.waitForTimeout(2000);
+        await creatorPage.waitForTimeout(800);
 
         // 如果进入 KYC 步骤，填写 KYC 信息
         const kycForm = creatorPage
@@ -112,8 +113,7 @@ test.describe("完整用户旅程测试", () => {
           }
         }
 
-        // 等待回到 home
-        await creatorPage.waitForTimeout(2000);
+        await creatorPage.waitForTimeout(800);
         await creatorPage.goto(`${BASE_URL}/home`);
       }
 
@@ -134,7 +134,7 @@ test.describe("完整用户旅程测试", () => {
       const publishButton = creatorPage.getByTestId("submit-button");
       if (await publishButton.isVisible()) {
         await publishButton.click();
-        await creatorPage.waitForTimeout(2000);
+        await creatorPage.waitForTimeout(800);
       }
 
       // 创建订阅者专享 Post
@@ -157,10 +157,9 @@ test.describe("完整用户旅程测试", () => {
         }
       }
 
-      // 发布
       if (await publishButton.isVisible()) {
         await publishButton.click();
-        await creatorPage.waitForTimeout(2000);
+        await creatorPage.waitForTimeout(800);
       }
 
       // 获取 Creator ID（从 URL 或页面元素）
@@ -231,7 +230,7 @@ test.describe("完整用户旅程测试", () => {
           throw e;
         }
       }
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(500);
     });
 
     // ========== 阶段 6: Fan 解锁 PPV 内容 ==========
@@ -257,9 +256,7 @@ test.describe("完整用户旅程测试", () => {
     // 尝试访问 Creator 路由
     await page.goto(`${BASE_URL}/creator/studio`);
 
-    // 验证被重定向或显示权限错误
-    // 根据 middleware 配置，应该重定向到 /home
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(800);
     // 验证不在 creator/studio 页面
     expect(page.url()).not.toContain("/creator/studio");
   });

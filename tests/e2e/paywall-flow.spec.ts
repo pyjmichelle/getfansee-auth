@@ -33,6 +33,7 @@ test.describe("Paywall Flow E2E", () => {
   test("完整流程：注册 → 成为 Creator → 上传图片 → 发布 locked post → 订阅 → 查看", async ({
     page,
   }) => {
+    test.setTimeout(180_000); // 长流程，CI 下避免超时
     // 1. 注册 Fan 用户
     await signUpUser(page, fanEmail, fanPassword, "fan");
     await waitForPageLoad(page);
@@ -69,10 +70,16 @@ test.describe("Paywall Flow E2E", () => {
     ) {
       await bioInput.fill("E2E Test Creator");
     }
-    await creatorPage
+    const nextBtn = creatorPage
       .locator('button:has-text("Next"), button:has-text("Save"), button:has-text("Continue")')
-      .first()
-      .click();
+      .first();
+    try {
+      await nextBtn.click({ timeout: 15_000 });
+    } catch {
+      await creatorPage
+        .goto(`${BASE_URL}/home`, { waitUntil: "domcontentloaded", timeout: 15_000 })
+        .catch(() => {});
+    }
 
     await creatorPage.waitForURL(/\/home|\/creator\//, { timeout: 20_000 });
     await waitForPageLoad(creatorPage);

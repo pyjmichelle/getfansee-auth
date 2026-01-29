@@ -50,8 +50,8 @@ export default defineConfig({
   workers: 1,
   /* Reporter */
   reporter: process.env.CI ? [["html"], ["github"]] : [["html"], ["list"]],
-  /* Global timeout - 增加到 2 分钟 */
-  timeout: 120 * 1000,
+  /* Global timeout - CI 长流程需更长时间，默认 4 分钟 */
+  timeout: 240 * 1000,
   /* Expect timeout */
   expect: {
     timeout: 15 * 1000,
