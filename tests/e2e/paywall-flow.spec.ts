@@ -63,7 +63,10 @@ test.describe("Paywall Flow E2E", () => {
       await displayNameInput.fill(`Creator ${uniqueSuffix}`);
     }
     const bioInput = creatorPage.locator("#bio, textarea[name='bio']").first();
-    if (await bioInput.isVisible().catch(() => false)) {
+    if (
+      (await bioInput.isVisible().catch(() => false)) &&
+      !(await bioInput.isDisabled().catch(() => true))
+    ) {
       await bioInput.fill("E2E Test Creator");
     }
     await creatorPage
