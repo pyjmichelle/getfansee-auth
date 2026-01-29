@@ -84,9 +84,11 @@ test.describe("Paywall Flow E2E", () => {
     await creatorPage.waitForURL(/\/home|\/creator\//, { timeout: 20_000 });
     await waitForPageLoad(creatorPage);
 
-    // 4. Creator 创建 Post（上传图片）
-    await creatorPage.click('a[href="/creator/new-post"]');
-    await creatorPage.waitForURL(`${BASE_URL}/creator/new-post`, { timeout: 10000 });
+    // 4. Creator 创建 Post（用 goto 避免底部导航链接在视窗外不可见）
+    await creatorPage.goto(`${BASE_URL}/creator/new-post`, {
+      waitUntil: "domcontentloaded",
+      timeout: 15_000,
+    });
     await waitForPageLoad(creatorPage);
 
     // 填写 post 内容（先填再上传，避免上传后内容未填）

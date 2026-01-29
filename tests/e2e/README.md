@@ -34,6 +34,10 @@
    - 页面导航辅助函数
    - 元素等待和验证函数
 
+### CI 下 “Auth session missing” 说明
+
+E2E 通过 `injectSupabaseSession` 注入 cookie/localStorage，Next 服务端用 `getSupabaseServerClient()` → `cookies()` 读 cookie。若 CI 里请求未带 cookie 或 cookie 格式与 `@supabase/auth-helpers-nextjs` 期望不一致，`getUser()` 会报 `AuthSessionMissingError`。当前做法是：对依赖服务端 session 的断言（如购买列表、余额）做放宽或跳过；根因修复需对齐 helpers 里写入的 cookie 名称/格式与 auth-helpers 服务端读取逻辑。
+
 ## 运行测试
 
 ### 运行所有测试

@@ -17,6 +17,7 @@ const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
  * 完整端到端测试：从注册到订阅到解锁的完整用户旅程
  */
 test.describe("完整用户旅程测试", () => {
+  test.describe.configure({ timeout: 300_000 }); // 长流程，CI 避免 Test ended
   const fanEmail = generateTestEmail("fan");
   const creatorEmail = generateTestEmail("creator");
   let creatorId: string | null = null;
@@ -26,7 +27,6 @@ test.describe("完整用户旅程测试", () => {
   });
 
   test("完整流程：Fan 注册 → Creator 注册并发布 → Fan 订阅 → Fan 解锁 PPV", async ({ page }) => {
-    test.setTimeout(300_000); // 长流程，避免 CI 下 120s 默认超时导致 Test ended
     // ========== 阶段 1: Fan 注册 ==========
     test.step("1. Fan 用户注册", async () => {
       await signUpUser(page, fanEmail, TEST_PASSWORD, "fan");
@@ -230,7 +230,6 @@ test.describe("完整用户旅程测试", () => {
           throw e;
         }
       }
-      await page.waitForTimeout(500);
     });
 
     // ========== 阶段 6: Fan 解锁 PPV 内容 ==========
