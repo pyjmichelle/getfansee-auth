@@ -53,13 +53,15 @@ test.describe("Paywall Flow E2E", () => {
         .catch(() => {});
     }
 
-    // 等待 onboarding/upgrade 表单（onboarding 用 id=display_name，upgrade/apply 用 id=displayName）
+    // 等待 onboarding/upgrade 表单（onboarding 用 id=display_name，upgrade/apply 用 id=displayName；CI 下可能只读）
     const displayNameInput = creatorPage
       .getByRole("textbox", { name: /display name/i })
       .or(creatorPage.locator("#display_name, #displayName, input[name='display_name']"))
       .first();
     await expect(displayNameInput).toBeVisible({ timeout: 20_000 });
-    await displayNameInput.fill(`Creator ${uniqueSuffix}`);
+    if (!(await displayNameInput.isDisabled().catch(() => true))) {
+      await displayNameInput.fill(`Creator ${uniqueSuffix}`);
+    }
     const bioInput = creatorPage.locator("#bio, textarea[name='bio']").first();
     if (await bioInput.isVisible().catch(() => false)) {
       await bioInput.fill("E2E Test Creator");

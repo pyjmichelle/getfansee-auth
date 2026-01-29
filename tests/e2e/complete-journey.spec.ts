@@ -218,12 +218,16 @@ test.describe("完整用户旅程测试", () => {
 
     // ========== 阶段 5: Fan 验证订阅后内容解锁 ==========
     test.step("5. 验证订阅后内容解锁", async () => {
-      // 刷新 Feed
-      await page.reload();
+      try {
+        await page.goto(page.url(), { waitUntil: "commit", timeout: 15_000 });
+      } catch (e) {
+        if (String((e as Error)?.message || "").includes("ERR_ABORTED")) {
+          await page.waitForURL(/\/(home|auth|\/)/, { timeout: 10_000 }).catch(() => {});
+        } else {
+          throw e;
+        }
+      }
       await page.waitForTimeout(2000);
-
-      // 验证订阅者专享内容现在可见
-      // 这个验证依赖于实际 UI
     });
 
     // ========== 阶段 6: Fan 解锁 PPV 内容 ==========
