@@ -73,9 +73,16 @@ export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: T
               <button
                 type="button"
                 onClick={() => toggleTag(tagId)}
-                className="ml-2 hover:text-destructive"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleTag(tagId);
+                  }
+                }}
+                className="ml-2 hover:text-destructive min-h-[20px] min-w-[20px]"
+                aria-label={`Remove tag ${getTagName(tagId)}`}
               >
-                <X className="w-3 h-3" />
+                <X className="w-3 h-3" aria-hidden="true" />
               </button>
             </Badge>
           ))}
@@ -93,8 +100,18 @@ export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: T
               variant="outline"
               size="sm"
               onClick={() => toggleTag(tag.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  if (selectedTags.length < maxTags) {
+                    toggleTag(tag.id);
+                  }
+                }
+              }}
               disabled={selectedTags.length >= maxTags}
-              className="h-8"
+              className="h-8 min-h-[32px]"
+              aria-label={`Add tag ${tag.name}`}
+              aria-disabled={selectedTags.length >= maxTags}
             >
               {tag.name}
             </Button>

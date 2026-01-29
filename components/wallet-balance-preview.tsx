@@ -126,7 +126,6 @@ export function WalletBalancePreview({ className }: WalletBalancePreviewProps) {
               className="border-[#1A1A1A] hover:bg-[#14B8A6]/10 hover:border-[#14B8A6] hover:scale-105 active:scale-95"
               onClick={async () => {
                 // TODO: 实现充值逻辑
-                console.log(`Recharge $${amount}`);
                 setIsDialogOpen(false);
               }}
             >

@@ -4,14 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { NavHeader } from "@/components/nav-header";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { ensureProfile } from "@/lib/auth";
 import { getProfile } from "@/lib/profile";
 import { listPendingReports, resolveReport } from "@/lib/reports";
-import { Check, X, FileText, User, MessageSquare, Calendar } from "lucide-react";
+import { FileText, User, MessageSquare, Calendar } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import {
@@ -104,7 +103,7 @@ export default function ReportsPage() {
       const success = await resolveReport(reportId, action, resolutionNotes.trim() || undefined);
 
       if (success) {
-        toast.success("举报已处理");
+        toast.success("Report resolved");
         // 重新加载列表
         const pending = await listPendingReports();
         setReports(pending);
@@ -112,11 +111,11 @@ export default function ReportsPage() {
         setResolutionAction(null);
         setResolutionNotes("");
       } else {
-        toast.error("处理失败，请重试");
+        toast.error("Failed to resolve. Please try again");
       }
     } catch (err) {
       console.error("[admin-reports] resolve error:", err);
-      toast.error("处理失败，请重试");
+      toast.error("Failed to resolve. Please try again");
     }
   };
 
@@ -198,7 +197,7 @@ export default function ReportsPage() {
                           {getReportTypeLabel(report.reported_type)}
                         </span>
                       </div>
-                      <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 rounded-lg">
+                      <Badge className="bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)] border-[var(--border-purple-500-20)] rounded-lg">
                         Pending
                       </Badge>
                       <span className="text-xs text-muted-foreground flex items-center gap-1">

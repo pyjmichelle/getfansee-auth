@@ -100,7 +100,22 @@ export async function listPendingReports(): Promise<
       return [];
     }
 
-    return (data || []).map((r: any) => ({
+    type ReportRow = {
+      id: string;
+      reporter_id: string;
+      reported_type: "post" | "user" | "comment";
+      reported_id: string;
+      reason: string;
+      description: string | null;
+      status: string;
+      created_at: string;
+      profiles?: {
+        display_name?: string;
+        avatar_url?: string;
+      } | null;
+    };
+
+    return ((data as ReportRow[] | null) || []).map((r) => ({
       id: r.id,
       reporter_id: r.reporter_id,
       reported_type: r.reported_type,

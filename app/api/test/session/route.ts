@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const headerFlag = request.headers.get("x-test-mode") === "1";
-  if (process.env.NEXT_PUBLIC_TEST_MODE !== "true" && !headerFlag) {
+  const isTestMode =
+    process.env.PLAYWRIGHT_TEST_MODE === "true" || process.env.NEXT_PUBLIC_TEST_MODE === "true";
+
+  if (!isTestMode) {
     return NextResponse.json({ error: "Test mode disabled" }, { status: 403 });
   }
 
@@ -12,10 +14,13 @@ export async function POST(request: NextRequest) {
   }
 
   const response = NextResponse.json({ success: true });
+  const isSecure =
+    request.nextUrl.protocol === "https:" || request.headers.get("x-forwarded-proto") === "https";
   response.cookies.set("playwright-test-mode", "1", {
     path: "/",
-    httpOnly: false,
+    httpOnly: true,
     sameSite: "lax",
+    secure: isSecure,
   });
   const maxAge = Number(expires_in);
 
@@ -23,7 +28,7 @@ export async function POST(request: NextRequest) {
     path: "/",
     httpOnly: true,
     sameSite: "lax",
-    secure: false,
+    secure: isSecure,
     maxAge,
   });
 
@@ -31,7 +36,7 @@ export async function POST(request: NextRequest) {
     path: "/",
     httpOnly: true,
     sameSite: "lax",
-    secure: false,
+    secure: isSecure,
     maxAge: maxAge * 4,
   });
 

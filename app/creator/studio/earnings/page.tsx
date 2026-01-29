@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, DollarSign, TrendingUp, Calendar, Download, Clock } from "lucide-react";
+import { ArrowLeft, DollarSign, TrendingUp, Download, Clock } from "lucide-react";
 import { NavHeader } from "@/components/nav-header";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
@@ -12,7 +11,7 @@ import { ensureProfile } from "@/lib/auth";
 import { getProfile } from "@/lib/profile";
 // getCreatorEarnings 通过 API 调用，不直接导入
 import Link from "next/link";
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -22,7 +21,7 @@ interface Transaction {
   amount_cents: number;
   status: string;
   available_on: string | null;
-  metadata: any;
+  metadata?: Record<string, unknown> | null;
   created_at: string;
 }
 
@@ -36,7 +35,6 @@ export default function EarningsPage() {
     role: "fan" | "creator";
     avatar?: string;
   } | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -53,8 +51,6 @@ export default function EarningsPage() {
         }
 
         await ensureProfile();
-        setCurrentUserId(session.user.id);
-
         const profile = await getProfile(session.user.id);
         if (profile) {
           setCurrentUser({
@@ -135,8 +131,8 @@ export default function EarningsPage() {
         );
       case "ppv_purchase":
         return (
-          <Badge className="bg-purple-500/10 text-purple-500 border-purple-500/20 rounded-lg">
-            PPV
+          <Badge className="glass bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)] border-[var(--border-purple-500-20)] rounded-lg">
+            Premium
           </Badge>
         );
       case "commission":
@@ -200,7 +196,9 @@ export default function EarningsPage() {
             size="sm"
             onClick={() => setTimeRange("7d")}
             className={`rounded-xl ${
-              timeRange === "7d" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
+              timeRange === "7d"
+                ? "bg-primary-gradient glass"
+                : "border-border/50 glass hover:border-accent/30"
             }`}
           >
             7 Days
@@ -239,7 +237,10 @@ export default function EarningsPage() {
 
         {/* Earnings Overview */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-          <div className="bg-card border border-border rounded-3xl p-6">
+          <div
+            className="bg-card border border-border rounded-3xl p-6"
+            data-testid="earnings-balance"
+          >
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-600 dark:text-green-400 flex items-center justify-center">
                 <DollarSign className="w-5 h-5" />
@@ -265,7 +266,7 @@ export default function EarningsPage() {
 
           <div className="bg-card border border-border rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)] flex items-center justify-center">
                 <Clock className="w-5 h-5" />
               </div>
               <div>
@@ -309,7 +310,10 @@ export default function EarningsPage() {
         )}
 
         {/* Transaction History */}
-        <div className="bg-card border border-border rounded-3xl p-6">
+        <div
+          className="bg-card border border-border rounded-3xl p-6"
+          data-testid="earnings-history"
+        >
           <h2 className="text-lg font-semibold text-foreground mb-4">Transaction History</h2>
           {transactions.length === 0 ? (
             <div className="text-center py-12">
@@ -330,7 +334,7 @@ export default function EarningsPage() {
                       className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                         transaction.status === "completed"
                           ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                          : "bg-amber-500/10 text-amber-500"
+                          : "bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)]"
                       }`}
                     >
                       <DollarSign className="w-5 h-5" />

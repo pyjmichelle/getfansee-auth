@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { type Comment } from "@/lib/comments";
 
 interface CommentFormProps {
   postId: string;
-  onCommentCreated?: (comment: any) => void;
+  onCommentCreated?: (comment: Comment) => void;
   className?: string;
 }
 
@@ -96,8 +97,17 @@ export function CommentForm({ postId, onCommentCreated, className }: CommentForm
           type="submit"
           disabled={isSubmitting || !content.trim() || isOverLimit}
           className="min-h-[44px] min-w-[100px]"
+          aria-label={isSubmitting ? "Posting comment…" : "Post comment"}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+              e.preventDefault();
+              if (!isSubmitting && content.trim() && !isOverLimit) {
+                handleSubmit(e as unknown as React.FormEvent);
+              }
+            }
+          }}
         >
-          {isSubmitting ? "Posting..." : "Post Comment"}
+          {isSubmitting ? "Posting…" : "Post Comment"}
         </Button>
       </div>
     </form>

@@ -1,6 +1,6 @@
 
 > my-v0-project@0.1.0 dev /Users/puyijun/Downloads/authentication-flow-design (1)
-> next dev
+> PORT=3000 next dev -p 3000
 
  ⨯ Failed to start server
 Error: listen EADDRINUSE: address already in use :::3000

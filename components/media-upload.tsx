@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Upload, X, Image as ImageIcon, Video, Loader2 } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { uploadFile, type UploadProgress } from "@/lib/storage";
 
@@ -31,13 +31,13 @@ export function MediaUpload({
     async (file: File) => {
       // 验证文件类型
       if (!file.type.match(/^(image|video)\//)) {
-        onUploadError?.("只支持图片和视频文件");
+        onUploadError?.("Only image and video files are supported");
         return;
       }
 
       // 验证文件大小
       if (maxSize && file.size > maxSize) {
-        onUploadError?.(`文件大小超过限制: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+        onUploadError?.(`File size exceeds limit: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
         return;
       }
 
@@ -70,9 +70,10 @@ export function MediaUpload({
         setUploadedUrl(mediaFile.url);
         onUploadComplete(mediaFile.url);
         setUploadProgress(null);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("[MediaUpload] upload error:", err);
-        onUploadError?.(err.message || "上传失败");
+        const message = err instanceof Error ? err.message : "Upload failed";
+        onUploadError?.(message);
         setPreviewUrl(null);
         setUploadProgress(null);
       } finally {
@@ -147,12 +148,12 @@ export function MediaUpload({
           {isUploading ? (
             <>
               <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground mb-2">上传中...</p>
+              <p className="text-sm text-muted-foreground mb-2">Uploading…</p>
               {uploadProgress && (
                 <div className="w-full max-w-xs mx-auto">
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-primary transition-all duration-300"
+                      className="h-full bg-primary transition-[width] duration-300 motion-safe:transition-[width] motion-reduce:transition-none"
                       style={{ width: `${uploadProgress.percentage}%` }}
                     />
                   </div>
@@ -165,9 +166,9 @@ export function MediaUpload({
           ) : (
             <>
               <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-sm font-medium mb-1">点击或拖拽文件到此处上传</p>
+              <p className="text-sm font-medium mb-1">Click or drag files here to upload</p>
               <p className="text-xs text-muted-foreground">
-                支持图片和视频（图片最大 10MB，视频最大 200MB）
+                Supports images and videos (images max 10MB, videos max 200MB)
               </p>
             </>
           )}
@@ -209,7 +210,7 @@ export function MediaUpload({
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                   <div className="text-center text-white">
                     <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin" />
-                    <p className="text-sm">上传中...</p>
+                    <p className="text-sm">Uploading…</p>
                     {uploadProgress && (
                       <p className="text-xs mt-1">{uploadProgress.percentage.toFixed(0)}%</p>
                     )}

@@ -36,8 +36,8 @@ export default function PublishSuccessPageClient({
 
   const getPostTypeLabel = () => {
     if (postType === "free") return "Free Post";
-    if (postType === "subscribers") return "Subscribers-Only Post";
-    return `Pay-Per-View Post ($${price})`;
+    if (postType === "subscribers") return "Exclusive Post";
+    return `Premium Post ($${price})`;
   };
 
   return (
@@ -47,8 +47,8 @@ export default function PublishSuccessPageClient({
       <main className="container max-w-2xl mx-auto px-4 py-12">
         <Card className="p-8 text-center">
           {/* Success Icon */}
-          <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-green-500" />
+          <div className="w-20 h-20 rounded-full glass bg-subscribe-gradient/20 flex items-center justify-center mx-auto mb-6 shadow-subscribe-glow">
+            <Check className="w-10 h-10 text-[var(--color-pink-400)]" aria-hidden="true" />
           </div>
 
           {/* Success Message */}
@@ -62,35 +62,44 @@ export default function PublishSuccessPageClient({
             <h3 className="font-semibold text-foreground mb-4">What happens next?</h3>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-3">
-                <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <Check
+                  className="w-5 h-5 text-[var(--color-pink-400)] flex-shrink-0 mt-0.5"
+                  aria-hidden="true"
+                />
                 <div>
-                  <p className="text-foreground font-medium">Post is live on your profile</p>
-                  <p className="text-muted-foreground">
+                  <p className="text-foreground font-semibold">Post is live on your profile</p>
+                  <p className="text-muted-foreground text-sm">
                     {postType === "free"
                       ? "Anyone can view this post"
                       : postType === "subscribers"
-                        ? "Only your subscribers can see this"
-                        : "Fans can purchase to unlock"}
+                        ? "Only your subscribers can access this exclusive content"
+                        : "Fans can purchase to unlock this hot content"}
                   </p>
                 </div>
               </li>
               {postType !== "free" && (
                 <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <Check
+                    className="w-5 h-5 text-[var(--color-pink-400)] flex-shrink-0 mt-0.5"
+                    aria-hidden="true"
+                  />
                   <div>
-                    <p className="text-foreground font-medium">Notifications sent</p>
-                    <p className="text-muted-foreground">
+                    <p className="text-foreground font-semibold">Notifications sent</p>
+                    <p className="text-muted-foreground text-sm">
                       Your {postType === "subscribers" ? "subscribers" : "followers"} will be
-                      notified
+                      notified about your new content
                     </p>
                   </div>
                 </li>
               )}
               <li className="flex items-start gap-3">
-                <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <Check
+                  className="w-5 h-5 text-[var(--color-pink-400)] flex-shrink-0 mt-0.5"
+                  aria-hidden="true"
+                />
                 <div>
-                  <p className="text-foreground font-medium">Analytics tracking started</p>
-                  <p className="text-muted-foreground">
+                  <p className="text-foreground font-semibold">Analytics tracking started</p>
+                  <p className="text-muted-foreground text-sm">
                     Track views, likes, and earnings in your studio
                   </p>
                 </div>
@@ -102,12 +111,20 @@ export default function PublishSuccessPageClient({
           <div className="space-y-3 mb-6">
             <Button
               size="lg"
-              className="w-full"
+              variant="subscribe-gradient"
+              className="w-full font-bold shadow-lg"
               onClick={() =>
                 router.push(`/creator/${currentUser.username}?viewAs=fan&postId=${postId}`)
               }
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  router.push(`/creator/${currentUser.username}?viewAs=fan&postId=${postId}`);
+                }
+              }}
+              aria-label="View post as a fan would see it"
             >
-              <Eye className="w-5 h-5 mr-2" />
+              <Eye className="w-5 h-5 mr-2" aria-hidden="true" />
               View as Fan
             </Button>
             <p className="text-xs text-muted-foreground">
@@ -116,13 +133,23 @@ export default function PublishSuccessPageClient({
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button asChild variant="outline" size="lg" className="flex-1 bg-transparent">
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="flex-1 border-2 hover:border-primary/50"
+            >
               <Link href="/creator/studio">
-                <ArrowLeft className="w-4 h-4 mr-2" />
+                <ArrowLeft className="w-4 h-4 mr-2" aria-hidden="true" />
                 Back to Studio
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="flex-1 bg-transparent">
+            <Button
+              asChild
+              variant="subscribe-gradient"
+              size="lg"
+              className="flex-1 font-semibold shadow-lg"
+            >
               <Link href="/creator/studio/post/new">Create Another Post</Link>
             </Button>
           </div>

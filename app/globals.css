@@ -40,32 +40,60 @@
 }
 
 .dark {
-  /* Midnight Neon Design System */
-  --background: #050505;
-  --foreground: #E5E5E5;
-  --card: #0D0D0D;
-  --card-foreground: #E5E5E5;
-  --popover: #0D0D0D;
-  --popover-foreground: #E5E5E5;
-  --primary: #6366F1;
+  /* Premium Adult Industry Design System - Attractive & Seductive */
+  /* 主色：深粉/玫瑰色 (#F48FB1, #C2185B) - 性感、有吸引力 */
+  /* 强调色：柔和紫色 (#9C27B0, #7B1FA2) - 精致、高级感 */
+  /* 辅助色：温暖珊瑚/桃色 (#FF8E81, #FFB3BA) - 温暖、魅力 */
+  --background: #0A0A0A;
+  --foreground: #F5F5F5;
+  --card: rgba(20, 20, 20, 0.8);
+  --card-foreground: #F5F5F5;
+  --popover: rgba(20, 20, 20, 0.95);
+  --popover-foreground: #F5F5F5;
+  --primary: #F48FB1; /* 深粉/玫瑰色 - 主色 */
   --primary-foreground: #FFFFFF;
-  --secondary: #1F1F1F;
-  --secondary-foreground: #E5E5E5;
-  --muted: #121212;
-  --muted-foreground: #999999;
-  --accent: #A855F7;
-  --accent-foreground: #E5E5E5;
-  --destructive: #F43F5E;
+  --secondary: rgba(30, 30, 30, 0.6);
+  --secondary-foreground: #F5F5F5;
+  --muted: rgba(25, 25, 25, 0.8);
+  --muted-foreground: #A0A0A0;
+  --accent: #9C27B0; /* 柔和紫色 - 强调色 */
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
   --destructive-foreground: #FFFFFF;
   --success: #10B981;
   --warning: #F59E0B;
-  --border: #1F1F1F;
-  --input: #0D0D0D;
-  --ring: #6366F1;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(20, 20, 20, 0.6);
+  --ring: #F48FB1;
   
-  /* Gradient Variables */
-  --primary-gradient: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
-  --accent-gradient: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
+  /* Premium Gradient Variables - Pink, Purple & Coral (Attractive & Seductive) */
+  --primary-gradient: linear-gradient(135deg, #F48FB1 0%, #C2185B 50%, #AD1457 100%);
+  --accent-gradient: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 50%, #6A1B9A 100%);
+  --subscribe-gradient: linear-gradient(135deg, #F48FB1 0%, #C2185B 100%);
+  --unlock-gradient: linear-gradient(135deg, #FF8E81 0%, #F48FB1 100%);
+  
+  /* Semantic Color Variables - Use these instead of hardcoded colors */
+  --color-pink-400: #F48FB1;
+  --color-pink-500: #EC4899;
+  --color-pink-600: #DB2777;
+  --color-purple-400: #A78BFA;
+  --color-purple-500: #9C27B0;
+  --color-purple-600: #7B1FA2;
+  --color-orange-400: #FB923C;
+  --color-orange-500: #F97316;
+  --color-orange-600: #EA580C;
+  --color-pink-100: #FCE7F3;
+  --color-pink-950: #831843;
+  
+  /* Semantic Background Colors with Opacity */
+  --bg-pink-500-10: rgba(244, 143, 177, 0.1);
+  --bg-purple-500-10: rgba(156, 39, 176, 0.1);
+  --bg-orange-500-10: rgba(251, 146, 60, 0.1);
+  
+  /* Semantic Border Colors with Opacity */
+  --border-pink-500-30: rgba(244, 143, 177, 0.3);
+  --border-purple-500-20: rgba(156, 39, 176, 0.2);
+  --border-orange-500-30: rgba(251, 146, 60, 0.3);
   
   /* Spacing (8px base unit) */
   --spacing-unit: 8px;
@@ -135,43 +163,202 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* building-native-ui: 触摸优化 */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: contain;
+    /* Adult industry: 更深的背景色增强对比 */
+    background-color: var(--background);
+    /* 移动端优化：确保最小字体大小 */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* 移动端响应式断点优化 */
+  @media (max-width: 375px) {
+    /* 小屏手机优化 */
+    body {
+      font-size: 14px;
+    }
+  }
+  
+  @media (min-width: 375px) and (max-width: 414px) {
+    /* 标准手机优化 */
+    body {
+      font-size: 15px;
+    }
+  }
+  
+  @media (min-width: 414px) {
+    /* 大屏手机和平板 */
+    body {
+      font-size: 16px;
+    }
+  }
+  /* building-native-ui: 平滑滚动 */
+  html {
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* Safe area insets for mobile devices with notches */
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
   }
 }
 
-/* Midnight Neon Design System Utilities */
+/* Premium Adult Industry Design System Utilities - Glassmorphism & Sophisticated */
 @layer utilities {
+  /* Glassmorphism Effect - Performance Optimized */
+  /* Use will-change and contain for better performance */
+  .glass {
+    background: rgba(20, 20, 20, 0.7);
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Performance: Use contain and will-change for better compositing */
+    contain: layout style paint;
+    will-change: backdrop-filter;
+  }
+  
+  .glass-card {
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    contain: layout style paint;
+    will-change: backdrop-filter;
+  }
+  
+  .glass-strong {
+    background: rgba(15, 15, 15, 0.85);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    contain: layout style paint;
+    will-change: backdrop-filter;
+  }
+  
+  /* Reduce backdrop-filter on low-end devices */
+  @media (prefers-reduced-motion: reduce) {
+    .glass,
+    .glass-card,
+    .glass-strong {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: rgba(20, 20, 20, 0.95);
+      will-change: auto;
+    }
+  }
+  
+  /* Premium Gradients - Pink, Purple & Coral (Attractive & Seductive) */
   .bg-primary-gradient {
-    background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+    background: linear-gradient(135deg, #F48FB1 0%, #C2185B 50%, #AD1457 100%);
   }
   
   .bg-accent-gradient {
-    background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
+    background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 50%, #6A1B9A 100%);
+  }
+  
+  .bg-subscribe-gradient {
+    background: linear-gradient(135deg, #F48FB1 0%, #C2185B 100%);
+  }
+  
+  .bg-unlock-gradient {
+    background: linear-gradient(135deg, #FF8E81 0%, #F48FB1 100%);
   }
   
   .text-primary-gradient {
-    background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+    background: linear-gradient(135deg, #F48FB1 0%, #C2185B 50%, #AD1457 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
   
   .text-accent-gradient {
-    background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
+    background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 50%, #6A1B9A 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
   
+  /* Sophisticated Glow Effects - Pink & Purple */
   .shadow-primary-glow {
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3), 0 0 40px rgba(168, 85, 247, 0.2);
+    box-shadow: 0 0 20px rgba(244, 143, 177, 0.4), 0 0 40px rgba(244, 143, 177, 0.2), 0 0 60px rgba(244, 143, 177, 0.1);
   }
   
   .shadow-accent-glow {
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3), 0 0 40px rgba(236, 72, 153, 0.2);
+    box-shadow: 0 0 20px rgba(156, 39, 176, 0.4), 0 0 40px rgba(156, 39, 176, 0.2), 0 0 60px rgba(156, 39, 176, 0.1);
+  }
+  
+  .shadow-subscribe-glow {
+    box-shadow: 0 0 25px rgba(244, 143, 177, 0.5), 0 0 50px rgba(194, 24, 91, 0.3);
+  }
+  
+  .shadow-unlock-glow {
+    box-shadow: 0 0 25px rgba(255, 142, 129, 0.5), 0 0 50px rgba(244, 143, 177, 0.3);
   }
   
   .hover-glow:hover {
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4), 0 0 40px rgba(168, 85, 247, 0.3);
+    box-shadow: 0 0 30px rgba(244, 143, 177, 0.5), 0 0 60px rgba(194, 24, 91, 0.3);
     filter: brightness(1.1);
+    transform: translateY(-2px);
+    /* Performance: Use will-change for transform animations */
+    will-change: transform, box-shadow;
+  }
+  
+  /* Performance: Remove will-change when not hovering */
+  .hover-glow:not(:hover) {
+    will-change: auto;
+  }
+  
+  .premium-badge {
+    background: linear-gradient(135deg, #F48FB1 0%, #C2185B 100%);
+    box-shadow: 0 0 15px rgba(244, 143, 177, 0.4);
+  }
+  
+  .exclusive-border {
+    border: 2px solid transparent;
+    background-image: linear-gradient(rgba(20, 20, 20, 0.8), rgba(20, 20, 20, 0.8)), linear-gradient(135deg, #F48FB1, #9C27B0);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
+  
+  /* Purple Accent Border */
+  .purple-border {
+    border: 1px solid rgba(156, 39, 176, 0.3);
+    box-shadow: 0 0 10px rgba(156, 39, 176, 0.1);
+  }
+  
+  .purple-border-hover:hover {
+    border-color: rgba(156, 39, 176, 0.5);
+    box-shadow: 0 0 20px rgba(156, 39, 176, 0.2);
+  }
+  
+  /* 移动端优化：确保所有交互元素符合触摸标准 */
+  @media (max-width: 768px) {
+    button, a, input, textarea, select {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* 移动端字体大小优化 */
+    .text-xs { font-size: 0.75rem; }
+    .text-sm { font-size: 0.875rem; }
+    .text-base { font-size: 1rem; }
+    .text-lg { font-size: 1.125rem; }
+  }
+  
+  /* 小屏手机特殊优化 (iPhone SE, 小屏Android) */
+  @media (max-width: 375px) {
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
   }
 }

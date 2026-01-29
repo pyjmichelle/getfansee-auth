@@ -71,7 +71,7 @@ export function LoadingState({
         aria-hidden="true"
       />
       {text && <p className="text-sm text-muted-foreground">{text}</p>}
-      <span className="sr-only">{text || "Loading..."}</span>
+      <span className="sr-only">{text || "Loading…"}</span>
     </div>
   );
 }

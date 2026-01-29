@@ -9,8 +9,9 @@
 import { chromium, Browser, BrowserContext, Page } from "playwright";
 import * as fs from "fs";
 import * as path from "path";
+import { getBaseUrl } from "../_shared/env";
 
-const BASE_URL = process.env.BASE_URL || "http://127.0.0.1:3000";
+const BASE_URL = getBaseUrl();
 const ARTIFACTS_DIR = path.join(process.cwd(), "artifacts", "qa");
 const SESSIONS_DIR = path.join(process.cwd(), "artifacts", "agent-browser-full", "sessions");
 
@@ -87,7 +88,7 @@ function ensureArtifactsDir() {
 async function createAuthContext(
   browser: Browser,
   state: "anonymous" | "fan" | "creator"
-): Promise<BrowserContext> {
+): Promise<BrowserContext | null> {
   const baseOptions = {
     viewport: { width: 1280, height: 720 },
     baseURL: BASE_URL,
@@ -100,22 +101,32 @@ async function createAuthContext(
   const sessionPath = path.join(SESSIONS_DIR, `${state}.json`);
 
   if (!fs.existsSync(sessionPath)) {
-    console.error(`\n❌ Session file not found: ${sessionPath}`);
-    console.error(`   Run: pnpm test:session:auto:${state}`);
-    throw new Error(`Missing session file: ${state}.json`);
+    console.warn(`\n⚠️  Session file not found: ${sessionPath}`);
+    console.warn(`   Skipping authenticated ${state} checks`);
+    console.warn(`   To enable: pnpm test:session:auto:${state}`);
+    console.warn(`   This is expected in CI if session creation failed`);
+    return null;
   }
 
-  const sessionData = JSON.parse(fs.readFileSync(sessionPath, "utf-8"));
-  const cookieCount = sessionData.cookies?.length || 0;
+  try {
+    const sessionData = JSON.parse(fs.readFileSync(sessionPath, "utf-8"));
+    const cookieCount = sessionData.cookies?.length || 0;
 
-  if (cookieCount === 0) {
-    throw new Error(`Invalid session file: ${state}.json (no cookies)`);
+    if (cookieCount === 0) {
+      console.warn(`\n⚠️  Session file exists but has no cookies: ${sessionPath}`);
+      console.warn(`   This may indicate a login failure`);
+      return null;
+    }
+
+    return await browser.newContext({
+      ...baseOptions,
+      storageState: sessionPath,
+    });
+  } catch (error: any) {
+    console.error(`\n❌ Error loading session file: ${error.message}`);
+    console.error(`   Path: ${sessionPath}`);
+    return null;
   }
-
-  return await browser.newContext({
-    ...baseOptions,
-    storageState: sessionPath,
-  });
 }
 
 async function verifySession(page: Page, expectedRole: "fan" | "creator"): Promise<boolean> {
@@ -126,12 +137,29 @@ async function verifySession(page: Page, expectedRole: "fan" | "creator"): Promi
     });
 
     if (!response || response.status() !== 200) {
+      if (process.env.CI === "true") {
+        console.warn(
+          `   [CI Debug] Session verification failed: /api/profile returned status ${response?.status() || "no response"}`
+        );
+      }
       return false;
     }
 
     const data = await response.json();
-    return data.profile?.role === expectedRole;
-  } catch (e) {
+    const actualRole = data.profile?.role;
+    const isValid = actualRole === expectedRole;
+
+    if (!isValid && process.env.CI === "true") {
+      console.warn(
+        `   [CI Debug] Session verification failed: expected role "${expectedRole}", got "${actualRole}"`
+      );
+    }
+
+    return isValid;
+  } catch (e: any) {
+    if (process.env.CI === "true") {
+      console.warn(`   [CI Debug] Session verification error: ${e.message}`);
+    }
     return false;
   }
 }
@@ -157,6 +185,19 @@ async function runDeadClickCheck(browser: Browser, check: DeadClickCheck): Promi
     console.log(`   Expect: ${check.expectation.description}`);
 
     context = await createAuthContext(browser, check.authState);
+    if (!context) {
+      console.log(`   ⏭️  Skipping (session not available)`);
+      // In CI, if session creation failed, we should fail the check
+      if (process.env.CI === "true") {
+        result.status = "FAIL";
+        result.actualResult = `${check.authState} session required but not available. Check test:session:auto:${check.authState} step. Session creation may have failed - check CI logs.`;
+      } else {
+        result.status = "FAIL";
+        result.actualResult = `${check.authState} session not available (run: pnpm test:session:auto:${check.authState})`;
+      }
+      // In CI, continue to next check instead of exiting immediately
+      return result;
+    }
     page = await context.newPage();
 
     // Verify session if not anonymous
@@ -398,10 +439,83 @@ async function main() {
     console.log(`\nReport: ${reportPath}`);
 
     // Exit with appropriate code
-    process.exit(failed > 0 ? 1 : 0);
+    if (failed > 0) {
+      console.error("\n" + "=".repeat(60));
+      console.error("❌ DEAD CLICK GATE FAILED");
+      console.error("=".repeat(60));
+      console.error(`Failed checks: ${failed}`);
+      console.error("\nFailed results:");
+
+      // Separate session failures from actual dead click failures
+      const sessionFailures = results.filter(
+        (r) =>
+          r.status === "FAIL" &&
+          (r.actualResult.includes("session required") ||
+            r.actualResult.includes("Session validation failed"))
+      );
+      const deadClickFailures = results.filter(
+        (r) =>
+          r.status === "FAIL" &&
+          !r.actualResult.includes("session required") &&
+          !r.actualResult.includes("Session validation failed")
+      );
+
+      if (sessionFailures.length > 0) {
+        console.error("\n⚠️  Session-related failures (may be transient):");
+        sessionFailures.forEach((r) => {
+          console.error(`\n  ⚠️  ${r.id} (${r.route}, ${r.authState})`);
+          console.error(`     Action: ${r.action}`);
+          console.error(`     Expectation: ${r.expectation}`);
+          console.error(`     Actual: ${r.actualResult}`);
+        });
+      }
+
+      if (deadClickFailures.length > 0) {
+        console.error("\n❌ Actual dead click failures:");
+        deadClickFailures.forEach((r) => {
+          console.error(`\n  ❌ ${r.id} (${r.route}, ${r.authState})`);
+          console.error(`     Action: ${r.action}`);
+          console.error(`     Expectation: ${r.expectation}`);
+          console.error(`     Actual: ${r.actualResult}`);
+        });
+      }
+
+      console.error(`\nFull report: ${reportPath}`);
+
+      // In CI, if only session failures (no actual dead click failures), provide guidance but still fail
+      // This helps identify if it's a session creation issue vs actual dead click problem
+      if (
+        deadClickFailures.length === 0 &&
+        sessionFailures.length > 0 &&
+        process.env.CI === "true"
+      ) {
+        console.error("\n💡 Note: All failures are session-related.");
+        console.error("   This suggests session creation failed. Check:");
+        console.error("   1. Test accounts exist in Supabase");
+        console.error("   2. test:session:auto:all step completed successfully");
+        console.error("   3. Session files exist in artifacts/agent-browser-full/sessions/");
+      }
+
+      process.exit(1);
+    } else {
+      console.log("\n" + "=".repeat(60));
+      console.log("✅ DEAD CLICK GATE PASSED");
+      console.log("=".repeat(60));
+      process.exit(0);
+    }
+  } catch (error: any) {
+    console.error("\n" + "=".repeat(60));
+    console.error("❌ DEAD CLICK GATE ERROR");
+    console.error("=".repeat(60));
+    console.error(`Error: ${error.message}`);
+    console.error(`Stack: ${error.stack}`);
+    process.exit(1);
   } finally {
     await browser.close();
   }
 }
 
-main();
+main().catch((error) => {
+  console.error("Fatal error:", error);
+  process.exit(1);
+});

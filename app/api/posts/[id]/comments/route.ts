@@ -24,9 +24,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const limit = parseInt(searchParams.get("limit") || "50");
     const offset = parseInt(searchParams.get("offset") || "0");
 
-    console.log(
-      `[GET /api/posts/${postId}/comments] User: ${user.id}, Limit: ${limit}, Offset: ${offset}`
-    );
+    // Removed debug console.log - vercel-react-best-practices
 
     const result = await getPostComments(postId, limit, offset);
 
@@ -65,8 +63,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const body = await request.json();
     const { content } = body;
 
-    console.log(`[POST /api/posts/${postId}/comments] User: ${user.id}`);
-
     // 验证输入
     if (!content || typeof content !== "string") {
       return NextResponse.json({ success: false, error: "Content is required" }, { status: 400 });
@@ -90,7 +86,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     // 创建评论
     const comment = await createComment(postId, user.id, trimmedContent);
 
-    console.log(`[POST /api/posts/${postId}/comments] Comment created:`, comment.id);
+    // Removed debug console.log - vercel-react-best-practices
 
     return NextResponse.json({
       success: true,

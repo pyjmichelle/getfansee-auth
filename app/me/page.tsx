@@ -11,10 +11,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { LoadingState } from "@/components/loading-state";
 import { CenteredContainer } from "@/components/layouts/centered-container";
+import { BottomNavigation } from "@/components/bottom-navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 // 所有服务器端函数都通过 API 调用，不直接导入
 import { uploadAvatar } from "@/lib/storage";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -94,9 +94,10 @@ export default function ProfilePage() {
       const avatarUrl = await uploadAvatar(file, currentUserId);
       setAvatar(avatarUrl);
       toast.success("Avatar uploaded successfully");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[me] avatar upload error:", err);
-      toast.error(err.message || "Failed to upload avatar");
+      const message = err instanceof Error ? err.message : "Failed to upload avatar";
+      toast.error(message);
     } finally {
       setIsUploadingAvatar(false);
     }
@@ -251,11 +252,12 @@ export default function ProfilePage() {
 
   if (isLoading || !currentUser) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-16 md:pb-0">
         <NavHeader user={currentUser!} notificationCount={0} />
         <CenteredContainer className="py-12">
-          <LoadingState type="spinner" text="Loading profile..." />
+          <LoadingState type="spinner" text="Loading profile…" />
         </CenteredContainer>
+        <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
       </div>
     );
   }
@@ -422,7 +424,7 @@ export default function ProfilePage() {
                     <Button
                       onClick={handleSave}
                       disabled={isSaving}
-                      className="flex-1 rounded-xl min-h-[44px] transition-all duration-200"
+                      className="flex-1 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
                       aria-label="Save profile changes"
                     >
                       {isSaving ? (
@@ -430,13 +432,13 @@ export default function ProfilePage() {
                       ) : (
                         <Save className="w-4 h-4 mr-2" aria-hidden="true" />
                       )}
-                      {isSaving ? "Saving..." : "Save Changes"}
+                      {isSaving ? "Saving…" : "Save Changes"}
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => setIsEditing(false)}
                       disabled={isSaving}
-                      className="flex-1 rounded-xl min-h-[44px] transition-all duration-200"
+                      className="flex-1 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
                       aria-label="Cancel editing"
                     >
                       Cancel
@@ -445,7 +447,7 @@ export default function ProfilePage() {
                 ) : (
                   <Button
                     onClick={() => setIsEditing(true)}
-                    className="w-full rounded-xl min-h-[44px] transition-all duration-200"
+                    className="w-full rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
                     aria-label="Edit profile"
                   >
                     Edit Profile
@@ -500,13 +502,13 @@ export default function ProfilePage() {
               <Button
                 onClick={handlePasswordChange}
                 disabled={isSaving || !oldPassword || !newPassword || !confirmPassword}
-                className="w-full rounded-xl min-h-[44px] transition-all duration-200"
+                className="w-full rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
                 aria-label="Change password"
               >
                 {isSaving ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
-                    Changing...
+                    Changing…
                   </>
                 ) : (
                   "Change Password"
@@ -529,7 +531,8 @@ export default function ProfilePage() {
                 <Button
                   onClick={handleCreateCreator}
                   disabled={isCreatingCreator}
-                  className="w-full rounded-xl min-h-[44px] transition-all duration-200"
+                  data-testid="become-creator-button"
+                  className="w-full rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
                   aria-label="Create creator profile"
                 >
                   {isCreatingCreator ? (
@@ -553,7 +556,7 @@ export default function ProfilePage() {
                   onClick={handleSeedPosts}
                   disabled={isSeeding}
                   variant="outline"
-                  className="w-full rounded-xl min-h-[44px] transition-all duration-200"
+                  className="w-full rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
                   aria-label="Seed demo posts"
                 >
                   {isSeeding ? (
@@ -561,7 +564,7 @@ export default function ProfilePage() {
                   ) : (
                     <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
                   )}
-                  {isSeeding ? "Seeding..." : "Seed demo posts"}
+                  {isSeeding ? "Seeding…" : "Seed demo posts"}
                 </Button>
                 <p className="text-xs text-muted-foreground mt-2">
                   Creates 3 demo posts: subscriber-only, PPV $4.99, PPV $9.99
@@ -579,7 +582,7 @@ export default function ProfilePage() {
               <Button
                 variant="ghost"
                 onClick={handleLogout}
-                className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 min-h-[44px] transition-all duration-200 rounded-xl"
+                className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 min-h-[44px] transition-[color,background-color] duration-200 motion-safe:transition-[color,background-color] motion-reduce:transition-none rounded-xl"
                 aria-label="Log out of your account"
               >
                 <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -589,6 +592,8 @@ export default function ProfilePage() {
           </Card>
         </CenteredContainer>
       </main>
+
+      <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
     </div>
   );
 }

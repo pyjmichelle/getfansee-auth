@@ -4,15 +4,16 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { NavHeader } from "@/components/nav-header";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { CenteredContainer } from "@/components/layouts/centered-container";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { getProfile } from "@/lib/profile";
-import { ensureProfile, getCurrentUser } from "@/lib/auth";
-import { deposit, getWalletBalance, getTransactions } from "@/lib/wallet";
+import { ensureProfile } from "@/lib/auth";
+import { getWalletBalance, getTransactions } from "@/lib/wallet";
 import { Wallet, Plus, ArrowDown, ArrowUp } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { BottomNavigation } from "@/components/bottom-navigation";
+import { EmptyState } from "@/components/empty-state";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -22,14 +23,17 @@ interface Transaction {
   amount_cents: number;
   status: string;
   created_at: string;
-  metadata?: any;
+  metadata?: {
+    amount_usd?: number;
+    post_id?: string;
+    creator_id?: string;
+  } | null;
 }
 
 export default function WalletPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [availableBalance, setAvailableBalance] = useState<number>(0);
-  const [pendingBalance, setPendingBalance] = useState<number>(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [currentUser, setCurrentUser] = useState<{
     username: string;
@@ -70,19 +74,24 @@ export default function WalletPage() {
           });
         }
 
-        // 加载钱包余额
-        const balanceData = await getWalletBalance(session.user.id);
-        if (balanceData) {
-          setAvailableBalance(balanceData.available);
-          setPendingBalance(balanceData.pending);
-        }
+        setIsLoading(false);
 
-        // 加载交易记录
-        const transactionsData = await getTransactions(session.user.id);
-        setTransactions(transactionsData);
+        // 余额与交易记录异步加载，避免阻塞首屏
+        void (async () => {
+          try {
+            const balanceData = await getWalletBalance(session.user.id);
+            if (balanceData) {
+              setAvailableBalance(balanceData.available);
+            }
+
+            const transactionsData = await getTransactions(session.user.id);
+            setTransactions(transactionsData);
+          } catch (loadErr) {
+            console.error("[wallet] background load error:", loadErr);
+          }
+        })();
       } catch (err) {
         console.error("[wallet] loadData error:", err);
-      } finally {
         setIsLoading(false);
       }
     };
@@ -151,9 +160,10 @@ export default function WalletPage() {
         setPaymentStatus("failed");
         setTimeout(() => setPaymentStatus("idle"), 3000);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[wallet] recharge error:", err);
-      toast.error(err.message || "Recharge failed, please try again");
+      const message = err instanceof Error ? err.message : "Recharge failed, please try again";
+      toast.error(message);
     } finally {
       setIsRecharging(false);
     }
@@ -197,25 +207,27 @@ export default function WalletPage() {
             </div>
           </CenteredContainer>
         </main>
+
+        <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background" data-testid="page-ready">
+    <div className="min-h-screen bg-background pb-16 md:pb-0" data-testid="wallet-page">
       {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
 
       <main className="py-6 sm:py-8 lg:py-12">
         <CenteredContainer maxWidth="4xl">
           {/* 余额显示 */}
-          <div className="mb-12 text-center" data-testid="wallet-balance">
+          <div className="mb-12 text-center" data-testid="wallet-balance-section">
             <div className="inline-block relative">
               <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full"></div>
               <div className="relative">
                 <p className="text-sm text-muted-foreground mb-2">Wallet Balance</p>
                 <h1
                   className="text-6xl md:text-7xl font-bold text-foreground mb-2"
-                  data-testid="balance-value"
+                  data-testid="wallet-balance-value"
                 >
                   ${availableBalance.toFixed(2)}
                 </h1>
@@ -235,14 +247,23 @@ export default function WalletPage() {
                 <button
                   key={amount}
                   onClick={() => setSelectedAmount(amount)}
+                  data-testid={`recharge-amount-${amount}`}
+                  data-amount={amount}
+                  data-selected={selectedAmount === amount ? "true" : "false"}
                   className={`
-                    relative p-6 rounded-xl border-2 transition-all duration-200
+                    relative p-6 rounded-xl border-2 transition-[border-color,background-color,box-shadow] duration-200 motion-safe:transition-[border-color,background-color,box-shadow] motion-reduce:transition-none
                     ${
                       selectedAmount === amount
                         ? "border-primary bg-primary/10 shadow-lg"
                         : "border-border bg-card hover:border-primary/50"
                     }
                   `}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedAmount(amount);
+                    }
+                  }}
                   aria-label={`Select $${amount} recharge amount`}
                   aria-pressed={selectedAmount === amount}
                 >
@@ -310,11 +331,13 @@ export default function WalletPage() {
             <Button
               onClick={handleRecharge}
               disabled={!selectedAmount || isRecharging}
-              className="w-full mt-4 rounded-xl min-h-[44px] transition-all duration-200"
+              data-testid="recharge-submit-button"
+              data-selected-amount={selectedAmount ?? 0}
+              className="w-full mt-4 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
               aria-label={`Recharge $${selectedAmount || 0}`}
             >
               {isRecharging ? (
-                "Processing..."
+                "Processing…"
               ) : (
                 <>
                   <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -325,20 +348,22 @@ export default function WalletPage() {
           </div>
 
           {/* 交易历史 */}
-          <div>
+          <div data-testid="transaction-history">
             <h2 className="text-2xl font-semibold text-foreground mb-6">Transaction History</h2>
             {transactions.length === 0 ? (
-              <div className="text-center py-16 text-muted-foreground">
-                <Wallet className="w-12 h-12 mx-auto mb-4 opacity-50" aria-hidden="true" />
-                <p>No transactions yet</p>
-              </div>
+              <EmptyState
+                data-testid="transaction-empty"
+                icon={<Wallet className="w-8 h-8 text-muted-foreground" />}
+                title="No Transactions Yet"
+                description="Your transaction history will appear here once you make your first transaction."
+              />
             ) : (
               <div className="space-y-4">
                 {transactions.map((transaction) => (
                   <div
                     key={transaction.id}
-                    className="bg-card border border-border rounded-xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition-all duration-200"
-                    data-testid="order-row"
+                    className="bg-card border border-border rounded-xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition-[box-shadow] duration-200 motion-safe:transition-[box-shadow] motion-reduce:transition-none"
+                    data-testid="transaction-row"
                   >
                     <div className="flex items-center gap-4">
                       <div

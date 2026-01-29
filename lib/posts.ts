@@ -11,9 +11,8 @@ import "server-only";
 import { getSupabaseServerClient } from "./supabase-server";
 import { getCurrentUser } from "./auth-server";
 import { getProfile } from "./profile-server";
-import { isKYCVerified } from "./kyc-service";
 import { getVisitorCountry, isCountryBlocked } from "./geo-utils";
-import { canViewPost, hasActiveSubscription, hasPurchasedPost } from "./paywall";
+import { batchCheckSubscriptions, batchCheckPurchases } from "./paywall";
 import type { Post, PostVisibility } from "./types";
 
 // 重新导出类型供其他模块使用
@@ -39,7 +38,14 @@ export async function createPost(params: {
   price_cents?: number | null;
   preview_enabled?: boolean;
   watermark_enabled?: boolean;
-}): Promise<{ success: true; postId: string } | { success: false; error: string; details?: any }> {
+}): Promise<
+  | { success: true; postId: string }
+  | {
+      success: false;
+      error: string;
+      details?: { code?: string; details?: string; hint?: string; role?: string | null };
+    }
+> {
   try {
     const supabase = await getSupabaseServerClient();
     // 检查当前用户是否为 creator
@@ -48,8 +54,6 @@ export async function createPost(params: {
       console.error("[posts] createPost: no user - user not authenticated");
       return { success: false, error: "User not authenticated" };
     }
-
-    console.log("[posts] createPost: user authenticated, userId:", user.id);
 
     const profile = await getProfile(user.id);
     if (!profile) {
@@ -64,10 +68,6 @@ export async function createPost(params: {
       });
       return { success: false, error: "User is not a creator", details: { role: profile.role } };
     }
-
-    console.log("[posts] createPost: user is creator, proceeding");
-    console.log("  userId:", user.id);
-    console.log("  ageVerified:", profile.age_verified);
 
     // KYC 拦截：检查 age_verified 状态
     // 如果用户未完成身份验证，禁止发布 PPV 或订阅内容
@@ -102,8 +102,7 @@ export async function createPost(params: {
       is_locked: params.visibility !== "free", // 向后兼容
     };
 
-    console.log("[posts] createPost: inserting post");
-    console.log("  Data:", JSON.stringify(insertData, null, 2));
+    // Removed debug console.log - vercel-react-best-practices
 
     // 创建 post
     const { data, error } = await supabase.from("posts").insert(insertData).select("id").single();
@@ -168,16 +167,7 @@ export async function listCreatorPosts(
         .eq("id", creatorId)
         .single();
 
-      // 调试日志
-      console.log("[posts] listCreatorPosts geo-blocking check:", {
-        creatorId,
-        visitorCountry,
-        profileData,
-        profileError: profileError?.message,
-        profileErrorCode: profileError?.code,
-        blockedCountries: profileData?.blocked_countries,
-        role: profileData?.role,
-      });
+      // Removed debug console.log - vercel-react-best-practices
 
       if (profileError) {
         // 如果是 "PGRST116" 错误（无法转换为单个 JSON 对象），可能是 RLS 阻止了查询
@@ -199,19 +189,15 @@ export async function listCreatorPosts(
         const blockedCountries = profileData.blocked_countries;
         if (blockedCountries && Array.isArray(blockedCountries) && blockedCountries.length > 0) {
           const isBlocked = isCountryBlocked(blockedCountries, visitorCountry);
-          console.log(
-            `[posts] listCreatorPosts: Checking geo-block. blocked_countries: ${JSON.stringify(blockedCountries)}, visitorCountry: ${visitorCountry}, isBlocked: ${isBlocked}`
-          );
+          // Removed debug console.log - vercel-react-best-practices
           if (isBlocked) {
-            console.log(
+            console.warn(
               `[posts] listCreatorPosts: Creator ${creatorId} blocked for country ${visitorCountry}`
             );
             return []; // 被屏蔽，返回空数组
           }
         } else {
-          console.log(
-            `[posts] listCreatorPosts: No blocked_countries set for creator ${creatorId}, allowing access`
-          );
+          // Removed debug console.log - vercel-react-best-practices
         }
       } else {
         console.warn(
@@ -233,7 +219,20 @@ export async function listCreatorPosts(
       return [];
     }
 
-    const posts = (data || []).map((post: any) => ({
+    interface PostData {
+      id: string;
+      creator_id: string;
+      title: string | null;
+      content: string;
+      media_url: string | null;
+      is_locked: boolean;
+      visibility: string;
+      price_cents: number | null;
+      preview_enabled: boolean;
+      watermark_enabled: boolean | null;
+      created_at: string;
+    }
+    const posts = (data || []).map((post: PostData) => ({
       id: post.id,
       creator_id: post.creator_id,
       title: post.title,
@@ -265,7 +264,7 @@ export async function listCreatorPosts(
           is_locked: m.is_locked,
         }));
         if (media) {
-          (post as any).media = media;
+          (post as Post).media = media;
         }
       });
     }
@@ -382,7 +381,7 @@ export async function listFeed(
       `
       )
       .order("created_at", { ascending: false })
-      .limit(limit * 2); // 获取更多，因为可能被地理屏蔽过滤掉一些
+      .range(offset, offset + limit * 2 - 1); // 获取更多，因为可能被地理屏蔽过滤掉一些
 
     if (error) {
       console.error("[posts] listFeed error:", error);
@@ -390,8 +389,27 @@ export async function listFeed(
     }
 
     // 地理屏蔽过滤：移除被屏蔽国家的 creator 的 posts
-    const rawPosts = (data || []) as any[];
-    let filteredData = rawPosts.filter((item: any) => {
+    interface PostWithProfile {
+      id: string;
+      creator_id: string;
+      title: string | null;
+      content: string;
+      media_url: string | null;
+      is_locked: boolean;
+      visibility: string;
+      price_cents: number | null;
+      preview_enabled: boolean;
+      watermark_enabled: boolean | null;
+      likes_count?: number;
+      created_at: string;
+      profiles?: {
+        display_name?: string;
+        avatar_url?: string;
+        blocked_countries?: string[] | null;
+      } | null;
+    }
+    const rawPosts = (data || []) as PostWithProfile[];
+    let filteredData = rawPosts.filter((item: PostWithProfile) => {
       if (!visitorCountry) {
         return true; // 无法确定国家，不过滤
       }
@@ -404,7 +422,7 @@ export async function listFeed(
       // 检查访客国家是否被屏蔽
       const isBlocked = isCountryBlocked(blockedCountries, visitorCountry);
       if (isBlocked) {
-        console.log(`[posts] listFeed: Post ${item.id} blocked for country ${visitorCountry}`);
+        // Removed debug console.log - vercel-react-best-practices
         return false; // 被屏蔽，不返回
       }
 
@@ -414,13 +432,21 @@ export async function listFeed(
     // 限制返回数量
     filteredData = filteredData.slice(0, limit);
 
-    // 批量检查权限（订阅和购买状态）
+    // 批量检查权限（订阅和购买状态）- 使用批量查询避免 N+1 问题
     // 注意：这些函数已在文件顶部导入，因为 listFeed 只在服务端使用
-    const postIds = filteredData.map((p: any) => p.id);
+    const postIds = filteredData.map((p) => p.id);
     const canViewMap = new Map<string, boolean>();
 
     if (userId) {
-      for (const post of filteredData) {
+      // 先处理不需要查询的 posts（creator 本人和免费内容）
+      const postsToCheck: Array<{
+        postId: string;
+        creatorId: string;
+        visibility: string;
+        priceCents: number;
+      }> = [];
+
+      filteredData.forEach((post: PostWithProfile) => {
         const postId = post.id;
         const creatorId = post.creator_id;
         const visibility = post.visibility || "free";
@@ -429,30 +455,51 @@ export async function listFeed(
         // Creator 本人永远可见
         if (creatorId === userId) {
           canViewMap.set(postId, true);
-          continue;
+          return;
         }
 
         // 免费内容永远可见
         if (visibility === "free") {
           canViewMap.set(postId, true);
-          continue;
+          return;
         }
 
-        // 订阅者专享：需要活跃订阅
-        if (visibility === "subscribers" || priceCents === 0) {
-          const hasSub = await hasActiveSubscription(creatorId);
-          canViewMap.set(postId, hasSub);
-          continue;
-        }
+        // 需要检查的 posts
+        postsToCheck.push({ postId, creatorId, visibility, priceCents });
+      });
 
-        // PPV：需要购买
-        if (visibility === "ppv" && priceCents > 0) {
-          const hasPurchased = await hasPurchasedPost(userId, postId);
-          canViewMap.set(postId, hasPurchased);
-          continue;
-        }
+      // 批量查询订阅和购买状态（避免 N+1 查询）
+      if (postsToCheck.length > 0) {
+        // 收集需要检查的 creator IDs 和 post IDs
+        const creatorIdsToCheck = Array.from(
+          new Set(
+            postsToCheck
+              .filter((p) => p.visibility === "subscribers" || p.priceCents === 0)
+              .map((p) => p.creatorId)
+          )
+        );
+        const postIdsToCheck = postsToCheck
+          .filter((p) => p.visibility === "ppv" && p.priceCents > 0)
+          .map((p) => p.postId);
 
-        canViewMap.set(postId, false);
+        // 并行执行批量查询
+        const [subscriptionMap, purchaseMap] = await Promise.all([
+          batchCheckSubscriptions(userId, creatorIdsToCheck),
+          batchCheckPurchases(userId, postIdsToCheck),
+        ]);
+
+        // 根据查询结果设置可见性
+        postsToCheck.forEach(({ postId, creatorId, visibility, priceCents }) => {
+          if (visibility === "subscribers" || priceCents === 0) {
+            // 订阅者专享：检查订阅状态
+            canViewMap.set(postId, subscriptionMap.get(creatorId) || false);
+          } else if (visibility === "ppv" && priceCents > 0) {
+            // PPV：检查购买状态
+            canViewMap.set(postId, purchaseMap.get(postId) || false);
+          } else {
+            canViewMap.set(postId, false);
+          }
+        });
       }
     } else {
       // 未登录用户：只有免费内容可见
@@ -462,7 +509,7 @@ export async function listFeed(
       }
     }
 
-    const posts: Post[] = filteredData.map((item: any) => {
+    const posts: Post[] = filteredData.map((item: PostWithProfile) => {
       const canView = canViewMap.get(item.id) || false;
       const post: Post = {
         id: item.id,
@@ -482,14 +529,7 @@ export async function listFeed(
         },
       };
 
-      // 调试：检查头像数据
-      if (process.env.NODE_ENV === "development" && item.profiles) {
-        console.log("[posts] Post creator data:", {
-          creator_id: item.creator_id,
-          display_name: item.profiles.display_name,
-          avatar_url: item.profiles.avatar_url,
-        });
-      }
+      // Removed debug console.log - vercel-react-best-practices
 
       return post;
     });
@@ -578,7 +618,7 @@ export async function updatePost(
     }
 
     // 更新 post 基础字段（不包括 price_cents 和 visibility）
-    const updateData: any = {};
+    const updateData: { title?: string; content?: string } = {};
     if (updates.title !== undefined) updateData.title = updates.title;
     if (updates.content !== undefined) updateData.content = updates.content;
 

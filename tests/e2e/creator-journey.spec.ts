@@ -23,7 +23,7 @@ test.describe("Creator 端完整流程测试", () => {
   test.describe("2.1 Creator Onboarding 完成", () => {
     test("注册并升级为 Creator", async ({ page }) => {
       // 1. 注册用户
-      await signUpUser(page, creatorEmail, TEST_PASSWORD);
+      await signUpUser(page, creatorEmail, TEST_PASSWORD, "creator");
 
       // 2. 点击 Become a Creator
       await page.goto(`${BASE_URL}/home`);
@@ -89,7 +89,7 @@ test.describe("Creator 端完整流程测试", () => {
   test.describe("2.2 创建内容（Post）", () => {
     test.beforeEach(async ({ page }) => {
       // 注册并完成 Creator onboarding
-      await signUpUser(page, creatorEmail, TEST_PASSWORD);
+      await signUpUser(page, creatorEmail, TEST_PASSWORD, "creator");
 
       // 完成 Creator onboarding
       await page.goto(`${BASE_URL}/home`);
@@ -187,11 +187,9 @@ test.describe("Creator 端完整流程测试", () => {
       await contentInput.fill(postContent);
 
       // 设置可见性为 Free（如果存在选择器）
-      const visibilitySelect = page
-        .locator('select[name="visibility"], input[value="free"]')
-        .first();
-      if (await visibilitySelect.isVisible()) {
-        await visibilitySelect.selectOption("free");
+      const visibilityOption = page.locator('input[name="visibility"][value="free"]').first();
+      if (await visibilityOption.isVisible()) {
+        await visibilityOption.check();
       }
 
       // 查找发布按钮
@@ -267,17 +265,11 @@ test.describe("Creator 端完整流程测试", () => {
       await contentInput.fill(postContent);
 
       // 设置可见性为 Subscribers
-      const visibilitySelect = page.locator('select[name="visibility"]').first();
-      if (await visibilitySelect.isVisible()) {
-        await visibilitySelect.selectOption("subscribers");
-      } else {
-        // 可能是 checkbox 或其他 UI
-        const subscriberCheckbox = page
-          .locator('input[type="checkbox"][id*="locked"], input[type="checkbox"][id*="subscriber"]')
-          .first();
-        if (await subscriberCheckbox.isVisible()) {
-          await subscriberCheckbox.check();
-        }
+      const visibilityOption = page
+        .locator('input[name="visibility"][value="subscribers"]')
+        .first();
+      if (await visibilityOption.isVisible()) {
+        await visibilityOption.check();
       }
 
       // 发布
@@ -308,9 +300,9 @@ test.describe("Creator 端完整流程测试", () => {
       await contentInput.fill(postContent);
 
       // 设置可见性为 PPV
-      const visibilitySelect = page.locator('select[name="visibility"]').first();
-      if (await visibilitySelect.isVisible()) {
-        await visibilitySelect.selectOption("ppv");
+      const visibilityOption = page.locator('input[name="visibility"][value="ppv"]').first();
+      if (await visibilityOption.isVisible()) {
+        await visibilityOption.check();
       }
 
       // 设置价格（如果存在价格输入）
@@ -332,7 +324,7 @@ test.describe("Creator 端完整流程测试", () => {
 
   test.describe("2.3 编辑和删除 Post", () => {
     test.beforeEach(async ({ page }) => {
-      await signUpUser(page, creatorEmail, TEST_PASSWORD);
+      await signUpUser(page, creatorEmail, TEST_PASSWORD, "creator");
     });
 
     test("访问 Post 列表页面", async ({ page }) => {
@@ -342,8 +334,9 @@ test.describe("Creator 端完整流程测试", () => {
       await waitForVisible(page, "main, [role='main']", 5000);
 
       // 验证列表容器存在
-      const postList = page.locator("text=/post|content/i");
-      await expect(postList.first()).toBeVisible({ timeout: 5000 });
+      await expect(page.getByTestId("creator-post-list-item").first()).toBeVisible({
+        timeout: 5000,
+      });
     });
 
     test("编辑 Post", async ({ page }) => {
@@ -413,7 +406,7 @@ test.describe("Creator 端完整流程测试", () => {
 
   test.describe("2.4 管理订阅者", () => {
     test.beforeEach(async ({ page }) => {
-      await signUpUser(page, creatorEmail, TEST_PASSWORD);
+      await signUpUser(page, creatorEmail, TEST_PASSWORD, "creator");
     });
 
     test("访问订阅者列表页面", async ({ page }) => {
@@ -430,7 +423,7 @@ test.describe("Creator 端完整流程测试", () => {
 
   test.describe("2.5 查看收益", () => {
     test.beforeEach(async ({ page }) => {
-      await signUpUser(page, creatorEmail, TEST_PASSWORD);
+      await signUpUser(page, creatorEmail, TEST_PASSWORD, "creator");
     });
 
     test("访问收益页面", async ({ page }) => {
@@ -447,7 +440,7 @@ test.describe("Creator 端完整流程测试", () => {
 
   test.describe("2.6 Creator Analytics", () => {
     test.beforeEach(async ({ page }) => {
-      await signUpUser(page, creatorEmail, TEST_PASSWORD);
+      await signUpUser(page, creatorEmail, TEST_PASSWORD, "creator");
     });
 
     test("访问 Analytics 页面", async ({ page }) => {

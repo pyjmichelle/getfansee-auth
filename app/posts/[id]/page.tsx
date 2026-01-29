@@ -10,8 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { PostLikeButton } from "@/components/post-like-button";
 import { CommentList } from "@/components/comments/comment-list";
 import { MediaDisplay } from "@/components/media-display";
+import { PaywallModal } from "@/components/paywall-modal";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
+import { BottomNavigation } from "@/components/bottom-navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { ensureProfile } from "@/lib/auth";
 import { getProfile } from "@/lib/profile";
@@ -38,6 +40,7 @@ export default function PostDetailPage() {
     avatar?: string;
   } | null>(null);
   const [canView, setCanView] = useState(false);
+  const [showPaywallModal, setShowPaywallModal] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -84,9 +87,10 @@ export default function PostDetailPage() {
         const isUnlocked = data.canView || false;
 
         setCanView(isCreator || isFree || isUnlocked);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("[PostDetail] loadData error:", err);
-        setError(err.message || "Failed to load post");
+        const message = err instanceof Error ? err.message : "Failed to load post";
+        setError(message);
       } finally {
         setIsLoading(false);
       }
@@ -108,20 +112,32 @@ export default function PostDetailPage() {
     }
   };
 
+  const refetchCanView = async () => {
+    if (!postId) return;
+    try {
+      const res = await fetch(`/api/posts/${postId}`);
+      const data = await res.json();
+      if (data?.success && data.canView) setCanView(true);
+    } catch {
+      // ignore
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-16 md:pb-0" data-testid="post-detail-page">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <LoadingState type="spinner" text="Loading post..." />
+          <LoadingState type="spinner" text="Loading post…" />
         </main>
+        <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
       </div>
     );
   }
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-16 md:pb-0">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <ErrorState
@@ -131,6 +147,7 @@ export default function PostDetailPage() {
             variant="centered"
           />
         </main>
+        <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
       </div>
     );
   }
@@ -176,13 +193,16 @@ export default function PostDetailPage() {
                   </h3>
                 </Link>
                 <p className="text-sm text-muted-foreground">
-                  {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                  {post.created_at
+                    ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true })
+                    : "Unknown date"}
                 </p>
               </div>
               {post.visibility !== "free" && (
                 <Badge
                   variant={post.visibility === "ppv" ? "default" : "secondary"}
                   className="shrink-0"
+                  data-testid="post-price-badge"
                 >
                   {post.visibility === "ppv"
                     ? `$${((post.price_cents || 0) / 100).toFixed(2)}`
@@ -197,7 +217,10 @@ export default function PostDetailPage() {
                 {post.title}
               </h1>
             )}
-            <p className="text-foreground mb-6 whitespace-pre-wrap text-base leading-relaxed">
+            <p
+              className="text-foreground mb-6 whitespace-pre-wrap text-base leading-relaxed"
+              data-testid="post-content"
+            >
               {post.content}
             </p>
 
@@ -209,11 +232,11 @@ export default function PostDetailPage() {
                 isCreator={isCreator}
                 onSubscribe={() => {
                   // 订阅逻辑
-                  toast.info("Subscription feature coming soon");
+                  toast.info("Subscription feature is coming soon");
                 }}
                 onUnlock={() => {
                   // 解锁逻辑
-                  toast.info("Unlock feature coming soon");
+                  toast.info("Unlock feature is coming soon");
                 }}
                 creatorDisplayName={post.creator?.display_name}
               />
@@ -221,16 +244,41 @@ export default function PostDetailPage() {
 
             {/* Locked State */}
             {!canView && !isCreator && (
-              <div className="p-8 bg-muted/50 rounded-xl border border-border text-center">
+              <div
+                className="p-8 bg-muted/50 rounded-xl border border-border text-center"
+                data-testid="post-locked-overlay"
+              >
                 <Lock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" aria-hidden="true" />
-                <h3 className="text-lg font-semibold mb-2">Locked Content</h3>
+                <h3 className="text-lg font-semibold mb-2">Premium Content</h3>
                 <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
                   {post.visibility === "subscribers"
-                    ? "This content is for subscribers only"
-                    : `Unlock this post for $${((post.price_cents || 0) / 100).toFixed(2)}`}
+                    ? "This exclusive content is available for subscribers only"
+                    : `Unlock this hot content for $${((post.price_cents || 0) / 100).toFixed(2)}`}
                 </p>
-                <Button className="rounded-lg min-h-[44px] px-8">
-                  {post.visibility === "subscribers" ? "Subscribe to view" : "Unlock Now"}
+                <Button
+                  variant={
+                    post.visibility === "subscribers" ? "subscribe-gradient" : "unlock-gradient"
+                  }
+                  className="rounded-xl min-h-[48px] px-8 font-bold shadow-lg"
+                  data-testid={
+                    post.visibility === "subscribers"
+                      ? "post-subscribe-button"
+                      : "post-unlock-button"
+                  }
+                  onClick={() => setShowPaywallModal(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setShowPaywallModal(true);
+                    }
+                  }}
+                  aria-label={
+                    post.visibility === "subscribers"
+                      ? "Subscribe to unlock this content"
+                      : `Unlock this content for $${((post.price_cents || 0) / 100).toFixed(2)}`
+                  }
+                >
+                  {post.visibility === "subscribers" ? "Subscribe to Unlock" : "Unlock Now"}
                 </Button>
               </div>
             )}
@@ -265,6 +313,30 @@ export default function PostDetailPage() {
           />
         )}
       </main>
+
+      {post && (
+        <PaywallModal
+          open={showPaywallModal}
+          onOpenChange={setShowPaywallModal}
+          type={post.visibility === "subscribers" ? "subscribe" : "ppv"}
+          creatorName={post.creator?.display_name || "Creator"}
+          price={post.visibility === "ppv" ? (post.price_cents ?? 0) / 100 : 9.99}
+          benefits={
+            post.visibility === "subscribers"
+              ? ["Exclusive content", "Direct support", "Early access"]
+              : ["Instant access to this post", "Unlock all media"]
+          }
+          postId={post.visibility === "ppv" ? post.id : undefined}
+          creatorId={post.creator_id}
+          contentPreview={post.title || undefined}
+          onSuccess={async () => {
+            setShowPaywallModal(false);
+            await refetchCanView();
+          }}
+        />
+      )}
+
+      <BottomNavigation notificationCount={0} />
     </div>
   );
 }

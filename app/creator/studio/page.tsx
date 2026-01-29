@@ -1,17 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  DollarSign,
-  Users,
-  Eye,
-  Heart,
-  Plus,
-  BarChart3,
-  Calendar,
-  TrendingUp,
-  TrendingDown,
-} from "lucide-react";
+import { DollarSign, Users, Eye, Heart, Plus, BarChart3, Calendar, FileText } from "lucide-react";
 import { NavHeader } from "@/components/nav-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatCard } from "@/components/stat-card";
 import { CenteredContainer } from "@/components/layouts/centered-container";
+import { BottomNavigation } from "@/components/bottom-navigation";
+import { EmptyState } from "@/components/empty-state";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { getProfile } from "@/lib/profile";
 import { ensureProfile } from "@/lib/auth";
@@ -175,7 +167,7 @@ export default function CreatorStudioPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-16 md:pb-0">
         {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
         <main className="py-6 sm:py-8 lg:py-12">
           <CenteredContainer maxWidth="7xl">
@@ -201,7 +193,7 @@ export default function CreatorStudioPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background" data-testid="page-ready">
+    <div className="min-h-screen bg-background pb-16 md:pb-0" data-testid="page-ready">
       {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
 
       <main className="py-6 sm:py-8 lg:py-12">
@@ -210,13 +202,13 @@ export default function CreatorStudioPage() {
             <div>
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">Creator Studio</h1>
               <p className="text-lg text-muted-foreground">
-                Manage your content and track performance
+                Manage your content, track earnings, and grow your fanbase
               </p>
             </div>
             <Button
               asChild
               size="lg"
-              className="w-full sm:w-auto rounded-xl min-h-[44px] transition-all duration-200"
+              className="w-full sm:w-auto rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
             >
               <Link href="/creator/new-post">
                 <Plus className="w-5 h-5 mr-2" aria-hidden="true" />
@@ -231,7 +223,7 @@ export default function CreatorStudioPage() {
               variant={timeRange === "7d" ? "default" : "outline"}
               size="sm"
               onClick={() => setTimeRange("7d")}
-              className="rounded-xl transition-all duration-200"
+              className="rounded-xl transition-[color,background-color] duration-200 motion-safe:transition-[color,background-color] motion-reduce:transition-none"
               role="tab"
               aria-selected={timeRange === "7d"}
             >
@@ -241,7 +233,7 @@ export default function CreatorStudioPage() {
               variant={timeRange === "30d" ? "default" : "outline"}
               size="sm"
               onClick={() => setTimeRange("30d")}
-              className="rounded-xl transition-all duration-200"
+              className="rounded-xl transition-[color,background-color] duration-200 motion-safe:transition-[color,background-color] motion-reduce:transition-none"
               role="tab"
               aria-selected={timeRange === "30d"}
             >
@@ -251,7 +243,7 @@ export default function CreatorStudioPage() {
               variant={timeRange === "90d" ? "default" : "outline"}
               size="sm"
               onClick={() => setTimeRange("90d")}
-              className="rounded-xl transition-all duration-200"
+              className="rounded-xl transition-[color,background-color] duration-200 motion-safe:transition-[color,background-color] motion-reduce:transition-none"
               role="tab"
               aria-selected={timeRange === "90d"}
             >
@@ -308,7 +300,7 @@ export default function CreatorStudioPage() {
             <Button
               asChild
               variant="outline"
-              className="h-auto py-4 rounded-xl min-h-[44px] transition-all duration-200"
+              className="h-auto py-4 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
             >
               <Link href="/creator/studio/analytics" className="flex items-center gap-3">
                 <BarChart3 className="w-5 h-5" aria-hidden="true" />
@@ -322,7 +314,7 @@ export default function CreatorStudioPage() {
             <Button
               asChild
               variant="outline"
-              className="h-auto py-4 rounded-xl min-h-[44px] transition-all duration-200"
+              className="h-auto py-4 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
             >
               <Link href="/creator/studio/subscribers" className="flex items-center gap-3">
                 <Users className="w-5 h-5" aria-hidden="true" />
@@ -336,7 +328,7 @@ export default function CreatorStudioPage() {
             <Button
               asChild
               variant="outline"
-              className="h-auto py-4 rounded-xl min-h-[44px] transition-all duration-200"
+              className="h-auto py-4 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
             >
               <Link href="/creator/studio/earnings" className="flex items-center gap-3">
                 <DollarSign className="w-5 h-5" aria-hidden="true" />
@@ -352,96 +344,112 @@ export default function CreatorStudioPage() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-foreground">Recent Posts</h2>
-              <Button asChild variant="ghost" size="sm" className="transition-all duration-200">
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="transition-[color,background-color] duration-200 motion-safe:transition-[color,background-color] motion-reduce:transition-none"
+              >
                 <Link href="/creator/studio/post/list">View All</Link>
               </Button>
             </div>
 
             <div className="space-y-4">
-              {recentPosts.map((post) => (
-                <Card
-                  key={post.id}
-                  className="rounded-xl border shadow-sm overflow-hidden hover:shadow-md transition-all duration-200"
-                >
-                  <div className="flex flex-col md:flex-row">
-                    {/* Media Preview */}
-                    <div className="relative bg-muted md:w-48 aspect-video md:aspect-auto">
-                      <img
-                        src={post.mediaUrl || "/placeholder.svg"}
-                        alt="Post preview"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+              {recentPosts.length === 0 ? (
+                <EmptyState
+                  icon={<FileText className="w-8 h-8 text-muted-foreground" />}
+                  title="No Posts Yet"
+                  description="Create your first post to get started"
+                  action={{ label: "Create Post", href: "/creator/new-post" }}
+                />
+              ) : (
+                recentPosts.map((post) => (
+                  <Card
+                    key={post.id}
+                    className="rounded-xl border shadow-sm overflow-hidden hover:shadow-md transition-[box-shadow] duration-200 motion-safe:transition-[box-shadow] motion-reduce:transition-none"
+                  >
+                    <div className="flex flex-col md:flex-row">
+                      {/* Media Preview */}
+                      <div className="relative bg-muted md:w-48 aspect-video md:aspect-auto">
+                        <img
+                          src={post.mediaUrl || "/placeholder.svg"}
+                          alt="Post preview"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
 
-                    {/* Post Details */}
-                    <div className="flex-1 p-4 md:p-6">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge
-                              variant={post.type === "free" ? "secondary" : "default"}
-                              className="rounded-lg"
-                            >
-                              {post.type === "free"
-                                ? "Free"
-                                : post.type === "subscribers"
-                                  ? "Subscribers"
-                                  : `$${post.price}`}
-                            </Badge>
-                            <span className="text-xs text-muted-foreground flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
-                              {formatDate(post.createdAt)}
-                            </span>
+                      {/* Post Details */}
+                      <div className="flex-1 p-4 md:p-6">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge
+                                variant={post.type === "free" ? "secondary" : "default"}
+                                className="rounded-lg"
+                              >
+                                {post.type === "free"
+                                  ? "Free"
+                                  : post.type === "subscribers"
+                                    ? "Exclusive"
+                                    : `Premium $${post.price}`}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {formatDate(post.createdAt)}
+                              </span>
+                            </div>
+                            <p className="text-foreground mb-3">{post.content}</p>
                           </div>
-                          <p className="text-foreground mb-3">{post.content}</p>
+                        </div>
+
+                        <div className="flex flex-wrap gap-6 text-sm">
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Eye className="w-4 h-4" aria-hidden="true" />
+                            {post.views.toLocaleString()} views
+                          </div>
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Heart className="w-4 h-4" aria-hidden="true" />
+                            {post.likes} likes
+                          </div>
+                          {post.revenue > 0 && (
+                            <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                              <DollarSign className="w-4 h-4" aria-hidden="true" />${post.revenue}
+                            </div>
+                          )}
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-6 text-sm">
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Eye className="w-4 h-4" aria-hidden="true" />
-                          {post.views.toLocaleString()} views
-                        </div>
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Heart className="w-4 h-4" aria-hidden="true" />
-                          {post.likes} likes
-                        </div>
-                        {post.revenue > 0 && (
-                          <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                            <DollarSign className="w-4 h-4" aria-hidden="true" />${post.revenue}
-                          </div>
-                        )}
+                      <div className="p-4 md:p-6 flex md:flex-col gap-2 border-t md:border-t-0 md:border-l border-border">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 md:flex-none rounded-xl min-h-[40px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
+                          aria-label="Edit post"
+                          disabled
+                          title="Coming soon"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="flex-1 md:flex-none rounded-xl min-h-[40px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
+                          aria-label="View post"
+                          asChild
+                        >
+                          <Link href={`/posts/${post.id}`}>View</Link>
+                        </Button>
                       </div>
                     </div>
-
-                    <div className="p-4 md:p-6 flex md:flex-col gap-2 border-t md:border-t-0 md:border-l border-border">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 md:flex-none rounded-xl min-h-[40px] transition-all duration-200"
-                        aria-label="Edit post"
-                        disabled
-                        title="Coming soon"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="flex-1 md:flex-none rounded-xl min-h-[40px] transition-all duration-200"
-                        aria-label="View post"
-                        asChild
-                      >
-                        <Link href={`/posts/${post.id}`}>View</Link>
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                ))
+              )}
             </div>
           </div>
         </CenteredContainer>
       </main>
+
+      <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
     </div>
   );
 }

@@ -20,12 +20,12 @@ export function StudioChart({ data }: StudioChartProps) {
       <AreaChart data={data}>
         <defs>
           <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#A855F7" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#A855F7" stopOpacity={0} />
+            <stop offset="5%" stopColor="#C41E3A" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#C41E3A" stopOpacity={0} />
           </linearGradient>
           <linearGradient id="colorSubscribers" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#6366F1" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+            <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#D4AF37" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" />
@@ -42,14 +42,14 @@ export function StudioChart({ data }: StudioChartProps) {
         <Area
           type="monotone"
           dataKey="revenue"
-          stroke="#A855F7"
+          stroke="#F48FB1"
           fillOpacity={1}
           fill="url(#colorRevenue)"
         />
         <Area
           type="monotone"
           dataKey="subscribers"
-          stroke="#6366F1"
+          stroke="#9C27B0"
           fillOpacity={1}
           fill="url(#colorSubscribers)"
         />

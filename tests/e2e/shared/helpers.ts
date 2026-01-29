@@ -6,13 +6,58 @@ import { createClient } from "@supabase/supabase-js";
  */
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+const BASE_HOSTNAME = new URL(BASE_URL).hostname;
 
 /**
  * 生成唯一的测试邮箱
  */
 export function generateTestEmail(prefix: string): string {
   const timestamp = Date.now();
-  return `e2e-${prefix}-${timestamp}@example.com`;
+  const random = Math.random().toString(36).slice(2, 8);
+  return `e2e-${prefix}-${timestamp}-${random}@example.com`;
+}
+
+function isAlreadyRegisteredError(error: unknown): boolean {
+  const message =
+    typeof error === "object" && error && "message" in error
+      ? String((error as { message?: unknown }).message)
+      : String(error);
+  return message.toLowerCase().includes("already registered");
+}
+
+function isRetryableAdminError(error: unknown): boolean {
+  const message =
+    typeof error === "object" && error && "message" in error
+      ? String((error as { message?: unknown }).message)
+      : String(error);
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("fetch failed") ||
+    normalized.includes("econnreset") ||
+    normalized.includes("network") ||
+    normalized.includes("timeout")
+  );
+}
+
+async function withAdminRetries<T>(
+  action: () => Promise<T>,
+  label: string,
+  retries: number = 3
+): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      return await action();
+    } catch (error) {
+      lastError = error;
+      if (!isRetryableAdminError(error) || attempt === retries - 1) {
+        throw error;
+      }
+      console.warn(`[helpers] ${label} failed, retrying...`, error);
+      await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
+    }
+  }
+  throw lastError;
 }
 
 /**
@@ -39,19 +84,42 @@ const publicClient =
       })
     : null;
 
+async function ensureTestMode(page: Page): Promise<void> {
+  await page.context().addCookies([
+    {
+      name: "playwright-test-mode",
+      value: "1",
+      domain: BASE_HOSTNAME,
+      path: "/",
+      httpOnly: false,
+      secure: false,
+      sameSite: "Lax",
+    },
+  ]);
+
+  await page.addInitScript(() => {
+    localStorage.setItem("getfansee_age_verified", "true");
+  });
+}
+
 async function findUserByEmail(email: string, retries = 5) {
   if (!adminClient) {
     return null;
   }
   const normalizedEmail = email.toLowerCase();
   for (let attempt = 0; attempt < retries; attempt++) {
-    const { data, error } = await adminClient.auth.admin.listUsers({
-      page: 1,
-      perPage: 200,
-    });
+    const { data, error } = await withAdminRetries(
+      () =>
+        adminClient.auth.admin.listUsers({
+          page: 1,
+          perPage: 200,
+        }),
+      "listUsers"
+    );
     if (error) {
       console.warn("[helpers] listUsers error:", error);
-      break;
+      await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
+      continue;
     }
     const user = data?.users?.find((u) => u.email?.toLowerCase() === normalizedEmail);
     if (user) {
@@ -67,16 +135,35 @@ async function ensureTestProfileRecord(userId: string, email: string, role: Test
     return;
   }
   try {
+    const username = email
+      .split("@")[0]
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+    const displayName = email.split("@")[0];
+
     await adminClient.from("profiles").upsert(
       {
         id: userId,
         email,
-        display_name: email.split("@")[0],
+        username,
+        display_name: displayName,
         role,
         age_verified: true,
       },
       { onConflict: "id" }
     );
+
+    // 如果是 creator，同时创建 creators 记录
+    if (role === "creator") {
+      await adminClient.from("creators").upsert(
+        {
+          id: userId,
+          display_name: displayName,
+          bio: "Test creator",
+        },
+        { onConflict: "id" }
+      );
+    }
   } catch (err) {
     console.warn("[helpers] ensureTestProfileRecord error:", err);
   }
@@ -86,6 +173,7 @@ async function confirmAndInjectSession(
   page: Page,
   email: string,
   password: string,
+  role: TestUserRole = "fan",
   retries: number = 3
 ): Promise<boolean> {
   if (process.env.NEXT_PUBLIC_TEST_MODE !== "true" || !adminClient) {
@@ -109,7 +197,7 @@ async function confirmAndInjectSession(
   await ensureTestProfileRecord(
     user.id,
     email,
-    (user.user_metadata?.role as TestUserRole | undefined) ?? "fan"
+    (user.user_metadata?.role as TestUserRole | undefined) ?? role
   );
 
   // 注入测试模式 cookie
@@ -117,7 +205,7 @@ async function confirmAndInjectSession(
     {
       name: "playwright-test-mode",
       value: "1",
-      domain: "localhost",
+      domain: BASE_HOSTNAME,
       path: "/",
       httpOnly: false,
       secure: false,
@@ -161,33 +249,48 @@ export async function createConfirmedTestUser(
   const password = TEST_PASSWORD;
   const displayName = options?.displayName ?? `${role}-${Date.now()}`;
 
-  const { data, error } = await adminClient.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-  });
-
-  if (error && !error.message?.includes("already registered")) {
-    throw error;
+  let createdUserId: string | undefined;
+  try {
+    const { data } = await withAdminRetries(
+      () =>
+        adminClient.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+        }),
+      "createUser"
+    );
+    createdUserId = data?.user?.id;
+  } catch (error) {
+    if (!isAlreadyRegisteredError(error)) {
+      throw error;
+    }
   }
 
-  let userId = data?.user?.id;
-  if (!userId) {
-    const { data: list } = await adminClient.auth.admin.listUsers({
-      page: 1,
-      perPage: 100,
-    });
-    userId = list?.users.find((u) => u.email === email)?.id ?? undefined;
-  }
+  const existingUser = createdUserId ? { id: createdUserId } : await findUserByEmail(email);
+  const userId = existingUser?.id;
 
   if (!userId) {
     throw new Error(`Unable to resolve userId for ${email}`);
   }
 
+  if (!createdUserId) {
+    try {
+      await adminClient.auth.admin.updateUserById(userId, { password });
+    } catch (error) {
+      console.warn("[helpers] updateUserById failed:", error);
+    }
+  }
+
+  const username = email
+    .split("@")[0]
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
   await adminClient.from("profiles").upsert(
     {
       id: userId,
       email,
+      username,
       display_name: displayName,
       role,
       age_verified: true,
@@ -237,6 +340,7 @@ export async function injectSupabaseSession(
     throw new Error("injectSupabaseSession requires NEXT_PUBLIC_TEST_MODE to be true.");
   }
 
+  await ensureTestMode(page);
   const { data, error } = await publicClient.auth.signInWithPassword({ email, password });
   if (error || !data.session || !data.session.user) {
     throw error || new Error("Failed to obtain Supabase session.");
@@ -248,38 +352,122 @@ export async function injectSupabaseSession(
     currentUser: data.session.user,
   };
 
-  const sessionResponse = await page.request.post(`${baseUrl}/api/test/session`, {
-    data: {
+  await page.goto(`${baseUrl}/auth`, { waitUntil: "domcontentloaded" });
+
+  const sessionResult = await page.evaluate(
+    async (sessionPayload) => {
+      const response = await fetch("/api/test/session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-test-mode": "1",
+        },
+        body: JSON.stringify(sessionPayload),
+      });
+      return { ok: response.ok, status: response.status, text: await response.text() };
+    },
+    {
       access_token: data.session.access_token,
       refresh_token: data.session.refresh_token,
       expires_in: data.session.expires_in,
+    }
+  );
+
+  if (!sessionResult.ok) {
+    throw new Error(`Failed to set test session: ${sessionResult.status} ${sessionResult.text}`);
+  }
+
+  if (!SUPABASE_PROJECT_REF) {
+    throw new Error("SUPABASE_PROJECT_REF is missing, cannot set auth cookie");
+  }
+
+  const sessionCookieName = `sb-${SUPABASE_PROJECT_REF}-auth-token`;
+  const sessionCookieValue = `base64-${Buffer.from(JSON.stringify(data.session)).toString(
+    "base64"
+  )}`;
+  await page.context().addCookies([
+    {
+      name: sessionCookieName,
+      value: sessionCookieValue,
+      url: baseUrl,
     },
-    headers: {
-      "x-test-mode": "1",
-    },
-  });
-  if (!sessionResponse.ok()) {
+  ]);
+
+  const sessionCookies = await page.context().cookies(baseUrl);
+  const hasAccessCookie = sessionCookies.some((cookie) => cookie.name === "sb-access-token");
+  if (!hasAccessCookie) {
     throw new Error(
-      `Failed to set test session: ${sessionResponse.status()} ${await sessionResponse.text()}`
+      `Test session cookie missing after injection (url: ${baseUrl}). Cookies: ${sessionCookies
+        .map((cookie) => cookie.name)
+        .join(", ")}`
     );
   }
 
-  await page.goto(`${baseUrl}/auth`, { waitUntil: "domcontentloaded" });
   await page.evaluate(
     ({ key, value }) => {
       localStorage.setItem(key, JSON.stringify(value));
     },
     { key: storageKey, value: payload }
   );
-  await page.goto(`${baseUrl}/home`, { waitUntil: "load" });
+
+  await page.evaluate(
+    ({ accessToken, refreshToken, maxAge }) => {
+      document.cookie = `sb-access-token=${accessToken}; path=/; max-age=${maxAge}`;
+      document.cookie = `sb-refresh-token=${refreshToken}; path=/; max-age=${maxAge * 4}`;
+    },
+    {
+      accessToken: data.session.access_token,
+      refreshToken: data.session.refresh_token,
+      maxAge: Math.max(1, Math.floor(data.session.expires_in || 3600)),
+    }
+  );
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const navigated = await page
+      .goto(`${baseUrl}/home`, { waitUntil: "domcontentloaded", timeout: 20000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!navigated) {
+      await page.waitForTimeout(1000 * (attempt + 1));
+      continue;
+    }
+    const onHome = await page
+      .getByTestId("home-feed")
+      .isVisible()
+      .then(() => true)
+      .catch(() => false);
+    if (onHome) {
+      return;
+    }
+    await page.waitForTimeout(1000 * (attempt + 1));
+  }
+  try {
+    await signInUser(page, email, password);
+    return;
+  } catch (error) {
+    throw new Error(
+      `Failed to navigate to /home after session injection (url: ${page.url()}). Fallback login failed: ${String(error)}`
+    );
+  }
 }
 
 /**
  * 等待页面加载完成
  */
 export async function waitForPageLoad(page: Page) {
-  await page.waitForLoadState("networkidle");
   await page.waitForLoadState("domcontentloaded");
+}
+
+/**
+ * 等待 Auth 页面就绪
+ */
+async function waitForAuthReady(page: Page) {
+  const ageGateModal = page.getByTestId("age-gate-modal");
+  if (await ageGateModal.isVisible().catch(() => false)) {
+    const confirmButton = page.getByTestId("age-gate-yes");
+    await confirmButton.click();
+  }
+  await expect(page.getByTestId("auth-email")).toBeVisible({ timeout: 60000 });
 }
 
 /**
@@ -288,62 +476,87 @@ export async function waitForPageLoad(page: Page) {
 export async function signUpUser(
   page: Page,
   email: string,
-  password: string = TEST_PASSWORD
+  password: string = TEST_PASSWORD,
+  role: TestUserRole = "fan"
 ): Promise<void> {
-  // #region agent log
-  fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      location: "helpers.ts:signUpUser",
-      message: "开始注册用户",
-      data: { email },
-      timestamp: Date.now(),
-      sessionId: "debug-session",
-      runId: "test-run",
-      hypothesisId: "D",
-    }),
-  }).catch(() => {});
-  // #endregion
-  await page.goto(`${BASE_URL}/auth?mode=signup`);
-  await waitForPageLoad(page);
-  // #region agent log
-  fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      location: "helpers.ts:signUpUser",
-      message: "已导航到auth页面",
-      data: { url: page.url() },
-      timestamp: Date.now(),
-      sessionId: "debug-session",
-      runId: "test-run",
-      hypothesisId: "D",
-    }),
-  }).catch(() => {});
-  // #endregion
+  await ensureTestMode(page);
 
-  // 等待表单加载
-  await page.waitForSelector('input[type="email"]', { state: "visible", timeout: 15000 });
+  if (process.env.NEXT_PUBLIC_TEST_MODE === "true" && adminClient) {
+    try {
+      let createdUser = null;
+      try {
+        const { data } = await withAdminRetries(
+          () =>
+            adminClient.auth.admin.createUser({
+              email,
+              password,
+              email_confirm: true,
+              user_metadata: { role },
+            }),
+          "createUser"
+        );
+        createdUser = data?.user ?? null;
+      } catch (error) {
+        if (!isAlreadyRegisteredError(error)) {
+          throw error;
+        }
+      }
 
-  // 填写邮箱和密码
-  const emailInput = page.locator('input[type="email"]').first();
-  const passwordInput = page.locator('input[type="password"]').first();
+      const existingUser = createdUser ?? (await findUserByEmail(email));
+      if (!existingUser?.id) {
+        throw new Error("Failed to create or locate test user");
+      }
 
-  await emailInput.fill(email);
-  await passwordInput.fill(password);
+      if (!createdUser) {
+        try {
+          await adminClient.auth.admin.updateUserById(existingUser.id, {
+            password,
+            user_metadata: { role },
+          });
+        } catch (error) {
+          console.warn("[helpers] updateUserById failed:", error);
+        }
+      }
 
-  // 确认年龄（如果存在）
-  const ageCheckbox = page.locator('input[type="checkbox"]').first();
-  if (await ageCheckbox.isVisible()) {
-    await ageCheckbox.check();
+      await ensureTestProfileRecord(existingUser.id, email, role);
+      await injectSupabaseSession(page, email, password, BASE_URL);
+      const navigationResult = await page
+        .waitForURL(/\/home/, { timeout: 15000 })
+        .then(() => true)
+        .catch(() => false);
+      if (!navigationResult) {
+        await page.goto(`${BASE_URL}/home`, { waitUntil: "load" }).catch(() => {});
+      }
+      if (!page.url().includes("/home")) {
+        await signInUser(page, email, password);
+      }
+      return;
+    } catch (error) {
+      console.warn("[helpers] admin signup failed, falling back to UI:", error);
+    }
+  }
+  await page.goto(`${BASE_URL}/auth?mode=signup`, { waitUntil: "domcontentloaded" });
+  await waitForAuthReady(page);
+
+  // 确保在 signup tab
+  const signupTab = page.getByTestId("auth-tab-signup");
+  if (await signupTab.isVisible()) {
+    await signupTab.click();
+    await page.waitForTimeout(500); // 等待 tab 切换动画
   }
 
-  // 点击注册按钮（优先匹配 "Sign up with email"）
-  const signupButton = page
-    .getByRole("button", { name: /sign up with email|sign up|continue/i })
-    .first();
-  await signupButton.click();
+  // 填写邮箱和密码
+  await page.getByTestId("auth-email").fill(email);
+  await page.getByTestId("auth-password").fill(password);
+
+  // 确认年龄 checkbox（signup 页面的 auth-age-checkbox）
+  const ageCheckbox = page.getByTestId("auth-age-checkbox");
+  if (await ageCheckbox.isVisible().catch(() => false)) {
+    await ageCheckbox.click();
+  }
+
+  // 点击注册按钮
+  await page.getByTestId("auth-submit").click();
 
   // 等待导航或状态更新（window.location.href 可能需要一些时间）
   // 使用 Promise.race 同时等待导航和超时
@@ -374,12 +587,18 @@ export async function signUpUser(
       if (hasSuccessMessage) {
         console.log("注册成功，需要邮箱验证，尝试通过 Admin API 确认并注入 session");
         // 使用 Admin API 确认邮箱并注入 session
-        const injected = await confirmAndInjectSession(page, email, password);
+        const injected = await confirmAndInjectSession(page, email, password, role);
         if (injected) {
           // session 注入成功，导航到 /home
           await page.goto(`${BASE_URL}/home`, { waitUntil: "load", timeout: 15000 });
           return;
-        } else {
+        }
+
+        // 如果无法注入 session，尝试直接登录（可能已自动确认邮箱）
+        try {
+          await signInUser(page, email, password);
+          return;
+        } catch (signInError) {
           throw new Error("无法通过 Admin API 确认邮箱，请确保 SUPABASE_SERVICE_ROLE_KEY 已配置");
         }
       } else {
@@ -429,7 +648,7 @@ export async function signUpUser(
   }
 
   if (!page.url().includes("/home")) {
-    const injected = await confirmAndInjectSession(page, email, password);
+    const injected = await confirmAndInjectSession(page, email, password, role);
     if (!injected) {
       throw new Error("注册成功但无法建立会话，请检查测试环境配置");
     }
@@ -444,27 +663,26 @@ export async function signInUser(
   email: string,
   password: string = TEST_PASSWORD
 ): Promise<void> {
-  await page.goto(`${BASE_URL}/auth?mode=login`);
-  await waitForPageLoad(page);
+  await ensureTestMode(page);
+  await page.goto(`${BASE_URL}/auth?mode=login`, { waitUntil: "domcontentloaded" });
+  await waitForAuthReady(page);
 
-  // 等待表单加载
-  await page.waitForSelector('input[type="email"]', { state: "visible", timeout: 15000 });
+  // 确保在 login tab
+  const loginTab = page.getByTestId("auth-tab-login");
+  if (await loginTab.isVisible()) {
+    await loginTab.click();
+    await page.waitForTimeout(500); // 等待 tab 切换动画
+  }
 
   // 填写邮箱和密码
-  const emailInput = page.locator('input[type="email"]').first();
-  const passwordInput = page.locator('input[type="password"]').first();
-
-  await emailInput.fill(email);
-  await passwordInput.fill(password);
+  await page.getByTestId("auth-email").fill(email);
+  await page.getByTestId("auth-password").fill(password);
 
   // 点击登录按钮并等待响应
   const navigationPromise = page
     .waitForURL(`${BASE_URL}/home`, { timeout: 20000 })
     .catch(() => null);
-  await page
-    .getByRole("button", { name: /log in|continue/i })
-    .first()
-    .click();
+  await page.getByTestId("auth-submit").click();
 
   // 等待一下让登录请求完成
   await page.waitForTimeout(2000);
@@ -580,7 +798,7 @@ export async function signInUser(
       // 已经在 home 页面，直接返回
       return;
     } else {
-      const injected = await confirmAndInjectSession(page, email, password);
+      const injected = await confirmAndInjectSession(page, email, password, role);
       if (injected) {
         return;
       }
@@ -618,6 +836,8 @@ export async function clearStorage(page: Page): Promise<void> {
     // 如果清除存储失败，继续执行（不是致命错误）
     console.warn("清除存储时出错:", e);
   }
+
+  await ensureTestMode(page);
 }
 
 /**

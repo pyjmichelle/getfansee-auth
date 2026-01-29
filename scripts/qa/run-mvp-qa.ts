@@ -8,9 +8,10 @@
 import { chromium, Browser, BrowserContext, Page } from "playwright";
 import * as fs from "fs";
 import * as path from "path";
+import { getBaseUrl } from "../_shared/env";
 import { MVP_TEST_CASES, DEAD_CLICK_ROUTES, TestCase, Expectation } from "./mvp-flow.spec";
 
-const BASE_URL = process.env.BASE_URL || "http://127.0.0.1:3000";
+const BASE_URL = getBaseUrl();
 const ARTIFACTS_DIR = path.join(process.cwd(), "artifacts", "qa-mvp");
 const SESSIONS_DIR = path.join(process.cwd(), "artifacts", "agent-browser-full", "sessions");
 

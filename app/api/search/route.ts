@@ -40,7 +40,36 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = getSupabaseAdmin();
-    const results: any = { success: true };
+    interface SearchResults {
+      success: boolean;
+      creators?: Array<{
+        id: string;
+        display_name: string;
+        avatar_url?: string;
+        bio?: string;
+        role: string;
+      }>;
+      posts?: Array<{
+        id: string;
+        creator_id: string;
+        title?: string;
+        content: string;
+        visibility: string;
+        price_cents: number | null;
+        likes_count?: number;
+        created_at: string;
+        profiles?:
+          | {
+              display_name?: string;
+              avatar_url?: string;
+            }
+          | Array<{
+              display_name?: string;
+              avatar_url?: string;
+            }>;
+      }>;
+    }
+    const results: SearchResults = { success: true, creators: [], posts: [] };
 
     // Search Creators
     if (searchType === "all" || searchType === "creators") {

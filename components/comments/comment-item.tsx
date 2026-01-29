@@ -72,11 +72,17 @@ export function CommentItem({
           onClick={() => onDelete(comment.id)}
           disabled={isDeleting}
           className={cn(
-            "opacity-0 group-hover:opacity-100 transition-opacity",
-            "h-8 w-8 p-0 flex-shrink-0",
+            "opacity-0 group-hover:opacity-100 transition-[opacity] motion-safe:transition-[opacity] motion-reduce:transition-none",
+            "h-8 w-8 p-0 flex-shrink-0 min-h-[32px] min-w-[32px]",
             "hover:bg-destructive/10 hover:text-destructive"
           )}
           aria-label="Delete comment"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onDelete(comment.id);
+            }
+          }}
         >
           <Trash2 className="w-4 h-4" aria-hidden="true" />
         </Button>

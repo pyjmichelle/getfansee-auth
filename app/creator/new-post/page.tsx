@@ -17,7 +17,9 @@ import { toast } from "sonner";
 import { MultiMediaUpload } from "@/components/multi-media-upload";
 import { TagSelector } from "@/components/tag-selector";
 import { type MediaFile } from "@/lib/storage";
-import Link from "next/link";
+import { LoadingState } from "@/components/loading-state";
+import { ErrorState } from "@/components/error-state";
+import { BottomNavigation } from "@/components/bottom-navigation";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -175,11 +177,8 @@ export default function NewPostPage() {
   // Show minimal loading state during auth check - don't render any components that make API calls
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse space-y-4 text-center">
-          <div className="h-8 w-48 bg-muted rounded mx-auto"></div>
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        </div>
+      <div className="min-h-screen bg-background">
+        <LoadingState type="spinner" text="Loading…" />
       </div>
     );
   }
@@ -198,7 +197,7 @@ export default function NewPostPage() {
                 </p>
                 <Button
                   onClick={() => router.push("/home")}
-                  className="rounded-xl min-h-[44px] transition-all duration-200"
+                  className="rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
                 >
                   Back to Home
                 </Button>
@@ -211,7 +210,7 @@ export default function NewPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background" data-testid="page-ready">
+    <div className="min-h-screen bg-background pb-16 md:pb-0" data-testid="page-ready">
       {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
 
       <main className="py-6 sm:py-8 lg:py-12">
@@ -221,12 +220,7 @@ export default function NewPostPage() {
             <p className="text-lg text-muted-foreground">Share your content with your audience</p>
           </div>
 
-          {error && (
-            <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-6 mb-8">
-              <p className="text-destructive font-medium">Error</p>
-              <p className="text-sm text-muted-foreground mt-1">{error}</p>
-            </div>
-          )}
+          {error && <ErrorState title="Error" message={error} variant="inline" className="mb-8" />}
 
           <Card className="rounded-xl border shadow-sm p-6 md:p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -320,7 +314,7 @@ export default function NewPostPage() {
                       disabled={isSaving}
                       className="w-4 h-4"
                     />
-                    <span className="text-sm">Free - Visible to everyone</span>
+                    <span className="text-sm">Free - Public content visible to everyone</span>
                   </label>
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
@@ -338,7 +332,9 @@ export default function NewPostPage() {
                       disabled={isSaving}
                       className="w-4 h-4"
                     />
-                    <span className="text-sm">Subscribers-only - Only subscribers can view</span>
+                    <span className="text-sm">
+                      Subscribers-only - Exclusive content for your fans
+                    </span>
                   </label>
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
@@ -352,7 +348,7 @@ export default function NewPostPage() {
                       disabled={isSaving}
                       className="w-4 h-4"
                     />
-                    <span className="text-sm">Pay-per-view - Requires individual unlock</span>
+                    <span className="text-sm">Pay-per-view - Fans pay to unlock each post</span>
                   </label>
                 </div>
               </div>
@@ -377,7 +373,7 @@ export default function NewPostPage() {
                     data-testid="price-input"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Set the price to unlock this post (USD)
+                    Set the price fans pay to unlock this exclusive content (USD)
                   </p>
                 </div>
               )}
@@ -388,7 +384,7 @@ export default function NewPostPage() {
                   <div className="space-y-0.5">
                     <Label htmlFor="preview_enabled">Enable Preview (first 10 seconds)</Label>
                     <p className="text-sm text-muted-foreground">
-                      Allow non-subscribers to preview the first 10 seconds
+                      Give fans a teaser - let them preview the first 10 seconds
                     </p>
                   </div>
                   <Switch
@@ -408,7 +404,7 @@ export default function NewPostPage() {
                   <div className="space-y-0.5">
                     <Label htmlFor="watermark_enabled">Enable Watermark (top-left corner)</Label>
                     <p className="text-sm text-muted-foreground">
-                      Add watermark to images (creators can toggle)
+                      Protect your content with a watermark on images
                     </p>
                   </div>
                   <Switch
@@ -429,7 +425,7 @@ export default function NewPostPage() {
                   variant="outline"
                   onClick={() => router.push("/home")}
                   disabled={isSaving}
-                  className="flex-1 rounded-xl min-h-[44px] transition-all duration-200"
+                  className="flex-1 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
                   aria-label="Cancel post creation"
                 >
                   Cancel
@@ -437,17 +433,19 @@ export default function NewPostPage() {
                 <Button
                   type="submit"
                   disabled={isSaving}
-                  className="flex-1 rounded-xl min-h-[44px] transition-all duration-200"
+                  className="flex-1 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
                   aria-label="Publish post"
                   data-testid="submit-button"
                 >
-                  {isSaving ? "Publishing..." : "Publish"}
+                  {isSaving ? "Publishing…" : "Publish"}
                 </Button>
               </div>
             </form>
           </Card>
         </CenteredContainer>
       </main>
+
+      <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
     </div>
   );
 }

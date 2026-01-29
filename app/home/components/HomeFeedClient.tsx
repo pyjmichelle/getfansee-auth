@@ -15,10 +15,10 @@ import Link from "next/link";
 import { Lock, Share2, AlertCircle, TrendingUp, Users, Hash } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { PaywallModal } from "@/components/paywall-modal";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { CenteredContainer } from "@/components/layouts/centered-container";
 import { LoadingState } from "@/components/loading-state";
+import { BottomNavigation } from "@/components/bottom-navigation";
 
 interface HomeFeedClientProps {
   initialPosts: Post[];
@@ -80,7 +80,7 @@ export function HomeFeedClient({
       setPostViewStates(states);
     } catch (err) {
       console.error("[home] reloadFeed error", err);
-      setError("Failed to load");
+      setError("Unable to load feed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +105,7 @@ export function HomeFeedClient({
     } catch (err) {
       console.error("[home] subscribe error", err);
       setError("Subscription failed");
-      toast.error("Subscription failed");
+      toast.error("Unable to subscribe. Please try again.");
     } finally {
       setSubscribingCreators((prev) => {
         const next = new Set(prev);
@@ -131,8 +131,8 @@ export function HomeFeedClient({
     try {
       await navigator.clipboard.writeText(url);
       toast.success("Link copied to clipboard");
-    } catch (err) {
-      toast.error("Failed to copy");
+    } catch {
+      toast.error("Unable to copy link. Please try again.");
     }
   };
 
@@ -141,14 +141,18 @@ export function HomeFeedClient({
       <div className="min-h-screen bg-background">
         <NavHeader user={currentUser!} />
         <CenteredContainer className="py-12">
-          <LoadingState type="spinner" text="Loading..." />
+          <LoadingState type="spinner" text="Loading…" />
         </CenteredContainer>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background" data-testid="page-ready">
+    <div
+      className="min-h-screen bg-background pb-16 md:pb-0"
+      data-testid="page-ready"
+      style={{ touchAction: "manipulation", overscrollBehaviorY: "contain" }}
+    >
       <NavHeader user={currentUser!} />
 
       <CenteredContainer maxWidth="7xl" className="py-6 sm:py-8 lg:py-10">
@@ -162,7 +166,11 @@ export function HomeFeedClient({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           {/* 左侧边栏 - 仅桌面显示 */}
           <aside className="hidden lg:block lg:col-span-3 space-y-6 sticky top-20 self-start">
-            <Card className="rounded-xl border shadow-sm">
+            <Card
+              className="rounded-xl border shadow-sm"
+              role="complementary"
+              aria-label="Trending creators"
+            >
               <CardHeader className="pb-3">
                 <h2 className="text-base font-semibold flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -170,11 +178,15 @@ export function HomeFeedClient({
                 </h2>
               </CardHeader>
               <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground">Coming soon...</p>
+                <p className="text-sm text-muted-foreground">Trending creators will appear here</p>
               </CardContent>
             </Card>
 
-            <Card className="rounded-xl border shadow-sm">
+            <Card
+              className="rounded-xl border shadow-sm"
+              role="complementary"
+              aria-label="Popular tags"
+            >
               <CardHeader className="pb-3">
                 <h2 className="text-base font-semibold flex items-center gap-2">
                   <Hash className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -182,13 +194,18 @@ export function HomeFeedClient({
                 </h2>
               </CardHeader>
               <CardContent className="space-y-2">
-                <p className="text-sm text-muted-foreground">Coming soon...</p>
+                <p className="text-sm text-muted-foreground">Popular tags will appear here</p>
               </CardContent>
             </Card>
           </aside>
 
           {/* 主内容区 */}
-          <main className="lg:col-span-6">
+          <main
+            className="lg:col-span-6"
+            role="main"
+            aria-label="Home feed"
+            data-testid="home-feed"
+          >
             {posts.length === 0 ? (
               <Card className="rounded-xl border shadow-sm" data-testid="empty-state">
                 <CardContent className="py-16 text-center">
@@ -196,48 +213,67 @@ export function HomeFeedClient({
                     className="h-16 w-16 mx-auto text-muted-foreground mb-4"
                     aria-hidden="true"
                   />
-                  <h3 className="text-xl font-semibold mb-2">No Content Yet</h3>
+                  <h3 className="text-xl font-semibold mb-2">Your Feed Is Empty</h3>
                   <p className="text-muted-foreground max-w-sm mx-auto mb-6">
-                    Follow some creators to see their content in your feed, or explore trending
-                    content to discover new creators.
+                    Discover exclusive creators and unlock premium content. Start following your
+                    favorites to see their latest posts here.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Button
+                      variant="subscribe-gradient"
                       onClick={() => router.push("/discover")}
-                      className="rounded-lg min-h-[44px]"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          router.push("/discover");
+                        }
+                      }}
+                      className="rounded-xl min-h-[44px] font-semibold shadow-lg"
+                      aria-label="Explore creators and discover new content"
                     >
-                      <TrendingUp className="w-4 h-4 mr-2" />
-                      Explore Creators
+                      <TrendingUp className="w-4 h-4 mr-2" aria-hidden="true" />
+                      Discover Creators
                     </Button>
                     {currentUser?.role === "fan" && (
                       <Button
                         variant="outline"
                         onClick={() => router.push("/creator/upgrade")}
-                        className="rounded-lg min-h-[44px]"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            router.push("/creator/upgrade");
+                          }
+                        }}
+                        className="rounded-xl min-h-[44px] border-2 hover:border-primary/50"
+                        aria-label="Become a creator and start sharing content"
                       >
-                        Become a Creator
+                        Start Creating
                       </Button>
                     )}
                   </div>
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-6">
-                {posts.map((post) => {
+              <div className="space-y-8">
+                {posts.map((post, index) => {
                   const isUnlocked = postViewStates.get(post.id) || false;
-                  const isSubscribing = subscribingCreators.has(post.creator_id);
+                  const creatorId = post.creator_id;
+                  const isSubscribing = creatorId ? subscribingCreators.has(creatorId) : false;
 
                   return (
                     <Card
                       key={post.id}
-                      className="rounded-xl border shadow-sm hover:shadow-md transition-all duration-200"
+                      className="rounded-2xl border border-border/50 shadow-lg hover:shadow-2xl hover:shadow-primary-glow/20 hover:border-primary/30 transition-[box-shadow,border-color,transform] duration-300 motion-safe:transition-[box-shadow,border-color,transform] motion-reduce:transition-none hover:-translate-y-1"
+                      style={index > 10 ? { contentVisibility: "auto" as const } : undefined}
                       data-testid="post-card"
+                      data-post-id={post.id}
                     >
-                      <CardHeader className="pb-3">
+                      <CardHeader className="pb-4">
                         <div className="flex items-center justify-between gap-4">
                           <Link
                             href={`/creator/${post.creator_id}`}
                             className="flex items-center gap-3 hover:opacity-80 transition-opacity min-w-0 flex-1"
+                            aria-label={`View ${post.creator?.display_name || "creator"}'s profile`}
                           >
                             <Avatar className="h-10 w-10 ring-2 ring-background">
                               <AvatarImage
@@ -253,30 +289,48 @@ export function HomeFeedClient({
                                 {post.creator?.display_name || "Creator"}
                               </p>
                               <p className="text-xs text-muted-foreground">
-                                {formatDistanceToNow(new Date(post.created_at), {
-                                  addSuffix: true,
-                                })}
+                                {post.created_at
+                                  ? formatDistanceToNow(new Date(post.created_at), {
+                                      addSuffix: true,
+                                    })
+                                  : "Unknown date"}
                               </p>
                             </div>
                           </Link>
 
-                          {post.creator_id !== currentUserId && !isUnlocked && (
+                          {creatorId && creatorId !== currentUserId && !isUnlocked && (
                             <Button
                               size="sm"
-                              onClick={() => handleSubscribe(post.creator_id)}
+                              variant="subscribe-gradient"
+                              onClick={() => creatorId && handleSubscribe(creatorId)}
+                              data-testid="creator-subscribe-button"
+                              data-creator-id={creatorId}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  if (creatorId) {
+                                    handleSubscribe(creatorId);
+                                  }
+                                }
+                              }}
                               disabled={isSubscribing}
-                              className="shrink-0 rounded-lg min-h-[36px]"
+                              className="shrink-0 rounded-xl min-h-[44px] font-semibold shadow-lg"
+                              aria-label={
+                                isSubscribing
+                                  ? `Subscribing to ${post.creator?.display_name || "creator"}…`
+                                  : `Subscribe to ${post.creator?.display_name || "creator"}`
+                              }
                             >
-                              {isSubscribing ? "Subscribing..." : "Subscribe"}
+                              {isSubscribing ? "Subscribing…" : "Subscribe Now"}
                             </Button>
                           )}
                         </div>
                       </CardHeader>
 
-                      <CardContent className="pb-3">
+                      <CardContent className="pb-4">
                         {post.title && (
-                          <Link href={`/posts/${post.id}`}>
-                            <h3 className="text-lg font-bold mb-2 hover:text-primary transition-colors cursor-pointer line-clamp-2">
+                          <Link href={`/posts/${post.id}`} aria-label={`View post: ${post.title}`}>
+                            <h3 className="text-lg font-bold mb-2 hover:text-primary transition-[color] cursor-pointer line-clamp-2">
                               {post.title}
                             </h3>
                           </Link>
@@ -289,8 +343,11 @@ export function HomeFeedClient({
                         )}
 
                         {isUnlocked ? (
-                          <Link href={`/posts/${post.id}`}>
-                            <div className="rounded-lg overflow-hidden cursor-pointer hover:opacity-95 transition-opacity">
+                          <Link
+                            href={`/posts/${post.id}`}
+                            aria-label={`View media for post: ${post.title || "Untitled"}`}
+                          >
+                            <div className="rounded-lg overflow-hidden cursor-pointer hover:opacity-95 transition-[opacity] motion-safe:transition-opacity motion-reduce:transition-none">
                               <MediaDisplay
                                 post={post}
                                 canView={true}
@@ -300,21 +357,39 @@ export function HomeFeedClient({
                             </div>
                           </Link>
                         ) : (
-                          <div className="relative rounded-lg overflow-hidden bg-muted/50 border border-border">
+                          <div
+                            className="relative rounded-lg overflow-hidden bg-muted/50 border border-border"
+                            role="region"
+                            aria-label="Locked content preview"
+                            data-testid="post-locked-preview"
+                          >
                             <div className="aspect-video flex flex-col items-center justify-center p-6">
                               <Lock
                                 className="h-12 w-12 text-muted-foreground mb-3"
                                 aria-hidden="true"
                               />
                               <p className="text-base font-semibold mb-1">Locked Content</p>
-                              <p className="text-sm text-muted-foreground mb-4">
+                              <p className="text-sm text-muted-foreground mb-4" aria-live="polite">
                                 {post.price_cents
                                   ? `$${(post.price_cents / 100).toFixed(2)}`
                                   : "Subscribe to unlock"}
                               </p>
                               <Button
                                 onClick={() => handleUnlock(post)}
+                                data-testid="post-unlock-trigger"
+                                data-post-id={post.id}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    handleUnlock(post);
+                                  }
+                                }}
                                 className="rounded-lg min-h-[40px]"
+                                aria-label={
+                                  post.price_cents
+                                    ? `Unlock this post for $${(post.price_cents / 100).toFixed(2)}`
+                                    : "Subscribe to unlock this content"
+                                }
                               >
                                 Unlock Now
                               </Button>
@@ -334,7 +409,14 @@ export function HomeFeedClient({
                             variant="ghost"
                             size="sm"
                             onClick={() => router.push(`/posts/${post.id}#comments`)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                router.push(`/posts/${post.id}#comments`);
+                              }
+                            }}
                             className="rounded-lg min-h-[40px] gap-2"
+                            aria-label={`View comments for post: ${post.title || "Untitled"}`}
                           >
                             <span className="text-sm">Comment</span>
                           </Button>
@@ -344,6 +426,12 @@ export function HomeFeedClient({
                           variant="ghost"
                           size="sm"
                           onClick={() => handleShare(post)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              handleShare(post);
+                            }
+                          }}
                           className="rounded-lg min-h-[40px]"
                           aria-label="Share post"
                         >
@@ -359,12 +447,16 @@ export function HomeFeedClient({
 
           {/* 右侧边栏 - 仅桌面显示 */}
           <aside className="hidden lg:block lg:col-span-3 space-y-6 sticky top-20 self-start">
-            <Card className="rounded-xl border shadow-sm">
+            <Card
+              className="rounded-xl border shadow-sm"
+              role="complementary"
+              aria-label="Suggested follows"
+            >
               <CardHeader className="pb-3">
                 <h2 className="text-base font-semibold">Suggested Follows</h2>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">Coming soon...</p>
+                <p className="text-sm text-muted-foreground">Suggested creators will appear here</p>
               </CardContent>
             </Card>
           </aside>
@@ -389,6 +481,8 @@ export function HomeFeedClient({
           onSuccess={() => handlePaywallSuccess(paywallPost.id)}
         />
       )}
+
+      <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
     </div>
   );
 }

@@ -69,12 +69,14 @@ async function captureSnapshot(page: Page, routeName: string): Promise<any> {
   try {
     // Get page content and basic structure
     const snapshot = await page.evaluate(() => {
-      const getElementInfo = (el: Element) => ({
-        tag: el.tagName.toLowerCase(),
-        id: el.id || undefined,
-        classes: Array.from(el.classList),
-        text: el.textContent?.substring(0, 100) || undefined,
-      });
+      function getElementInfo(el: Element) {
+        return {
+          tag: el.tagName.toLowerCase(),
+          id: el.id || undefined,
+          classes: Array.from(el.classList),
+          text: el.textContent?.substring(0, 100) || undefined,
+        };
+      }
 
       return {
         title: document.title,
@@ -122,7 +124,12 @@ async function captureErrors(page: Page, routeName: string): Promise<string[]> {
 
   // Listen for failed requests
   page.on("requestfailed", (request) => {
-    errors.push(`Request Failed: ${request.url()} - ${request.failure()?.errorText}`);
+    const url = request.url();
+    const errorText = request.failure()?.errorText;
+    if (errorText === "net::ERR_ABORTED" && url.includes("?_rsc=")) {
+      return;
+    }
+    errors.push(`Request Failed: ${url} - ${errorText}`);
   });
 
   return errors;

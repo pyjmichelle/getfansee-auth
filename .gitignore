@@ -38,6 +38,9 @@ lerna-debug.log*
 *.swo
 *~
 
+# Cursor
+.cursor/debug.log
+
 # Vercel
 .vercel
 

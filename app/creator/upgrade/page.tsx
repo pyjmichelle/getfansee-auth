@@ -68,13 +68,18 @@ export default function CreatorUpgradePage() {
             Become a Creator on GetFanSee
           </h1>
           <p className="text-lg text-muted-foreground mb-8 text-balance max-w-2xl mx-auto">
-            Share your content, connect with fans, and earn money doing what you love. Join
-            thousands of creators already earning on our platform.
+            Share exclusive content, build your fanbase, and earn money doing what you love. Join
+            thousands of creators already making money on our platform.
           </p>
-          <Button asChild size="lg" className="h-12 px-8">
+          <Button
+            asChild
+            size="lg"
+            variant="subscribe-gradient"
+            className="h-12 px-8 font-bold shadow-lg"
+          >
             <Link href="/creator/upgrade/apply">
               Start Your Application
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-5 h-5 ml-2" aria-hidden="true" />
             </Link>
           </Button>
         </div>
@@ -137,10 +142,15 @@ export default function CreatorUpgradePage() {
         <Card className="p-8 text-center bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
           <h2 className="text-2xl font-bold text-foreground mb-4">Ready to Get Started?</h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Join our creator community and start monetizing your content today. The application
-            takes less than 5 minutes.
+            Join our creator community and start earning today. The application takes less than 5
+            minutes to complete.
           </p>
-          <Button asChild size="lg" className="h-12 px-8">
+          <Button
+            asChild
+            size="lg"
+            variant="subscribe-gradient"
+            className="h-12 px-8 font-bold shadow-lg"
+          >
             <Link href="/creator/upgrade/apply">Apply Now</Link>
           </Button>
         </Card>

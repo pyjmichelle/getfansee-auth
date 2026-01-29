@@ -50,12 +50,12 @@ export async function checkKYCStatus(userId: string): Promise<KYCResult> {
       verified: false,
       message: "KYC not completed",
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("[kyc-service] checkKYCStatus error:", err);
     return {
       status: "failed",
       verified: false,
-      message: err?.message || "KYC check failed",
+      message: err instanceof Error ? err.message : "KYC check failed",
     };
   }
 }

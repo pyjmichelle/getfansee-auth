@@ -4,6 +4,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { resolveSubscriptionUserColumn } from "./subscriptions";
 
 // 使用 Service Role Key 进行特权操作
 function getSupabaseAdmin() {
@@ -44,27 +45,14 @@ export async function getPostComments(
   const supabase = getSupabaseAdmin();
 
   try {
-    // 获取评论列表，包含用户信息
+    // post_comments.user_id 外键指向 auth.users，无直接 FK 到 profiles，故分两次查询
     const {
       data: comments,
       error,
       count,
     } = await supabase
       .from("post_comments")
-      .select(
-        `
-        id,
-        post_id,
-        user_id,
-        content,
-        created_at,
-        profiles:user_id (
-          display_name,
-          avatar_url
-        )
-      `,
-        { count: "exact" }
-      )
+      .select("id, post_id, user_id, content, created_at", { count: "exact" })
       .eq("post_id", postId)
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
@@ -74,18 +62,37 @@ export async function getPostComments(
       throw new Error(`Failed to fetch comments: ${error.message}`);
     }
 
-    // 转换数据格式
-    const formattedComments: Comment[] = (comments || []).map((comment: any) => ({
-      id: comment.id,
-      post_id: comment.post_id,
-      user_id: comment.user_id,
-      content: comment.content,
-      created_at: comment.created_at,
-      user: {
-        display_name: comment.profiles?.display_name || "Anonymous",
-        avatar_url: comment.profiles?.avatar_url,
-      },
-    }));
+    const list = comments || [];
+    const userIds = [...new Set(list.map((c) => c.user_id))].filter(Boolean);
+    const profileMap = new Map<string, { display_name?: string; avatar_url?: string }>();
+
+    if (userIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, display_name, avatar_url")
+        .in("id", userIds);
+      for (const p of profiles || []) {
+        profileMap.set(p.id, {
+          display_name: p.display_name ?? undefined,
+          avatar_url: p.avatar_url ?? undefined,
+        });
+      }
+    }
+
+    const formattedComments: Comment[] = list.map((comment) => {
+      const profile = profileMap.get(comment.user_id);
+      return {
+        id: comment.id,
+        post_id: comment.post_id,
+        user_id: comment.user_id,
+        content: comment.content,
+        created_at: comment.created_at,
+        user: {
+          display_name: profile?.display_name ?? "Anonymous",
+          avatar_url: profile?.avatar_url,
+        },
+      };
+    });
 
     return {
       comments: formattedComments,
@@ -129,7 +136,7 @@ export async function createComment(
       throw new Error("You must be subscribed or have purchased this content to comment");
     }
 
-    // 创建评论
+    // 创建评论（post_comments 无直接 FK 到 profiles，插入后单独查 profile）
     const { data: comment, error } = await supabase
       .from("post_comments")
       .insert({
@@ -137,25 +144,19 @@ export async function createComment(
         user_id: userId,
         content: content.trim(),
       })
-      .select(
-        `
-        id,
-        post_id,
-        user_id,
-        content,
-        created_at,
-        profiles:user_id (
-          display_name,
-          avatar_url
-        )
-      `
-      )
+      .select("id, post_id, user_id, content, created_at")
       .single();
 
     if (error) {
       console.error("[createComment] Error:", error);
       throw new Error(`Failed to create comment: ${error.message}`);
     }
+
+    const { data: profileRow } = await supabase
+      .from("profiles")
+      .select("display_name, avatar_url")
+      .eq("id", userId)
+      .single();
 
     return {
       id: comment.id,
@@ -164,8 +165,8 @@ export async function createComment(
       content: comment.content,
       created_at: comment.created_at,
       user: {
-        display_name: (comment.profiles as any)?.display_name || "Anonymous",
-        avatar_url: (comment.profiles as any)?.avatar_url,
+        display_name: profileRow?.display_name ?? "Anonymous",
+        avatar_url: profileRow?.avatar_url,
       },
     };
   } catch (err) {
@@ -230,10 +231,11 @@ async function checkCommentPermission(
   }
 
   // 2. 检查是否已订阅该 Creator
+  const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
   const { data: subscription } = await supabase
     .from("subscriptions")
     .select("id")
-    .eq("user_id", userId)
+    .eq(subscriptionUserColumn, userId)
     .eq("creator_id", creatorId)
     .eq("status", "active")
     .single();
@@ -246,7 +248,7 @@ async function checkCommentPermission(
   const { data: purchase } = await supabase
     .from("purchases")
     .select("id")
-    .eq("user_id", userId)
+    .eq("fan_id", userId)
     .eq("post_id", postId)
     .single();
 
