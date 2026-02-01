@@ -21,7 +21,7 @@ import {
   type TestFixtures,
 } from "./shared/fixtures";
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 const fanEmail = generateTestEmail("fan");
 
 test.describe("Fan 端完整流程测试", () => {

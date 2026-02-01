@@ -1,5 +1,34 @@
 # GetFanSee 端到端测试文档
 
+## Test-mode 环境变量（唯一来源）
+
+CI 与本地跑 E2E / qa-gate 时，**必须**开启 test-mode，否则 `/api/test/*` 会返回 404。
+
+| 环境变量                     | 用途                                    | CI/本地 E2E | Staging/生产 |
+| ---------------------------- | --------------------------------------- | ----------- | ------------ |
+| `PLAYWRIGHT_TEST_MODE=true`  | 服务端 `/api/test/*` **唯一**门控       | ✅ 必须     | ❌ 禁止      |
+| `E2E=1`                      | 同上，与 PLAYWRIGHT_TEST_MODE 二选一    | ✅ 必须     | ❌ 禁止      |
+| `NEXT_PUBLIC_TEST_MODE=true` | 仅前端 UI（如隐藏分析），**不**门控路由 | ✅ 可选     | ❌ 禁止      |
+
+- **唯一来源**：CI 在 `qa-gate` 与 `e2e-tests` 的 job env 中设置 `PLAYWRIGHT_TEST_MODE=true` 与 `E2E=1`；本地复现时起服需带相同变量（见下方「本地复刻 CI」）。
+- **Staging 安全**：staging 环境**禁止**设置上述任一变量。部署前可执行 `bash scripts/ci/assert-no-test-mode-on-staging.sh` 校验；若检测到 test-mode 已开启则 exit 1，防止 service_role + `/api/test/*` 暴露。
+
+### `/api/test/*` 路由与 env 依赖
+
+| 路由                               | 方法 | 依赖的 env（**仅** E2E/PLAYWRIGHT_TEST_MODE） | 说明                                                          |
+| ---------------------------------- | ---- | --------------------------------------------- | ------------------------------------------------------------- |
+| `/api/test/ping`                   | GET  | E2E=1 \| PLAYWRIGHT_TEST_MODE=true            | CI sanity check 用，返回 200 表示 test-mode 已开              |
+| `/api/test/session`                | POST | 同上                                          | E2E 登录：服务端 signIn 并写 cookie                           |
+| `/api/test/create-post-with-media` | POST | 同上                                          | 创建带媒体 Post，host 需 127.0.0.1 或 E2E_ALLOW_ANY_HOST=true |
+
+CI 已统一设置 `PLAYWRIGHT_TEST_MODE` 与 `E2E`，上述路由在 CI 中均可访问（非 404）。
+
+## 会话策略（Session）
+
+- **QA Gate（gate-ui / gate-deadclick）**：使用 **文件会话**。步骤「Create test sessions」运行 `pnpm test:session:auto:all`，通过浏览器打开 `/auth` 登录并导出 storageState 到 `artifacts/agent-browser-full/sessions/fan.json` 与 `creator.json`。gate-ui / gate-deadclick 读取这些文件做已登录态检查。账号与下方「固定测试账号」一致。
+- **E2E**：使用 **服务端会话**。测试中调用 `POST /api/test/session` 传入 `{ email, password }`，服务端用 `getSupabaseRouteHandlerClient()` 执行 `signInWithPassword` 并写 cookie，不再注入 cookie/localStorage。可用固定测试账号或 `getTestCredentials()` 等动态账号。
+- **固定测试账号（与 create-test-users 一致）**：`test-fan@example.com` / `test-creator@example.com`，密码 `TestPassword123!`。CI 先执行「Create test users (if needed)」再「Create test sessions」，保证 QA gate 的 sessions 与 E2E 使用的账号一致。
+
 ## 测试结构
 
 ### 测试文件
@@ -34,11 +63,51 @@
    - 页面导航辅助函数
    - 元素等待和验证函数
 
-### CI 下 “Auth session missing” 说明
+### E2E 登录与 “Auth session missing” 说明
 
-E2E 通过 `injectSupabaseSession` 注入 cookie/localStorage，Next 服务端用 `getSupabaseServerClient()` → `cookies()` 读 cookie。若 CI 里请求未带 cookie 或 cookie 格式与 `@supabase/auth-helpers-nextjs` 期望不一致，`getUser()` 会报 `AuthSessionMissingError`。当前做法是：对依赖服务端 session 的断言（如购买列表、余额）做放宽或跳过；根因修复需对齐 helpers 里写入的 cookie 名称/格式与 auth-helpers 服务端读取逻辑。
+- **方案 A（当前）**：E2E 不再注入 cookie/localStorage。测试专用接口 `POST /api/test/session`（仅在 test-mode 开启时启用，见上文「Test-mode 环境变量」）接受 `{ email, password }`，由服务端用与线上相同的 `getSupabaseRouteHandlerClient()` 调用 `signInWithPassword` 并写 cookie，保证 cookie 名字/格式/chunking 与 auth-helpers 一致。Playwright 只负责 `page.request.post('/api/test/session', { data: { email, password } })` 后 `page.goto('/')`，由浏览器接收 Set-Cookie。
+- 若仍出现 “Auth session missing”，可查看 E2E 日志中 `[E2E] missing sb cookie on <url>`，确认后续 `/api` 或 `/auth` 请求是否带上 `sb-` 前缀的 cookie。
+- **ensureProfile: No user found 根因定位**：
+  - 调用点：`lib/auth-server.ts` 的 `ensureProfile()`、`getCurrentUser()`；RSC/Server Action 通过 `getSupabaseServerClient()`（`lib/supabase-server.ts` 的 `createClient()`）读 cookie。
+  - 写 cookie 点：`/api/test/session` 使用 `getSupabaseRouteHandlerClient()`（`lib/supabase-route.ts`），同一套 `cookies()` from next/headers，适配均为 getAll/setAll（chunked sb-\*.0/.1 一致）。
+  - 若 cookie 存在仍 No user found：检查 RSC 请求是否与 route 同域/同 path，以及服务端是否读到 sb-\*。
+  - E2E 下已加 debug：在 `lib/auth-server.ts` 的 `getCurrentUser()` 内，当 `E2E=1` 或 `PLAYWRIGHT_TEST_MODE=true` 且 user 为空时，打印 `[E2E auth] cookie names seen by server (getCurrentUser): ...`（仅 cookie 名，不打印 token 值，每个进程最多一次），用于确认 server 端是否读到 sb-\*。
 
 ## 运行测试
+
+### 本地必过命令（含端口/复用）
+
+playwright.config 已设置 `reuseExistingServer: true`，若 3000 端口已有服务会直接复用，不会因“端口占用”导致未跑完。
+
+```bash
+pnpm exec playwright test --project=chromium
+```
+
+仅跑三个核心 spec（atomic-unlock / complete-journey / paywall-flow）：
+
+```bash
+pnpm exec playwright test --project=chromium tests/e2e/atomic-unlock.spec.ts tests/e2e/complete-journey.spec.ts tests/e2e/paywall-flow.spec.ts
+```
+
+确保 server 就绪后再跑（推荐，可复现）：
+
+```bash
+# 终端 1：起服（必须就绪后再在终端 2 跑测试）
+pnpm build && pnpm start
+
+# 终端 2：跑 chromium 或仅跑三个核心 spec
+pnpm exec playwright test --project=chromium
+# 或
+pnpm exec playwright test --project=chromium tests/e2e/atomic-unlock.spec.ts tests/e2e/complete-journey.spec.ts tests/e2e/paywall-flow.spec.ts
+```
+
+CI 下若 create-post-with-media 因 host 校验失败，可设置 `E2E_ALLOW_ANY_HOST=true`（仅 CI 使用，生产不可达）。
+
+若需先清 3000 端口再跑（可选）：
+
+```bash
+lsof -ti:3000 | xargs kill -9 2>/dev/null; pnpm exec playwright test --project=chromium
+```
 
 ### 运行所有测试
 
@@ -135,13 +204,48 @@ pnpm exec playwright test --reporter=html
 3. **查看测试报告**: 运行 `pnpm exec playwright show-report` 查看详细的测试报告
 4. **截图和视频**: 测试失败时会自动截图，可以在报告中查看
 
-## 持续集成
+## 持续集成与本地复刻 CI
 
-测试可以在 CI/CD 环境中运行：
+### 本地复刻 CI 的命令（起服 + qa-gate / E2E）
+
+与 CI 一致地开启 test-mode 并跑 qa-gate 或 E2E：
 
 ```bash
-# CI 环境运行测试
-pnpm exec playwright test --reporter=html
+# 1. 质量与构建
+pnpm check-all
+pnpm build
+
+# 2. 起服（必须带 test-mode，与 CI 一致）
+export PLAYWRIGHT_TEST_MODE=true E2E=1 NEXT_PUBLIC_TEST_MODE=true
+PORT=3000 pnpm start &
+# 等待就绪：curl -sf http://127.0.0.1:3000/api/health && curl -sf http://127.0.0.1:3000/api/test/ping
+
+# 3a. 复刻 qa-gate（含 session 创建 + gate-ui + gate-deadclick）
+pnpm test:session:auto:all   # 若需与 CI 一致的 session
+pnpm qa:gate
+
+# 3b. 复刻 E2E（另终端，服务器已起）
+PLAYWRIGHT_SKIP_SERVER=true pnpm exec playwright test --project=chromium --reporter=html
 ```
 
-确保 CI 环境中配置了必要的环境变量和 Supabase 凭据。
+单次一条龙（起服后在同一 shell 跑 E2E，不依赖 webServer）：
+
+```bash
+pnpm build && PORT=3000 pnpm start & \
+  until curl -sf http://127.0.0.1:3000/api/test/ping >/dev/null; do sleep 2; done && \
+  PLAYWRIGHT_SKIP_SERVER=true pnpm exec playwright test --project=chromium
+```
+
+### Staging 部署前检查
+
+Staging 环境**禁止**开启 test-mode。部署流程或文档中应约定：staging 不设置 `NEXT_PUBLIC_TEST_MODE` / `PLAYWRIGHT_TEST_MODE` / `E2E`。可选在部署前执行：
+
+```bash
+bash scripts/ci/assert-no-test-mode-on-staging.sh
+```
+
+若任一 test-mode 变量被开启，脚本 exit 1 并拒绝部署。
+
+### CI 中运行
+
+CI 已在 `qa-gate` 与 `e2e-tests` 中设置 `PLAYWRIGHT_TEST_MODE`、`E2E`，并在起服后做 `/api/test/ping` sanity check（非 404 才继续）。确保 CI 环境配置了 Supabase 凭据与（若需要）`E2E_ALLOW_ANY_HOST=true`。

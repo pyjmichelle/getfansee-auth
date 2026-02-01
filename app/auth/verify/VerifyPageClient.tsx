@@ -80,7 +80,14 @@ export default function VerifyPageClient({ query }: VerifyPageClientProps) {
         const error = queryError || hashError;
         const errorCode = hashErrorCode;
         const errorDescription = queryErrorDescription || hashErrorDescription;
-        const email = queryEmail || localStorage.getItem("pending_signup_email");
+        let email = queryEmail;
+        if (!email && typeof window !== "undefined") {
+          try {
+            email = localStorage.getItem("pending_signup_email");
+          } catch {
+            /* SecurityError in cross-origin or restricted contexts; ignore */
+          }
+        }
 
         if (email) {
           setUserEmail(email);
@@ -249,7 +256,14 @@ export default function VerifyPageClient({ query }: VerifyPageClientProps) {
   ]);
 
   const handleResend = async () => {
-    const email = userEmail || localStorage.getItem("pending_signup_email");
+    let email = userEmail;
+    if (!email && typeof window !== "undefined") {
+      try {
+        email = localStorage.getItem("pending_signup_email");
+      } catch {
+        /* SecurityError in cross-origin or restricted contexts; ignore */
+      }
+    }
 
     if (!email) {
       router.push("/auth/resend-verification");

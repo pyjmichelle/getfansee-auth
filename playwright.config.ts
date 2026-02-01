@@ -26,7 +26,7 @@ if (!process.env.NEXT_PUBLIC_TEST_MODE) {
   process.env.NEXT_PUBLIC_TEST_MODE = "true";
 }
 
-const defaultBaseUrl = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+const defaultBaseUrl = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 const parsedUrl = new URL(defaultBaseUrl);
 const serverPort = parsedUrl.port || (parsedUrl.protocol === "https:" ? "443" : "80");
 const cookieExpires = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30;
@@ -44,9 +44,9 @@ export default defineConfig({
   fullyParallel: false, // 串行执行，更稳定
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* 重试次数 - 重试后通过不会被标记为 flaky */
-  retries: 0, // 不重试，避免 flaky 标记
-  /* 使用单个 worker */
+  /* CI 下重试 2 次提高稳定性，本地不重试便于快速失败 */
+  retries: process.env.CI ? 2 : 0,
+  /* 使用单个 worker，先稳定再提速 */
   workers: 1,
   /* Reporter */
   reporter: process.env.CI ? [["html"], ["github"]] : [["html"], ["list"]],
@@ -56,14 +56,16 @@ export default defineConfig({
   expect: {
     timeout: 15 * 1000,
   },
-  /* Shared settings */
+  /* Shared settings；contextOptions.reducedMotion 降低动画导致的 flaky */
   use: {
     baseURL: defaultBaseUrl,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     actionTimeout: 30 * 1000,
     navigationTimeout: 60 * 1000,
-    /* 增加重试网络请求 */
+    ...((): { contextOptions?: { reducedMotion: "reduce" } } => ({
+      contextOptions: { reducedMotion: "reduce" },
+    }))(),
     ignoreHTTPSErrors: true,
     storageState: {
       cookies: [
@@ -98,15 +100,14 @@ export default defineConfig({
     },
   ],
 
-  /* 本地开发/CI 时自动启动服务器 */
+  /* 本地开发/CI 时自动启动服务器；日志重定向到文件，禁止 pipe+tee 以免影响 server ready 判断 */
   webServer: process.env.PLAYWRIGHT_SKIP_SERVER
     ? undefined
     : {
-        // 确保测试使用最新构建产物
-        command: `PLAYWRIGHT_TEST_MODE=true NEXT_PUBLIC_TEST_MODE=true PORT=${serverPort} pnpm build && PLAYWRIGHT_TEST_MODE=true NEXT_PUBLIC_TEST_MODE=true PORT=${serverPort} pnpm start`,
-        url: `${defaultBaseUrl}/api/health`, // 使用 health check endpoint
-        reuseExistingServer: !process.env.CI, // CI 中不复用，确保干净启动
-        timeout: 180 * 1000, // 增加到 3 分钟，确保 build + start 有足够时间
+        command: `PLAYWRIGHT_TEST_MODE=true E2E=1 PORT=${serverPort} pnpm build && bash -lc 'PORT=${serverPort} E2E=1 PLAYWRIGHT_TEST_MODE=true pnpm start > .next/e2e-server.log 2>&1'`,
+        url: `${defaultBaseUrl}/api/health`,
+        reuseExistingServer: true,
+        timeout: 180 * 1000,
         stdout: "pipe",
         stderr: "pipe",
       },

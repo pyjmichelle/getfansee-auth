@@ -1,12 +1,84 @@
 import { Page, expect } from "@playwright/test";
+import type { TestInfo } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 
 /**
  * 共享测试工具函数
+ * baseURL 统一 127.0.0.1，避免 localhost 与 127.0.0.1 cookie 隔离
  */
-
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 const BASE_HOSTNAME = new URL(BASE_URL).hostname;
+
+/** 最后一次 injectSupabaseSession 的 response（仅用于失败诊断，不发起新请求） */
+let lastSessionResponseStatus: number | null = null;
+let lastSessionResponseText: string | null = null;
+
+export function getLastSessionResponse(): { status: number | null; text: string | null } {
+  return { status: lastSessionResponseStatus, text: lastSessionResponseText };
+}
+
+/**
+ * E2E 失败时输出关键诊断（无副作用：不 POST /api/test/session，不触发 signIn）
+ * 输出：page.url()、cookie 名、是否有 sb-*、/api/test/ping status、可选 last session status。
+ */
+export async function emitE2EDiagnostics(page: Page, testInfo: TestInfo): Promise<void> {
+  if (!page || page.isClosed()) {
+    console.warn("[E2E diagnostics] page closed or missing, skip");
+    return;
+  }
+  const out: string[] = [];
+  try {
+    out.push(`[E2E diagnostics] test=${testInfo.titlePath?.join(" > ") ?? testInfo.title}`);
+    out.push(`  page.url()=${page.url()}`);
+    const cookies = await page
+      .context()
+      .cookies(page.url())
+      .catch(() => []);
+    const names = cookies.map((c) => c.name);
+    out.push(`  cookie names (no values)=${names.join(", ") || "none"}`);
+    const hasSb = names.some((n) => n.startsWith("sb-"));
+    out.push(`  has sb-* cookie=${hasSb}`);
+    const origin = new URL(page.url()).origin;
+    const pingRes = await page.request.get(`${origin}/api/test/ping`).catch(() => null);
+    const pingStatus = pingRes ? pingRes.status() : "failed";
+    out.push(`  /api/test/ping => ${pingStatus} (200=test-mode on)`);
+    if (lastSessionResponseStatus !== null) {
+      out.push(
+        `  last session (cached): status=${lastSessionResponseStatus} text=${(lastSessionResponseText || "").slice(0, 100)}`
+      );
+    }
+  } catch (e) {
+    out.push(`  error=${String(e)}`);
+  }
+  console.warn(out.join("\n"));
+}
+
+/**
+ * 从当前页面获取 origin，用于带 cookie 的 fetch（避免 localhost/127.0.0.1 隔离导致 credentials 不带 cookie）
+ */
+export function getOrigin(page: Page): string {
+  return new URL(page.url()).origin;
+}
+
+type FetchAuthedResult =
+  | { ok: true; status: number; body: unknown }
+  | { ok: false; status: number; body: unknown };
+
+/**
+ * 使用当前页面 origin 发起带 cookie 的 fetch，避免 BASE_URL 拼接导致 cookie 隔离/CORS
+ */
+export async function fetchAuthedJson(page: Page, path: string): Promise<FetchAuthedResult> {
+  return page.evaluate(async (p: string) => {
+    const origin = new URL(window.location.href).origin;
+    const res = await fetch(`${origin}${p}`, { credentials: "include" });
+    const body = await res.json().catch(() => ({}));
+    return {
+      ok: res.ok,
+      status: res.status,
+      body,
+    };
+  }, path);
+}
 
 /**
  * 生成唯一的测试邮箱
@@ -67,19 +139,10 @@ export const TEST_PASSWORD = "TestPassword123!";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const SUPABASE_PROJECT_REF = SUPABASE_URL ? new URL(SUPABASE_URL).hostname.split(".")[0] : null;
 
 const adminClient =
   SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
     ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-        auth: { persistSession: false, autoRefreshToken: false },
-      })
-    : null;
-
-const publicClient =
-  SUPABASE_URL && SUPABASE_ANON_KEY
-    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: { persistSession: false, autoRefreshToken: false },
       })
     : null;
@@ -325,130 +388,100 @@ export async function deleteTestUser(userId: string) {
   await adminClient.from("user_wallets").delete().eq("id", userId);
 }
 
+/**
+ * E2E 登录：在浏览器上下文中 fetch /api/test/session，使 Set-Cookie 写入浏览器 cookie jar，
+ * 保证 sb-* cookie 与线上一致，避免 "Auth Session Missing"。
+ * page.request.post 不会把 Set-Cookie 写入浏览器，必须用 page.evaluate(fetch) + credentials: include。
+ */
 export async function injectSupabaseSession(
   page: Page,
   email: string,
   password: string,
   baseUrl: string
 ) {
-  if (!publicClient || !SUPABASE_PROJECT_REF) {
-    throw new Error(
-      "Missing Supabase public client. Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set."
-    );
+  if (page.isClosed()) {
+    throw new Error("injectSupabaseSession: page/context already closed, cannot set session");
   }
-  if (process.env.NEXT_PUBLIC_TEST_MODE !== "true") {
-    throw new Error("injectSupabaseSession requires NEXT_PUBLIC_TEST_MODE to be true.");
-  }
-
   await ensureTestMode(page);
-  const { data, error } = await publicClient.auth.signInWithPassword({ email, password });
-  if (error || !data.session || !data.session.user) {
-    throw error || new Error("Failed to obtain Supabase session.");
+
+  // 必须先导航到同源页面，否则 fetch credentials 无法正确应用 Set-Cookie
+  await page.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded", timeout: 15_000 });
+  const origin = new URL(page.url()).origin;
+  if (!origin || origin === "null") {
+    throw new Error(`injectSupabaseSession: invalid origin from page.url()=${page.url()}`);
   }
 
-  const storageKey = `sb-${SUPABASE_PROJECT_REF}-auth-token`;
-  const payload = {
-    currentSession: data.session,
-    currentUser: data.session.user,
-  };
-
-  await page.goto(`${baseUrl}/auth`, { waitUntil: "domcontentloaded" });
-
+  // 在浏览器上下文内发 POST，Set-Cookie 会写入浏览器 cookie jar
   const sessionResult = await page.evaluate(
-    async (sessionPayload) => {
-      const response = await fetch("/api/test/session", {
+    async ({
+      origin: o,
+      email: e,
+      password: p,
+    }: {
+      origin: string;
+      email: string;
+      password: string;
+    }) => {
+      const res = await fetch(`${o}/api/test/session`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-test-mode": "1",
-        },
-        body: JSON.stringify(sessionPayload),
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email: e, password: p }),
       });
-      return { ok: response.ok, status: response.status, text: await response.text() };
+      const text = await res.text().catch(() => "");
+      return { ok: res.ok, status: res.status, text };
     },
-    {
-      access_token: data.session.access_token,
-      refresh_token: data.session.refresh_token,
-      expires_in: data.session.expires_in,
-    }
+    { origin, email, password }
   );
 
-  if (!sessionResult.ok) {
-    throw new Error(`Failed to set test session: ${sessionResult.status} ${sessionResult.text}`);
+  lastSessionResponseStatus = sessionResult.status;
+  lastSessionResponseText = sessionResult.text;
+
+  if (sessionResult.status === 401) {
+    throw new Error(`Test session API login failed: ${sessionResult.text.slice(0, 200)}`);
   }
-
-  if (!SUPABASE_PROJECT_REF) {
-    throw new Error("SUPABASE_PROJECT_REF is missing, cannot set auth cookie");
+  if (sessionResult.status === 404) {
+    throw new Error("Test session API not enabled (set E2E=1 or PLAYWRIGHT_TEST_MODE=true).");
   }
-
-  const sessionCookieName = `sb-${SUPABASE_PROJECT_REF}-auth-token`;
-  const sessionCookieValue = `base64-${Buffer.from(JSON.stringify(data.session)).toString(
-    "base64"
-  )}`;
-  await page.context().addCookies([
-    {
-      name: sessionCookieName,
-      value: sessionCookieValue,
-      url: baseUrl,
-    },
-  ]);
-
-  const sessionCookies = await page.context().cookies(baseUrl);
-  const hasAccessCookie = sessionCookies.some((cookie) => cookie.name === "sb-access-token");
-  if (!hasAccessCookie) {
+  if (sessionResult.status !== 204) {
     throw new Error(
-      `Test session cookie missing after injection (url: ${baseUrl}). Cookies: ${sessionCookies
-        .map((cookie) => cookie.name)
-        .join(", ")}`
+      `Test session API unexpected status ${sessionResult.status}: ${sessionResult.text.slice(0, 200)}`
     );
   }
 
-  await page.evaluate(
-    ({ key, value }) => {
-      localStorage.setItem(key, JSON.stringify(value));
-    },
-    { key: storageKey, value: payload }
-  );
-
-  await page.evaluate(
-    ({ accessToken, refreshToken, maxAge }) => {
-      document.cookie = `sb-access-token=${accessToken}; path=/; max-age=${maxAge}`;
-      document.cookie = `sb-refresh-token=${refreshToken}; path=/; max-age=${maxAge * 4}`;
-    },
-    {
-      accessToken: data.session.access_token,
-      refreshToken: data.session.refresh_token,
-      maxAge: Math.max(1, Math.floor(data.session.expires_in || 3600)),
-    }
-  );
-
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const navigated = await page
-      .goto(`${baseUrl}/home`, { waitUntil: "domcontentloaded", timeout: 20000 })
-      .then(() => true)
-      .catch(() => false);
-    if (!navigated) {
-      await page.waitForTimeout(1000 * (attempt + 1));
-      continue;
-    }
-    const onHome = await page
-      .getByTestId("home-feed")
-      .isVisible()
-      .then(() => true)
-      .catch(() => false);
-    if (onHome) {
-      return;
-    }
-    await page.waitForTimeout(1000 * (attempt + 1));
-  }
-  try {
-    await signInUser(page, email, password);
-    return;
-  } catch (error) {
+  // 强断言：sb-* cookie 必须存在
+  const cookies = await page.context().cookies(origin);
+  const hasSbCookie = cookies.some((c) => c.name.startsWith("sb-"));
+  if (!hasSbCookie) {
+    const cookieNames = cookies.map((c) => c.name).join(", ") || "none";
     throw new Error(
-      `Failed to navigate to /home after session injection (url: ${page.url()}). Fallback login failed: ${String(error)}`
+      `E2E session: no sb-* cookie after session API (origin=${origin} cookies=[${cookieNames}] status=${sessionResult.status} text=${sessionResult.text.slice(0, 200)})`
     );
   }
+
+  // 导航到 /home 并验证 session 生效
+  await page.goto(`${origin}/home`, { waitUntil: "domcontentloaded", timeout: 15_000 });
+  if (page.url().includes("/auth")) {
+    throw new Error(
+      `E2E session: redirected to /auth after goto(/home) — session not生效 (origin=${origin} sb-cookies present but server did not recognize)`
+    );
+  }
+  // 等待首页就绪（非 auth 页）
+  await expect(page.getByTestId("home-feed")).toBeVisible({ timeout: 15_000 });
+}
+
+/** 临时：监听 /api 或 /auth 请求是否带 sb- cookie，仅打日志（跑绿后可删） */
+function addCookieCheckListener(page: Page): () => void {
+  const handler = (req: { url: () => string; headers: () => Record<string, string> }) => {
+    const u = req.url();
+    if (!u.includes("/api/") && !u.includes("/auth")) return;
+    const cookie = req.headers()["cookie"] ?? "";
+    if (!cookie.includes("sb-")) {
+      console.warn("[E2E] missing sb cookie on", u);
+    }
+  };
+  page.on("request", handler);
+  return () => page.removeListener("request", handler);
 }
 
 /**
@@ -479,6 +512,9 @@ export async function signUpUser(
   password: string = TEST_PASSWORD,
   role: TestUserRole = "fan"
 ): Promise<void> {
+  if (page.isClosed()) {
+    throw new Error("signUpUser: page/context already closed, cannot continue");
+  }
   await ensureTestMode(page);
 
   if (process.env.NEXT_PUBLIC_TEST_MODE === "true" && adminClient) {
@@ -798,7 +834,7 @@ export async function signInUser(
       // 已经在 home 页面，直接返回
       return;
     } else {
-      const injected = await confirmAndInjectSession(page, email, password, role);
+      const injected = await confirmAndInjectSession(page, email, password, "fan");
       if (injected) {
         return;
       }
@@ -808,32 +844,28 @@ export async function signInUser(
 }
 
 /**
- * 清除所有存储和 cookies
+ * 清除所有存储和 cookies。
+ * 必须在同源页执行：about:blank 为 opaque origin，localStorage 会抛 SecurityError。
  */
 export async function clearStorage(page: Page): Promise<void> {
-  // 先导航到一个页面，确保有有效的上下文
-  try {
-    await page.goto("about:blank");
-  } catch {
-    // 如果 about:blank 失败，尝试导航到 baseURL
-    await page.goto(BASE_URL);
+  if (page.isClosed()) {
+    throw new Error("clearStorage: page already closed, cannot clear storage");
   }
+  await page.goto(BASE_URL, { waitUntil: "domcontentloaded", timeout: 30_000 });
 
   await page.context().clearCookies();
 
-  // 在页面上下文中清除存储
   try {
     await page.evaluate(() => {
       try {
         localStorage.clear();
         sessionStorage.clear();
       } catch (e) {
-        // 忽略安全错误（某些页面可能不允许访问 storage）
+        // 同源下仍可能受限（如 iframe），仅忽略
         console.warn("无法清除存储:", e);
       }
     });
   } catch (e) {
-    // 如果清除存储失败，继续执行（不是致命错误）
     console.warn("清除存储时出错:", e);
   }
 

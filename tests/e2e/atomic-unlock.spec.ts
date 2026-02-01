@@ -12,6 +12,8 @@ import {
   clearStorage,
   createConfirmedTestUser,
   deleteTestUser,
+  emitE2EDiagnostics,
+  fetchAuthedJson,
   injectSupabaseSession,
   waitForPageLoad,
 } from "./shared/helpers";
@@ -26,7 +28,7 @@ import {
 const TEST_PASSWORD = "TestPassword123!";
 const PPV_PRICE = 5.0;
 const INITIAL_BALANCE = 10.0;
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 
 test.describe("Atomic PPV Unlock Tests", () => {
   let fixtures: TestFixtures;
@@ -129,46 +131,73 @@ test.describe("Atomic PPV Unlock Tests", () => {
     await injectSupabaseSession(page, fanAccount.email, fanAccount.password, BASE_URL);
     await waitForPageLoad(page);
 
-    // Navigate to PPV post
     await page.goto(`${BASE_URL}/posts/${fixtures.posts.ppv.id}`);
     await waitForPageLoad(page);
 
+    // 前置断言：进入 post 页后立即验证，避免中途超时
+    const preUrl = page.url();
+    if (preUrl.includes("/auth")) {
+      const bodyText = await page
+        .locator("body")
+        .textContent()
+        .catch(() => "");
+      throw new Error(
+        `E2E-2 pre-assert: URL contains /auth. url=${preUrl} body(200)=${bodyText.slice(0, 200)}`
+      );
+    }
     const unlockBtn = page.getByTestId("post-unlock-button");
     await expect(unlockBtn).toBeVisible({ timeout: 20_000 });
     await unlockBtn.click();
     await expect(page.getByTestId("paywall-modal")).toBeVisible({ timeout: 15_000 });
 
-    // Get initial balance
     const balanceText = await page.getByTestId("paywall-balance-value").textContent();
     const initialBalance = parseFloat(balanceText?.match(/\$(\d+\.\d+)/)?.[1] || "0");
 
-    // Click unlock button rapidly (simulate double-click)
+    // 前置断言：paywall-unlock 按钮必须存在且可点
     const unlockButton = page.getByTestId("paywall-unlock-button");
-    await Promise.all([unlockButton.click(), unlockButton.click(), unlockButton.click()]);
+    try {
+      await expect(unlockButton).toBeVisible({ timeout: 5000 });
+      await expect(unlockButton).toBeEnabled({ timeout: 3000 });
+    } catch (e) {
+      const url = page.url();
+      const bodyText = await page
+        .locator("body")
+        .textContent()
+        .catch(() => "");
+      const modalVisible = await page
+        .getByTestId("paywall-modal")
+        .isVisible()
+        .catch(() => false);
+      throw new Error(
+        `E2E-2 pre-assert: paywall-unlock-button not visible/enabled. url=${url} modalVisible=${modalVisible} body(200)=${bodyText.slice(0, 200)}. Original: ${e}`
+      );
+    }
 
-    // Wait for success
-    await expect(page.getByTestId("paywall-success-message")).toBeVisible({ timeout: 10000 });
+    // 模拟“快速多次触发”：在按钮仍 enabled 时连续两次 click（不等待成功态，不用 force）
+    await unlockButton.click();
+    await unlockButton.click();
 
-    // Verify only charged once
-    await page.waitForTimeout(2000);
-    await page.goto("/me/wallet");
+    await expect(page.getByTestId("paywall-success-message")).toBeVisible({ timeout: 12_000 });
 
+    // 幂等证明：仅用“购买记录仅 1 条 + 余额只扣一次”，不依赖 successBodies 计数（幂等可能多次 200/409/202）
+    const purchasesRes = await fetchAuthedJson(page, "/api/purchases");
+    if (!purchasesRes.ok) {
+      throw new Error(
+        `/api/purchases failed (session/cookie): status=${purchasesRes.status} body=${JSON.stringify(purchasesRes.body)}`
+      );
+    }
+    const list = Array.isArray((purchasesRes.body as { data?: unknown[] })?.data)
+      ? (purchasesRes.body as { data: unknown[] }).data
+      : [];
+    const forThisPost = list.filter(
+      (p: { post_id?: string }) => p.post_id === fixtures.posts.ppv.id
+    );
+    expect(forThisPost.length, "idempotency: exactly one purchase for this post").toBe(1);
+
+    await page.goto(`${BASE_URL}/me/wallet`, { waitUntil: "domcontentloaded", timeout: 15_000 });
     const finalBalanceText = await page.getByTestId("wallet-balance-value").textContent();
     const finalBalance = parseFloat(finalBalanceText?.match(/\$(\d+\.\d+)/)?.[1] || "0");
-
-    const purchases = await page.evaluate(async () => {
-      const res = await fetch("/api/purchases", { credentials: "same-origin" });
-      return res.json();
-    });
-    const purchaseCount = Array.isArray(purchases?.data) ? purchases.data.length : 0;
-    expect(purchaseCount, "idempotency: at most one purchase").toBeLessThanOrEqual(1);
-    // 余额或 API 在 CI 下可能未同步，以单次扣款为准
-    if (finalBalance === initialBalance - PPV_PRICE) {
-      expect(purchaseCount).toBe(1);
-    } else if (purchaseCount === 1) {
-      // 扣款已发生，余额显示可能未更新
-      expect(finalBalance).toBeLessThanOrEqual(initialBalance);
-    }
+    expect(finalBalance, "balance deducted once").toBe(initialBalance - PPV_PRICE);
   });
 
   test("E2E-3: Insufficient balance → no purchase, no transactions, UI prompts recharge", async ({
@@ -204,13 +233,27 @@ test.describe("Atomic PPV Unlock Tests", () => {
     await expect(page).toHaveURL(/\/me\/wallet/);
 
     // 4. Verify no purchase was created
-    const response = await page.request.get("/api/purchases");
-    const purchases = await response.json();
-    expect(purchases.data || []).toHaveLength(0);
+    const purchasesRes = await fetchAuthedJson(page, "/api/purchases");
+    if (!purchasesRes.ok) {
+      throw new Error(
+        `/api/purchases failed: status=${purchasesRes.status} body=${JSON.stringify(purchasesRes.body)}`
+      );
+    }
+    const purchasesData = Array.isArray((purchasesRes.body as { data?: unknown[] })?.data)
+      ? (purchasesRes.body as { data: unknown[] }).data
+      : [];
+    expect(purchasesData).toHaveLength(0);
 
     // 5. Verify no transactions were created
-    const txResponse = await page.request.get("/api/transactions");
-    const transactions = await txResponse.json();
-    expect(transactions.data || []).toHaveLength(0);
+    const txRes = await fetchAuthedJson(page, "/api/transactions");
+    if (!txRes.ok) {
+      throw new Error(
+        `/api/transactions failed: status=${txRes.status} body=${JSON.stringify(txRes.body)}`
+      );
+    }
+    const txData = Array.isArray((txRes.body as { data?: unknown[] })?.data)
+      ? (txRes.body as { data: unknown[] }).data
+      : [];
+    expect(txData).toHaveLength(0);
   });
 });

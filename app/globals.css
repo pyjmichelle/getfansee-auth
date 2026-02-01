@@ -361,4 +361,48 @@
       padding-right: 1rem;
     }
   }
+
+  /* ========== Auth page: single source of truth (brand tokens) ========== */
+  .auth-page {
+    --auth-primary: #F48FB1;
+    --auth-primary-foreground: #FFFFFF;
+    --auth-primary-gradient: linear-gradient(135deg, #F48FB1 0%, #C2185B 50%, #AD1457 100%);
+    --auth-primary-glow: 0 0 20px rgba(244, 143, 177, 0.4), 0 0 40px rgba(244, 143, 177, 0.2);
+    /* Override theme primary inside auth so CTAs and tab active use brand color */
+    --primary: var(--auth-primary);
+    --primary-foreground: var(--auth-primary-foreground);
+    --color-primary: var(--auth-primary);
+    --color-primary-foreground: var(--auth-primary-foreground);
+  }
+
+  .auth-page .bg-primary-gradient {
+    background: var(--auth-primary-gradient);
+  }
+
+  .auth-hero-bg {
+    background: var(--auth-primary-gradient);
+  }
+
+  /* Auth tabs: high-contrast active state */
+  .auth-tabs-list {
+    @apply grid w-full grid-cols-2 gap-0 rounded-xl border border-border/50 p-1;
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(12px);
+  }
+
+  .auth-tab-trigger {
+    @apply rounded-lg border border-transparent px-4 py-2 text-sm font-medium transition-[color,background-color,box-shadow,border-color] duration-200;
+    @apply focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-primary/50;
+    @apply disabled:pointer-events-none disabled:opacity-50;
+    @apply min-h-[44px] text-muted-foreground;
+  }
+
+  .auth-tab-trigger[data-state="inactive"] {
+    @apply hover:text-foreground hover:bg-white/5;
+  }
+
+  .auth-tab-trigger[data-state="active"] {
+    @apply bg-primary text-primary-foreground font-semibold border-primary/30 shadow-md;
+    box-shadow: 0 0 12px rgba(244, 143, 177, 0.25);
+  }
 }

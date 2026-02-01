@@ -92,6 +92,9 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       NEXT_PUBLIC_TEST_MODE: "true"
+      # 统一测试开关：/api/test/* 路由 gate 依赖 E2E 或 PLAYWRIGHT_TEST_MODE
+      PLAYWRIGHT_TEST_MODE: "true"
+      E2E: "1"
       # Used by scripts if needed
       PLAYWRIGHT_BASE_URL: "http://127.0.0.1:3000"
     steps:
@@ -136,6 +139,24 @@ jobs:
           done
           echo "❌ Server did not become ready in time"
           exit 1
+
+      - name: Test-mode sanity check (must not 404)
+        run: |
+          # 1) /api/test/ping must return 200
+          PING_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/api/test/ping")
+          if [ "$PING_CODE" != "200" ]; then
+            echo "❌ /api/test/ping returned $PING_CODE (expected 200) — test-mode NOT enabled"
+            echo "   PLAYWRIGHT_TEST_MODE=$PLAYWRIGHT_TEST_MODE NEXT_PUBLIC_TEST_MODE=$NEXT_PUBLIC_TEST_MODE E2E=$E2E"
+            exit 1
+          fi
+          echo "✅ /api/test/ping => 200"
+          # 2) /api/test/session route exists (HEAD only, no signIn)
+          SESSION_CODE=$(curl -s -o /dev/null -w "%{http_code}" -I "http://127.0.0.1:3000/api/test/session")
+          if [ "$SESSION_CODE" = "404" ]; then
+            echo "❌ /api/test/session returned 404 — session route not enabled"
+            exit 1
+          fi
+          echo "✅ /api/test/session route reachable (HEAD => $SESSION_CODE, 405/400 ok)"
 
       - name: Create test users (if needed)
         run: |
@@ -208,6 +229,9 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       NEXT_PUBLIC_TEST_MODE: "true"
+      # 统一测试开关：/api/test/session、/api/test/create-post-with-media 依赖
+      PLAYWRIGHT_TEST_MODE: "true"
+      E2E: "1"
       # Used by playwright.config.ts
       PLAYWRIGHT_BASE_URL: "http://127.0.0.1:3000"
     steps:
@@ -233,8 +257,43 @@ jobs:
       - name: Install Playwright (with deps) - Chromium
         run: pnpm exec playwright install --with-deps chromium
 
+      - name: Start app server (background)
+        run: |
+          PORT=3000 pnpm start > .next/e2e-server.log 2>&1 &
+          echo $! > .next/e2e-server.pid
+
+      - name: Wait for health and test-mode
+        run: |
+          for i in {1..30}; do
+            if curl -sf "http://127.0.0.1:3000/api/health" > /dev/null; then
+              echo "✅ Server is ready"
+              break
+            fi
+            sleep 2
+          done
+          if ! curl -sf "http://127.0.0.1:3000/api/health" > /dev/null; then
+            echo "❌ Server did not become ready in time"
+            exit 1
+          fi
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/api/test/ping")
+          if [ "$CODE" != "200" ]; then
+            echo "❌ /api/test/ping returned $CODE (expected 200) — test-mode is NOT enabled"
+            echo "   PLAYWRIGHT_TEST_MODE=$PLAYWRIGHT_TEST_MODE E2E=$E2E PLAYWRIGHT_BASE_URL=$PLAYWRIGHT_BASE_URL"
+            exit 1
+          fi
+          echo "✅ Test-mode sanity check passed (ping=200)"
+
       - name: Run E2E (chromium)
+        env:
+          PLAYWRIGHT_SKIP_SERVER: "true"
         run: pnpm exec playwright test --project=chromium --reporter=html
+
+      - name: Stop app server
+        if: always()
+        run: |
+          if [ -f .next/e2e-server.pid ]; then
+            kill $(cat .next/e2e-server.pid) 2>/dev/null || true
+          fi
 
       - name: Upload Playwright report
         if: always()
@@ -251,6 +310,15 @@ jobs:
           name: playwright-traces
           path: test-results/
           retention-days: 14
+
+      - name: Upload e2e server log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-server-log
+          path: .next/e2e-server.log
+          retention-days: 14
+          if-no-files-found: ignore
 
   # ============================================
   # Stage 6: Quality Gate

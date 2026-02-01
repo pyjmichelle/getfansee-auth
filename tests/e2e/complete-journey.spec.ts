@@ -5,13 +5,16 @@ import {
   signUpUser,
   signInUser,
   clearStorage,
+  emitE2EDiagnostics,
   waitForVisible,
   waitForPageLoad,
-  waitForNavigation,
   clickAndWaitForNavigation,
+  createConfirmedTestUser,
+  injectSupabaseSession,
+  deleteTestUser,
 } from "./shared/helpers";
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 
 /**
  * 完整端到端测试：从注册到订阅到解锁的完整用户旅程
@@ -24,6 +27,12 @@ test.describe("完整用户旅程测试", () => {
 
   test.beforeEach(async ({ page }) => {
     await clearStorage(page);
+  });
+
+  test.afterEach(async ({ page }, testInfo) => {
+    if (testInfo.status !== "passed") {
+      await emitE2EDiagnostics(page, testInfo);
+    }
   });
 
   test("完整流程：Fan 注册 → Creator 注册并发布 → Fan 订阅 → Fan 解锁 PPV", async ({ page }) => {
@@ -163,8 +172,10 @@ test.describe("完整用户旅程测试", () => {
       }
 
       // 获取 Creator ID（从 URL 或页面元素）
-      // 这里需要根据实际 UI 调整
-      await creatorPage.close();
+      // 仅当页面仍打开时关闭，避免重复关闭或 closed 后操作导致 "Target closed"
+      if (!creatorPage.isClosed()) {
+        await creatorPage.close();
+      }
     });
 
     test.step("3. Fan 浏览 Feed", async () => {
@@ -250,13 +261,31 @@ test.describe("完整用户旅程测试", () => {
   });
 
   test("边界情况：Fan 用户访问 Creator 路由", async ({ page }) => {
-    await signUpUser(page, fanEmail, TEST_PASSWORD);
+    await clearStorage(page);
+    // 使用 createConfirmedTestUser + injectSupabaseSession 避免 signUpUser 长流程和 page closed
+    const fanAccount = await createConfirmedTestUser("fan");
+    try {
+      await injectSupabaseSession(page, fanAccount.email, fanAccount.password, BASE_URL);
+      await waitForPageLoad(page);
 
-    // 尝试访问 Creator 路由
-    await page.goto(`${BASE_URL}/creator/studio`);
+      // 尝试访问 Creator 路由（Fan 无权限）
+      await page.goto(`${BASE_URL}/creator/studio`, {
+        waitUntil: "domcontentloaded",
+        timeout: 15_000,
+      });
 
-    await page.waitForTimeout(800);
-    // 验证不在 creator/studio 页面
-    expect(page.url()).not.toContain("/creator/studio");
+      // 预期：被 redirect 或显示 403/unauthorized，不在 creator/studio
+      const finalUrl = page.url();
+      const isRedirected = !finalUrl.includes("/creator/studio");
+      const hasAuthRedirect = finalUrl.includes("/auth");
+      const hasForbidden = await page
+        .locator("text=/403|unauthorized|forbidden|无权/i")
+        .isVisible()
+        .catch(() => false);
+
+      expect(isRedirected || hasAuthRedirect || hasForbidden).toBe(true);
+    } finally {
+      await deleteTestUser(fanAccount.userId);
+    }
   });
 });

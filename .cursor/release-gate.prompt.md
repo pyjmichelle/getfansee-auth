@@ -97,7 +97,7 @@ Minimum required skills per category:
 #### Auth / Identity
 
 - `better-auth-best-practices.skill.md`
-- `supabase-postgres.skill.md`
+- `supabase-postgres-best-practices.skill.md`
 
 #### UI / Frontend
 

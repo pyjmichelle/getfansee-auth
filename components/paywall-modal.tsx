@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Lock, Check, X, CreditCard, Loader2 } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "@/hooks/use-mobile";
@@ -209,31 +209,35 @@ export function PaywallModal({
 
         {paymentState === "success" ? (
           <>
-            <h2
+            <DialogTitle
               className="text-2xl font-bold text-foreground mb-2"
               data-testid="paywall-success-message"
             >
               Access Granted!
-            </h2>
-            <p className="text-muted-foreground">Enjoy your exclusive content...</p>
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground text-center">
+              Enjoy your exclusive content...
+            </DialogDescription>
           </>
         ) : paymentState === "error" ? (
           <>
-            <h2 className="text-2xl font-bold text-foreground mb-2">Payment Failed</h2>
-            <p className="text-muted-foreground">
+            <DialogTitle className="text-2xl font-bold text-foreground mb-2">
+              Payment Failed
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Something went wrong. Please check your payment method and try again.
-            </p>
+            </DialogDescription>
           </>
         ) : (
           <>
-            <h2 className="text-2xl font-bold text-foreground mb-2">
+            <DialogTitle className="text-2xl font-bold text-foreground mb-2">
               {type === "subscribe"
                 ? `Join ${creatorName}'s Inner Circle`
                 : "Unlock This Hot Content"}
-            </h2>
-            <p className="text-muted-foreground">
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               {contentPreview || "Get instant access to exclusive, uncensored content"}
-            </p>
+            </DialogDescription>
           </>
         )}
       </div>

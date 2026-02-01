@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cookies, headers } from "next/headers";
 import { getSupabaseServerClient } from "./supabase-server";
 
 export type AppUser = {
@@ -41,14 +42,50 @@ async function getUserWithRetries(supabase: Awaited<ReturnType<typeof getSupabas
   return { user: null, error: lastError };
 }
 
+const E2E_COOKIE_LOG_WINDOW_MS = 5000;
+let e2eCookieLastLoggedAt = 0;
+
 export async function getCurrentUser(): Promise<AppUser | null> {
   const supabase = await getSupabaseServerClient();
   const { user, error } = await getUserWithRetries(supabase);
 
+  const isE2E = process.env.E2E === "1" || process.env.PLAYWRIGHT_TEST_MODE === "true";
+
+  if ((error || !user) && isE2E) {
+    const now = Date.now();
+    if (now - e2eCookieLastLoggedAt >= E2E_COOKIE_LOG_WINDOW_MS) {
+      e2eCookieLastLoggedAt = now;
+      try {
+        const cookieStore = await cookies();
+        const names = cookieStore.getAll().map((c) => c.name);
+        let pathInfo = "unknown";
+        try {
+          const h = await headers();
+          const invokePath = h.get("x-invoke-path") ?? h.get("x-nextjs-matched-path");
+          const referer = h.get("referer") ?? h.get("x-url") ?? "";
+          if (invokePath) pathInfo = invokePath;
+          else if (referer) {
+            try {
+              pathInfo = new URL(referer).pathname;
+            } catch {
+              pathInfo = referer.slice(0, 80);
+            }
+          }
+        } catch {
+          // ignore
+        }
+        console.warn(
+          "[E2E auth] getCurrentUser null: path=" + pathInfo,
+          "cookies=[" + names.join(", ") + "]"
+        );
+      } catch {
+        // ignore
+      }
+    }
+  }
+
   if (error) {
-    // better-auth-best-practices: 不泄露详细错误信息
     console.error("[auth-server] getUser error", error);
-    // 不向调用者暴露具体错误，只返回 null
     return null;
   }
 

@@ -6,7 +6,7 @@ import {
   injectSupabaseSession,
 } from "./shared/helpers";
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 const RECHARGE_AMOUNT = 10;
 const PPV_PRICE = 5;
 

@@ -1,44 +1,37 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { getSupabaseRouteHandlerClient } from "@/lib/supabase-route";
 
-export async function POST(request: NextRequest) {
-  const isTestMode =
-    process.env.PLAYWRIGHT_TEST_MODE === "true" || process.env.NEXT_PUBLIC_TEST_MODE === "true";
+/**
+ * E2E 测试专用：由服务端用与线上相同的 createServerClient 登录并 set-cookie，
+ * 保证 cookie name / chunking / options 与 auth-helpers 一致，避免 "Auth Session Missing"。
+ * 仅在测试环境启用；返回 204，不向前端返回 token。
+ */
+export async function POST(request: Request) {
+  /** CI/E2E 唯一门控：仅 E2E 与 PLAYWRIGHT_TEST_MODE，不依赖 NEXT_PUBLIC_TEST_MODE */
+  const isTestEnv = process.env.E2E === "1" || process.env.PLAYWRIGHT_TEST_MODE === "true";
 
-  if (!isTestMode) {
-    return NextResponse.json({ error: "Test mode disabled" }, { status: 403 });
+  if (!isTestEnv) {
+    return new NextResponse("Not Found", { status: 404 });
   }
 
-  const { access_token, refresh_token, expires_in = 3600 } = await request.json();
-  if (!access_token || !refresh_token) {
-    return NextResponse.json({ error: "Missing tokens" }, { status: 400 });
+  let body: { email?: string; password?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const response = NextResponse.json({ success: true });
-  const isSecure =
-    request.nextUrl.protocol === "https:" || request.headers.get("x-forwarded-proto") === "https";
-  response.cookies.set("playwright-test-mode", "1", {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    secure: isSecure,
-  });
-  const maxAge = Number(expires_in);
+  const { email, password } = body;
+  if (!email || !password) {
+    return NextResponse.json({ error: "Missing email or password" }, { status: 400 });
+  }
 
-  response.cookies.set("sb-access-token", access_token, {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    secure: isSecure,
-    maxAge,
-  });
+  const supabase = await getSupabaseRouteHandlerClient();
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-  response.cookies.set("sb-refresh-token", refresh_token, {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    secure: isSecure,
-    maxAge: maxAge * 4,
-  });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 401 });
+  }
 
-  return response;
+  return new NextResponse(null, { status: 204 });
 }

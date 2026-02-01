@@ -1,6 +1,10 @@
 # Skills 应用指南
 
-本文档说明已安装的 9 个 skills 在本项目中的应用场景和使用时机。
+本文档说明当前已安装的 skills 及与 release-gate 必选列表的对应关系。
+
+**Release-gate 必选 (10 个)**：better-auth-best-practices、supabase-postgres-best-practices、shadcn-ui、react-best-practices、frontend-design、e2e-test-setup、fixture-generator、test-report-generator、ci-pipeline-config、api-test-runner。
+
+**项目保留 (5 个)**：agent-browser、ci-auto-fix、planning-with-files、audit-website、web-design-guidelines。
 
 ## 项目技术栈概览
 
@@ -13,7 +17,9 @@
 
 ---
 
-## 1. vercel-react-best-practices ⚡
+## 1. react-best-practices（展示名：vercel-react-best-practices）
+
+**文件**: `react-best-practices.skill.md`
 
 ### 功能
 
@@ -21,80 +27,33 @@ React 和 Next.js 性能优化指南，包含 57 条规则，按影响优先级�
 
 ### 在本项目中的应用场景
 
-#### ✅ **立即应用** (Critical Priority)
+#### 立即应用 (Critical Priority)
 
 1. **消除异步瀑布流** (`async-*`)
-   - **位置**: `app/home/page.tsx` (第 26-52 行)
-   - **问题**: 当前代码在循环中串行调用 `canViewPost`，造成瀑布流
-
-   ```typescript
-   // 当前代码（有问题）
-   for (const post of posts) {
-     const canView = await canViewPost(post.id, post.creator_id);
-     unlockedStates.set(post.id, canView);
-   }
-
-   // 应该改为并行
-   const viewChecks = await Promise.all(posts.map((post) => canViewPost(post.id, post.creator_id)));
-   ```
-
+   - **位置**: `app/home/page.tsx`（已用 Promise.all 并行 canViewPost，符合本规则）
    - **时机**: 重构 Feed 加载逻辑时
 
 2. **Bundle 大小优化** (`bundle-*`)
    - **位置**: 所有页面组件
-   - **问题**: 可能导入了未使用的组件或库
-   - **时机**:
-     - 构建时检查 bundle 大小
-     - 添加新功能时
-     - 性能审计时
+   - **时机**: 构建时检查 bundle 大小、添加新功能时、性能审计时
 
-#### ✅ **高优先级应用** (High Priority)
+#### 高优先级应用 (High Priority)
 
-3. **服务端性能优化** (`server-*`)
-   - **位置**: `lib/posts.ts`, `lib/paywall.ts`
-   - **问题**:
-     - 缺少 `React.cache()` 用于请求去重
-     - 多个查询可以并行执行
-   - **时机**:
-     - 优化 Feed 查询时
-     - 优化支付墙检查时
+3. **服务端性能优化** (`server-*`) — `lib/posts.ts`, `lib/paywall.ts`；优化 Feed 查询与支付墙检查时使用 React.cache() 与并行查询。
+4. **客户端数据获取** (`client-*`) — `app/home/components/HomeFeedClient.tsx`；实现 Feed 刷新时考虑请求去重。
 
-4. **客户端数据获取** (`client-*`)
-   - **位置**: `app/home/components/HomeFeedClient.tsx` (第 56-87 行)
-   - **问题**: `reloadFeed` 函数没有使用 SWR 或类似库进行请求去重
-   - **时机**: 实现 Feed 刷新功能时
+#### 中等优先级应用 (Medium Priority)
 
-#### ✅ **中等优先级应用** (Medium Priority)
-
-5. **重渲染优化** (`rerender-*`)
-   - **位置**: `components/paywall-modal.tsx`, `app/home/components/HomeFeedClient.tsx`
-   - **问题**:
-     - 可能有不必要的重渲染
-     - 状态更新可能导致整个列表重渲染
-   - **时机**:
-     - 发现性能问题时
-     - 优化 Feed 滚动性能时
-
-6. **渲染性能** (`rendering-*`)
-   - **位置**: `app/home/components/HomeFeedClient.tsx` (第 226-393 行)
-   - **问题**:
-     - 长列表没有使用虚拟化
-     - 静态 JSX 可以提取到组件外
-   - **时机**:
-     - Feed 列表很长时
-     - 优化滚动性能时
+5. **重渲染优化** — `components/paywall-modal.tsx`, `HomeFeedClient.tsx`
+6. **渲染性能** — 长列表虚拟化、静态 JSX 提取
 
 ### 使用时机总结
 
-- ✅ **编写新 React 组件时** - 遵循最佳实践
-- ✅ **实现数据获取时** - 避免瀑布流，使用并行请求
-- ✅ **代码审查时** - 检查性能问题
-- ✅ **重构现有代码时** - 应用优化规则
-- ✅ **优化 bundle 大小时** - 使用动态导入
+- 编写新 React 组件、实现数据获取、代码审查、重构、优化 bundle 大小时使用本 skill。
 
 ---
 
-## 2. web-design-guidelines 🎨
+## 2. web-design-guidelines
 
 ### 功能
 
@@ -102,83 +61,17 @@ React 和 Next.js 性能优化指南，包含 57 条规则，按影响优先级�
 
 ### 在本项目中的应用场景
 
-#### ✅ **可访问性检查**
-
-1. **ARIA 标签和语义 HTML**
-   - **位置**: 所有 UI 组件
-   - **问题**: 需要检查是否有适当的 aria-label
-   - **时机**:
-     - 创建新组件时
-     - 可访问性审计时
-
-2. **键盘导航**
-   - **位置**: `components/paywall-modal.tsx`, `components/nav-header.tsx`
-   - **问题**: 需要确保所有交互元素可通过键盘访问
-   - **时机**: 实现新交互功能时
-
-3. **焦点状态**
-   - **位置**: 所有按钮和链接
-   - **问题**: 需要可见的焦点指示器
-   - **时机**: 样式审查时
-
-#### ✅ **表单和输入**
-
-4. **表单验证和错误处理**
-   - **位置**: `app/auth/AuthPageClient.tsx`
-   - **问题**: 需要检查 autocomplete、验证、错误处理
-   - **时机**:
-     - 实现新表单时
-     - 审查现有表单时
-
-#### ✅ **性能和动画**
-
-5. **动画性能**
-   - **位置**: 所有使用动画的组件
-   - **问题**: 需要检查 `prefers-reduced-motion`
-   - **时机**: 添加动画时
-
-6. **图片优化**
-   - **位置**: `components/media-display.tsx`
-   - **问题**: 需要检查 lazy loading、alt text、尺寸
-   - **时机**:
-     - 实现媒体展示时
-     - 性能优化时
+- **可访问性**: ARIA、键盘导航、焦点状态 — 所有 UI 组件、paywall-modal、nav-header
+- **表单与输入**: 验证与错误处理 — `app/auth/AuthPageClient.tsx`
+- **性能与动画**: prefers-reduced-motion、图片 lazy loading — 媒体展示组件
 
 ### 使用时机总结
 
-- ✅ **"审查我的 UI"** - 全面 UI 审查
-- ✅ **"检查可访问性"** - 可访问性审计
-- ✅ **"审计设计"** - 设计一致性检查
-- ✅ **"审查 UX"** - 用户体验审查
-- ✅ **创建新组件时** - 确保符合指南
+- 审查 UI、检查可访问性、审计设计、审查 UX、创建新组件时使用。
 
 ---
 
-## 3. remotion-best-practices 🎬
-
-### 功能
-
-Remotion 视频渲染和动画最佳实践。
-
-### 在本项目中的应用场景
-
-#### ⚠️ **当前不适用**
-
-项目目前没有使用 Remotion 进行视频生成。
-
-#### ✅ **未来可能的应用**
-
-- 如果未来需要实现视频生成功能（如创作者生成视频内容）
-- 如果需要在应用中嵌入视频动画
-
-### 使用时机总结
-
-- ⚠️ **当前**: 不适用
-- ✅ **未来**: 如果添加视频生成功能
-
----
-
-## 4. frontend-design 🎨
+## 3. frontend-design
 
 ### 功能
 
@@ -186,89 +79,16 @@ Remotion 视频渲染和动画最佳实践。
 
 ### 在本项目中的应用场景
 
-#### ✅ **设计一致性**
-
-1. **响应式布局**
-   - **位置**: 所有页面和组件
-   - **问题**: 需要确保移动端和桌面端都良好显示
-   - **时机**:
-     - 创建新页面时
-     - 响应式问题修复时
-
-2. **间距和排版**
-   - **位置**: 所有组件
-   - **问题**: 需要保持一致的间距系统
-   - **时机**:
-     - 设计系统更新时
-     - 新组件开发时
-
-3. **视觉层次**
-   - **位置**: `app/home/components/HomeFeedClient.tsx`
-   - **问题**: 需要清晰的视觉层次
-   - **时机**: 优化 Feed 展示时
-
-#### ✅ **用户体验**
-
-4. **用户流程优化**
-   - **位置**: `app/auth/AuthPageClient.tsx`, `components/paywall-modal.tsx`
-   - **问题**: 需要优化认证和支付流程
-   - **时机**:
-     - 用户反馈问题时
-     - A/B 测试时
+- **设计一致性**: 响应式布局、间距与排版、视觉层次 — 所有页面与组件、HomeFeedClient
+- **用户体验**: 用户流程优化 — AuthPageClient、paywall-modal
 
 ### 使用时机总结
 
-- ✅ **设计新 UI 组件时** - 遵循设计模式
-- ✅ **审查视觉设计一致性时** - 确保设计系统一致
-- ✅ **实现响应式布局时** - 移动优先设计
-- ✅ **优化用户流程时** - 改善 UX
+- 设计新 UI 组件、审查视觉一致性、实现响应式布局、优化用户流程时使用。
 
 ---
 
-## 5. building-native-ui 📱
-
-### 功能
-
-构建原生感觉的 UI 组件和交互。
-
-### 在本项目中的应用场景
-
-#### ✅ **移动端优化**
-
-1. **触摸目标大小**
-   - **位置**: 所有按钮和交互元素
-   - **问题**: 需要确保最小 44x44px 触摸目标
-   - **时机**:
-     - 移动端测试时
-     - 创建新交互元素时
-
-2. **滚动和动量**
-   - **位置**: `app/home/components/HomeFeedClient.tsx`
-   - **问题**: Feed 列表需要平滑滚动
-   - **时机**: 优化移动端体验时
-
-3. **手势识别**
-   - **位置**: 媒体展示组件
-   - **问题**: 可能需要滑动手势（如滑动解锁）
-   - **时机**: 添加手势交互时
-
-#### ✅ **原生感觉的动画**
-
-4. **过渡动画**
-   - **位置**: 所有页面过渡和模态框
-   - **问题**: 需要原生感觉的过渡
-   - **时机**: 优化动画时
-
-### 使用时机总结
-
-- ✅ **构建移动响应式组件时** - 确保触摸友好
-- ✅ **实现触摸交互时** - 原生感觉
-- ✅ **优化移动端性能时** - 流畅体验
-- ✅ **添加手势时** - 手势识别
-
----
-
-## 6. better-auth-best-practices 🔐
+## 4. better-auth-best-practices
 
 ### 功能
 
@@ -276,48 +96,16 @@ Remotion 视频渲染和动画最佳实践。
 
 ### 在本项目中的应用场景
 
-#### ✅ **安全实践**
-
-1. **会话管理**
-   - **位置**: `lib/auth.ts`, `lib/auth-server.ts`
-   - **问题**: 需要检查会话过期处理
-   - **时机**:
-     - 审查认证代码时
-     - 修复会话问题时
-
-2. **错误处理**
-   - **位置**: `app/auth/AuthPageClient.tsx`
-   - **问题**: 需要确保错误信息不泄露敏感信息
-   - **时机**:
-     - 安全审计时
-     - 修复认证错误时
-
-3. **速率限制**
-   - **位置**: API 路由（如果有）
-   - **问题**: 需要防止暴力破解
-   - **时机**:
-     - 实现 API 路由时
-     - 安全加固时
-
-#### ✅ **OAuth 提供者**
-
-4. **Google 登录**
-   - **位置**: `lib/auth.ts` (signInWithGoogle)
-   - **问题**: 需要确保 OAuth 流程安全
-   - **时机**:
-     - 实现 OAuth 时
-     - 审查 OAuth 实现时
+- **安全实践**: 会话管理、错误处理、速率限制 — `lib/auth.ts`, `lib/auth-server.ts`, AuthPageClient, API 路由
+- **OAuth**: Google 登录流程安全 — `lib/auth.ts` (signInWithGoogle)
 
 ### 使用时机总结
 
-- ✅ **实现认证流程时** - 遵循安全最佳实践
-- ✅ **审查安全实践时** - 安全审计
-- ✅ **处理会话管理时** - 会话安全
-- ✅ **实现 OAuth 时** - OAuth 安全
+- 实现认证流程、审查安全实践、处理会话、实现 OAuth 时使用。
 
 ---
 
-## 7. supabase-postgres-best-practices 🗄️
+## 5. supabase-postgres-best-practices
 
 ### 功能
 
@@ -325,240 +113,87 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ### 在本项目中的应用场景
 
-#### ✅ **查询优化**
-
-1. **避免 N+1 查询**
-   - **位置**: `lib/posts.ts` (listFeed 函数)
-   - **问题**: 当前代码在循环中检查权限，可能造成 N+1
-   - **时机**:
-     - 优化 Feed 查询时
-     - 性能问题修复时
-
-2. **使用索引**
-   - **位置**: 数据库迁移文件
-   - **问题**: 需要确保常用查询字段有索引
-   - **时机**:
-     - 创建新表时
-     - 优化查询性能时
-
-3. **并行查询**
-   - **位置**: `app/home/page.tsx`
-   - **问题**: 多个独立查询应该并行执行
-   - **时机**: 重构数据获取逻辑时
-
-#### ✅ **Row Level Security (RLS)**
-
-4. **RLS 策略**
-   - **位置**: 所有数据库表
-   - **问题**: 需要确保所有表都有适当的 RLS 策略
-   - **时机**:
-     - 创建新表时
-     - 安全审计时
-     - 修复权限问题时
-
-5. **数据最小化**
-   - **位置**: 所有查询
-   - **问题**: 只查询需要的字段
-   - **时机**:
-     - 编写新查询时
-     - 优化现有查询时
-
-#### ✅ **错误处理**
-
-6. **事务处理**
-   - **位置**: `lib/paywall.ts` (解锁逻辑)
-   - **问题**: 多步操作应该使用事务
-   - **时机**:
-     - 实现支付逻辑时
-     - 修复数据一致性问题时
+- **查询优化**: 避免 N+1、索引、并行查询 — `lib/posts.ts`, `app/home/page.tsx`
+- **RLS**: 策略与数据最小化 — 所有表与查询
+- **事务**: 多步操作 — `lib/paywall.ts` 解锁逻辑
 
 ### 使用时机总结
 
-- ✅ **编写数据库查询时** - 优化查询性能
-- ✅ **设计数据库模式时** - 适当的索引和结构
-- ✅ **实现 RLS 时** - 安全策略
-- ✅ **优化查询性能时** - 避免 N+1，使用并行
-- ✅ **处理事务时** - 数据一致性
+- 编写数据库查询、设计模式、实现 RLS、优化性能、处理事务时使用。
 
 ---
 
-## 8. copywriting ✍️
+## 6. audit-website
 
 ### 功能
 
-编写有效的 UI 文案、错误消息和用户面向文本的最佳实践。
+全面的网站审计指南，涵盖性能、可访问性、SEO 和安全。
 
 ### 在本项目中的应用场景
 
-#### ✅ **UI 文案**
-
-1. **按钮文本**
-   - **位置**: 所有按钮组件
-   - **问题**: 需要清晰、行动导向的文本
-   - **时机**:
-     - 创建新按钮时
-     - 审查 UI 文案时
-
-2. **错误消息**
-   - **位置**: `app/auth/AuthPageClient.tsx`
-   - **问题**: 需要有用、不泄露信息的错误消息
-   - **时机**:
-     - 实现错误处理时
-     - 用户反馈错误消息不清楚时
-
-3. **空状态**
-   - **位置**: `app/home/components/HomeFeedClient.tsx` (第 200-223 行)
-   - **问题**: 需要清晰、有帮助的空状态文案
-   - **时机**:
-     - 实现空状态时
-     - 优化用户体验时
-
-#### ✅ **通知和提示**
-
-4. **Toast 消息**
-   - **位置**: 所有使用 toast 的地方
-   - **问题**: 需要清晰、简洁的消息
-   - **时机**:
-     - 添加新通知时
-     - 审查通知文案时
-
-5. **帮助文本**
-   - **位置**: 表单和复杂功能
-   - **问题**: 需要上下文相关的帮助
-   - **时机**:
-     - 实现新功能时
-     - 用户反馈困惑时
+- **性能**: Core Web Vitals、Bundle 大小、加载时间
+- **可访问性**: WCAG、键盘导航
+- **SEO**: Meta 标签、结构化数据 — `app/layout.tsx`
+- **安全**: HTTPS、CSP、部署配置
 
 ### 使用时机总结
 
-- ✅ **编写 UI 标签和按钮时** - 清晰、行动导向
-- ✅ **创建错误消息时** - 有用、不泄露信息
-- ✅ **编写用户通知时** - 清晰、简洁
-- ✅ **设计 onboarding 流程时** - 引导性文案
-- ✅ **创建帮助文本时** - 上下文相关
+- 执行全站审计、审查性能指标、检查可访问性、分析 SEO、审查安全实践时使用。
 
 ---
 
-## 9. audit-website 🔍
+## 其他 Skills（简要）
 
-### 功能
-
-全面的网站审计指南，涵盖性能、可访问性、SEO 和最佳实践。
-
-### 在本项目中的应用场景
-
-#### ✅ **性能审计**
-
-1. **Core Web Vitals**
-   - **位置**: 所有页面
-   - **问题**: 需要检查 LCP、FID、CLS
-   - **时机**:
-     - 性能审计时
-     - 部署前检查时
-
-2. **Bundle 大小**
-   - **位置**: 构建输出
-   - **问题**: 需要检查 JavaScript bundle 大小
-   - **时机**:
-     - 构建优化时
-     - 添加新依赖时
-
-3. **加载时间**
-   - **位置**: 所有页面
-   - **问题**: 需要优化首屏加载
-   - **时机**:
-     - 性能问题修复时
-     - 优化 Feed 加载时
-
-#### ✅ **可访问性审计**
-
-4. **WCAG 合规性**
-   - **位置**: 整个应用
-   - **问题**: 需要符合 WCAG 2.1 AA 标准
-   - **时机**:
-     - 可访问性审计时
-     - 发布前检查时
-
-5. **键盘导航**
-   - **位置**: 所有交互元素
-   - **问题**: 需要完整的键盘导航支持
-   - **时机**:
-     - 可访问性测试时
-     - 修复键盘导航问题时
-
-#### ✅ **SEO 审计**
-
-6. **Meta 标签**
-   - **位置**: `app/layout.tsx`
-   - **问题**: 需要适当的 meta 标签
-   - **时机**:
-     - SEO 优化时
-     - 添加新页面时
-
-7. **结构化数据**
-   - **位置**: 所有内容页面
-   - **问题**: 可能需要结构化数据
-   - **时机**:
-     - SEO 优化时
-     - 内容页面优化时
-
-#### ✅ **安全审计**
-
-8. **HTTPS 和 CSP**
-   - **位置**: 部署配置
-   - **问题**: 需要确保安全头部
-   - **时机**:
-     - 安全审计时
-     - 部署配置时
-
-### 使用时机总结
-
-- ✅ **执行全站审计时** - 全面质量检查
-- ✅ **审查性能指标时** - Core Web Vitals
-- ✅ **检查可访问性合规性时** - WCAG 检查
-- ✅ **分析 SEO 因素时** - SEO 优化
-- ✅ **审查安全实践时** - 安全审计
-- ✅ **检查移动响应性时** - 移动端测试
+| Skill                                                    | 用途                                             |
+| -------------------------------------------------------- | ------------------------------------------------ |
+| **agent-browser** (`agent-browser/SKILL.md`)             | 前端 agent-browser CLI 自动化测试与网页交互      |
+| **ci-auto-fix**                                          | CI 失败分析与自动修复，与 plans 配合使用         |
+| **planning-with-files** (`planning-with-files/SKILL.md`) | 规划与文件工作流（.cursor/plans、docs/planning） |
+| **e2e-test-setup**                                       | E2E 测试环境与 Playwright 配置                   |
+| **fixture-generator**                                    | 测试 fixture 生成                                |
+| **test-report-generator**                                | 测试报告生成                                     |
+| **ci-pipeline-config**                                   | CI 流水线配置                                    |
+| **api-test-runner**                                      | API 测试运行与断言                               |
+| **shadcn-ui**                                            | shadcn/ui 组件与 cn() 使用规范                   |
 
 ---
 
 ## 总结：Skills 使用优先级
 
-### 🔥 **立即应用** (高优先级)
+### 立即应用 (高优先级)
 
-1. **vercel-react-best-practices** - 修复异步瀑布流，优化 Feed 加载
-2. **supabase-postgres-best-practices** - 优化数据库查询，避免 N+1
-3. **web-design-guidelines** - 可访问性和 UX 审查
+1. **react-best-practices** — 异步与 bundle 优化、Feed 加载
+2. **supabase-postgres-best-practices** — 数据库查询与 N+1 避免
+3. **web-design-guidelines** — 可访问性与 UX 审查
 
-### ⚡ **近期应用** (中优先级)
+### 近期应用 (中优先级)
 
-4. **frontend-design** - 设计一致性审查
-5. **building-native-ui** - 移动端优化
-6. **better-auth-best-practices** - 安全审查
-7. **copywriting** - UI 文案优化
+4. **frontend-design** — 设计一致性
+5. **better-auth-best-practices** — 安全与认证审查
 
-### 📋 **按需应用** (低优先级)
+### 按需应用 (低优先级)
 
-8. **audit-website** - 定期全站审计
-9. **remotion-best-practices** - 未来视频功能（当前不适用）
+6. **audit-website** — 定期全站审计
 
 ---
 
 ## 快速参考：何时使用哪个 Skill
 
-| 任务              | 使用的 Skill                                                  |
-| ----------------- | ------------------------------------------------------------- |
-| 编写新 React 组件 | vercel-react-best-practices                                   |
-| 实现数据获取      | vercel-react-best-practices, supabase-postgres-best-practices |
-| 审查 UI           | web-design-guidelines, frontend-design                        |
-| 优化性能          | vercel-react-best-practices, audit-website                    |
-| 数据库查询        | supabase-postgres-best-practices                              |
-| 认证实现          | better-auth-best-practices                                    |
-| 移动端优化        | building-native-ui, frontend-design                           |
-| 编写文案          | copywriting                                                   |
-| 全站审计          | audit-website                                                 |
-| 安全审查          | better-auth-best-practices, supabase-postgres-best-practices  |
+| 任务              | 使用的 Skill                                                 |
+| ----------------- | ------------------------------------------------------------ |
+| 编写新 React 组件 | react-best-practices                                         |
+| 实现数据获取      | react-best-practices, supabase-postgres-best-practices       |
+| 审查 UI           | web-design-guidelines, frontend-design                       |
+| 优化性能          | react-best-practices, audit-website                          |
+| 数据库查询        | supabase-postgres-best-practices                             |
+| 认证实现          | better-auth-best-practices                                   |
+| 移动端/响应式     | frontend-design, web-design-guidelines                       |
+| 全站审计          | audit-website                                                |
+| 安全审查          | better-auth-best-practices, supabase-postgres-best-practices |
+| 前端自动化测试    | agent-browser                                                |
+| CI 修复与配置     | ci-auto-fix, ci-pipeline-config, api-test-runner             |
+| E2E/测试报告      | e2e-test-setup, fixture-generator, test-report-generator     |
 
 ---
 
-_最后更新: 2026-01-24_
+_最后更新: 2026-01-28_

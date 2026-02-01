@@ -3,6 +3,7 @@
 import type React from "react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -229,11 +230,11 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
 
   return (
     <div
-      className="min-h-screen grid lg:grid-cols-2"
+      className="auth-page min-h-screen grid lg:grid-cols-2"
       style={{ touchAction: "manipulation", overscrollBehaviorY: "contain" }}
     >
-      {/* 左侧 - 品牌展示区 (仅桌面显示) */}
-      <div className="hidden lg:flex bg-gradient-to-br from-pink-900/90 via-purple-800/80 to-pink-900/70 text-primary-foreground p-12 flex-col justify-between backdrop-blur-sm">
+      {/* 左侧 - 品牌展示区 (仅桌面显示)，使用单一真源渐变 */}
+      <div className="auth-hero-bg hidden lg:flex text-primary-foreground p-12 flex-col justify-between backdrop-blur-sm">
         <div>
           <h1 className="text-5xl font-bold mb-4 tracking-tight">GetFansee</h1>
           <p className="text-xl opacity-90 font-medium">Connect with your favorite creators</p>
@@ -284,11 +285,19 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
           </div>
 
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8 h-12">
-              <TabsTrigger value="login" data-testid="auth-tab-login" className="text-base">
+            <TabsList className="auth-tabs-list mb-8 h-12">
+              <TabsTrigger
+                value="login"
+                data-testid="auth-tab-login"
+                className="auth-tab-trigger text-base"
+              >
                 Login
               </TabsTrigger>
-              <TabsTrigger value="signup" data-testid="auth-tab-signup" className="text-base">
+              <TabsTrigger
+                value="signup"
+                data-testid="auth-tab-signup"
+                className="auth-tab-trigger text-base"
+              >
                 Sign Up
               </TabsTrigger>
             </TabsList>
@@ -349,7 +358,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
                     <Button
                       type="submit"
                       variant="default"
-                      className="w-full rounded-xl min-h-[44px] font-semibold shadow-lg hover:shadow-primary-glow hover-glow transition-[box-shadow,transform] duration-200 motion-safe:transition-[box-shadow,transform] motion-reduce:transition-none"
+                      className="w-full min-h-[44px]"
                       disabled={isLoading}
                       aria-label="Sign in to your account"
                       data-testid="auth-submit"
@@ -451,28 +460,52 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
                       <p className="text-xs text-muted-foreground">Must be at least 8 characters</p>
                     </div>
 
-                    <div className="flex items-start space-x-3 py-2">
-                      <Checkbox
-                        id="age-confirm"
-                        checked={ageConfirmed}
-                        onCheckedChange={(checked) => setAgeConfirmed(checked === true)}
-                        disabled={isLoading}
-                        data-testid="auth-age-checkbox"
-                        className="mt-0.5"
-                        aria-label="Confirm you are 18 years or older"
-                      />
-                      <label
-                        htmlFor="age-confirm"
-                        className="text-sm font-medium leading-relaxed cursor-pointer select-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1"
-                      >
-                        I confirm I am 18 years or older
-                      </label>
+                    <div className="space-y-1.5 py-2">
+                      <div className="flex items-start gap-3">
+                        <Checkbox
+                          id="age-confirm"
+                          checked={ageConfirmed}
+                          onCheckedChange={(checked) => setAgeConfirmed(checked === true)}
+                          disabled={isLoading}
+                          data-testid="auth-age-checkbox"
+                          className="mt-0.5 size-[18px] rounded-md shrink-0"
+                          aria-label="I confirm I am 18+ and agree to the Terms"
+                        />
+                        <label
+                          htmlFor="age-confirm"
+                          className="text-sm font-medium leading-relaxed cursor-pointer select-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1"
+                        >
+                          I confirm I am 18+ and agree to the{" "}
+                          <Link
+                            href="/terms"
+                            className="underline underline-offset-2 hover:text-primary"
+                          >
+                            Terms
+                          </Link>{" "}
+                          and{" "}
+                          <Link
+                            href="/privacy"
+                            className="underline underline-offset-2 hover:text-primary"
+                          >
+                            Privacy Policy
+                          </Link>
+                          .
+                        </label>
+                      </div>
+                      {!ageConfirmed && (
+                        <p
+                          className="text-xs text-muted-foreground pl-[calc(18px+0.75rem)]"
+                          data-testid="auth-age-hint"
+                        >
+                          Please confirm you are 18+ to continue.
+                        </p>
+                      )}
                     </div>
 
                     <Button
                       type="submit"
-                      variant="subscribe-gradient"
-                      className="w-full rounded-xl min-h-[44px] font-bold shadow-lg hover:shadow-subscribe-glow hover-glow transition-[box-shadow,transform] duration-200 motion-safe:transition-[box-shadow,transform] motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none disabled:hover:transform-none"
+                      variant="default"
+                      className="w-full min-h-[44px]"
                       disabled={isLoading || !ageConfirmed}
                       aria-label="Create your account"
                       data-testid="auth-submit"

@@ -1,5 +1,20 @@
 # 部署前必做清单
 
+## 🚫 Staging 安全：禁止 test-mode
+
+**Staging 与生产环境不得开启 test-mode**，否则会暴露 `/api/test/*`（含 service_role 能力）。
+
+- 在 Vercel / Railway 等平台的 **staging 环境变量**中，**不要**设置：
+  - `NEXT_PUBLIC_TEST_MODE`
+  - `PLAYWRIGHT_TEST_MODE`
+  - `E2E`
+- 部署前可执行校验（若任一 test-mode 变量被开启则 exit 1）：
+  ```bash
+  bash scripts/ci/assert-no-test-mode-on-staging.sh
+  ```
+
+---
+
 ## ⚠️ 重要：执行 SQL 迁移
 
 在运行 `pnpm test:auth` 之前，**必须先执行以下 SQL**：

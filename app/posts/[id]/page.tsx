@@ -171,7 +171,7 @@ export default function PostDetailPage() {
           Back
         </Button>
 
-        <Card className="rounded-xl border shadow-sm mb-6">
+        <Card className="rounded-xl border shadow-sm mb-6" data-testid="post-page">
           <CardContent className="p-6 sm:p-8">
             {/* Creator Header */}
             <div className="flex items-center gap-4 mb-6 pb-6 border-b">
@@ -213,7 +213,10 @@ export default function PostDetailPage() {
 
             {/* Post Content */}
             {post.title && (
-              <h1 className="text-3xl font-bold text-foreground mb-4 leading-tight">
+              <h1
+                className="text-3xl font-bold text-foreground mb-4 leading-tight"
+                data-testid="post-title"
+              >
                 {post.title}
               </h1>
             )}
@@ -225,7 +228,7 @@ export default function PostDetailPage() {
             </p>
 
             {/* Media Display */}
-            <div className="mb-6">
+            <div className="mb-6" data-testid="post-media">
               <MediaDisplay
                 post={post}
                 canView={canView || isCreator}

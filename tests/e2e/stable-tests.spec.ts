@@ -7,7 +7,7 @@
 import { test, expect, Page } from "@playwright/test";
 import { signUpUser } from "./shared/helpers";
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 const TEST_PASSWORD = "TestPassword123!";
 
 // 生成唯一的测试邮箱
