@@ -51,6 +51,17 @@ pnpm check:env
 pnpm dev
 ```
 
+**本地调试 E2E（推荐）**：先起 E2E 专用服务再跑用例，输出可见、可复刻。
+
+- **终端 1**：启动 E2E 服务（清理 3000 端口 → build → start）
+  ```bash
+  bash scripts/e2e/start-server.sh
+  ```
+- **终端 2**：等服务就绪后跑 paywall「上传视频」用例（脚本会等待 health 最多 60s 自动重试）
+  ```bash
+  bash scripts/e2e/run-paywall-video.sh
+  ```
+
 ### 5. 运行测试（推送前必须！）
 
 ```bash

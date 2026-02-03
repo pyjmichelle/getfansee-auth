@@ -41,141 +41,203 @@ test.describe("Paywall Flow E2E", () => {
     page,
   }) => {
     test.setTimeout(180_000); // 长流程，CI 下避免超时
-    // 1. 注册 Fan 用户
-    await signUpUser(page, fanEmail, fanPassword, "fan");
-    await waitForPageLoad(page);
-
-    // 2. 注册 Creator 用户（新标签页）
-    const creatorPage = await page.context().newPage();
-    await signUpUser(creatorPage, creatorEmail, creatorPassword, "creator");
-    await waitForPageLoad(creatorPage);
-
-    // 3. Creator 成为 Creator（如果按钮可见）
-    await creatorPage.goto(`${BASE_URL}/me`, { waitUntil: "domcontentloaded", timeout: 15000 });
-    await waitForPageLoad(creatorPage);
-    const becomeCreatorButton = creatorPage.getByTestId("become-creator-button");
-    if (await becomeCreatorButton.isVisible({ timeout: 10_000 }).catch(() => false)) {
-      await becomeCreatorButton.click();
-      await creatorPage
-        .waitForURL(/\/creator\/(onboarding|upgrade)/, { timeout: 15_000 })
-        .catch(() => {});
-    }
-
-    // 等待 onboarding/upgrade 表单（onboarding 用 id=display_name，upgrade/apply 用 id=displayName；CI 下可能只读）
-    const displayNameInput = creatorPage
-      .getByRole("textbox", { name: /display name/i })
-      .or(creatorPage.locator("#display_name, #displayName, input[name='display_name']"))
-      .first();
-    await expect(displayNameInput).toBeVisible({ timeout: 20_000 });
-    if (!(await displayNameInput.isDisabled().catch(() => true))) {
-      await displayNameInput.fill(`Creator ${uniqueSuffix}`);
-    }
-    const bioInput = creatorPage.locator("#bio, textarea[name='bio']").first();
-    if (
-      (await bioInput.isVisible().catch(() => false)) &&
-      !(await bioInput.isDisabled().catch(() => true))
-    ) {
-      await bioInput.fill("E2E Test Creator");
-    }
-    const nextBtn = creatorPage
-      .locator('button:has-text("Next"), button:has-text("Save"), button:has-text("Continue")')
-      .first();
+    let creatorPage: Awaited<ReturnType<typeof page.context>["newPage"]> | null = null;
     try {
-      await nextBtn.click({ timeout: 15_000 });
-    } catch {
-      await creatorPage
-        .goto(`${BASE_URL}/home`, { waitUntil: "domcontentloaded", timeout: 15_000 })
-        .catch(() => {});
-    }
+      // 1. 注册 Fan 用户
+      await signUpUser(page, fanEmail, fanPassword, "fan");
+      await waitForPageLoad(page);
 
-    await creatorPage.waitForURL(/\/home|\/creator\//, { timeout: 20_000 });
-    await waitForPageLoad(creatorPage);
+      // 2. 注册 Creator 用户（新标签页）
+      creatorPage = await page.context().newPage();
+      await signUpUser(creatorPage, creatorEmail, creatorPassword, "creator");
+      await waitForPageLoad(creatorPage);
 
-    // 4. Creator 通过 E2E 专用 API 创建带媒体的 locked post（使用当前页 origin，避免 cookie 隔离）
-    const content = `E2E Test Post ${uniqueSuffix}`;
-    const origin = getOrigin(creatorPage);
-    const mediaUrl = `${origin}/artist-creator-avatar.jpg`;
-    const createRes = await creatorPage.request.post(`${origin}/api/test/create-post-with-media`, {
-      data: { content, visibility: "subscribers", mediaUrl },
-      headers: { "Content-Type": "application/json" },
-    });
-    expect(createRes.ok(), "create-post-with-media must succeed").toBe(true);
-    const createBody = (await createRes.json()) as { success?: boolean; postId?: string };
-    expect(createBody.success && createBody.postId).toBeTruthy();
-    const postId = createBody.postId as string;
+      // 3. Creator 成为 Creator（如果按钮可见）
+      await creatorPage.goto(`${BASE_URL}/me`, { waitUntil: "domcontentloaded", timeout: 15000 });
+      await waitForPageLoad(creatorPage);
+      const becomeCreatorButton = creatorPage.getByTestId("become-creator-button");
+      if (await becomeCreatorButton.isVisible({ timeout: 10_000 }).catch(() => false)) {
+        await becomeCreatorButton.click();
+        await creatorPage
+          .waitForURL(/\/creator\/(onboarding|upgrade)/, { timeout: 15_000 })
+          .catch(() => {});
+      }
 
-    // 5. Fan 查看 Feed（应该看到 locked 遮罩）
-    await page.goto(`${BASE_URL}/home`, { waitUntil: "domcontentloaded", timeout: 30000 });
-    await waitForPageLoad(page);
-    await page.waitForSelector(`text=${content}`, { timeout: 15000 });
+      // 等待 onboarding/upgrade 表单（onboarding 用 id=display_name，upgrade/apply 用 id=displayName；CI 下可能只读）
+      const displayNameInput = creatorPage
+        .getByRole("textbox", { name: /display name/i })
+        .or(creatorPage.locator("#display_name, #displayName, input[name='display_name']"))
+        .first();
+      await expect(displayNameInput).toBeVisible({ timeout: 20_000 });
+      if (!(await displayNameInput.isDisabled().catch(() => true))) {
+        await displayNameInput.fill(`Creator ${uniqueSuffix}`);
+      }
+      const bioInput = creatorPage.locator("#bio, textarea[name='bio']").first();
+      if (
+        (await bioInput.isVisible().catch(() => false)) &&
+        !(await bioInput.isDisabled().catch(() => true))
+      ) {
+        await bioInput.fill("E2E Test Creator");
+      }
+      const nextBtn = creatorPage
+        .locator('button:has-text("Next"), button:has-text("Save"), button:has-text("Continue")')
+        .first();
+      try {
+        await nextBtn.click({ timeout: 15_000 });
+      } catch {
+        await creatorPage
+          .goto(`${BASE_URL}/home`, { waitUntil: "domcontentloaded", timeout: 15_000 })
+          .catch(() => {});
+      }
 
-    const lockedContent = page.getByTestId("post-locked-preview").first();
-    await expect(lockedContent).toBeVisible({ timeout: 15000 });
+      await creatorPage.waitForURL(/\/home|\/creator\//, { timeout: 20_000 });
+      await waitForPageLoad(creatorPage);
 
-    // 6. Fan 订阅 Creator（优先用 creator-subscribe-button，fallback 到 unlock-trigger + modal）
-    const creatorSubscribeBtn = page.getByTestId("creator-subscribe-button").first();
-    const unlockTrigger = page.getByTestId("post-unlock-trigger").first();
-    let usedUnlockTrigger = false;
-
-    // 启动 /api/subscribe 响应监听（两种路径都会调用该 API）
-    const subscribeRes = page.waitForResponse((r) => r.url().includes("/api/subscribe"), {
-      timeout: 30_000,
-    });
-
-    if (await creatorSubscribeBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
-      // 路径 A：直接 subscribe（无 modal）
-      await creatorSubscribeBtn.click();
-    } else if (await unlockTrigger.isVisible({ timeout: 5000 }).catch(() => false)) {
-      // 路径 B（fallback）：unlock-trigger → modal → paywall-subscribe-button
-      usedUnlockTrigger = true;
-      await unlockTrigger.click();
-      const paywallModal = page.getByTestId("paywall-modal");
-      await expect(paywallModal).toBeVisible({ timeout: 15000 });
-      const paywallSubscribeBtn = page.getByTestId("paywall-subscribe-button");
-      await expect(paywallSubscribeBtn).toBeVisible({ timeout: 5000 });
-      await paywallSubscribeBtn.click();
-    } else {
-      throw new Error(
-        `paywall-flow: neither creator-subscribe-button nor post-unlock-trigger visible. url=${page.url()}`
+      // 4. Creator 通过 E2E 专用 API 创建带媒体的 locked post（使用当前页 origin，避免 cookie 隔离）
+      const content = `E2E Test Post ${uniqueSuffix}`;
+      const origin = getOrigin(creatorPage);
+      const mediaUrl = `${origin}/artist-creator-avatar.jpg`;
+      const createRes = await creatorPage.request.post(
+        `${origin}/api/test/create-post-with-media`,
+        {
+          data: { content, visibility: "subscribers", mediaUrl },
+          headers: { "Content-Type": "application/json" },
+        }
       );
-    }
+      expect(createRes.ok(), "create-post-with-media must succeed").toBe(true);
+      const createBody = (await createRes.json()) as { success?: boolean; postId?: string };
+      expect(createBody.success && createBody.postId).toBeTruthy();
+      const postId = createBody.postId as string;
 
-    // 断言 /api/subscribe 响应
-    const res = await subscribeRes;
-    expect(res.ok(), `/api/subscribe must succeed, got ${res.status()}`).toBe(true);
+      // 5. Fan 查看 Feed（应该看到 locked 遮罩）
+      await page.goto(`${BASE_URL}/home`, { waitUntil: "domcontentloaded", timeout: 30000 });
+      await waitForPageLoad(page);
+      await page.waitForSelector(`text=${content}`, { timeout: 15000 });
 
-    // 若使用了 unlock-trigger 路径，断言 modal 出现过（已在上方断言）
-    // 现在验证订阅成功 UI
-    const successMsg = page.getByTestId("paywall-success-message");
-    try {
-      await expect(successMsg).toBeVisible({ timeout: 20000 });
-    } catch (e) {
-      const url = page.url();
-      const onAuth = url.includes("/auth");
-      const lockedVisible = await page
-        .getByTestId("post-locked-preview")
-        .isVisible()
-        .catch(() => false);
-      const bodyText = await page
-        .locator("body")
-        .textContent()
-        .catch(() => "");
-      throw new Error(
-        `paywall-flow: paywall-success-message not visible (usedUnlockTrigger=${usedUnlockTrigger}). url=${url} onAuth=${onAuth} lockedVisible=${lockedVisible} body(300)=${bodyText.slice(0, 300)}. Original: ${e}`
+      const lockedContent = page.getByTestId("post-locked-preview").first();
+      await expect(lockedContent).toBeVisible({ timeout: 15000 });
+
+      // 6. Fan 订阅 Creator（路径 A：creator-subscribe-button 直订阅 /api/subscribe；路径 B：unlock-trigger → modal → paywall-subscribe-button）
+      const creatorSubscribeBtn = page.getByTestId("creator-subscribe-button").first();
+      const unlockTrigger = page.getByTestId("post-unlock-trigger").first();
+      let usedUnlockTrigger = false;
+      let creatorIdForStatus: string | null = null;
+
+      const subscribeRes = page.waitForResponse(
+        (r) => {
+          try {
+            const u = new URL(r.url());
+            return r.request().method() === "POST" && u.pathname === "/api/subscribe";
+          } catch {
+            return false;
+          }
+        },
+        { timeout: 30_000 }
       );
+
+      if (await creatorSubscribeBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
+        // 路径 A：直订阅（无 modal），取 creatorId 强校验后供 API 佐证
+        creatorIdForStatus = await creatorSubscribeBtn.getAttribute("data-creator-id");
+        if (!creatorIdForStatus) {
+          const url = page.url();
+          const buttonHtml = await creatorSubscribeBtn
+            .evaluate((el) => el.outerHTML)
+            .catch(() => "");
+          throw new Error(
+            `paywall-flow: creator-subscribe-button missing data-creator-id. url=${url} button(200)=${buttonHtml.slice(0, 200)}`
+          );
+        }
+        expect(creatorIdForStatus).toBeTruthy();
+        await creatorSubscribeBtn.click();
+      } else if (await unlockTrigger.isVisible({ timeout: 5000 }).catch(() => false)) {
+        // 路径 B：unlock-trigger → modal 必须出现，否则立即 fail 并输出诊断
+        usedUnlockTrigger = true;
+        await unlockTrigger.click();
+        const paywallModal = page.getByTestId("paywall-modal");
+        try {
+          await expect(paywallModal).toBeVisible({ timeout: 15000 });
+        } catch (e) {
+          const url = page.url();
+          const onAuth = url.includes("/auth");
+          const bodyText =
+            (await page
+              .locator("body")
+              .textContent()
+              .catch(() => "")) ?? "";
+          throw new Error(
+            `paywall-flow: paywall modal not visible. url=${url} onAuth=${onAuth} body(200)=${bodyText.slice(0, 200)}. Original: ${String(e)}`
+          );
+        }
+        const paywallSubscribeBtn = page.getByTestId("paywall-subscribe-button");
+        await expect(paywallSubscribeBtn).toBeVisible({ timeout: 5000 });
+        await paywallSubscribeBtn.click();
+      } else {
+        throw new Error(
+          `paywall-flow: neither creator-subscribe-button nor post-unlock-trigger visible. url=${page.url()}`
+        );
+      }
+
+      let res;
+      try {
+        res = await subscribeRes;
+      } catch (e) {
+        const url = page.url();
+        const onAuth = url.includes("/auth");
+        const bodyText =
+          (await page
+            .locator("body")
+            .textContent()
+            .catch(() => "")) ?? "";
+        throw new Error(
+          `paywall-flow: waitForResponse /api/subscribe failed. url=${url} onAuth=${onAuth} body(200)=${bodyText.slice(0, 200)}. Original: ${String(e)}`
+        );
+      }
+      if (!res.ok()) {
+        const url = page.url();
+        const onAuth = url.includes("/auth");
+        const bodyText =
+          (await page
+            .locator("body")
+            .textContent()
+            .catch(() => "")) ?? "";
+        throw new Error(
+          `paywall-flow: /api/subscribe failed. status=${res.status()} url=${url} onAuth=${onAuth} body(200)=${bodyText.slice(0, 200)}`
+        );
+      }
+
+      // 路径 A：不断言 paywall-success-message；以订阅后可访问受限内容（步骤 7）+ API 佐证（page 内 fetch credentials:include）
+      // 路径 B：usedUnlockTrigger 时才断言 paywall-success-message 可见
+      if (usedUnlockTrigger) {
+        await expect(page.getByTestId("paywall-success-message")).toBeVisible({ timeout: 20000 });
+      } else {
+        // 路径 A API 佐证：page.evaluate(fetch(..., { credentials:'include' })) 确保带页面 cookie
+        const statusUrl = `${getOrigin(page)}/api/subscription/status?creatorId=${encodeURIComponent(creatorIdForStatus!)}`;
+        const statusResult = await page.evaluate(async (url: string) => {
+          const r = await fetch(url, { credentials: "include" });
+          const body = await r.text();
+          return { ok: r.ok, status: r.status, body };
+        }, statusUrl);
+        if (!statusResult.ok) {
+          throw new Error(
+            `paywall-flow: subscription/status failed. status=${statusResult.status} body=${statusResult.body.slice(0, 200)}`
+          );
+        }
+        const statusBody = JSON.parse(statusResult.body) as { isSubscribed?: boolean };
+        expect(statusBody.isSubscribed, "API should report subscribed after path A").toBe(true);
+      }
+
+      // 7. 成功标准：订阅后可访问受限内容（post 页面可打开 + post-media 可见）；路径 A 不依赖 modal，以此为准
+      await page.goto(`${BASE_URL}/posts/${postId}`, {
+        waitUntil: "domcontentloaded",
+        timeout: 15000,
+      });
+      await waitForPageLoad(page);
+      const postMedia = page.getByTestId("post-media");
+      await expect(postMedia).toBeVisible({ timeout: 10000 });
+      await expect(postMedia.locator("img, video").first()).toBeVisible({ timeout: 10000 });
+    } finally {
+      if (creatorPage && !creatorPage.isClosed()) await creatorPage.close();
     }
-
-    // 7. 验证订阅后该 post 的媒体存在（只断言 post-media 容器内 img/video，避免 logo/avatar 假阳性）
-    await page.goto(`${BASE_URL}/posts/${postId}`, {
-      waitUntil: "domcontentloaded",
-      timeout: 15000,
-    });
-    await waitForPageLoad(page);
-    const postMedia = page.getByTestId("post-media");
-    await expect(postMedia).toBeVisible({ timeout: 10000 });
-    await expect(postMedia.locator("img, video").first()).toBeVisible({ timeout: 10000 });
-
-    await creatorPage.close();
   });
 
   test("上传视频并发布", async ({ page }) => {

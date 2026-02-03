@@ -22,6 +22,7 @@ export default [
       'commitlint.config.js',
       'playwright-report/**/*',
       'test-results/**/*',
+      '.ci-artifacts/**/*',
     ],
   },
   js.configs.recommended,

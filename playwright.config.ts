@@ -31,10 +31,6 @@ const parsedUrl = new URL(defaultBaseUrl);
 const serverPort = parsedUrl.port || (parsedUrl.protocol === "https:" ? "443" : "80");
 const cookieExpires = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30;
 
-// 记录配置信息（用于调试）
-console.log("[Playwright Config] CI:", !!process.env.CI);
-console.log("[Playwright Config] Base URL:", defaultBaseUrl);
-
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -100,7 +96,7 @@ export default defineConfig({
     },
   ],
 
-  /* 本地开发/CI 时自动启动服务器；日志重定向到文件，禁止 pipe+tee 以免影响 server ready 判断 */
+  /* CI/自动启动时：build + start，日志落盘；本地推荐用 scripts/e2e/start-server.sh + run-paywall-video.sh */
   webServer: process.env.PLAYWRIGHT_SKIP_SERVER
     ? undefined
     : {
