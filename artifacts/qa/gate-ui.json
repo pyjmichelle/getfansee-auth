@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-18T17:04:12.474Z",
+  "timestamp": "2026-01-28T13:09:07.062Z",
   "summary": {
     "total": 10,
     "passed": 10,
@@ -31,7 +31,7 @@
       "status": "PASS",
       "checks": [
         {
-          "selector": "[data-testid=\"wallet-balance\"]",
+          "selector": "[data-testid=\"wallet-balance-section\"]",
           "description": "Wallet balance section should be visible",
           "found": 1,
           "required": 1,
@@ -203,7 +203,7 @@
           "passed": true
         },
         {
-          "selector": "[data-testid=\"balance-value\"]",
+          "selector": "[data-testid=\"wallet-balance-value\"]",
           "description": "Balance value should be visible",
           "found": 1,
           "required": 1,
@@ -242,6 +242,13 @@
           "found": 1,
           "required": 1,
           "passed": true
+        },
+        {
+          "selector": "[data-testid=\"search-page\"]",
+          "description": "Search page loads after click",
+          "found": 0,
+          "required": 1,
+          "passed": false
         }
       ],
       "finalUrl": "http://127.0.0.1:3000/home",

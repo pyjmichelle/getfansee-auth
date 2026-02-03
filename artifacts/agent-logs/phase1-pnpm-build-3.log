@@ -1,0 +1,105 @@
+
+> my-v0-project@0.1.0 build /Users/puyijun/Downloads/authentication-flow-design (1)
+> next build
+
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Environments: .env.local
+
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 7.4s
+   Running TypeScript ...
+   Collecting page data using 9 workers ...
+   Generating static pages using 9 workers (0/66) ...
+   Generating static pages using 9 workers (16/66) 
+   Generating static pages using 9 workers (32/66) 
+   Generating static pages using 9 workers (49/66) 
+ ✓ Generating static pages using 9 workers (66/66) in 527.1ms
+   Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /admin/content-review
+├ ○ /admin/creator-verifications
+├ ○ /admin/reports
+├ ○ /ai-dashboard
+├ ƒ /api/admin/content-review
+├ ƒ /api/admin/posts
+├ ƒ /api/ai/generate
+├ ƒ /api/auth/ensure-profile
+├ ƒ /api/auth/session
+├ ƒ /api/comments/[id]
+├ ƒ /api/creator/[id]
+├ ƒ /api/creator/[id]/posts
+├ ƒ /api/creator/create
+├ ƒ /api/creator/stats
+├ ƒ /api/feed
+├ ƒ /api/health
+├ ƒ /api/kyc/verification
+├ ƒ /api/paywall/earnings
+├ ƒ /api/paywall/subscribers
+├ ƒ /api/posts
+├ ƒ /api/posts/[id]
+├ ƒ /api/posts/[id]/comments
+├ ƒ /api/posts/[id]/delete
+├ ƒ /api/posts/[id]/like
+├ ƒ /api/posts/[id]/tags
+├ ƒ /api/posts/creator
+├ ƒ /api/profile
+├ ƒ /api/profile/general
+├ ƒ /api/profile/password
+├ ƒ /api/profile/update
+├ ƒ /api/search
+├ ƒ /api/subscribe
+├ ƒ /api/subscription/cancel
+├ ƒ /api/subscription/status
+├ ƒ /api/tags
+├ ƒ /api/tags/[tag]/posts
+├ ƒ /api/test/session
+├ ƒ /api/unlock
+├ ƒ /api/user
+├ ƒ /api/wallet/recharge
+├ ƒ /api/webhooks/didit
+├ ƒ /auth
+├ ○ /auth/error
+├ ○ /auth/resend-verification
+├ ○ /auth/verify
+├ ○ /buildmark
+├ ƒ /creator/[id]
+├ ○ /creator/new-post
+├ ○ /creator/onboard
+├ ○ /creator/onboarding
+├ ○ /creator/studio
+├ ○ /creator/studio/analytics
+├ ○ /creator/studio/earnings
+├ ƒ /creator/studio/post/edit/[id]
+├ ○ /creator/studio/post/list
+├ ○ /creator/studio/post/new
+├ ○ /creator/studio/post/success
+├ ○ /creator/studio/subscribers
+├ ○ /creator/upgrade
+├ ○ /creator/upgrade/apply
+├ ○ /creator/upgrade/kyc
+├ ○ /dmca
+├ ƒ /home
+├ ○ /me
+├ ○ /me/wallet
+├ ○ /notifications
+├ ƒ /posts/[id]
+├ ○ /privacy
+├ ○ /purchases
+├ ○ /report
+├ ○ /search
+├ ○ /subscriptions
+├ ○ /support
+├ ƒ /tags/[tag]
+├ ○ /terms
+└ ○ /test
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

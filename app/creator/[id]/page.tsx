@@ -14,18 +14,13 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 
-import {
-  Image as ImageIcon,
-  Heart,
-  FileText,
-  AlertTriangle,
-  Lock,
-  Share2,
-  Check,
-  Copy,
-} from "lucide-react";
+import { Image as ImageIcon, Heart, FileText, Lock, Share2 } from "lucide-react";
 import { ReportButton } from "@/components/report-button";
 import { toast } from "sonner";
+import { BottomNavigation } from "@/components/bottom-navigation";
+import { LoadingState } from "@/components/loading-state";
+import { ErrorState } from "@/components/error-state";
+import { EmptyState } from "@/components/empty-state";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -142,56 +137,29 @@ export default function CreatorProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-16 md:pb-0">
         {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {/* Shimmer 骨架屏 */}
-          <div className="animate-pulse space-y-8">
-            {/* Header Skeleton */}
-            <div className="h-48 md:h-64 bg-muted rounded-xl"></div>
-            <div className="flex items-center gap-4 -mt-16 px-4">
-              <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-muted border-4 border-background"></div>
-              <div className="flex-1 space-y-3">
-                <div className="h-6 w-48 bg-muted rounded"></div>
-                <div className="h-4 w-64 bg-muted rounded"></div>
-              </div>
-            </div>
-            {/* Tabs Skeleton */}
-            <div className="flex gap-8 border-b border-border px-4">
-              <div className="h-10 w-20 bg-muted rounded"></div>
-              <div className="h-10 w-20 bg-muted rounded"></div>
-              <div className="h-10 w-20 bg-muted rounded"></div>
-            </div>
-            {/* Posts Skeleton */}
-            <div className="px-4 space-y-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="space-y-4 pb-8 border-b border-border">
-                  <div className="h-48 bg-muted rounded-xl"></div>
-                  <div className="h-4 w-3/4 bg-muted rounded"></div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <LoadingState type="skeleton" />
         </main>
+        <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
       </div>
     );
   }
 
   if (error || !creatorProfile) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-16 md:pb-0">
         {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
         <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Card className="rounded-xl border shadow-sm">
-            <CardContent className="p-6">
-              <p className="text-destructive font-semibold mb-2">Error</p>
-              <p className="text-sm text-muted-foreground mb-4">{error || "Creator not found"}</p>
-              <Button asChild variant="outline" className="rounded-lg">
-                <Link href="/home">Return to Home</Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <ErrorState
+            title="Creator Not Found"
+            message={error || "This creator does not exist"}
+            retry={() => router.push("/home")}
+            variant="centered"
+          />
         </main>
+        <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
       </div>
     );
   }
@@ -267,7 +235,7 @@ export default function CreatorProfilePage() {
     try {
       await navigator.clipboard.writeText(shareUrl);
       toast.success("Link copied to clipboard!");
-    } catch (err) {
+    } catch {
       // Fallback for browsers that don't support clipboard API
       const textarea = document.createElement("textarea");
       textarea.value = shareUrl;
@@ -280,25 +248,25 @@ export default function CreatorProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
       {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 封面图 Banner */}
         <div className="relative w-full h-48 md:h-64 rounded-xl overflow-hidden mt-6 mb-6">
-          <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5"></div>
+          <div className="w-full h-full bg-gradient-to-br from-red-900/40 via-red-800/20 to-amber-900/20 shadow-inner backdrop-blur-sm"></div>
         </div>
 
         {/* 头像和个人信息 */}
         <div className="relative -mt-20 mb-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div className="flex items-end gap-4 md:gap-6">
-              <Avatar className="w-24 h-24 md:w-32 md:h-32 border-4 border-background ring-2 ring-border shadow-xl">
+              <Avatar className="w-24 h-24 md:w-32 md:h-32 border-4 border-background ring-2 ring-primary/30 shadow-primary-glow/50">
                 <AvatarImage
                   src={creatorProfile.avatar_url || "/placeholder.svg"}
                   alt={creatorProfile.display_name || "Creator"}
                 />
-                <AvatarFallback className="text-2xl md:text-3xl bg-primary/10 text-primary">
+                <AvatarFallback className="text-2xl md:text-3xl glass bg-subscribe-gradient/20 text-[var(--color-pink-400)]">
                   {creatorProfile.display_name?.[0]?.toUpperCase() || "C"}
                 </AvatarFallback>
               </Avatar>
@@ -324,7 +292,7 @@ export default function CreatorProfilePage() {
                     disabled={isSubscribing}
                     className="rounded-lg min-w-[160px] min-h-[44px]"
                   >
-                    {isSubscribing ? "Processing..." : "Unsubscribe"}
+                    {isSubscribing ? "Processing…" : "Unsubscribe"}
                   </Button>
                 ) : (
                   <Button
@@ -332,7 +300,7 @@ export default function CreatorProfilePage() {
                     disabled={isSubscribing}
                     className="rounded-lg min-w-[160px] min-h-[44px]"
                   >
-                    {isSubscribing ? "Processing..." : "Subscribe"}
+                    {isSubscribing ? "Processing…" : "Subscribe Now"}
                   </Button>
                 )}
                 <Button
@@ -417,18 +385,11 @@ export default function CreatorProfilePage() {
           {activeTab === "posts" && (
             <div className="space-y-6">
               {posts.length === 0 ? (
-                <Card className="rounded-xl border shadow-sm">
-                  <CardContent className="py-16 text-center">
-                    <FileText
-                      className="w-16 h-16 mx-auto mb-4 text-muted-foreground"
-                      aria-hidden="true"
-                    />
-                    <h3 className="text-lg font-semibold mb-2">No Posts Yet</h3>
-                    <p className="text-muted-foreground text-sm">
-                      This creator hasn't posted anything yet.
-                    </p>
-                  </CardContent>
-                </Card>
+                <EmptyState
+                  icon={<FileText className="w-8 h-8 text-muted-foreground" />}
+                  title="No Posts Yet"
+                  description="This creator hasn't posted anything yet."
+                />
               ) : (
                 posts.map((post) => {
                   const canView =
@@ -437,9 +398,9 @@ export default function CreatorProfilePage() {
                   return (
                     <Card
                       key={post.id}
-                      className="rounded-xl border shadow-sm hover:shadow-md transition-shadow"
+                      className="rounded-2xl border border-border/50 shadow-lg hover:shadow-2xl hover:shadow-primary-glow/20 hover:border-primary/30 transition-[box-shadow,border-color,transform] duration-300 motion-safe:transition-[box-shadow,border-color,transform] motion-reduce:transition-none hover:-translate-y-1"
                     >
-                      <CardContent className="p-6">
+                      <CardContent className="p-6 lg:p-8">
                         {post.title && (
                           <Link href={`/posts/${post.id}`}>
                             <h3 className="text-xl font-bold text-foreground mb-3 hover:text-primary transition-colors cursor-pointer line-clamp-2">
@@ -459,21 +420,34 @@ export default function CreatorProfilePage() {
                             />
                             <p className="text-muted-foreground mb-4 text-sm">
                               {post.price_cents === 0
-                                ? "This content is for subscribers only"
-                                : `Unlock for $${((post.price_cents || 0) / 100).toFixed(2)}`}
+                                ? "This exclusive content is for subscribers only"
+                                : `Unlock this hot content for $${((post.price_cents || 0) / 100).toFixed(2)}`}
                             </p>
                             {post.price_cents === 0 ? (
                               <Button
                                 size="sm"
+                                variant="subscribe-gradient"
                                 onClick={handleSubscribe}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    handleSubscribe();
+                                  }
+                                }}
                                 disabled={isSubscribing}
-                                className="rounded-lg min-h-[40px]"
+                                className="rounded-xl min-h-[44px] font-semibold shadow-lg"
+                                aria-label={
+                                  isSubscribing
+                                    ? "Processing subscription…"
+                                    : "Subscribe to unlock this content"
+                                }
                               >
-                                {isSubscribing ? "Processing..." : "Subscribe to view"}
+                                {isSubscribing ? "Processing…" : "Subscribe to Unlock"}
                               </Button>
                             ) : (
                               <Button
                                 size="sm"
+                                variant="unlock-gradient"
                                 onClick={async () => {
                                   try {
                                     const response = await fetch("/api/unlock", {
@@ -516,7 +490,14 @@ export default function CreatorProfilePage() {
                                     console.error("[creator] unlock error", err);
                                   }
                                 }}
-                                className="rounded-lg min-h-[40px]"
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    // Trigger unlock
+                                  }
+                                }}
+                                className="rounded-xl min-h-[44px] font-semibold shadow-lg"
+                                aria-label={`Unlock this content for $${((post.price_cents || 0) / 100).toFixed(2)}`}
                               >
                                 Unlock for ${((post.price_cents || 0) / 100).toFixed(2)}
                               </Button>
@@ -581,7 +562,7 @@ export default function CreatorProfilePage() {
 
                         <div className="pt-4 border-t flex items-center justify-between">
                           <span className="text-sm text-muted-foreground">
-                            {formatDate(post.created_at)}
+                            {post.created_at ? formatDate(post.created_at) : "Unknown date"}
                           </span>
                           <Button variant="ghost" size="sm" asChild className="rounded-lg">
                             <Link href={`/posts/${post.id}`}>View Details</Link>
@@ -616,7 +597,7 @@ export default function CreatorProfilePage() {
                   aria-hidden="true"
                 />
                 <h3 className="text-lg font-semibold mb-2">Liked Posts</h3>
-                <p className="text-muted-foreground text-sm">Coming soon...</p>
+                <p className="text-muted-foreground text-sm">Liked posts feature is coming soon</p>
               </CardContent>
             </Card>
           )}
@@ -632,20 +613,32 @@ export default function CreatorProfilePage() {
                 disabled={isSubscribing}
                 className="w-full rounded-lg h-12 min-h-[48px]"
               >
-                {isSubscribing ? "Processing..." : "Unsubscribe"}
+                {isSubscribing ? "Processing…" : "Unsubscribe"}
               </Button>
             ) : (
               <Button
                 onClick={handleSubscribe}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleSubscribe();
+                  }
+                }}
                 disabled={isSubscribing}
-                className="w-full rounded-lg h-12 min-h-[48px]"
+                variant="subscribe-gradient"
+                className="w-full rounded-xl h-12 min-h-[48px] font-bold shadow-lg"
+                aria-label={
+                  isSubscribing ? "Processing subscription…" : "Subscribe to this creator"
+                }
               >
-                {isSubscribing ? "Processing..." : "Subscribe"}
+                {isSubscribing ? "Processing…" : "Subscribe Now"}
               </Button>
             )}
           </div>
         )}
       </main>
+
+      <BottomNavigation notificationCount={0} />
     </div>
   );
 }

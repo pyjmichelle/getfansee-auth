@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Upload, X, Image as ImageIcon, Video, Loader2, Trash2 } from "lucide-react";
+import { Upload, X, Video, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { uploadFiles, validateFile, type MediaFile } from "@/lib/storage";
 
@@ -95,9 +95,10 @@ export function MultiMediaUpload({
         setUploadedFiles(newFiles);
         onUploadComplete(newFiles);
         setUploadProgress(new Map());
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("[MultiMediaUpload] upload error:", err);
-        onUploadError?.(err.message || "Upload failed");
+        const message = err instanceof Error ? err.message : "Upload failed";
+        onUploadError?.(message);
         setUploadProgress(new Map());
       } finally {
         setIsUploading(false);
@@ -160,8 +161,8 @@ export function MultiMediaUpload({
           className={`
             border-2 border-dashed rounded-xl p-8 text-center cursor-pointer
             transition-colors
-            ${isDragging ? "border-[#6366F1] bg-[#6366F1]/5" : "border-border bg-card"}
-            hover:border-[#6366F1]/50
+            ${isDragging ? "border-primary bg-primary/5" : "border-border/50 glass"}
+            hover:border-primary/50
           `}
           onClick={() => fileInputRef.current?.click()}
         >
@@ -196,8 +197,8 @@ export function MultiMediaUpload({
               className={`
                 border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
                 transition-colors
-                ${isDragging ? "border-[#6366F1] bg-[#6366F1]/5" : "border-border bg-card"}
-                ${isUploading ? "opacity-50 cursor-not-allowed" : "hover:border-[#6366F1]/50"}
+                ${isDragging ? "border-primary bg-primary/5" : "border-border/50 glass"}
+                ${isUploading ? "opacity-50 cursor-not-allowed" : "hover:border-primary/50"}
               `}
               onClick={() => !isUploading && fileInputRef.current?.click()}
             >
@@ -225,7 +226,7 @@ export function MultiMediaUpload({
             </div>
           )}
 
-          {/* 已上传文件列表 */}
+          {/* Uploaded files list */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4" data-testid="upload-preview">
             {uploadedFiles.map((file, index) => {
               const progress = uploadProgress.get(index);
@@ -255,7 +256,7 @@ export function MultiMediaUpload({
                         {/* Primary Gradient 进度条 */}
                         <div className="absolute bottom-0 left-0 right-0 h-1 bg-card">
                           <div
-                            className="h-full bg-primary-gradient transition-all duration-300"
+                            className="h-full bg-primary-gradient backdrop-blur-sm transition-[width] duration-300 motion-safe:transition-[width] motion-reduce:transition-none"
                             style={{ width: `${progress?.percentage || 0}%` }}
                           ></div>
                         </div>

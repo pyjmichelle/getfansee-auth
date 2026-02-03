@@ -1,0 +1,907 @@
+
+> my-v0-project@0.1.0 qa:gate /Users/puyijun/Downloads/authentication-flow-design (1)
+> bash scripts/qa/check-server.sh && pnpm test:session:auto:all && pnpm test:gate:ui && pnpm test:gate:deadclick && pnpm audit:full
+
+🔍 Checking if dev server is running on port 3000...
+✅ Dev server is running and responding on port 3000
+
+> my-v0-project@0.1.0 test:session:auto:all /Users/puyijun/Downloads/authentication-flow-design (1)
+> pnpm test:session:auto:fan && pnpm test:session:auto:creator
+
+
+> my-v0-project@0.1.0 test:session:auto:fan /Users/puyijun/Downloads/authentication-flow-design (1)
+> ROLE=fan tsx scripts/auth/auto-login.ts
+
+🔐 Automated Login Session Export
+============================================================
+Role: Fan
+Email: test-fan@example.com
+Base URL: http://localhost:3000
+Test Page: /home
+============================================================
+
+🌐 Launching browser (headless)...
+
+→ Opening http://localhost:3000/auth
+
+🔑 Attempting automated login...
+   → Checking for age gate...
+   → Age gate detected, accepting...
+   → Ensuring login tab is active...
+   → Clicked login tab
+   → Filling email...
+   → Filling password...
+   → Submitting login form...
+   [Browser Warn] [auth] Starting login for: test-fan@example.com
+   [Auth Request] POST https://ordomkygjpujxyivwviq.supabase.co/auth/v1/token?grant_type=password
+   → Waiting for login response...
+   [Auth Response] 200 https://ordomkygjpujxyivwviq.supabase.co/auth/v1/token?grant_type=password
+   [Auth Token Response] 200
+   [Browser Warn] [auth] Session synced
+   [Browser Warn] [auth] Sign-in successful, user ID: dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Browser Warn] [auth] Ensuring profile...
+   [Browser Warn] [auth] Profile ensured, navigating to /home
+   [Browser Warn] [auth] Navigation initiated
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/profiles?select=is_banned%2Cban_until&id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/profiles?select=id%2Crole%2Cage_verified%2Creferrer_id&id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/d48ad_%40supabase_realtime-js_dist_module_d27a22d7._.js
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/818fd_%40supabase_storage-js_dist_module_cccc9d11._.js
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/9e750_%40supabase_auth-js_dist_module_94f42586._.js
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/d48ad_%40supabase_realtime-js_dist_module_d27a22d7._.js
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/818fd_%40supabase_storage-js_dist_module_cccc9d11._.js
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/9e750_%40supabase_auth-js_dist_module_94f42586._.js
+   [Browser Warn] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+   → Current URL: http://localhost:3000/home
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8dba8222-437f-429e-89c5-f5f0d5214d90&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.4c207ff3-348a-4cb1-b977-7b94184084bf&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8353b5f2-5f5e-4ab1-a225-ede6190e2802&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.bb9205ac-7f19-4e9f-9528-f6a7fa7c2deb&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.92757d5b-9335-461b-974d-8034e937d73f&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.383582b7-f974-4f5f-889f-a6d5092b4c9a&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.34d09efa-ef5c-4df5-b776-20213e3e62bc&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   ✓ Login successful!
+
+⏳ Waiting for session to stabilize...
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.9ce10084-4541-4507-9321-5778e6e0b1c5&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.ad0865c6-3e9b-4a77-b2be-6b103b1f51b6&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.95891d00-7092-416d-959c-64a35b27146c&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0b5a7f54-4fc5-4b68-a78d-19810ebed02d&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.d7285157-328a-4eec-bf59-b3c7ad3382b2&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.c56ce2d8-f618-46d1-9eb5-1d49334a1757&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0d8f4066-c17e-4a88-a2e2-b0b6414c7bbd&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.531d7317-1e48-4f8f-8ac8-a71ecc3663fa&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.818d9ba5-4735-4098-8b66-99b75895e135&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.5e3353a4-66e1-471b-9caa-8bfc4816a344&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.041dc859-5886-4f3b-9b94-8730269ed38b&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.275b9f4e-003a-4746-9f54-ce39a4702306&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.1db92fa2-5e20-4678-b75b-bf41c7ab1697&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8dba8222-437f-429e-89c5-f5f0d5214d90&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.4c207ff3-348a-4cb1-b977-7b94184084bf&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8353b5f2-5f5e-4ab1-a225-ede6190e2802&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.bb9205ac-7f19-4e9f-9528-f6a7fa7c2deb&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.92757d5b-9335-461b-974d-8034e937d73f&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.383582b7-f974-4f5f-889f-a6d5092b4c9a&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.34d09efa-ef5c-4df5-b776-20213e3e62bc&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.9ce10084-4541-4507-9321-5778e6e0b1c5&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.ad0865c6-3e9b-4a77-b2be-6b103b1f51b6&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.95891d00-7092-416d-959c-64a35b27146c&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0b5a7f54-4fc5-4b68-a78d-19810ebed02d&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.d7285157-328a-4eec-bf59-b3c7ad3382b2&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.c56ce2d8-f618-46d1-9eb5-1d49334a1757&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0d8f4066-c17e-4a88-a2e2-b0b6414c7bbd&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.531d7317-1e48-4f8f-8ac8-a71ecc3663fa&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.818d9ba5-4735-4098-8b66-99b75895e135&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.5e3353a4-66e1-471b-9caa-8bfc4816a344&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.041dc859-5886-4f3b-9b94-8730269ed38b&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.275b9f4e-003a-4746-9f54-ce39a4702306&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.1db92fa2-5e20-4678-b75b-bf41c7ab1697&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+
+🔍 Verifying session via /api/profile...
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.34d09efa-ef5c-4df5-b776-20213e3e62bc&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.c56ce2d8-f618-46d1-9eb5-1d49334a1757&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.383582b7-f974-4f5f-889f-a6d5092b4c9a&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.c56ce2d8-f618-46d1-9eb5-1d49334a1757&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.041dc859-5886-4f3b-9b94-8730269ed38b&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.818d9ba5-4735-4098-8b66-99b75895e135&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.34d09efa-ef5c-4df5-b776-20213e3e62bc&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8dba8222-437f-429e-89c5-f5f0d5214d90&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8353b5f2-5f5e-4ab1-a225-ede6190e2802&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.95891d00-7092-416d-959c-64a35b27146c&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.9ce10084-4541-4507-9321-5778e6e0b1c5&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.531d7317-1e48-4f8f-8ac8-a71ecc3663fa&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.5e3353a4-66e1-471b-9caa-8bfc4816a344&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.9ce10084-4541-4507-9321-5778e6e0b1c5&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.4c207ff3-348a-4cb1-b977-7b94184084bf&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.1db92fa2-5e20-4678-b75b-bf41c7ab1697&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.ad0865c6-3e9b-4a77-b2be-6b103b1f51b6&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.275b9f4e-003a-4746-9f54-ce39a4702306&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.383582b7-f974-4f5f-889f-a6d5092b4c9a&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8353b5f2-5f5e-4ab1-a225-ede6190e2802&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.d7285157-328a-4eec-bf59-b3c7ad3382b2&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.531d7317-1e48-4f8f-8ac8-a71ecc3663fa&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.bb9205ac-7f19-4e9f-9528-f6a7fa7c2deb&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.95891d00-7092-416d-959c-64a35b27146c&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.d7285157-328a-4eec-bf59-b3c7ad3382b2&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.bb9205ac-7f19-4e9f-9528-f6a7fa7c2deb&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.041dc859-5886-4f3b-9b94-8730269ed38b&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.4c207ff3-348a-4cb1-b977-7b94184084bf&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8dba8222-437f-429e-89c5-f5f0d5214d90&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.818d9ba5-4735-4098-8b66-99b75895e135&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.1db92fa2-5e20-4678-b75b-bf41c7ab1697&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.275b9f4e-003a-4746-9f54-ce39a4702306&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0b5a7f54-4fc5-4b68-a78d-19810ebed02d&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0d8f4066-c17e-4a88-a2e2-b0b6414c7bbd&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0d8f4066-c17e-4a88-a2e2-b0b6414c7bbd&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.5e3353a4-66e1-471b-9caa-8bfc4816a344&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0b5a7f54-4fc5-4b68-a78d-19810ebed02d&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.92757d5b-9335-461b-974d-8034e937d73f&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.92757d5b-9335-461b-974d-8034e937d73f&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/profiles?select=id%2Crole%2Cage_verified%2Creferrer_id&id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Request Failed] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.ad0865c6-3e9b-4a77-b2be-6b103b1f51b6&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   → net::ERR_ABORTED
+   [Browser Error] [auth] ensureProfile select error {message: TypeError: Failed to fetch, details: TypeError: Failed to fetch
+    at http://localhost…t:3000/_next/static/chunks/_371c273f._.js:475:33), hint: , code: }
+   ✓ Profile API returned 200
+   → User ID: dec562f2-a534-42a0-91f7-a5b8dbcf9305
+
+🔍 Verifying access to /home...
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/d48ad_%40supabase_realtime-js_dist_module_d27a22d7._.js
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/818fd_%40supabase_storage-js_dist_module_cccc9d11._.js
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/9e750_%40supabase_auth-js_dist_module_94f42586._.js
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/d48ad_%40supabase_realtime-js_dist_module_d27a22d7._.js
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/818fd_%40supabase_storage-js_dist_module_cccc9d11._.js
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/9e750_%40supabase_auth-js_dist_module_94f42586._.js
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8dba8222-437f-429e-89c5-f5f0d5214d90&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.4c207ff3-348a-4cb1-b977-7b94184084bf&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8353b5f2-5f5e-4ab1-a225-ede6190e2802&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.bb9205ac-7f19-4e9f-9528-f6a7fa7c2deb&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.92757d5b-9335-461b-974d-8034e937d73f&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.383582b7-f974-4f5f-889f-a6d5092b4c9a&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.34d09efa-ef5c-4df5-b776-20213e3e62bc&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.9ce10084-4541-4507-9321-5778e6e0b1c5&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.ad0865c6-3e9b-4a77-b2be-6b103b1f51b6&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.95891d00-7092-416d-959c-64a35b27146c&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0b5a7f54-4fc5-4b68-a78d-19810ebed02d&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.d7285157-328a-4eec-bf59-b3c7ad3382b2&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.c56ce2d8-f618-46d1-9eb5-1d49334a1757&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0d8f4066-c17e-4a88-a2e2-b0b6414c7bbd&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.531d7317-1e48-4f8f-8ac8-a71ecc3663fa&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.818d9ba5-4735-4098-8b66-99b75895e135&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.5e3353a4-66e1-471b-9caa-8bfc4816a344&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.041dc859-5886-4f3b-9b94-8730269ed38b&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.275b9f4e-003a-4746-9f54-ce39a4702306&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.1db92fa2-5e20-4678-b75b-bf41c7ab1697&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8dba8222-437f-429e-89c5-f5f0d5214d90&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.4c207ff3-348a-4cb1-b977-7b94184084bf&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8353b5f2-5f5e-4ab1-a225-ede6190e2802&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.bb9205ac-7f19-4e9f-9528-f6a7fa7c2deb&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.92757d5b-9335-461b-974d-8034e937d73f&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.383582b7-f974-4f5f-889f-a6d5092b4c9a&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.34d09efa-ef5c-4df5-b776-20213e3e62bc&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.9ce10084-4541-4507-9321-5778e6e0b1c5&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.ad0865c6-3e9b-4a77-b2be-6b103b1f51b6&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.95891d00-7092-416d-959c-64a35b27146c&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0b5a7f54-4fc5-4b68-a78d-19810ebed02d&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.d7285157-328a-4eec-bf59-b3c7ad3382b2&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.c56ce2d8-f618-46d1-9eb5-1d49334a1757&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0d8f4066-c17e-4a88-a2e2-b0b6414c7bbd&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.531d7317-1e48-4f8f-8ac8-a71ecc3663fa&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.818d9ba5-4735-4098-8b66-99b75895e135&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.5e3353a4-66e1-471b-9caa-8bfc4816a344&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.041dc859-5886-4f3b-9b94-8730269ed38b&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.275b9f4e-003a-4746-9f54-ce39a4702306&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.1db92fa2-5e20-4678-b75b-bf41c7ab1697&user_id=eq.dec562f2-a534-42a0-91f7-a5b8dbcf9305
+   Final URL: http://localhost:3000/home
+   ✓ Verification passed!
+
+💾 Exporting session to: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/sessions/fan.json
+   ✓ Session exported
+
+📸 Taking verification screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/sessions/fan-post-login.png
+   ✓ Screenshot saved
+
+📊 Session Info:
+   Cookies: 3
+   Origins: 1
+   Final URL: http://localhost:3000/home
+
+============================================================
+✅ SUCCESS
+============================================================
+Session file: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/sessions/fan.json
+Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/sessions/fan-post-login.png
+
+🔒 Browser closed
+
+> my-v0-project@0.1.0 test:session:auto:creator /Users/puyijun/Downloads/authentication-flow-design (1)
+> ROLE=creator tsx scripts/auth/auto-login.ts
+
+🔐 Automated Login Session Export
+============================================================
+Role: Creator
+Email: test-creator@example.com
+Base URL: http://localhost:3000
+Test Page: /creator/studio
+============================================================
+
+🌐 Launching browser (headless)...
+
+→ Opening http://localhost:3000/auth
+
+🔑 Attempting automated login...
+   → Checking for age gate...
+   → Age gate detected, accepting...
+   → Ensuring login tab is active...
+   → Clicked login tab
+   → Filling email...
+   → Filling password...
+   → Submitting login form...
+   [Browser Warn] [auth] Starting login for: test-creator@example.com
+   [Auth Request] POST https://ordomkygjpujxyivwviq.supabase.co/auth/v1/token?grant_type=password
+   → Waiting for login response...
+   [Auth Response] 200 https://ordomkygjpujxyivwviq.supabase.co/auth/v1/token?grant_type=password
+   [Auth Token Response] 200
+   [Browser Warn] [auth] Session synced
+   [Browser Warn] [auth] Sign-in successful, user ID: 77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Browser Warn] [auth] Ensuring profile...
+   [Browser Warn] [auth] Profile ensured, navigating to /home
+   [Browser Warn] [auth] Navigation initiated
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/profiles?select=is_banned%2Cban_until&id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/profiles?select=id%2Crole%2Cage_verified%2Creferrer_id&id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/d48ad_%40supabase_realtime-js_dist_module_d27a22d7._.js
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/818fd_%40supabase_storage-js_dist_module_cccc9d11._.js
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/9e750_%40supabase_auth-js_dist_module_94f42586._.js
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/d48ad_%40supabase_realtime-js_dist_module_d27a22d7._.js
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/818fd_%40supabase_storage-js_dist_module_cccc9d11._.js
+   [Auth Request] GET http://localhost:3000/_next/static/chunks/9e750_%40supabase_auth-js_dist_module_94f42586._.js
+   [Browser Warn] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+   → Current URL: http://localhost:3000/home
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8dba8222-437f-429e-89c5-f5f0d5214d90&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.4c207ff3-348a-4cb1-b977-7b94184084bf&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8353b5f2-5f5e-4ab1-a225-ede6190e2802&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.bb9205ac-7f19-4e9f-9528-f6a7fa7c2deb&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.92757d5b-9335-461b-974d-8034e937d73f&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.383582b7-f974-4f5f-889f-a6d5092b4c9a&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.34d09efa-ef5c-4df5-b776-20213e3e62bc&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.9ce10084-4541-4507-9321-5778e6e0b1c5&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.ad0865c6-3e9b-4a77-b2be-6b103b1f51b6&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.95891d00-7092-416d-959c-64a35b27146c&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0b5a7f54-4fc5-4b68-a78d-19810ebed02d&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.d7285157-328a-4eec-bf59-b3c7ad3382b2&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.c56ce2d8-f618-46d1-9eb5-1d49334a1757&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0d8f4066-c17e-4a88-a2e2-b0b6414c7bbd&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.531d7317-1e48-4f8f-8ac8-a71ecc3663fa&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.818d9ba5-4735-4098-8b66-99b75895e135&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.5e3353a4-66e1-471b-9caa-8bfc4816a344&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.041dc859-5886-4f3b-9b94-8730269ed38b&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.275b9f4e-003a-4746-9f54-ce39a4702306&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.1db92fa2-5e20-4678-b75b-bf41c7ab1697&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8dba8222-437f-429e-89c5-f5f0d5214d90&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.4c207ff3-348a-4cb1-b977-7b94184084bf&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.8353b5f2-5f5e-4ab1-a225-ede6190e2802&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.bb9205ac-7f19-4e9f-9528-f6a7fa7c2deb&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.92757d5b-9335-461b-974d-8034e937d73f&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.383582b7-f974-4f5f-889f-a6d5092b4c9a&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.34d09efa-ef5c-4df5-b776-20213e3e62bc&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.9ce10084-4541-4507-9321-5778e6e0b1c5&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.ad0865c6-3e9b-4a77-b2be-6b103b1f51b6&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.95891d00-7092-416d-959c-64a35b27146c&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0b5a7f54-4fc5-4b68-a78d-19810ebed02d&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.d7285157-328a-4eec-bf59-b3c7ad3382b2&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.c56ce2d8-f618-46d1-9eb5-1d49334a1757&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.0d8f4066-c17e-4a88-a2e2-b0b6414c7bbd&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.531d7317-1e48-4f8f-8ac8-a71ecc3663fa&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.818d9ba5-4735-4098-8b66-99b75895e135&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.5e3353a4-66e1-471b-9caa-8bfc4816a344&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.041dc859-5886-4f3b-9b94-8730269ed38b&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.275b9f4e-003a-4746-9f54-ce39a4702306&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/post_likes?select=id&post_id=eq.1db92fa2-5e20-4678-b75b-bf41c7ab1697&user_id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   ✓ Login successful!
+
+⏳ Waiting for session to stabilize...
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+   [Browser Warn] %c%s%c Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server. background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+
+🔍 Verifying session via /api/profile...
+   ✓ Profile API returned 200
+   → User ID: 77deaaa3-0c60-417d-ac8d-152ec291f674
+
+🔍 Verifying access to /creator/studio...
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/profiles?select=is_banned%2Cban_until&id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/profiles?select=is_banned%2Cban_until&id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/profiles?select=id%2Crole%2Cage_verified%2Creferrer_id&id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/profiles?select=id%2Crole%2Cage_verified%2Creferrer_id&id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/profiles?select=id%2Crole%2Cdisplay_name%2Cbio%2Cavatar_url%2Cemail%2Cage_verified%2Cblocked_countries&id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   [Auth Request] GET https://ordomkygjpujxyivwviq.supabase.co/rest/v1/profiles?select=id%2Crole%2Cdisplay_name%2Cbio%2Cavatar_url%2Cemail%2Cage_verified%2Cblocked_countries&id=eq.77deaaa3-0c60-417d-ac8d-152ec291f674
+   Final URL: http://localhost:3000/creator/studio
+   ✓ Verification passed!
+
+💾 Exporting session to: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/sessions/creator.json
+   ✓ Session exported
+
+📸 Taking verification screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/sessions/creator-post-login.png
+   ✓ Screenshot saved
+
+📊 Session Info:
+   Cookies: 3
+   Origins: 1
+   Final URL: http://localhost:3000/creator/studio
+
+============================================================
+✅ SUCCESS
+============================================================
+Session file: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/sessions/creator.json
+Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/sessions/creator-post-login.png
+
+🔒 Browser closed
+
+> my-v0-project@0.1.0 test:gate:ui /Users/puyijun/Downloads/authentication-flow-design (1)
+> tsx scripts/qa/gate-ui.ts
+
+🔍 UI Gate - Required Selectors Check
+============================================================
+Base URL: http://localhost:3000
+Checks: 10
+============================================================
+
+🔍 Checking: home-posts
+   Route: /home (fan)
+   ✓ Page ready signal detected
+   ✓ Post card should be visible
+   ✅ PASS
+
+🔍 Checking: wallet-balance
+   Route: /me/wallet (fan)
+   ✓ Page ready signal detected
+   ✓ Wallet balance section should be visible
+   ✅ PASS
+
+🔍 Checking: new-post-form
+   Route: /creator/new-post (creator)
+   ✓ Page ready signal detected
+   ✓ Post title input should be visible
+   ✓ Post content textarea should be visible
+   ✓ Upload zone should be visible
+   ✓ Visibility toggle should be visible
+   ✓ Submit button should be visible
+   ✅ PASS
+
+🔍 Checking: creator-studio
+   Route: /creator/studio (creator)
+   ✓ Page ready signal detected
+   ✓ Creator stats section should be visible
+   ✓ Creator navigation should be visible
+   ✅ PASS
+
+🔍 Checking: creator-earnings
+   Route: /creator/studio/earnings (creator)
+   → No page-ready signal, using fallback...
+   ✓ Earnings balance section should be visible
+   ✓ Earnings history section should be visible
+   ✅ PASS
+
+🔍 Checking: search-modal
+   Route: /home (fan)
+   ✓ Page ready signal detected
+   ✓ Search button should be visible
+   ✅ PASS
+
+🔍 Checking: age-gate
+   Route: /auth (anonymous)
+   → No page-ready signal, using fallback...
+   ✓ Age gate modal should be visible for anonymous users
+   ✅ PASS
+
+🔍 Checking: checkout-disclaimer
+   Route: /me/wallet (fan)
+   ✓ Page ready signal detected
+   ✓ Checkout disclaimer should be visible
+   ✓ Terms link should be visible
+   ✓ Privacy link should be visible
+   ✓ No refund notice should be visible
+   ✓ Balance value should be visible
+   ✅ PASS
+
+🔍 Checking: upload-file-input
+   Route: /creator/new-post (creator)
+   ✓ Page ready signal detected
+   ✓ Upload zone with file input should exist
+   ✅ PASS
+
+🔍 Checking: search-modal-opens
+   Route: /home (fan)
+   ✓ Search destination opened successfully
+   ✅ PASS
+
+============================================================
+📊 UI GATE RESULTS
+============================================================
+Total: 10
+Passed: 10
+Failed: 0
+Pass Rate: 100.0%
+
+Report: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/gate-ui.json
+
+> my-v0-project@0.1.0 test:gate:deadclick /Users/puyijun/Downloads/authentication-flow-design (1)
+> tsx scripts/qa/gate-deadclick.ts
+
+🔍 Dead Click Gate
+============================================================
+Base URL: http://localhost:3000
+Checks: 2
+============================================================
+
+🔍 Checking: search-opens-modal
+   Route: /home (fan)
+   Action: Click search button
+   Expect: Search modal should open
+   ✓ Modal opened
+   ✅ PASS
+
+🔍 Checking: new-post-submit-disabled-empty
+   Route: /creator/new-post (creator)
+   Action: Click submit with empty form
+   Expect: Error message should appear or button should be disabled
+   ✓ Error message displayed
+   ✅ PASS
+
+============================================================
+📊 DEAD CLICK GATE RESULTS
+============================================================
+Total: 2
+Passed: 2
+Failed: 0
+Pass Rate: 100.0%
+
+Report: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/dead-clicks.json
+
+> my-v0-project@0.1.0 audit:full /Users/puyijun/Downloads/authentication-flow-design (1)
+> tsx scripts/full-site-audit.ts
+
+🔍 Full Site Interactive Audit
+📍 Base URL: http://localhost:3000
+📋 Routes to test: 20
+🔐 Auth states: anonymous, fan, creator
+============================================================
+✓ Route map saved: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/route-map.json
+
+🚀 Starting dev server...
+   PORT=3000 pnpm dev
+   Waiting for server at http://localhost:3000/auth...
+  ✓ Server ready (115ms)
+
+🌐 Launching browser...
+  ✓ Browser launched
+
+============================================================
+🔐 Testing as: ANONYMOUS
+============================================================
+
+🧪 Testing: / (anonymous)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/root.png
+  → Found 8 clickable elements
+  ⚠️  4 network errors
+
+🧪 Testing: /auth (anonymous)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/auth.png
+  → Found 8 clickable elements
+
+🧪 Testing: /home (anonymous)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/home.png
+  → Found 8 clickable elements
+  ⚠️  2 network errors
+
+🧪 Testing: /me (anonymous)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/me.png
+  → Found 8 clickable elements
+  ⚠️  1 network errors
+
+🧪 Testing: /me/wallet (anonymous)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/me_wallet.png
+  → Found 8 clickable elements
+  ⚠️  2 network errors
+
+🧪 Testing: /purchases (anonymous)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/purchases.png
+  → Found 8 clickable elements
+  ⚠️  1 network errors
+
+🧪 Testing: /subscriptions (anonymous)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/subscriptions.png
+  → Found 8 clickable elements
+  ⚠️  1 network errors
+
+🧪 Testing: /search (anonymous)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/search.png
+  → Found 8 clickable elements
+
+🧪 Testing: /support (anonymous)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/support.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/new-post (anonymous)
+  → Status: 200 (redirected to http://localhost:3000/auth?redirect=%2Fcreator%2Fnew-post)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_new-post.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/upgrade (anonymous)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_upgrade.png
+  → Found 12 clickable elements
+
+🧪 Testing: /creator/onboarding (anonymous)
+  → Status: 200 (redirected to http://localhost:3000/auth?redirect=%2Fcreator%2Fonboarding)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_onboarding.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/studio (anonymous)
+  → Status: 200 (redirected to http://localhost:3000/auth?redirect=%2Fcreator%2Fstudio)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/studio/analytics (anonymous)
+  → Status: 200 (redirected to http://localhost:3000/auth?redirect=%2Fcreator%2Fstudio%2Fanalytics)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio_analytics.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/studio/earnings (anonymous)
+  → Status: 200 (redirected to http://localhost:3000/auth?redirect=%2Fcreator%2Fstudio%2Fearnings)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio_earnings.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/studio/subscribers (anonymous)
+  → Status: 200 (redirected to http://localhost:3000/auth?redirect=%2Fcreator%2Fstudio%2Fsubscribers)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio_subscribers.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/studio/post/list (anonymous)
+  → Status: 200 (redirected to http://localhost:3000/auth?redirect=%2Fcreator%2Fstudio%2Fpost%2Flist)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio_post_list.png
+  → Found 8 clickable elements
+
+🧪 Testing: /admin/reports (anonymous)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/admin_reports.png
+  → Found 8 clickable elements
+  ⚠️  1 network errors
+
+🧪 Testing: /admin/content-review (anonymous)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/admin_content-review.png
+  → Found 8 clickable elements
+  ⚠️  1 network errors
+
+🧪 Testing: /admin/creator-verifications (anonymous)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/admin_creator-verifications.png
+  → Found 8 clickable elements
+  ⚠️  1 network errors
+
+============================================================
+🔐 Testing as: FAN
+============================================================
+  ✓ Loading fan session from /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/sessions/fan.json
+     Cookies: 3, Origins: 1
+
+🧪 Testing: / (fan)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/root.png
+  → Found 0 clickable elements
+
+🧪 Testing: /auth (fan)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/auth.png
+  → Found 4 clickable elements
+
+🧪 Testing: /home (fan)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/home.png
+  → Found 127 clickable elements
+
+🧪 Testing: /me (fan)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/me.png
+  → Found 14 clickable elements
+
+🧪 Testing: /me/wallet (fan)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/me_wallet.png
+  → Found 4 clickable elements
+
+🧪 Testing: /purchases (fan)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/purchases.png
+  → Found 0 clickable elements
+
+🧪 Testing: /subscriptions (fan)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/subscriptions.png
+  → Found 0 clickable elements
+
+🧪 Testing: /search (fan)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/search.png
+  → Found 0 clickable elements
+
+🧪 Testing: /support (fan)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/support.png
+  → Found 0 clickable elements
+
+🧪 Testing: /creator/new-post (fan)
+  → Status: 200 (redirected to http://localhost:3000/creator/upgrade?redirect=%2Fcreator%2Fnew-post)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_new-post.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/upgrade (fan)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_upgrade.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/onboarding (fan)
+  → Status: 200 (redirected to http://localhost:3000/creator/upgrade?redirect=%2Fcreator%2Fonboarding)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_onboarding.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/studio (fan)
+  → Status: 200 (redirected to http://localhost:3000/creator/upgrade?redirect=%2Fcreator%2Fstudio)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/studio/analytics (fan)
+  → Status: 200 (redirected to http://localhost:3000/creator/upgrade?redirect=%2Fcreator%2Fstudio%2Fanalytics)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio_analytics.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/studio/earnings (fan)
+  → Status: 200 (redirected to http://localhost:3000/creator/upgrade?redirect=%2Fcreator%2Fstudio%2Fearnings)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio_earnings.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/studio/subscribers (fan)
+  → Status: 200 (redirected to http://localhost:3000/creator/upgrade?redirect=%2Fcreator%2Fstudio%2Fsubscribers)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio_subscribers.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/studio/post/list (fan)
+  → Status: 200 (redirected to http://localhost:3000/creator/upgrade?redirect=%2Fcreator%2Fstudio%2Fpost%2Flist)
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio_post_list.png
+  → Found 8 clickable elements
+
+🧪 Testing: /admin/reports (fan)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/admin_reports.png
+  → Found 0 clickable elements
+
+🧪 Testing: /admin/content-review (fan)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/admin_content-review.png
+  → Found 0 clickable elements
+
+🧪 Testing: /admin/creator-verifications (fan)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/admin_creator-verifications.png
+  → Found 0 clickable elements
+
+============================================================
+🔐 Testing as: CREATOR
+============================================================
+  ✓ Loading creator session from /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/sessions/creator.json
+     Cookies: 3, Origins: 1
+
+🧪 Testing: / (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/root.png
+  → Found 0 clickable elements
+
+🧪 Testing: /auth (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/auth.png
+  → Found 4 clickable elements
+
+🧪 Testing: /home (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/home.png
+  → Found 127 clickable elements
+
+🧪 Testing: /me (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/me.png
+  → Found 7 clickable elements
+
+🧪 Testing: /me/wallet (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/me_wallet.png
+  → Found 4 clickable elements
+
+🧪 Testing: /purchases (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/purchases.png
+  → Found 0 clickable elements
+
+🧪 Testing: /subscriptions (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/subscriptions.png
+  → Found 0 clickable elements
+
+🧪 Testing: /search (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/search.png
+  → Found 0 clickable elements
+
+🧪 Testing: /support (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/support.png
+  → Found 0 clickable elements
+
+🧪 Testing: /creator/new-post (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_new-post.png
+  → Found 12 clickable elements
+
+🧪 Testing: /creator/upgrade (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_upgrade.png
+  → Found 8 clickable elements
+
+🧪 Testing: /creator/onboarding (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_onboarding.png
+  → Found 0 clickable elements
+
+🧪 Testing: /creator/studio (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio.png
+  → Found 0 clickable elements
+
+🧪 Testing: /creator/studio/analytics (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio_analytics.png
+  → Found 10 clickable elements
+
+🧪 Testing: /creator/studio/earnings (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio_earnings.png
+  → Found 0 clickable elements
+
+🧪 Testing: /creator/studio/subscribers (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio_subscribers.png
+  → Found 0 clickable elements
+
+🧪 Testing: /creator/studio/post/list (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio_post_list.png
+  → Found 0 clickable elements
+
+🧪 Testing: /admin/reports (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/admin_reports.png
+  → Found 0 clickable elements
+
+🧪 Testing: /admin/content-review (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/admin_content-review.png
+  → Found 0 clickable elements
+
+🧪 Testing: /admin/creator-verifications (creator)
+  → Status: 200
+  ✓ Screenshot: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/admin_creator-verifications.png
+  → Found 0 clickable elements
+
+✓ Results saved: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/audit-results.json
+
+============================================================
+📊 AUDIT SUMMARY
+============================================================
+Total tests: 60
+Successful loads (200): 60
+Redirects: 14
+Errors (4xx/5xx/0): 0
+Console errors: 0
+Network errors: 14
+
+============================================================
+🔍 VALIDATING AUTH SESSIONS
+============================================================
+Fan auth pages: 1/20 (5.0%)
+Creator auth pages: 1/20 (5.0%)
+✅ Fan session validation PASSED: 5.0% <= 5%
+✅ Creator session validation PASSED: 5.0% <= 5%
+
+✓ Summary saved: /Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/summary.json
+
+✅ AUDIT PASSED: All gates met

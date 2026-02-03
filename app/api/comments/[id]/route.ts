@@ -21,11 +21,8 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
     const { id: commentId } = await context.params;
 
-    console.log(`[DELETE /api/comments/${commentId}] User: ${user.id}`);
-
+    // Removed debug console.log - vercel-react-best-practices
     await deleteComment(commentId, user.id);
-
-    console.log(`[DELETE /api/comments/${commentId}] Comment deleted successfully`);
 
     return NextResponse.json({
       success: true,

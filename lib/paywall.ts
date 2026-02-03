@@ -5,6 +5,7 @@
 
 import { getSupabaseUniversalClient } from "./supabase-universal";
 import { getCurrentUserUniversal } from "./auth-universal";
+import { getSubscriptionUserId, resolveSubscriptionUserColumn } from "./subscriptions";
 
 export type PaywallState = {
   hasActiveSubscription: boolean;
@@ -28,17 +29,18 @@ export async function subscribe30d(creatorId: string): Promise<boolean> {
     const now = new Date();
     const currentPeriodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // +30 days
 
-    // 使用 upsert（ON CONFLICT fan_id, creator_id DO UPDATE）
+    const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
+    // 使用 upsert（ON CONFLICT user_column, creator_id DO UPDATE）
     const { error } = await supabase.from("subscriptions").upsert(
       {
-        fan_id: user.id,
+        [subscriptionUserColumn]: user.id,
         creator_id: creatorId,
         plan: "monthly",
         status: "active",
         current_period_end: currentPeriodEnd.toISOString(),
       },
       {
-        onConflict: "fan_id,creator_id",
+        onConflict: `${subscriptionUserColumn},creator_id`,
       }
     );
 
@@ -68,6 +70,7 @@ export async function cancelSubscription(creatorId: string): Promise<boolean> {
     }
 
     const supabase = await getSupabaseUniversalClient();
+    const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
     // 更新状态为 canceled，并设置 cancelled_at 时间戳
     const { error } = await supabase
       .from("subscriptions")
@@ -75,7 +78,7 @@ export async function cancelSubscription(creatorId: string): Promise<boolean> {
         status: "canceled",
         cancelled_at: new Date().toISOString(),
       })
-      .eq("fan_id", user.id)
+      .eq(subscriptionUserColumn, user.id)
       .eq("creator_id", creatorId);
 
     if (error) {
@@ -110,21 +113,17 @@ export async function listSubscribers(creatorId: string): Promise<
 > {
   try {
     const supabase = await getSupabaseUniversalClient();
+    const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
     const { data, error } = await supabase
       .from("subscriptions")
       .select(
         `
         id,
-        fan_id,
         status,
         starts_at,
-        ends_at,
+        current_period_end,
         cancelled_at,
-        created_at,
-        profiles!subscriptions_fan_id_fkey (
-          display_name,
-          avatar_url
-        )
+        created_at
       `
       )
       .eq("creator_id", creatorId)
@@ -135,17 +134,48 @@ export async function listSubscribers(creatorId: string): Promise<
       return [];
     }
 
-    return (data || []).map((sub: any) => ({
-      id: sub.id,
-      fan_id: sub.fan_id,
-      fan_display_name: sub.profiles?.display_name || null,
-      fan_avatar_url: sub.profiles?.avatar_url || null,
-      status: sub.status,
-      starts_at: sub.starts_at,
-      ends_at: sub.ends_at,
-      cancelled_at: sub.cancelled_at,
-      created_at: sub.created_at,
+    type SubscriptionRow = {
+      id: string;
+      status: string;
+      starts_at: string;
+      current_period_end?: string | null;
+      cancelled_at: string | null;
+      created_at: string;
+    } & Partial<Record<"subscriber_id" | "fan_id" | "user_id", string | null>>;
+
+    const rows = ((data as SubscriptionRow[] | null) || []).map((sub) => ({
+      ...sub,
+      subscriberId: getSubscriptionUserId(sub, subscriptionUserColumn),
     }));
+
+    const subscriberIds = rows
+      .map((row) => row.subscriberId)
+      .filter((id): id is string => typeof id === "string" && id.length > 0);
+
+    const { data: profiles } =
+      subscriberIds.length > 0
+        ? await supabase
+            .from("profiles")
+            .select("id, display_name, avatar_url")
+            .in("id", subscriberIds)
+        : { data: [] };
+
+    const profileMap = new Map((profiles || []).map((profile) => [profile.id, profile]));
+
+    return rows.map((sub) => {
+      const profile = sub.subscriberId ? profileMap.get(sub.subscriberId) : null;
+      return {
+        id: sub.id,
+        fan_id: sub.subscriberId || "",
+        fan_display_name: profile?.display_name || null,
+        fan_avatar_url: profile?.avatar_url || null,
+        status: sub.status,
+        starts_at: sub.starts_at,
+        ends_at: sub.current_period_end || sub.starts_at,
+        cancelled_at: sub.cancelled_at,
+        created_at: sub.created_at,
+      };
+    });
   } catch (err) {
     console.error("[paywall] listSubscribers exception:", err);
     return [];
@@ -164,7 +194,7 @@ export async function getCreatorEarnings(creatorId: string): Promise<
     amount_cents: number;
     status: string;
     available_on: string | null;
-    metadata: any;
+    metadata: Record<string, unknown> | null;
     created_at: string;
   }>
 > {
@@ -183,15 +213,25 @@ export async function getCreatorEarnings(creatorId: string): Promise<
     }
 
     // 过滤出真正属于该创作者的交易
-    return (data || [])
-      .filter((t: any) => {
+    type TransactionRow = {
+      id: string;
+      type: string;
+      amount_cents: number;
+      status: string;
+      available_on: string | null;
+      created_at: string;
+      metadata: Record<string, unknown> | null;
+    };
+
+    return ((data as TransactionRow[] | null) || [])
+      .filter((t) => {
         // 如果是订阅或PPV，检查 metadata 中的 creator_id
-        if (t.metadata?.creator_id === creatorId) {
+        if (t.metadata && t.metadata.creator_id === creatorId) {
           return true;
         }
         return false;
       })
-      .map((t: any) => ({
+      .map((t) => ({
         id: t.id,
         type: t.type,
         amount_cents: t.amount_cents,
@@ -232,10 +272,11 @@ export async function isActiveSubscriber(
 
   try {
     const supabase = await getSupabaseUniversalClient();
+    const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
     const { data, error } = await supabase
       .from("subscriptions")
       .select("id")
-      .eq("fan_id", fanId)
+      .eq(subscriptionUserColumn, fanId)
       .eq("creator_id", creatorId)
       .eq("status", "active")
       .gt("current_period_end", new Date().toISOString())
@@ -261,7 +302,8 @@ export async function isActiveSubscriber(
  */
 export async function unlockPost(
   postId: string,
-  priceCents?: number
+  priceCents?: number,
+  idempotencyKey?: string
 ): Promise<{ success: boolean; error?: string; balance_after_cents?: number }> {
   try {
     const user = await getCurrentUserUniversal();
@@ -287,9 +329,10 @@ export async function unlockPost(
     }
 
     // 调用原子扣费函数（在数据库内部完成：检查余额 -> 扣费 -> 记录交易 -> 创建购买）
-    const { data, error } = await supabase.rpc("rpc_purchase_post", {
+    const { data, error } = await supabase.rpc("unlock_ppv", {
       p_post_id: postId,
       p_user_id: user.id,
+      p_idempotency_key: idempotencyKey ?? null,
     });
 
     if (error) {
@@ -307,11 +350,14 @@ export async function unlockPost(
 
     return {
       success: true,
-      balance_after_cents: data.balance_after_cents,
+      balance_after_cents: data.balance_after_cents ?? data.balance ?? 0,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("[paywall] unlockPost exception:", err);
-    return { success: false, error: err?.message || "Unknown error" };
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
   }
 }
 
@@ -348,9 +394,12 @@ export async function getWalletBalance(): Promise<{
       success: true,
       balance_cents: data.balance_cents || 0,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("[paywall] getWalletBalance exception:", err);
-    return { success: false, error: err?.message || "Unknown error" };
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
   }
 }
 
@@ -451,11 +500,12 @@ export async function canViewPost(postId: string, creatorId?: string): Promise<b
 export async function getMyPaywallState(userId: string): Promise<PaywallState | null> {
   try {
     const supabase = await getSupabaseUniversalClient();
+    const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
     // 1. 查询 active subscriptions
     const { data: subscriptions, error: subError } = await supabase
       .from("subscriptions")
       .select("creator_id")
-      .eq("fan_id", userId)
+      .eq(subscriptionUserColumn, userId)
       .eq("status", "active")
       .gt("current_period_end", new Date().toISOString());
 
@@ -484,5 +534,107 @@ export async function getMyPaywallState(userId: string): Promise<PaywallState | 
   } catch (err) {
     console.error("[paywall] getMyPaywallState exception:", err);
     return null;
+  }
+}
+
+/**
+ * 批量检查用户对多个 creator 的订阅状态（避免 N+1 查询）
+ * @param fanId 用户 ID
+ * @param creatorIds Creator ID 数组
+ * @returns Map<creatorId, boolean> - 是否订阅
+ */
+export async function batchCheckSubscriptions(
+  fanId: string | null,
+  creatorIds: string[]
+): Promise<Map<string, boolean>> {
+  const result = new Map<string, boolean>();
+
+  if (!fanId || creatorIds.length === 0) {
+    creatorIds.forEach((id) => result.set(id, false));
+    return result;
+  }
+
+  try {
+    const supabase = await getSupabaseUniversalClient();
+    const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
+    const now = new Date().toISOString();
+
+    // 批量查询所有订阅状态
+    const { data: subscriptions, error } = await supabase
+      .from("subscriptions")
+      .select("creator_id")
+      .eq(subscriptionUserColumn, fanId)
+      .eq("status", "active")
+      .gt("current_period_end", now)
+      .in("creator_id", creatorIds);
+
+    if (error) {
+      console.error("[paywall] batchCheckSubscriptions error:", error);
+      creatorIds.forEach((id) => result.set(id, false));
+      return result;
+    }
+
+    // 初始化所有 creator 为 false
+    creatorIds.forEach((id) => result.set(id, false));
+
+    // 设置有订阅的 creator 为 true
+    subscriptions?.forEach((sub) => {
+      result.set(sub.creator_id, true);
+    });
+
+    return result;
+  } catch (err) {
+    console.error("[paywall] batchCheckSubscriptions exception:", err);
+    creatorIds.forEach((id) => result.set(id, false));
+    return result;
+  }
+}
+
+/**
+ * 批量检查用户对多个 post 的购买状态（避免 N+1 查询）
+ * @param fanId 用户 ID
+ * @param postIds Post ID 数组
+ * @returns Map<postId, boolean> - 是否购买
+ */
+export async function batchCheckPurchases(
+  fanId: string | null,
+  postIds: string[]
+): Promise<Map<string, boolean>> {
+  const result = new Map<string, boolean>();
+
+  if (!fanId || postIds.length === 0) {
+    postIds.forEach((id) => result.set(id, false));
+    return result;
+  }
+
+  try {
+    const supabase = await getSupabaseUniversalClient();
+
+    // 批量查询所有购买状态
+    const { data: purchases, error } = await supabase
+      .from("purchases")
+      .select("post_id")
+      .eq("fan_id", fanId)
+      .in("post_id", postIds);
+
+    if (error) {
+      console.error("[paywall] batchCheckPurchases error:", error);
+      postIds.forEach((id) => result.set(id, false));
+      return result;
+    }
+
+    // 初始化所有 post 为 false
+    postIds.forEach((id) => result.set(id, false));
+
+    // 设置已购买的 post 为 true
+    purchases?.forEach((purchase) => {
+      result.set(purchase.post_id, true);
+    });
+
+    return result;
+  } catch (err) {
+    console.error("[paywall] batchCheckPurchases exception:", err);
+    postIds.forEach((id) => result.set(id, false));
+    return result;
   }
 }

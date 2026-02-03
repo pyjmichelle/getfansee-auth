@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-server";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { createClient } from "@/lib/supabase-server";
 
 interface RouteContext {
   params: Promise<{
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     }
 
     const { id: postId } = await context.params;
-    const supabase = getSupabaseBrowserClient();
+    const supabase = await createClient();
 
     const { data, error } = await supabase
       .from("post_tags")
@@ -41,7 +41,18 @@ export async function GET(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Failed to fetch tags" }, { status: 500 });
     }
 
-    const tags = data?.map((item: any) => item.tags).filter(Boolean) || [];
+    interface PostTagItem {
+      tags: {
+        id: string;
+        name: string;
+        slug: string;
+        category: string | null;
+      } | null;
+    }
+    const tags =
+      ((data as unknown as PostTagItem[] | null) ?? [])
+        .map((item) => item.tags)
+        .filter((tag): tag is NonNullable<PostTagItem["tags"]> => Boolean(tag)) || [];
     return NextResponse.json({ success: true, tags });
   } catch (err: unknown) {
     console.error("[api/posts/tags] Exception:", err);
@@ -69,7 +80,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Invalid tag IDs" }, { status: 400 });
     }
 
-    const supabase = getSupabaseBrowserClient();
+    const supabase = await createClient();
 
     // 验证用户是否拥有该帖子
     const { data: post, error: postError } = await supabase
@@ -126,7 +137,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ success: false, error: "Missing tag ID" }, { status: 400 });
     }
 
-    const supabase = getSupabaseBrowserClient();
+    const supabase = await createClient();
 
     // 验证用户是否拥有该帖子
     const { data: post, error: postError } = await supabase

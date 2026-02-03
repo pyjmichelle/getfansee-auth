@@ -9,8 +9,9 @@
 import { chromium, Browser, BrowserContext, Page } from "playwright";
 import * as fs from "fs";
 import * as path from "path";
+import { getBaseUrl } from "../_shared/env";
 
-const BASE_URL = process.env.BASE_URL || "http://127.0.0.1:3000";
+const BASE_URL = getBaseUrl();
 const ROLE = process.env.ROLE || "fan";
 const SESSIONS_DIR = path.join(process.cwd(), "artifacts", "agent-browser-full", "sessions");
 

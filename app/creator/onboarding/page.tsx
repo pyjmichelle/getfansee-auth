@@ -9,10 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 // 所有服务器端函数都通过 API 调用，不直接导入
-import { submitVerification, type VerificationData } from "@/lib/kyc";
+import { submitVerification } from "@/lib/kyc";
 import { toast } from "sonner";
 import { LoadingState } from "@/components/loading-state";
 
@@ -96,7 +96,7 @@ export default function CreatorOnboardingPage() {
         }
       } catch (err) {
         console.error("[onboarding] loadProfile error", err);
-        setError("加载 profile 失败");
+        setError("Failed to load profile");
       } finally {
         setIsLoading(false);
       }
@@ -109,12 +109,12 @@ export default function CreatorOnboardingPage() {
     e.preventDefault();
 
     if (!currentUserId) {
-      setError("用户未登录");
+      setError("User not logged in");
       return;
     }
 
     if (!formData.display_name.trim()) {
-      setError("Display name 是必填项");
+      setError("Display name is required");
       return;
     }
 
@@ -134,13 +134,13 @@ export default function CreatorOnboardingPage() {
       });
 
       if (!updateResponse.ok) {
-        setError("更新失败，请重试");
+        setError("Update failed. Please try again");
         return;
       }
 
       const updateData = await updateResponse.json();
       if (updateData.success) {
-        toast.success("Profile 更新成功！");
+        toast.success("Profile updated successfully");
         // 重新加载 profile 以获取最新数据（包括 age_verified）
         const profileResponse = await fetch("/api/profile");
         if (profileResponse.ok) {
@@ -148,7 +148,11 @@ export default function CreatorOnboardingPage() {
           if (profileData) {
             setProfile(profileData);
             // 如果用户还未完成 KYC，进入 KYC 步骤
-            if (!(profileData as any).age_verified) {
+            interface ProfileData {
+              age_verified?: boolean;
+              [key: string]: unknown;
+            }
+            if (!(profileData as ProfileData).age_verified) {
               setCurrentStep("kyc");
             } else {
               setTimeout(() => {
@@ -162,11 +166,11 @@ export default function CreatorOnboardingPage() {
           setCurrentStep("kyc");
         }
       } else {
-        setError("更新失败，请重试");
+        setError("Update failed. Please try again");
       }
     } catch (err) {
       console.error("[onboarding] handleSubmit error", err);
-      setError("更新失败，请重试");
+      setError("Update failed. Please try again");
     } finally {
       setIsSaving(false);
     }
@@ -192,13 +196,15 @@ export default function CreatorOnboardingPage() {
 
       <main className="container max-w-2xl mx-auto px-4 py-6">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Creator Onboarding</h1>
-          <p className="text-muted-foreground">完善你的 creator profile 信息</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Become a Creator</h1>
+          <p className="text-muted-foreground">
+            Set up your profile and start monetizing your content
+          </p>
         </div>
 
         {error && (
           <div className="bg-destructive/10 border border-destructive/20 rounded-3xl p-4 mb-6">
-            <p className="text-destructive font-medium">错误</p>
+            <p className="text-destructive font-medium">Error</p>
             <p className="text-sm text-muted-foreground mt-1">{error}</p>
           </div>
         )}
@@ -215,7 +221,7 @@ export default function CreatorOnboardingPage() {
                   </AvatarFallback>
                 </Avatar>
                 <Label htmlFor="avatar_url" className="text-sm text-muted-foreground">
-                  Avatar URL (可选)
+                  Avatar URL (Optional)
                 </Label>
                 <Input
                   id="avatar_url"
@@ -246,7 +252,7 @@ export default function CreatorOnboardingPage() {
 
               {/* Bio */}
               <div className="space-y-2">
-                <Label htmlFor="bio">Bio (可选)</Label>
+                <Label htmlFor="bio">Bio (Optional)</Label>
                 <Textarea
                   id="bio"
                   placeholder="Tell us about yourself..."
@@ -267,7 +273,7 @@ export default function CreatorOnboardingPage() {
                   disabled={isSaving}
                   className="flex-1 border-border bg-card hover:bg-card rounded-xl"
                 >
-                  取消
+                  Cancel
                 </Button>
                 <Button
                   type="submit"
@@ -275,41 +281,45 @@ export default function CreatorOnboardingPage() {
                   variant="gradient"
                   className="flex-1 rounded-xl"
                 >
-                  {isSaving ? "保存中..." : "下一步"}
+                  {isSaving ? "Saving…" : "Next"}
                 </Button>
               </div>
             </form>
           ) : (
             <div className="space-y-6">
               {verificationStatus?.status === "pending" && (
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
-                  <p className="text-sm text-amber-500">您的身份验证申请正在审核中，请耐心等待。</p>
+                <div className="bg-[var(--bg-purple-500-10)] border border-[var(--border-purple-500-20)] rounded-xl p-4">
+                  <p className="text-sm text-[var(--color-purple-400)]">
+                    Your verification request is under review. Please wait patiently.
+                  </p>
                 </div>
               )}
 
               {verificationStatus?.status === "rejected" && (
                 <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-4">
-                  <p className="text-sm text-destructive font-medium mb-2">验证被拒绝</p>
+                  <p className="text-sm text-destructive font-medium mb-2">Verification Rejected</p>
                   {verificationStatus.rejection_reason && (
                     <p className="text-sm text-muted-foreground">
-                      原因：{verificationStatus.rejection_reason}
+                      Reason: {verificationStatus.rejection_reason}
                     </p>
                   )}
-                  <p className="text-sm text-muted-foreground mt-2">您可以重新提交申请。</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    You can resubmit your application.
+                  </p>
                 </div>
               )}
 
               {verificationStatus?.status === "approved" && (
                 <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4">
                   <p className="text-sm text-green-600 dark:text-green-400 font-medium">
-                    身份验证已通过
+                    Verification Approved
                   </p>
                   <Button
                     onClick={() => router.push("/home")}
                     variant="gradient"
                     className="mt-4 rounded-xl"
                   >
-                    完成
+                    Complete
                   </Button>
                 </div>
               )}
@@ -321,12 +331,12 @@ export default function CreatorOnboardingPage() {
                     if (!currentUserId) return;
 
                     if (!kycData.real_name.trim() || !kycData.birth_date || !kycData.country) {
-                      toast.error("请填写所有必填字段");
+                      toast.error("Please fill in all required fields");
                       return;
                     }
 
                     if (kycData.id_doc_files.length === 0) {
-                      toast.error("请上传至少一张证件照片");
+                      toast.error("Please upload at least one ID document photo");
                       return;
                     }
 
@@ -340,7 +350,7 @@ export default function CreatorOnboardingPage() {
                       });
 
                       if (success) {
-                        toast.success("身份验证申请已提交，等待审核");
+                        toast.success("Verification request submitted. Awaiting review");
                         // 通过 API 获取验证状态
                         const verificationResponse = await fetch("/api/kyc/verification");
                         if (verificationResponse.ok) {
@@ -351,11 +361,13 @@ export default function CreatorOnboardingPage() {
                           }
                         }
                       } else {
-                        toast.error("提交失败，请重试");
+                        toast.error("Submission failed. Please try again");
                       }
-                    } catch (err: any) {
+                    } catch (err: unknown) {
                       console.error("[onboarding] submit KYC error:", err);
-                      toast.error(err.message || "提交失败，请重试");
+                      const message =
+                        err instanceof Error ? err.message : "Submission failed. Please try again";
+                      toast.error(message);
                     } finally {
                       setIsSubmittingKYC(false);
                     }
@@ -364,7 +376,7 @@ export default function CreatorOnboardingPage() {
                 >
                   <div className="space-y-2">
                     <Label htmlFor="real_name">
-                      真实姓名 <span className="text-destructive">*</span>
+                      Legal Name <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="real_name"
@@ -379,7 +391,7 @@ export default function CreatorOnboardingPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="birth_date">
-                      出生日期 <span className="text-destructive">*</span>
+                      Date of Birth <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="birth_date"
@@ -394,14 +406,14 @@ export default function CreatorOnboardingPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="country">
-                      国家 <span className="text-destructive">*</span>
+                      Country <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="country"
                       type="text"
                       value={kycData.country}
                       onChange={(e) => setKycData({ ...kycData, country: e.target.value })}
-                      placeholder="例如：US, CN, JP"
+                      placeholder="e.g., US, CN, JP"
                       required
                       disabled={isSubmittingKYC}
                       className="bg-card border-border rounded-xl"
@@ -410,7 +422,7 @@ export default function CreatorOnboardingPage() {
 
                   <div className="space-y-2">
                     <Label>
-                      证件照片 <span className="text-destructive">*</span>
+                      ID Document Photos <span className="text-destructive">*</span>
                     </Label>
                     <div className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-border transition-colors">
                       <input
@@ -432,8 +444,8 @@ export default function CreatorOnboardingPage() {
                         <Upload className="w-8 h-8 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">
                           {kycData.id_doc_files.length > 0
-                            ? `已选择 ${kycData.id_doc_files.length} 个文件`
-                            : "点击上传证件照片（支持多张）"}
+                            ? `${kycData.id_doc_files.length} file${kycData.id_doc_files.length > 1 ? "s" : ""} selected`
+                            : "Click to upload ID document photos (multiple files supported)"}
                         </span>
                       </label>
                     </div>
@@ -459,7 +471,7 @@ export default function CreatorOnboardingPage() {
                       disabled={isSubmittingKYC}
                       className="flex-1 border-border bg-card hover:bg-card rounded-xl"
                     >
-                      上一步
+                      Previous
                     </Button>
                     <Button
                       type="submit"
@@ -467,7 +479,7 @@ export default function CreatorOnboardingPage() {
                       variant="gradient"
                       className="flex-1 rounded-xl"
                     >
-                      {isSubmittingKYC ? "提交中..." : "提交验证"}
+                      {isSubmittingKYC ? "Submitting…" : "Submit Verification"}
                     </Button>
                   </div>
                 </form>

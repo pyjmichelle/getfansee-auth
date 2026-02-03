@@ -85,12 +85,12 @@ export default function ReportPageClient({ initialType, initialId }: ReportPageC
     e.preventDefault();
 
     if (!formData.reason) {
-      toast.error("请选择举报原因");
+      toast.error("Please select a report reason");
       return;
     }
 
     if (!id) {
-      toast.error("无效的举报目标");
+      toast.error("Invalid report target");
       return;
     }
 
@@ -104,16 +104,16 @@ export default function ReportPageClient({ initialType, initialId }: ReportPageC
       });
 
       if (success) {
-        toast.success("举报已提交，我们会尽快处理");
+        toast.success("Report submitted. We will review it shortly");
         setTimeout(() => {
           router.back();
         }, 1500);
       } else {
-        toast.error("提交失败，请重试");
+        toast.error("Submission failed. Please try again");
       }
     } catch (err) {
       console.error("[report] submit error:", err);
-      toast.error("提交失败，请重试");
+      toast.error("Submission failed. Please try again");
     } finally {
       setIsSubmitting(false);
     }
@@ -149,8 +149,8 @@ export default function ReportPageClient({ initialType, initialId }: ReportPageC
 
         <Card className="bg-card border border-border rounded-3xl p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex items-start gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-              <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-4 bg-[var(--bg-purple-500-10)] border border-[var(--border-purple-500-20)] rounded-xl">
+              <AlertTriangle className="w-5 h-5 text-[var(--color-purple-400)] flex-shrink-0 mt-0.5" />
               <div className="text-sm text-muted-foreground">
                 <p className="font-medium text-foreground mb-1">Reporting {type}</p>
                 <p>

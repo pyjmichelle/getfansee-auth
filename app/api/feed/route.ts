@@ -3,6 +3,7 @@ import { listFeed } from "@/lib/posts";
 import { canViewPost } from "@/lib/paywall";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getMockPostsWithCreators, shouldUseMockData } from "@/lib/mock-data";
+import { type Post } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,28 +23,40 @@ export async function GET(request: NextRequest) {
     // If no posts and mock data is enabled, use mock posts
     if (posts.length === 0 && shouldUseMockData()) {
       const mockPosts = getMockPostsWithCreators();
-      posts = mockPosts.slice(offset, offset + limit) as any;
+      posts = mockPosts.slice(offset, offset + limit) as Post[];
     }
 
-    // 在服务端检查每个 post 的可见性状态
+    // 在服务端检查每个 post 的可见性状态（并行执行，避免异步瀑布流）
     const unlockedStates: Record<string, boolean> = {};
-    for (const post of posts) {
-      // Creator 本人永远可见
+
+    // 先处理不需要异步检查的 posts
+    const postsToCheck: Post[] = [];
+    posts.forEach((post) => {
       if (post.creator_id === user.id) {
         unlockedStates[post.id] = true;
       } else if (post.visibility === "free") {
-        // 免费内容永远可见
         unlockedStates[post.id] = true;
       } else {
-        // 调用服务端函数检查解锁状态
+        postsToCheck.push(post);
+      }
+    });
+
+    // 并行执行所有 canViewPost 检查（使用 Promise.all 避免瀑布流）
+    if (postsToCheck.length > 0) {
+      const checkPromises = postsToCheck.map(async (post) => {
         try {
           const canView = await canViewPost(post.id, post.creator_id);
-          unlockedStates[post.id] = canView;
+          return { postId: post.id, canView };
         } catch (err) {
           console.error("[api] feed canViewPost error", err);
-          unlockedStates[post.id] = false;
+          return { postId: post.id, canView: false };
         }
-      }
+      });
+
+      const results = await Promise.all(checkPromises);
+      results.forEach(({ postId, canView }) => {
+        unlockedStates[postId] = canView;
+      });
     }
 
     return NextResponse.json({

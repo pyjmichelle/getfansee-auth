@@ -16,7 +16,6 @@ import { type Post } from "@/lib/types";
 import { toast } from "sonner";
 import { MultiMediaUpload } from "@/components/multi-media-upload";
 import { type MediaFile } from "@/lib/storage";
-import Link from "next/link";
 import { Lock } from "lucide-react";
 
 const supabase = getSupabaseBrowserClient();
@@ -83,7 +82,7 @@ export default function EditPostPage() {
           } else if (response.status === 403) {
             setError("Not authorized to edit this post");
           } else {
-            setError("加载失败，请重试");
+            setError("Failed to load. Please try again");
           }
           return;
         }
@@ -108,7 +107,7 @@ export default function EditPostPage() {
         }
       } catch (err) {
         console.error("[edit-post] loadData error:", err);
-        setError("加载失败，请重试");
+        setError("Failed to load. Please try again");
       } finally {
         setIsLoading(false);
       }
@@ -123,12 +122,12 @@ export default function EditPostPage() {
     e.preventDefault();
 
     if (!currentUserId || !post) {
-      setError("用户未登录或 post 不存在");
+      setError("User not logged in or post does not exist");
       return;
     }
 
     if (!formData.content.trim()) {
-      setError("Content 是必填项");
+      setError("Content is required");
       return;
     }
 
@@ -149,7 +148,7 @@ export default function EditPostPage() {
       const result = await response.json();
 
       if (result.success) {
-        toast.success("Post 更新成功！");
+        toast.success("Post updated successfully");
         setTimeout(() => {
           router.push("/creator/studio/post/list");
         }, 500);
@@ -185,7 +184,7 @@ export default function EditPostPage() {
             <div className="text-center">
               <h1 className="text-2xl font-bold text-foreground mb-4">Error</h1>
               <p className="text-muted-foreground mb-6">{error}</p>
-              <Button onClick={() => router.push("/creator/studio/post/list")}>返回列表</Button>
+              <Button onClick={() => router.push("/creator/studio/post/list")}>Back to List</Button>
             </div>
           </div>
         </main>
@@ -204,12 +203,14 @@ export default function EditPostPage() {
       <main className="container max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Edit Post</h1>
-          <p className="text-muted-foreground">修改你的内容（价格和可见性已锁定）</p>
+          <p className="text-muted-foreground">
+            Edit your content (price and visibility are locked)
+          </p>
         </div>
 
         {error && (
           <div className="bg-destructive/10 border border-destructive/20 rounded-3xl p-6 mb-8">
-            <p className="text-destructive font-medium">错误</p>
+            <p className="text-destructive font-medium">Error</p>
             <p className="text-sm text-muted-foreground mt-1">{error}</p>
           </div>
         )}
@@ -220,7 +221,9 @@ export default function EditPostPage() {
             <div className="bg-muted border border-border rounded-xl p-4 space-y-3">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Lock className="w-4 h-4" />
-                <span className="text-sm font-medium">价格和可见性已锁定（不可修改）</span>
+                <span className="text-sm font-medium">
+                  Price and visibility are locked (cannot be modified)
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <Badge
@@ -229,14 +232,14 @@ export default function EditPostPage() {
                       ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 rounded-lg"
                       : post.visibility === "subscribers"
                         ? "bg-primary/10 text-primary border-primary/20 rounded-lg"
-                        : "bg-purple-500/10 text-purple-500 border-purple-500/20 rounded-lg"
+                        : "glass bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)] border-[var(--border-purple-500-20)] rounded-lg"
                   }
                 >
                   {post.visibility === "free"
                     ? "Free"
                     : post.visibility === "subscribers"
-                      ? "Subscribers"
-                      : `PPV $${((post.price_cents || 0) / 100).toFixed(2)}`}
+                      ? "Exclusive"
+                      : `Premium $${((post.price_cents || 0) / 100).toFixed(2)}`}
                 </Badge>
                 {post.visibility === "ppv" && (
                   <span className="text-sm text-muted-foreground">
@@ -248,7 +251,7 @@ export default function EditPostPage() {
 
             {/* Title */}
             <div className="space-y-2">
-              <Label htmlFor="title">Title (可选)</Label>
+              <Label htmlFor="title">Title (Optional)</Label>
               <Input
                 id="title"
                 type="text"
@@ -277,11 +280,14 @@ export default function EditPostPage() {
 
             {/* Multi Media Upload */}
             <div className="space-y-2">
-              <Label>Media (可选，支持多文件，新上传的文件会追加到现有媒体)</Label>
+              <Label>
+                Media (Optional, supports multiple files. New uploads will be appended to existing
+                media)
+              </Label>
               {post.media && post.media.length > 0 && (
                 <div className="mb-3 p-3 bg-muted rounded-lg">
                   <p className="text-xs text-muted-foreground mb-2">
-                    现有媒体 ({post.media.length} 个文件)
+                    Existing media ({post.media.length} file{post.media.length > 1 ? "s" : ""})
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {post.media.map((media) => (
@@ -295,7 +301,7 @@ export default function EditPostPage() {
               <MultiMediaUpload
                 onUploadComplete={(files) => {
                   setMediaFiles(files);
-                  toast.success(`已上传 ${files.length} 个新文件`);
+                  toast.success(`${files.length} new file${files.length > 1 ? "s" : ""} uploaded`);
                 }}
                 onUploadError={(error) => {
                   setError(error);
@@ -305,7 +311,8 @@ export default function EditPostPage() {
               />
               {mediaFiles.length > 0 && (
                 <p className="text-xs text-muted-foreground mt-2">
-                  新上传 {mediaFiles.length} 个文件（将追加到现有媒体）
+                  {mediaFiles.length} new file{mediaFiles.length > 1 ? "s" : ""} uploaded (will be
+                  appended to existing media)
                 </p>
               )}
             </div>

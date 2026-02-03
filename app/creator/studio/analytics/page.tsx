@@ -115,7 +115,7 @@ export default function AnalyticsPage() {
 
         {/* Performance Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="p-6">
+          <Card className="p-6 lg:p-8 rounded-2xl">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                 <Eye className="w-5 h-5" />
@@ -127,9 +127,9 @@ export default function AnalyticsPage() {
             <p className="text-sm text-muted-foreground">Total Views</p>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-6 lg:p-8 rounded-2xl">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-[var(--bg-pink-500-10)] text-[var(--color-pink-500)] flex items-center justify-center">
                 <Heart className="w-5 h-5" />
               </div>
               <div>
@@ -139,7 +139,7 @@ export default function AnalyticsPage() {
             <p className="text-sm text-muted-foreground">Total Likes</p>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-6 lg:p-8 rounded-2xl">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-500 flex items-center justify-center">
                 <TrendingUp className="w-5 h-5" />
@@ -151,7 +151,7 @@ export default function AnalyticsPage() {
             <p className="text-sm text-muted-foreground">Engagement Rate</p>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-6 lg:p-8 rounded-2xl">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-accent/10 text-accent flex items-center justify-center">
                 <Users className="w-5 h-5" />
@@ -195,8 +195,8 @@ export default function AnalyticsPage() {
                   {post.type === "free"
                     ? "Free"
                     : post.type === "subscribers"
-                      ? "Subscribers"
-                      : "PPV"}
+                      ? "Exclusive"
+                      : "Premium"}
                 </Badge>
               </div>
             ))}
@@ -204,8 +204,8 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Audience Demographics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Card className="p-6 lg:p-8 rounded-2xl">
             <h2 className="text-lg font-semibold text-foreground mb-4">Audience by Age</h2>
             <div className="space-y-4">
               {audienceStats.byAge.map((stat) => (
@@ -216,7 +216,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
                     <div
-                      className="bg-primary rounded-full h-2 transition-all"
+                      className="bg-primary rounded-full h-2 transition-[width] motion-safe:transition-[width] motion-reduce:transition-none"
                       style={{ width: `${stat.percentage}%` }}
                     />
                   </div>
@@ -225,7 +225,7 @@ export default function AnalyticsPage() {
             </div>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-6 lg:p-8 rounded-2xl">
             <h2 className="text-lg font-semibold text-foreground mb-4">Audience by Country</h2>
             <div className="space-y-4">
               {audienceStats.byCountry.map((stat) => (
@@ -236,7 +236,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
                     <div
-                      className="bg-accent rounded-full h-2 transition-all"
+                      className="bg-accent rounded-full h-2 transition-[width] motion-safe:transition-[width] motion-reduce:transition-none"
                       style={{ width: `${stat.percentage}%` }}
                     />
                   </div>

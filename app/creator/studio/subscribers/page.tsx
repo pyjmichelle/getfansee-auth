@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Search, Calendar, DollarSign, MoreVertical } from "lucide-react";
+import { ArrowLeft, Search, Calendar, MoreVertical } from "lucide-react";
 import { NavHeader } from "@/components/nav-header";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,7 +19,7 @@ import { ensureProfile } from "@/lib/auth";
 import { getProfile } from "@/lib/profile";
 // listSubscribers 通过 API 调用，不直接导入
 import Link from "next/link";
-import { formatDistanceToNow, format } from "date-fns";
+import { format } from "date-fns";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -47,7 +46,6 @@ export default function SubscribersPage() {
     role: "fan" | "creator";
     avatar?: string;
   } | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -64,7 +62,6 @@ export default function SubscribersPage() {
         }
 
         await ensureProfile();
-        setCurrentUserId(session.user.id);
 
         const profile = await getProfile(session.user.id);
         if (profile) {
@@ -135,7 +132,7 @@ export default function SubscribersPage() {
         );
       case "will_cancel":
         return (
-          <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 rounded-lg">
+          <Badge className="bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)] border-[var(--border-purple-500-20)] rounded-lg">
             Expiring Soon
           </Badge>
         );
@@ -154,7 +151,6 @@ export default function SubscribersPage() {
   const willCancelCount = subscribers.filter(
     (s) => getSubscriberStatus(s) === "will_cancel"
   ).length;
-  const canceledCount = subscribers.filter((s) => getSubscriberStatus(s) === "canceled").length;
 
   if (isLoading) {
     return (
@@ -189,8 +185,8 @@ export default function SubscribersPage() {
         </Button>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Subscribers</h1>
-          <p className="text-muted-foreground">Manage your subscriber base</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">My Subscribers</h1>
+          <p className="text-muted-foreground">Manage your fanbase and track subscriber activity</p>
         </div>
 
         {/* Stats Overview */}
@@ -205,7 +201,7 @@ export default function SubscribersPage() {
           </div>
           <div className="bg-card border border-border rounded-3xl p-6">
             <p className="text-sm text-muted-foreground mb-1">Expiring Soon</p>
-            <p className="text-3xl font-bold text-amber-500">{willCancelCount}</p>
+            <p className="text-3xl font-bold text-[var(--color-purple-400)]">{willCancelCount}</p>
           </div>
         </div>
 

@@ -36,10 +36,10 @@ export function LockBadge({
     return (
       <Badge
         variant="secondary"
-        className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/20"
+        className="glass bg-subscribe-gradient/20 text-[var(--color-pink-400)] border-[var(--border-pink-500-30)] hover:bg-subscribe-gradient/30 hover:border-[var(--border-pink-500-30)] shadow-sm"
       >
-        <Lock className="w-3 h-3 mr-1" />
-        {variant === "compact" ? "Subscribers" : "Subscribers Only"}
+        <Lock className="w-3 h-3 mr-1" aria-hidden="true" />
+        {variant === "compact" ? "Exclusive" : "Exclusive Content"}
       </Badge>
     );
   }
@@ -47,9 +47,9 @@ export function LockBadge({
   return (
     <Badge
       variant="secondary"
-      className="bg-accent/10 text-accent hover:bg-accent/20 border-accent/20"
+      className="glass bg-unlock-gradient/20 text-[var(--color-orange-400)] border-[var(--border-orange-500-30)] hover:bg-unlock-gradient/30 hover:border-[var(--border-orange-500-30)] shadow-sm"
     >
-      <DollarSign className="w-3 h-3 mr-1" />${price}
+      <DollarSign className="w-3 h-3 mr-1" aria-hidden="true" />${price}
     </Badge>
   );
 }

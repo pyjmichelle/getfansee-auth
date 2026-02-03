@@ -1,0 +1,28 @@
+
+> my-v0-project@0.1.0 build /Users/puyijun/Downloads/authentication-flow-design (1)
+> next build
+
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Environments: .env.local
+
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 4.5s
+   Running TypeScript ...
+Failed to compile.
+
+./playwright.config.ts:68:5
+Type error: No overload matches this call.
+  The last overload gave the following error.
+    Type '{ cookies: { name: string; value: string; domain: string; path: string; expires: number; httpOnly: false; secure: boolean; sameSite: "Lax"; }[]; }' is not assignable to type 'StorageState | undefined'.
+      Property 'origins' is missing in type '{ cookies: { name: string; value: string; domain: string; path: string; expires: number; httpOnly: false; secure: boolean; sameSite: "Lax"; }[]; }' but required in type '{ cookies: { name: string; value: string; domain: string; path: string; expires: number; httpOnly: boolean; secure: boolean; sameSite: "Lax" | "Strict" | "None"; }[]; origins: { origin: string; localStorage: { ...; }[]; }[]; }'.
+
+[0m [90m 66 |[39m     [90m/* 增加重试网络请求 */[39m
+ [90m 67 |[39m     ignoreHTTPSErrors[33m:[39m [36mtrue[39m[33m,[39m
+[31m[1m>[22m[39m[90m 68 |[39m     storageState[33m:[39m {
+ [90m    |[39m     [31m[1m^[22m[39m
+ [90m 69 |[39m       cookies[33m:[39m [
+ [90m 70 |[39m         {
+ [90m 71 |[39m           name[33m:[39m [32m"playwright-test-mode"[39m[33m,[39m[0m
+Next.js build worker exited with code: 1 and signal: null
+ ELIFECYCLE  Command failed with exit code 1.

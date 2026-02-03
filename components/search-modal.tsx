@@ -147,7 +147,18 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
             query.length >= 2 &&
             creators.length === 0 &&
             posts.length === 0 &&
-            tags.length === 0 && <CommandEmpty>No results found for "{query}"</CommandEmpty>}
+            tags.length === 0 && (
+              <CommandEmpty className="py-12">
+                <div className="flex flex-col items-center gap-3">
+                  <Search className="h-10 w-10 text-muted-foreground" aria-hidden="true" />
+                  <p className="text-sm font-medium text-foreground">No results found</p>
+                  <p className="text-xs text-muted-foreground text-center max-w-sm">
+                    No results found for &quot;{query}&quot;. Try a different search term or browse
+                    creators.
+                  </p>
+                </div>
+              </CommandEmpty>
+            )}
 
           {!isSearching && tags.length > 0 && (
             <CommandGroup heading="Tags">
@@ -172,7 +183,19 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
           )}
 
           {!isSearching && query.length < 2 && (
-            <CommandEmpty>Type at least 2 characters to search</CommandEmpty>
+            <CommandEmpty className="py-12">
+              <div className="flex flex-col items-center gap-3">
+                <Search className="h-10 w-10 text-muted-foreground" aria-hidden="true" />
+                <p className="text-sm font-medium text-foreground">Start searching</p>
+                <p className="text-xs text-muted-foreground text-center max-w-sm">
+                  Type at least 2 characters to search. Use{" "}
+                  <kbd className="px-1.5 py-0.5 text-xs font-semibold bg-muted rounded border">
+                    #
+                  </kbd>{" "}
+                  to search tags.
+                </p>
+              </div>
+            </CommandEmpty>
           )}
 
           {!isSearching && creators.length > 0 && (

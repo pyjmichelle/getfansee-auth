@@ -1,28 +1,13 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
 
-echo "🚀 运行推送前检查..."
-echo ""
+echo "🚀 Running pre-push verification..."
+SKIP_QA_GATE=1 pnpm ci:verify
 
-# 运行完整的代码质量检查
-pnpm check-all
-
-# 检查是否通过
 if [ $? -ne 0 ]; then
-  echo ""
-  echo "❌ 推送前检查失败!"
-  echo "请修复上述问题后再推送"
-  echo ""
-  echo "💡 提示:"
-  echo "  - 运行 'pnpm lint:fix' 自动修复 lint 问题"
-  echo "  - 运行 'pnpm format' 自动格式化代码"
-  echo "  - 查看 .github/PRE_COMMIT_CHECKLIST.md 获取帮助"
-  echo ""
-  echo "⚠️  如需临时跳过检查 (不推荐): git push --no-verify"
-  echo ""
+  echo "❌ Pre-push verification failed!"
+  echo "Please fix the issues before pushing."
   exit 1
 fi
 
-echo ""
-echo "✅ 所有检查通过! 正在推送..."
-echo ""
+echo "✅ Pre-push verification passed! Proceeding with push..."

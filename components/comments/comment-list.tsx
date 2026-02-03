@@ -168,13 +168,20 @@ export function CommentList({
               <Button
                 variant="outline"
                 onClick={handleLoadMore}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleLoadMore();
+                  }
+                }}
                 disabled={isLoadingMore}
                 className="min-h-[44px]"
+                aria-label="Load more comments"
               >
                 {isLoadingMore ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
-                    Loading...
+                    Loading…
                   </>
                 ) : (
                   "Load More Comments"

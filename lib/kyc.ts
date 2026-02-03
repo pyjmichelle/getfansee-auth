@@ -7,7 +7,6 @@
 
 import { getSupabaseBrowserClient } from "./supabase-browser";
 import { getCurrentUser } from "./auth";
-import { uploadFile } from "./storage";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -45,7 +44,7 @@ export async function submitVerification(userId: string, data: VerificationData)
           data: { publicUrl },
         } = supabase.storage.from("avatars").getPublicUrl(uploadData.path);
         idDocUrls.push(publicUrl);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("[kyc] upload file exception:", err);
         throw err;
       }
@@ -182,7 +181,22 @@ export async function listPendingVerifications(): Promise<
       return [];
     }
 
-    return (data || []).map((v: any) => ({
+    type VerificationRow = {
+      id: string;
+      user_id: string;
+      real_name: string;
+      birth_date: string;
+      country: string;
+      id_doc_urls: string[];
+      status: string;
+      created_at: string;
+      profiles?: {
+        display_name?: string;
+        avatar_url?: string;
+      } | null;
+    };
+
+    return ((data as VerificationRow[] | null | undefined) || []).map((v) => ({
       id: v.id,
       user_id: v.user_id,
       real_name: v.real_name,

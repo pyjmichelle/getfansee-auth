@@ -98,7 +98,7 @@ describe("Paywall API Integration", () => {
       await adminClient.from("posts").delete().eq("id", testPPVPostId);
     }
     if (testFanId) {
-      await adminClient.from("subscriptions").delete().eq("fan_id", testFanId);
+      await adminClient.from("subscriptions").delete().eq("subscriber_id", testFanId);
       await adminClient.from("wallet_transactions").delete().eq("user_id", testFanId);
       await adminClient.from("user_wallets").delete().eq("id", testFanId);
       await adminClient.from("profiles").delete().eq("id", testFanId);

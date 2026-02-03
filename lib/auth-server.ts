@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cookies, headers } from "next/headers";
 import { getSupabaseServerClient } from "./supabase-server";
 
 export type AppUser = {
@@ -7,26 +8,95 @@ export type AppUser = {
   email: string;
 };
 
+function isRetryableAuthError(error: unknown): boolean {
+  const message =
+    typeof error === "object" && error && "message" in error
+      ? String((error as { message?: unknown }).message)
+      : String(error);
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("fetch failed") ||
+    normalized.includes("econnreset") ||
+    normalized.includes("socket") ||
+    normalized.includes("timeout") ||
+    normalized.includes("retryable")
+  );
+}
+
+async function getUserWithRetries(supabase: Awaited<ReturnType<typeof getSupabaseServerClient>>) {
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+    if (!error) {
+      return { user, error: null };
+    }
+    lastError = error;
+    if (!isRetryableAuthError(error) || attempt === 2) {
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+  }
+  return { user: null, error: lastError };
+}
+
+const E2E_COOKIE_LOG_WINDOW_MS = 5000;
+let e2eCookieLastLoggedAt = 0;
+
 export async function getCurrentUser(): Promise<AppUser | null> {
   const supabase = await getSupabaseServerClient();
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession();
+  const { user, error } = await getUserWithRetries(supabase);
+
+  const isE2E = process.env.E2E === "1" || process.env.PLAYWRIGHT_TEST_MODE === "true";
+
+  if ((error || !user) && isE2E) {
+    const now = Date.now();
+    if (now - e2eCookieLastLoggedAt >= E2E_COOKIE_LOG_WINDOW_MS) {
+      e2eCookieLastLoggedAt = now;
+      try {
+        const cookieStore = await cookies();
+        const names = cookieStore.getAll().map((c) => c.name);
+        let pathInfo = "unknown";
+        try {
+          const h = await headers();
+          const invokePath = h.get("x-invoke-path") ?? h.get("x-nextjs-matched-path");
+          const referer = h.get("referer") ?? h.get("x-url") ?? "";
+          if (invokePath) pathInfo = invokePath;
+          else if (referer) {
+            try {
+              pathInfo = new URL(referer).pathname;
+            } catch {
+              pathInfo = referer.slice(0, 80);
+            }
+          }
+        } catch {
+          // ignore
+        }
+        console.warn(
+          "[E2E auth] getCurrentUser null: path=" + pathInfo,
+          "cookies=[" + names.join(", ") + "]"
+        );
+      } catch {
+        // ignore
+      }
+    }
+  }
 
   if (error) {
-    console.error("[auth-server] getSession error", error);
+    console.error("[auth-server] getUser error", error);
     return null;
   }
 
-  if (!session?.user || !session.user.email) {
+  if (!user || !user.email) {
     return null;
   }
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("is_banned, ban_until")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .single();
 
   if (profile) {
@@ -34,12 +104,13 @@ export async function getCurrentUser(): Promise<AppUser | null> {
     const isBanned = profile.is_banned || (profile.ban_until && new Date(profile.ban_until) > now);
 
     if (isBanned) {
+      // better-auth-best-practices: 被禁用户自动登出
       await supabase.auth.signOut();
       return null;
     }
   }
 
-  return { id: session.user.id, email: session.user.email };
+  return { id: user.id, email: user.email };
 }
 
 export async function ensureProfile() {

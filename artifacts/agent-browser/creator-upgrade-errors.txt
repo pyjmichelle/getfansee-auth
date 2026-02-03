@@ -1,0 +1,34 @@
+Console Error: In HTML, %s cannot be a descendant of <%s>.
+This will cause a hydration error.%s <p> p 
+
+  ...
+    <FocusScope asChild={true} loop={true} trapped={true} onMountAutoFocus={function handleEvent} ...>
+      <Primitive.div tabIndex={-1} asChild={true} ref={function} ...>
+        <Slot tabIndex={-1} onKeyDown={function FocusScope.useCallback[handleKeyDown]} ref={function}>
+          <SlotClone tabIndex={-1} onKeyDown={function FocusScope.useCallback[handleKeyDown]} ref={function}>
+            <DismissableLayer role="alertdialog" id="radix-_r_f_" aria-describedby="radix-_r_h_" ...>
+              <Primitive.div role="alertdialog" id="radix-_r_f_" aria-describedby="radix-_r_h_" ...>
+                <div role="alertdialog" id="radix-_r_f_" aria-describedby="radix-_r_h_" aria-labelledby="radix-_r_g_" ...>
+                  <Slottable>
+                    <AlertDialogHeader className="text-cente...">
+                      <div data-slot="alert-dial..." className="flex flex-...">
+                        <div>
+                        <AlertDialogTitle>
+                        <AlertDialogDescription className="space-y-3">
+                          <AlertDialogDescription data-slot="alert-dial..." className="text-muted...">
+                            <DialogDescription __scopeDialog={{Dialog:[...]}} data-slot="alert-dial..." ...>
+                              <Primitive.p id="radix-_r_h_" data-slot="alert-dial..." className="text-muted..." ...>
+>                               <p
+>                                 id="radix-_r_h_"
+>                                 data-slot="alert-dialog-description"
+>                                 className="text-muted-foreground text-sm space-y-3"
+>                                 ref={null}
+>                               >
+>                                 <p>
+                                  ...
+                    ...
+                  ...
+    ...
+
+Console Error: <%s> cannot contain a nested %s.
+See this log for the ancestor stack trace. p <p>
