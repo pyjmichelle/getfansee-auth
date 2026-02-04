@@ -163,7 +163,6 @@ export async function signUpWithEmail(
 
     // 检查是否立即获得了 session（邮箱验证关闭的情况）
     const hasSession = !!data?.session;
-    console.log("[auth] signUp result:", { hasSession, userId: data?.user?.id });
 
     return { success: true, session: hasSession };
   } catch (err: unknown) {
