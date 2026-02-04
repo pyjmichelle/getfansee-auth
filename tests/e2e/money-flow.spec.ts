@@ -61,7 +61,17 @@ test.describe("Money Flow - 护城河测试", () => {
 
     await page.goto(`${BASE_URL}/posts/${fixtures.posts.ppv.id}`);
     await waitForPageLoad(page);
-    await expect(page.getByTestId("post-page")).toBeVisible({ timeout: 20_000 });
+    // 等待帖子页面加载，检查是否有错误
+    const postPageOrError = page.getByTestId("post-page").or(page.getByTestId("post-page-error"));
+    await expect(postPageOrError).toBeVisible({ timeout: 20_000 });
+    if (
+      await page
+        .getByTestId("post-page-error")
+        .isVisible()
+        .catch(() => false)
+    ) {
+      throw new Error(`Post page error: post ${postId} failed to load`);
+    }
 
     await expect(page.getByTestId("post-locked-overlay")).toBeVisible({ timeout: 20_000 });
 

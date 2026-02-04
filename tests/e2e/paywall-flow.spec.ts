@@ -105,9 +105,21 @@ test.describe("Paywall Flow E2E", () => {
           headers: { "Content-Type": "application/json" },
         }
       );
-      expect(createRes.ok(), "create-post-with-media must succeed").toBe(true);
-      const createBody = (await createRes.json()) as { success?: boolean; postId?: string };
-      expect(createBody.success && createBody.postId).toBeTruthy();
+      const createBody = (await createRes.json()) as {
+        success?: boolean;
+        postId?: string;
+        error?: string;
+      };
+      if (!createRes.ok() || !createBody.success) {
+        // 获取更多诊断信息
+        const profileRes = await creatorPage.request.get(`${origin}/api/profile`);
+        const profileBody = await profileRes.json().catch(() => ({}));
+        throw new Error(
+          `create-post-with-media failed: ${createBody.error || "unknown"}, ` +
+            `status: ${createRes.status()}, ` +
+            `profile: ${JSON.stringify(profileBody)}`
+        );
+      }
       const postId = createBody.postId as string;
 
       // 5. Fan 查看 Feed（应该看到 locked 遮罩）

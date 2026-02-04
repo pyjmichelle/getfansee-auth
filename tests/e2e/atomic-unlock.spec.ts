@@ -63,7 +63,19 @@ test.describe("Atomic PPV Unlock Tests", () => {
 
     await page.goto(`${BASE_URL}/posts/${fixtures.posts.ppv.id}`);
     await waitForPageLoad(page);
-    await expect(page.getByTestId("post-page")).toBeVisible({ timeout: 20_000 });
+    // 等待帖子页面加载，检查是否有错误
+    const postPageOrError = page.getByTestId("post-page").or(page.getByTestId("post-page-error"));
+    await expect(postPageOrError).toBeVisible({ timeout: 20_000 });
+    if (
+      await page
+        .getByTestId("post-page-error")
+        .isVisible()
+        .catch(() => false)
+    ) {
+      throw new Error(
+        `Post page error: fixtures.posts.ppv (${fixtures.posts.ppv.id}) failed to load`
+      );
+    }
 
     const unlockBtn = page.getByTestId("post-unlock-button");
     await expect(unlockBtn).toBeVisible({ timeout: 20_000 });
@@ -95,7 +107,19 @@ test.describe("Atomic PPV Unlock Tests", () => {
 
     await page.goto(`${BASE_URL}/posts/${fixtures.posts.ppv.id}`);
     await waitForPageLoad(page);
-    await expect(page.getByTestId("post-page")).toBeVisible({ timeout: 20_000 });
+    // 等待帖子页面加载，检查是否有错误
+    const postPageOrError = page.getByTestId("post-page").or(page.getByTestId("post-page-error"));
+    await expect(postPageOrError).toBeVisible({ timeout: 20_000 });
+    if (
+      await page
+        .getByTestId("post-page-error")
+        .isVisible()
+        .catch(() => false)
+    ) {
+      throw new Error(
+        `Post page error: fixtures.posts.ppv (${fixtures.posts.ppv.id}) failed to load`
+      );
+    }
 
     const preUrl = page.url();
     if (preUrl.includes("/auth")) {
