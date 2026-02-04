@@ -1,19 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-server";
-import { createClient } from "@supabase/supabase-js";
-
-// 使用 Service Role Key 绕过 RLS
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
+import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
 type RechargePayload = {
   amount: number; // 美元金额
@@ -38,13 +25,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Invalid amount" }, { status: 400 });
     }
 
-    console.log("[api/wallet/recharge] Processing recharge:", {
-      userId: user.id,
-      amount,
-    });
+    // Removed debug console.log - vercel-react-best-practices
 
     // 使用 Admin 客户端绕过 RLS
-    const supabase = getSupabaseAdmin();
+    const supabase = getSupabaseAdminClient();
     const amountCents = Math.round(amount * 100);
 
     // 1. 获取或创建钱包账户
@@ -115,11 +99,7 @@ export async function POST(request: NextRequest) {
       // 不返回错误，因为余额已更新
     }
 
-    console.log("[api/wallet/recharge] Recharge successful:", {
-      userId: user.id,
-      amount,
-      newBalance: newBalance / 100,
-    });
+    // Removed debug console.log - vercel-react-best-practices
 
     return NextResponse.json({
       success: true,

@@ -46,9 +46,11 @@ export default function ResendVerificationPage() {
 
       setIsLoading(false);
       setSent(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[resend] Error:", err);
-      setError(err?.message || "Failed to send verification email. Please try again.");
+      const message =
+        err instanceof Error ? err.message : "Failed to send verification email. Please try again.";
+      setError(message);
       setIsLoading(false);
     }
   };

@@ -70,7 +70,7 @@ export async function uploadFile(
   file: File,
   postId?: string,
   mediaId?: string,
-  onProgress?: (progress: UploadProgress) => void
+  _onProgress?: (progress: UploadProgress) => void
 ): Promise<MediaFile> {
   try {
     const user = await getCurrentUser();
@@ -118,7 +118,7 @@ export async function uploadFile(
       metadata.media_id = mediaId;
     }
 
-    const { data, error } = await supabase.storage.from("media").upload(filePath, file, {
+    const { data: _data, error } = await supabase.storage.from("media").upload(filePath, file, {
       cacheControl: "3600",
       upsert: false,
       metadata: metadata,
@@ -145,7 +145,7 @@ export async function uploadFile(
       fileName: file.name,
       fileSize: file.size,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("[storage] uploadFile exception:", err);
     throw err;
   }
@@ -174,9 +174,10 @@ export async function uploadFiles(
         onProgress?.(i, progress);
       });
       results.push(result);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(`[storage] uploadFiles: file ${i} failed:`, err);
-      throw new Error(`文件 "${file.name}" 上传失败: ${err.message}`);
+      const message = err instanceof Error ? err.message : "Unknown error";
+      throw new Error(`文件 "${file.name}" 上传失败: ${message}`);
     }
   }
 
@@ -193,7 +194,7 @@ export async function uploadFiles(
 export async function uploadAvatar(
   file: File,
   userId: string,
-  onProgress?: (progress: UploadProgress) => void
+  _onProgress?: (progress: UploadProgress) => void
 ): Promise<string> {
   try {
     // 验证文件类型（仅支持图片）
@@ -216,7 +217,7 @@ export async function uploadAvatar(
     const filePath = `${userId}/${timestamp}-${uuid}.${fileExt}`;
 
     // 上传到 Supabase Storage (avatars bucket)
-    const { data, error } = await supabase.storage.from("avatars").upload(filePath, file, {
+    const { data: _data, error } = await supabase.storage.from("avatars").upload(filePath, file, {
       cacheControl: "3600",
       upsert: false,
     });
@@ -232,7 +233,7 @@ export async function uploadAvatar(
     } = supabase.storage.from("avatars").getPublicUrl(filePath);
 
     return publicUrl;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("[storage] uploadAvatar exception:", err);
     throw err;
   }

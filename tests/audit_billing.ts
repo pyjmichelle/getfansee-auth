@@ -97,10 +97,13 @@ async function testInsufficientBalance() {
 
     const userId = signUpData.user.id;
 
-    // 2. 确保钱包存在（余额为 0）
+    // 2. 确保钱包存在（余额为 0）- 使用 wallet_accounts 表
     const { error: walletError } = await supabase
-      .from("user_wallets")
-      .upsert({ id: userId, balance_cents: 0 }, { onConflict: "id" });
+      .from("wallet_accounts")
+      .upsert(
+        { user_id: userId, available_balance_cents: 0, pending_balance_cents: 0 },
+        { onConflict: "user_id" }
+      );
 
     if (walletError) {
       recordTest("初始化钱包", false, walletError.message);
@@ -191,11 +194,11 @@ async function testInsufficientBalance() {
       recordTest("余额不足购买失败", false, "Purchase should have failed but succeeded");
     }
 
-    // 5. 验证余额未变化
+    // 5. 验证余额未变化 - 使用 wallet_accounts 表
     const { data: walletData, error: walletCheckError } = await supabase
-      .from("user_wallets")
-      .select("balance_cents")
-      .eq("id", userId)
+      .from("wallet_accounts")
+      .select("available_balance_cents")
+      .eq("user_id", userId)
       .single();
 
     if (walletCheckError) {
@@ -203,10 +206,14 @@ async function testInsufficientBalance() {
       return;
     }
 
-    if (walletData.balance_cents === 0) {
+    if (walletData.available_balance_cents === 0) {
       recordTest("验证余额未变化（仍为 0）", true);
     } else {
-      recordTest("验证余额未变化", false, `Balance should be 0, got: ${walletData.balance_cents}`);
+      recordTest(
+        "验证余额未变化",
+        false,
+        `Balance should be 0, got: ${walletData.available_balance_cents}`
+      );
     }
 
     // 6. 清理
@@ -242,10 +249,13 @@ async function testSufficientBalance() {
 
     const userId = signUpData.user.id;
 
-    // 2. 创建钱包并充值 1000 cents = $10.00
+    // 2. 创建钱包并充值 1000 cents = $10.00 - 使用 wallet_accounts 表
     const { error: walletError } = await supabase
-      .from("user_wallets")
-      .upsert({ id: userId, balance_cents: 1000 }, { onConflict: "id" });
+      .from("wallet_accounts")
+      .upsert(
+        { user_id: userId, available_balance_cents: 1000, pending_balance_cents: 0 },
+        { onConflict: "user_id" }
+      );
 
     if (walletError) {
       recordTest("创建钱包并充值", false, walletError.message);
@@ -330,11 +340,11 @@ async function testSufficientBalance() {
       return;
     }
 
-    // 5. 验证余额已扣费（1000 - 500 = 500）
+    // 5. 验证余额已扣费（1000 - 500 = 500）- 使用 wallet_accounts 表
     const { data: walletData, error: walletCheckError } = await supabase
-      .from("user_wallets")
-      .select("balance_cents")
-      .eq("id", userId)
+      .from("wallet_accounts")
+      .select("available_balance_cents")
+      .eq("user_id", userId)
       .single();
 
     if (walletCheckError) {
@@ -342,13 +352,13 @@ async function testSufficientBalance() {
       return;
     }
 
-    if (walletData.balance_cents === 500) {
+    if (walletData.available_balance_cents === 500) {
       recordTest("验证余额已扣费（1000 -> 500）", true);
     } else {
       recordTest(
         "验证余额已扣费",
         false,
-        `Balance should be 500, got: ${walletData.balance_cents}`
+        `Balance should be 500, got: ${walletData.available_balance_cents}`
       );
     }
 

@@ -2,7 +2,7 @@
 
 ## 📋 需要配置的 Secrets
 
-要让 CI/CD 正常工作,你需要在 GitHub 仓库中配置以下 3 个 Secrets:
+要让 CI/CD 正常工作,你需要在 GitHub 仓库中配置以下 3 个 **必需** Secrets。若启用 Claude Code Action（PR 语义审查、@claude CI 失败分析），需额外配置 **可选** Secret `ANTHROPIC_API_KEY`。
 
 ---
 
@@ -99,6 +99,7 @@ Value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ✅ NEXT_PUBLIC_SUPABASE_URL
 ✅ NEXT_PUBLIC_SUPABASE_ANON_KEY
 ✅ SUPABASE_SERVICE_ROLE_KEY
+（可选）ANTHROPIC_API_KEY — 启用 Claude PR 审查与 @claude CI 分析时添加
 ```
 
 ### 方法 2: 触发 CI 测试
@@ -161,6 +162,22 @@ Secrets 只在 GitHub Actions 中使用。
 
 ---
 
+## 🔮 可选：Claude Code Action（ANTHROPIC_API_KEY）
+
+若希望启用 **Claude 语义级 PR 审查**（`claude-pr-review.yml`）或 **评论触发 CI 失败分析**（在 PR/Issue 中 @claude 询问「为什么 CI 失败」），需在仓库或 Org 中配置:
+
+- **Name**: `ANTHROPIC_API_KEY`
+- **Value**: 你的 [Anthropic API Key](https://console.anthropic.com/)（用于 anthropics/claude-code-action）
+
+配置后:
+
+- 每个 PR 打开/更新时会触发 Claude 做代码质量、潜在 bug、安全、性能的语义级审查并发表评论。
+- 在 PR 或 Issue 评论中写「@claude 为什么 CI 失败了」可触发 Claude 查看 workflow/job 日志并回复。
+
+未配置时，`claude-pr-review.yml` 与 `claude-ci-helper.yml` 中依赖该密钥的步骤会失败，**不影响**主 CI（ci.yml）、code-quality、pr-auto-review。详见 [WORKFLOW_GUIDE.md](workflows/WORKFLOW_GUIDE.md) 中「Claude Code Action（可选）」一节。
+
+---
+
 ## 🔒 安全最佳实践
 
 ### ✅ 应该做的
@@ -190,6 +207,7 @@ Secrets 只在 GitHub Actions 中使用。
 - [ ] ✅ 配置了 Workflow permissions 为 "Read and write"
 - [ ] ✅ 勾选了 "Allow GitHub Actions to create and approve pull requests"
 - [ ] ✅ 触发了一次 CI 运行验证配置
+- [ ] （可选）若启用 Claude Code Action，添加了 `ANTHROPIC_API_KEY`
 
 ---
 

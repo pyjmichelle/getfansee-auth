@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { addWatermarkToImage, shouldAddWatermark } from "@/lib/watermark";
-import { getCurrentUser } from "@/lib/auth";
 import { PaywallModal } from "@/components/paywall-modal";
 import type { Post } from "@/lib/types";
 
@@ -71,9 +70,11 @@ function VideoPlayer({
         src={videoUrl}
         controls
         className="w-full h-auto max-h-[600px] rounded-3xl"
-        onError={(e) => {
+        preload="metadata"
+        onError={() => {
           console.error("[MediaDisplay] Video load error:", videoUrl);
         }}
+        aria-label="Post video content"
         onLoadedMetadata={(e) => {
           const video = e.currentTarget;
           // 如果内容被锁定且启用了预览，设置 10 秒限制
@@ -101,7 +102,7 @@ function VideoPlayer({
 
       {/* PPV 视频封面左下角 "10s Preview" 渐变标签 */}
       {!canView && post.preview_enabled && post.visibility === "ppv" && (
-        <div className="absolute bottom-4 left-4 px-3 py-1.5 bg-accent-gradient rounded-lg text-white text-xs font-semibold shadow-lg">
+        <div className="absolute bottom-4 left-4 px-3 py-1.5 glass bg-accent-gradient/90 rounded-lg text-foreground text-xs font-semibold shadow-lg">
           10s Preview
         </div>
       )}
@@ -127,17 +128,8 @@ export function MediaDisplay({
   creatorDisplayName,
 }: MediaDisplayProps) {
   const [watermarkedImages, setWatermarkedImages] = useState<Map<string, string>>(new Map());
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [showPaywallModal, setShowPaywallModal] = useState(false);
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
-
-  useEffect(() => {
-    const checkUser = async () => {
-      const user = await getCurrentUser();
-      setCurrentUserId(user?.id || null);
-    };
-    checkUser();
-  }, []);
 
   // 处理图片水印（新逻辑：仅当 watermark_enabled=true 且 media_type=image）
   useEffect(() => {
@@ -148,7 +140,7 @@ export function MediaDisplay({
     imageMedia.forEach(async (media) => {
       // 检查是否需要添加水印
       const needsWatermark = shouldAddWatermark(
-        post.watermark_enabled,
+        post.watermark_enabled ?? false,
         media.media_type,
         isCreator
       );
@@ -245,6 +237,8 @@ export function MediaDisplay({
                       <Button
                         size="sm"
                         onClick={onSubscribe}
+                        data-testid="media-subscribe-button"
+                        data-post-id={post.id}
                         variant="gradient"
                         className="rounded-xl"
                       >
@@ -254,6 +248,8 @@ export function MediaDisplay({
                       <Button
                         size="sm"
                         onClick={onUnlock}
+                        data-testid="media-unlock-button"
+                        data-post-id={post.id}
                         variant="gradient"
                         className="rounded-xl"
                       >
@@ -302,18 +298,36 @@ export function MediaDisplay({
                           {post.visibility === "subscribers" ? (
                             <Button
                               size="sm"
-                              onClick={onSubscribe}
-                              className="bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#050505]"
+                              variant="subscribe-gradient"
+                              onClick={onSubscribe ? () => onSubscribe() : undefined}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  onSubscribe?.();
+                                }
+                              }}
+                              className="min-h-[44px] font-semibold shadow-lg"
+                              aria-label="Subscribe to see full video"
                             >
-                              Subscribe to view full video
+                              Subscribe to See Full Video
                             </Button>
                           ) : (
                             <Button
                               size="sm"
-                              onClick={onUnlock}
-                              className="bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-[#050505]"
+                              variant="unlock-gradient"
+                              data-testid="media-unlock-button"
+                              data-post-id={post.id}
+                              onClick={onUnlock ? () => onUnlock() : undefined}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  onUnlock?.();
+                                }
+                              }}
+                              className="min-h-[44px] font-semibold shadow-lg"
+                              aria-label={`Unlock full video for $${((post.price_cents || 0) / 100).toFixed(2)}`}
                             >
-                              Unlock for ${((post.price_cents || 0) / 100).toFixed(2)}
+                              Unlock Full Video - ${((post.price_cents || 0) / 100).toFixed(2)}
                             </Button>
                           )}
                         </div>
@@ -342,6 +356,8 @@ export function MediaDisplay({
                           <Button
                             size="sm"
                             onClick={onSubscribe}
+                            data-testid="media-subscribe-button"
+                            data-post-id={post.id}
                             variant="gradient"
                             className="rounded-xl"
                           >
@@ -351,6 +367,8 @@ export function MediaDisplay({
                           <Button
                             size="sm"
                             onClick={onUnlock}
+                            data-testid="media-unlock-button"
+                            data-post-id={post.id}
                             variant="gradient"
                             className="rounded-xl"
                           >
@@ -388,6 +406,7 @@ export function MediaDisplay({
                     src={getMediaUrl(media)}
                     alt={media.file_name || "Post media"}
                     className="w-full h-auto object-contain max-h-[600px] rounded-3xl"
+                    loading="lazy"
                     onError={(e) => {
                       console.error("[MediaDisplay] Image load error:", media.media_url);
                       const target = e.target as HTMLImageElement;

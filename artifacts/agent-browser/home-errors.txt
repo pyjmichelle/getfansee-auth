@@ -1,0 +1,1 @@
+Request Failed: http://127.0.0.1:3000/auth?_rsc=1bcw7 - net::ERR_ABORTED

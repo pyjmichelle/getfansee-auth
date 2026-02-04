@@ -9,8 +9,25 @@
 import { chromium, Browser, BrowserContext, Page } from "playwright";
 import * as fs from "fs";
 import * as path from "path";
+import { getBaseUrl } from "../_shared/env";
 
-const BASE_URL = process.env.BASE_URL || "http://127.0.0.1:3000";
+// Load .env.local for environment variables (Supabase URLs, etc)
+const envLocalPath = path.join(process.cwd(), ".env.local");
+if (fs.existsSync(envLocalPath)) {
+  const envContent = fs.readFileSync(envLocalPath, "utf-8");
+  envContent.split("\n").forEach((line) => {
+    line = line.trim();
+    if (line && !line.startsWith("#")) {
+      const [key, ...valueParts] = line.split("=");
+      const value = valueParts.join("=").trim();
+      if (key && value && !process.env[key]) {
+        process.env[key] = value;
+      }
+    }
+  });
+}
+
+const BASE_URL = getBaseUrl();
 const ROLE = process.env.ROLE || "fan";
 const HEADED = process.env.HEADED === "true";
 const SESSIONS_DIR = path.join(process.cwd(), "artifacts", "agent-browser-full", "sessions");
@@ -68,6 +85,41 @@ async function autoLogin(role: "fan" | "creator") {
 
     page = await context.newPage();
 
+    // Capture console errors for debugging
+    const consoleErrors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error") {
+        consoleErrors.push(msg.text());
+        console.log(`   [Browser Error] ${msg.text()}`);
+      }
+      if (msg.type() === "warning") {
+        console.log(`   [Browser Warn] ${msg.text()}`);
+      }
+    });
+    page.on("pageerror", (error) => {
+      consoleErrors.push(error.message);
+      console.log(`   [Page Error] ${error.message}`);
+    });
+    page.on("requestfailed", (request) => {
+      const url = request.url();
+      if (url.includes("/auth/v1/") || url.includes("supabase")) {
+        console.warn(`   [Request Failed] ${request.method()} ${url}`);
+        console.warn(`   → ${request.failure()?.errorText || "unknown error"}`);
+      }
+    });
+    page.on("response", (response) => {
+      const url = response.url();
+      if (url.includes("/auth/v1/token")) {
+        console.log(`   [Auth Response] ${response.status()} ${url}`);
+      }
+    });
+    page.on("request", (request) => {
+      const url = request.url();
+      if (url.includes("/auth/v1/") || url.includes("supabase")) {
+        console.log(`   [Auth Request] ${request.method()} ${url}`);
+      }
+    });
+
     // Navigate to auth page
     console.log(`\n→ Opening ${BASE_URL}/auth`);
     await page.goto(`${BASE_URL}/auth`, {
@@ -77,67 +129,240 @@ async function autoLogin(role: "fan" | "creator") {
 
     console.log("\n🔑 Attempting automated login...");
 
-    // Wait for auth page to load
-    await page.waitForTimeout(2000);
+    // #region agent log
+    fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location: "auto-login.ts:START",
+        message: "开始登录",
+        data: { url: page.url(), role: ROLE },
+        timestamp: Date.now(),
+        sessionId: "debug-session",
+        hypothesisId: "START",
+      }),
+    }).catch(() => {});
+    // #endregion
 
-    // Ensure we're on the login tab (not signup)
+    // Check for age gate first
+    console.log("   → Checking for age gate...");
+    await page.waitForTimeout(1000);
+    const ageGateModal = page.locator('[data-testid="age-gate-modal"], [data-testid="agegate"]');
+    const hasAgeGate = await ageGateModal
+      .first()
+      .isVisible()
+      .catch(() => false);
+    if (hasAgeGate) {
+      console.log("   → Age gate detected, accepting...");
+      await page
+        .locator('[data-testid="age-gate-yes"], [data-testid="agegate-continue"]')
+        .first()
+        .click();
+      await page.waitForTimeout(1500);
+      // #region agent log
+      fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          location: "auto-login.ts:AGE_GATE",
+          message: "Age gate accepted",
+          data: { hadAgeGate: true },
+          timestamp: Date.now(),
+          sessionId: "debug-session",
+          hypothesisId: "A",
+        }),
+      }).catch(() => {});
+      // #endregion
+    } else {
+      console.log("   → No age gate present");
+    }
+
+    // Wait for auth page to fully load
+    await page.waitForTimeout(1000);
+
+    // Ensure we're on the login tab (not signup) using testid
     console.log("   → Ensuring login tab is active...");
     try {
-      const loginTab = page
-        .locator('button[role="tab"]:has-text("Login"), button:has-text("Login")')
-        .first();
-      await loginTab.click();
-      await page.waitForTimeout(500);
+      const loginTab = page.getByTestId("auth-tab-login");
+      const isVisible = await loginTab.isVisible().catch(() => false);
+      if (isVisible) {
+        await loginTab.click();
+        await page.waitForTimeout(500);
+        console.log("   → Clicked login tab");
+        // #region agent log
+        fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            location: "auto-login.ts:TAB",
+            message: "Login tab clicked",
+            data: {},
+            timestamp: Date.now(),
+            sessionId: "debug-session",
+            hypothesisId: "D",
+          }),
+        }).catch(() => {});
+        // #endregion
+      } else {
+        console.log("   → Login tab not visible");
+      }
     } catch (e) {
-      console.log("   → Login tab already active or not found");
+      console.log("   → Login tab error:", e);
     }
 
     // Fill in credentials using specific IDs
     console.log("   → Filling email...");
-    const emailInput = page.locator("#login-email");
+    const emailInput = page.getByTestId("auth-email");
     await emailInput.waitFor({ state: "visible", timeout: 10000 });
     await emailInput.fill(account.email);
+    // #region agent log
+    fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location: "auto-login.ts:EMAIL",
+        message: "Email filled",
+        data: { email: account.email },
+        timestamp: Date.now(),
+        sessionId: "debug-session",
+        hypothesisId: "B",
+      }),
+    }).catch(() => {});
+    // #endregion
 
     console.log("   → Filling password...");
-    const passwordInput = page.locator("#login-password");
+    const passwordInput = page.getByTestId("auth-password");
     await passwordInput.waitFor({ state: "visible", timeout: 10000 });
     await passwordInput.fill(account.password);
+    // #region agent log
+    fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location: "auto-login.ts:PASSWORD",
+        message: "Password filled",
+        data: { passwordLength: account.password.length },
+        timestamp: Date.now(),
+        sessionId: "debug-session",
+        hypothesisId: "B",
+      }),
+    }).catch(() => {});
+    // #endregion
 
     await page.waitForTimeout(500);
 
     // Submit the form
     console.log("   → Submitting login form...");
-    const submitButton = page.locator('button[type="submit"]:has-text("Sign In")').first();
+    const submitButton = page.getByTestId("auth-submit");
     await submitButton.click();
+    // #region agent log
+    fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location: "auto-login.ts:SUBMIT",
+        message: "Submit clicked",
+        data: {},
+        timestamp: Date.now(),
+        sessionId: "debug-session",
+        hypothesisId: "B",
+      }),
+    }).catch(() => {});
+    // #endregion
 
-    // Wait for the button to show "Signing in..." (loading state)
-    console.log("   → Waiting for form submission...");
-    await page.waitForTimeout(1000);
-
-    // Wait for navigation or error (up to 15 seconds)
     console.log("   → Waiting for login response...");
-    await Promise.race([
-      page.waitForURL((url) => !url.toString().includes("/auth"), { timeout: 15000 }),
-      page.waitForTimeout(15000),
-    ]);
 
-    // Check if login was successful
+    let authTokenStatus: number | null = null;
+    try {
+      const authResponse = await page.waitForResponse(
+        (response) => response.url().includes("/auth/v1/token"),
+        { timeout: 30000 }
+      );
+      authTokenStatus = authResponse.status();
+      console.log(`   [Auth Token Response] ${authTokenStatus}`);
+    } catch {
+      console.warn("   [Auth Token Response] timeout waiting for /auth/v1/token");
+      // In CI, give more time for network delays
+      if (process.env.CI === "true") {
+        console.warn("   [CI Mode] Waiting additional 5s for network stabilization...");
+        await page.waitForTimeout(5000);
+      }
+    }
+
+    const errorAlert = page.locator('[role="alert"], .alert-destructive').first();
+    let loginOutcome: "navigated" | "error" | "timeout" = "timeout";
+    // In CI, give more time for navigation
+    const navigationTimeout = process.env.CI === "true" ? 45000 : 30000;
+    try {
+      await page.waitForURL((url) => !url.toString().includes("/auth"), {
+        timeout: navigationTimeout,
+      });
+      loginOutcome = "navigated";
+    } catch {
+      loginOutcome = "timeout";
+      // In CI, wait a bit more and check again
+      if (process.env.CI === "true") {
+        console.warn("   [CI Mode] Initial navigation timeout, waiting 3s and rechecking...");
+        await page.waitForTimeout(3000);
+        const currentUrl = page.url();
+        if (!currentUrl.includes("/auth")) {
+          loginOutcome = "navigated";
+          console.log(`   [CI Mode] Navigation succeeded after retry: ${currentUrl}`);
+        }
+      }
+    }
+
+    // Check current state after submission
+    const urlAfterSubmit = page.url();
+    const bodyText = await page.textContent("body").catch(() => "");
+    // #region agent log
+    fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location: "auto-login.ts:AFTER_SUBMIT",
+        message: "After submit state",
+        data: {
+          url: urlAfterSubmit,
+          hasError: bodyText.includes("error") || bodyText.includes("Error"),
+          hasInvalid: bodyText.includes("Invalid") || bodyText.includes("incorrect"),
+        },
+        timestamp: Date.now(),
+        sessionId: "debug-session",
+        hypothesisId: "C",
+      }),
+    }).catch(() => {});
+    // #endregion
+
     const currentUrl = page.url();
     console.log(`   → Current URL: ${currentUrl}`);
 
-    // Check for error messages on the page
-    const errorAlert = await page
-      .locator('[role="alert"], .alert-destructive, [class*="error"]')
-      .first()
-      .textContent()
-      .catch(() => null);
-    if (errorAlert) {
-      console.error(`   ⚠️  Error message on page: ${errorAlert}`);
+    const errorAlertText = await errorAlert.textContent().catch(() => null);
+    if (errorAlertText) {
+      console.error(`   ⚠️  Error message on page: ${errorAlertText}`);
+      loginOutcome = "error";
     }
 
     if (currentUrl.includes("/auth")) {
       console.error("\n❌ Login failed - still on auth page");
       console.error(`   URL: ${currentUrl}`);
+      console.error(`   Outcome: ${loginOutcome}`);
+      if (authTokenStatus !== null) {
+        console.error(`   Auth token status: ${authTokenStatus}`);
+      }
+      const cookies = await context.cookies();
+      const cookieNames = cookies.map((cookie) => cookie.name);
+      console.error(`   Cookies: ${cookieNames.join(", ") || "none"}`);
+      const storageKeys = await page.evaluate(() => Object.keys(localStorage || {}));
+      console.error(`   LocalStorage keys: ${storageKeys.join(", ") || "none"}`);
+
+      // Output console errors
+      if (consoleErrors.length > 0) {
+        console.error(`\n   🔴 Browser Console Errors (${consoleErrors.length}):`);
+        consoleErrors.forEach((err, i) => {
+          console.error(`      ${i + 1}. ${err}`);
+        });
+      }
 
       // Get any visible error messages
       const pageText = await page.textContent("body");
@@ -150,6 +375,24 @@ async function autoLogin(role: "fan" | "creator") {
       const errorScreenshot = path.join(SESSIONS_DIR, `${role}-login-failed.png`);
       await page.screenshot({ path: errorScreenshot, fullPage: true });
       console.error(`   Screenshot: ${errorScreenshot}`);
+
+      // In CI, provide more context
+      if (process.env.CI === "true") {
+        console.error(`\n   🔍 CI Environment Debug Info:`);
+        console.error(`   - BASE_URL: ${BASE_URL}`);
+        console.error(
+          `   - NEXT_PUBLIC_SUPABASE_URL: ${process.env.NEXT_PUBLIC_SUPABASE_URL ? "set" : "not set"}`
+        );
+        console.error(
+          `   - NEXT_PUBLIC_SUPABASE_ANON_KEY: ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "set" : "not set"}`
+        );
+        console.error(`   - Test account email: ${account.email}`);
+        console.error(`   - This may indicate:`);
+        console.error(`     1. Network connectivity issues with Supabase`);
+        console.error(`     2. Test account credentials are incorrect`);
+        console.error(`     3. Test account does not exist in database`);
+        console.error(`     4. Server is not responding correctly`);
+      }
 
       process.exit(1);
     }
@@ -207,6 +450,17 @@ async function autoLogin(role: "fan" | "creator") {
       const errorScreenshot = path.join(SESSIONS_DIR, `${role}-verification-failed.png`);
       await page.screenshot({ path: errorScreenshot, fullPage: true });
       console.error(`   Screenshot saved: ${errorScreenshot}`);
+
+      // In CI, provide more context
+      if (process.env.CI === "true") {
+        console.error(`\n   🔍 CI Environment Debug Info:`);
+        console.error(`   - Expected page: ${account.testPage}`);
+        console.error(`   - Actual URL: ${finalUrl}`);
+        console.error(`   - This may indicate:`);
+        console.error(`     1. Session cookies are invalid`);
+        console.error(`     2. User profile is missing or incorrect role`);
+        console.error(`     3. Middleware is redirecting due to auth check failure`);
+      }
 
       process.exit(1);
     }

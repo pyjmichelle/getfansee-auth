@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Bell, Heart, DollarSign, UserPlus, Check } from "lucide-react";
 import { NavHeader } from "@/components/nav-header";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/empty-state";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { BottomNavigation } from "@/components/bottom-navigation";
+import { LoadingState } from "@/components/loading-state";
 import { getProfile } from "@/lib/profile";
 import { ensureProfile } from "@/lib/auth";
 import type { Notification } from "@/lib/types";
@@ -67,8 +67,20 @@ export default function NotificationsPage() {
           // 如果表不存在，使用空数组
           setNotifications([]);
         } else {
+          interface NotificationData {
+            id: string;
+            user_id?: string;
+            type?: string;
+            title?: string;
+            message?: string;
+            link?: string;
+            action_url?: string;
+            read?: boolean;
+            created_at?: string;
+            createdAt?: string;
+          }
           setNotifications(
-            (notificationsData || []).map((n: any) => ({
+            (notificationsData || []).map((n: NotificationData) => ({
               id: n.id,
               user_id: n.user_id || "",
               type: (n.type || "new_post") as Notification["type"],
@@ -136,8 +148,6 @@ export default function NotificationsPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
     // 使用 date-fns 统一格式化时间
     return formatDistanceToNow(date, { addSuffix: true });
   };
@@ -200,14 +210,12 @@ export default function NotificationsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container max-w-2xl mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-muted rounded-3xl"></div>
-            ))}
-          </div>
-        </div>
+      <div className="min-h-screen bg-background pb-16 md:pb-0">
+        <NavHeader user={currentUser ?? undefined} notificationCount={0} />
+        <main className="container max-w-2xl mx-auto px-4 py-8">
+          <LoadingState type="skeleton" />
+        </main>
+        <BottomNavigation notificationCount={0} />
       </div>
     );
   }
@@ -217,8 +225,8 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <NavHeader user={currentUser} notificationCount={unreadCount} />
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <NavHeader user={currentUser ?? undefined} notificationCount={unreadCount} />
 
       <main className="container max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
         <div className="flex items-center justify-between mb-8">
@@ -276,50 +284,55 @@ export default function NotificationsPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {filteredNotifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`bg-card border border-border rounded-3xl p-4 md:p-6 cursor-pointer transition-all hover:bg-card ${
-                  !notification.read ? "border-primary/30" : ""
-                }`}
-                onClick={async () => {
-                  await markAsRead(notification.id);
-                  if (notification.actionUrl) {
-                    // 使用 router.push 而非 window.location.href，避免改变身份上下文
-                    router.push(notification.actionUrl);
-                  }
-                }}
-              >
-                <div className="flex items-start gap-4">
-                  {/* 未读通知左侧渐变小圆点 */}
-                  {!notification.read && (
-                    <div className="w-2 h-2 rounded-full bg-primary-gradient flex-shrink-0 mt-2"></div>
-                  )}
-                  <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      !notification.read
-                        ? "bg-primary/10 text-primary"
-                        : "bg-border text-muted-foreground"
-                    }`}
-                  >
-                    {getNotificationIcon(notification.type)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p
-                      className={`text-sm md:text-base ${!notification.read ? "font-semibold text-foreground" : "text-muted-foreground"}`}
+            {filteredNotifications.map((notification) => {
+              const notificationDate = notification.createdAt || notification.created_at;
+              return (
+                <div
+                  key={notification.id}
+                  className={`bg-card border border-border rounded-3xl p-4 md:p-6 cursor-pointer transition-[background-color] motion-safe:transition-[background-color] motion-reduce:transition-none hover:bg-card ${
+                    !notification.read ? "border-primary/30" : ""
+                  }`}
+                  onClick={async () => {
+                    await markAsRead(notification.id);
+                    if (notification.actionUrl) {
+                      // 使用 router.push 而非 window.location.href，避免改变身份上下文
+                      router.push(notification.actionUrl);
+                    }
+                  }}
+                >
+                  <div className="flex items-start gap-4">
+                    {/* 未读通知左侧渐变小圆点 */}
+                    {!notification.read && (
+                      <div className="w-2 h-2 rounded-full bg-primary-gradient flex-shrink-0 mt-2"></div>
+                    )}
+                    <div
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                        !notification.read
+                          ? "bg-primary/10 text-primary"
+                          : "bg-border text-muted-foreground"
+                      }`}
                     >
-                      {notification.message}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {formatDate(notification.createdAt || notification.created_at)}
-                    </p>
+                      {getNotificationIcon(notification.type)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className={`text-sm md:text-base ${!notification.read ? "font-semibold text-foreground" : "text-muted-foreground"}`}
+                      >
+                        {notification.message}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {notificationDate ? formatDate(notificationDate) : "Unknown date"}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>
+
+      <BottomNavigation notificationCount={unreadCount} userRole={currentUser?.role} />
     </div>
   );
 }

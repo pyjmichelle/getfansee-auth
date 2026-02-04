@@ -19,27 +19,11 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
   // 保护 Creator 路由（除了公开的 /creator/[id] 查看页面）
-  const creatorProtectedPaths = [
-    "/creator/new-post",
-    "/creator/onboarding",
-    "/creator/studio",
-    "/creator/upgrade",
-  ];
+  const creatorProtectedPaths = ["/creator/new-post", "/creator/studio"];
 
   const isCreatorProtectedPath = creatorProtectedPaths.some((path) => pathname.startsWith(path));
 
   if (!isCreatorProtectedPath) {
-    return response;
-  }
-
-  // 增强测试模式检测：支持环境变量、Cookie、Header 三种方式
-  const isTestMode =
-    process.env.NEXT_PUBLIC_TEST_MODE === "true" ||
-    ["1", "true"].includes(request.cookies.get("playwright-test-mode")?.value || "") ||
-    request.headers.get("x-playwright-test") === "true";
-
-  if (isTestMode) {
-    // 测试模式下跳过所有认证检查
     return response;
   }
 
@@ -103,10 +87,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/creator/new-post/:path*",
-    "/creator/onboarding/:path*",
-    "/creator/studio/:path*",
-    "/creator/upgrade/:path*",
-  ],
+  matcher: ["/creator/new-post/:path*", "/creator/onboarding/:path*", "/creator/studio/:path*"],
 };

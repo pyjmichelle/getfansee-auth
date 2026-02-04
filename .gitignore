@@ -8,6 +8,7 @@ coverage/
 .nyc_output
 test-results/
 playwright-report/
+.ci-artifacts/
 
 # Next.js
 .next/
@@ -37,6 +38,9 @@ lerna-debug.log*
 *.swp
 *.swo
 *~
+
+# Cursor
+.cursor/debug.log
 
 # Vercel
 .vercel

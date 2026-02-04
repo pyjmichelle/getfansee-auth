@@ -14,27 +14,45 @@ export type Notification = {
   link?: string;
   actionUrl?: string; // 兼容旧字段名
   read: boolean;
-  created_at: string;
+  created_at?: string;
   createdAt?: string; // 兼容旧字段名
+};
+
+export type Creator = {
+  id: string;
+  display_name: string;
+  avatar_url?: string;
+  bio?: string;
+  role?: "fan" | "creator";
+  created_at?: string;
 };
 
 export type Post = {
   id: string;
-  creator_id: string;
-  title?: string;
+  creator_id?: string;
+  title?: string | null;
   content: string;
-  media_url?: string; // 保留向后兼容（单个媒体）
-  is_locked: boolean; // 保留向后兼容
-  visibility: PostVisibility;
-  price_cents: number | null;
-  preview_enabled: boolean;
-  watermark_enabled: boolean;
+  media_url?: string | null; // 保留向后兼容（单个媒体）
+  is_locked?: boolean; // 保留向后兼容
+  visibility?: PostVisibility | string;
+  price_cents?: number | null;
+  preview_enabled?: boolean;
+  watermark_enabled?: boolean | null;
   likes_count?: number; // 点赞数
-  created_at: string;
+  created_at?: string;
   creator?: {
     display_name?: string;
     avatar_url?: string;
   };
+  profiles?:
+    | {
+        display_name?: string;
+        avatar_url?: string;
+      }
+    | Array<{
+        display_name?: string;
+        avatar_url?: string;
+      }>;
   media?: Array<{
     id: string;
     media_url: string;

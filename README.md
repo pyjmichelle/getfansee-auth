@@ -1,6 +1,74 @@
 # getfansee-auth
 
+![CI Status](https://github.com/pyjmichelle/getfansee-auth/actions/workflows/ci.yml/badge.svg)
+![Code Quality](https://github.com/pyjmichelle/getfansee-auth/actions/workflows/code-quality.yml/badge.svg)
+
 All AI-assisted development must follow [docs/agents](./docs/agents) and [docs/sop](./docs/sop).
+
+## 📚 快速开始
+
+- **开发工作流程**: 查看 [QUICK_START_WORKFLOW.md](./QUICK_START_WORKFLOW.md) ⚡
+- **详细指南**: 查看 [DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md)
+- **部署指南**: 查看 [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
+- **贡献指南**: 查看 [CONTRIBUTING.md](./CONTRIBUTING.md) 👥
+
+## 🚀 本地开发设置
+
+### 1. 克隆项目
+
+```bash
+git clone <repo-url>
+cd authentication-flow-design
+pnpm install
+```
+
+### 2. 配置环境变量（必需！）
+
+```bash
+# 复制环境变量模板
+cp env.ci.template .env.local
+
+# 编辑 .env.local 并填入你的 Supabase credentials
+```
+
+**⚠️ 重要**: 你需要一个 Supabase 账号和项目。填写：
+
+- `NEXT_PUBLIC_SUPABASE_URL` - 你的 Supabase 项目 URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - 你的 Supabase anon key
+- `SUPABASE_SERVICE_ROLE_KEY` - 你的 Supabase service role key
+
+### 3. 验证环境配置
+
+```bash
+pnpm check:env
+```
+
+如果看到 ✅，说明配置正确！
+
+### 4. 启动开发服务器
+
+```bash
+pnpm dev
+```
+
+**本地调试 E2E（推荐）**：先起 E2E 专用服务再跑用例，输出可见、可复刻。
+
+- **终端 1**：启动 E2E 服务（清理 3000 端口 → build → start）
+  ```bash
+  bash scripts/e2e/start-server.sh
+  ```
+- **终端 2**：等服务就绪后跑 paywall「上传视频」用例（脚本会等待 health 最多 60s 自动重试）
+  ```bash
+  bash scripts/e2e/run-paywall-video.sh
+  ```
+
+### 5. 运行测试（推送前必须！）
+
+```bash
+pnpm ci:verify
+```
+
+这会运行所有 CI 检查（lint、type-check、build、qa、e2e）。所有检查必须通过才能推送！
 
 ## CI/CD Setup
 

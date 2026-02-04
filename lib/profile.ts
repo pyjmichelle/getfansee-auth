@@ -175,36 +175,42 @@ export async function updateProfile(
 
 /**
  * 更新用户密码
- * @param userId 用户 ID
+ * P1 安全修复：通过 API 端点更新密码，确保验证旧密码
+ *
+ * @param _userId 用户 ID（不再需要，API 会从 session 获取）
  * @param oldPassword 旧密码
  * @param newPassword 新密码
- * @returns true 成功，false 失败
+ * @returns { success: boolean, error?: string }
  */
 export async function updatePassword(
-  userId: string,
+  _userId: string,
   oldPassword: string,
   newPassword: string
-): Promise<boolean> {
+): Promise<{ success: boolean; error?: string }> {
   try {
     // 验证新密码强度（至少 8 个字符）
     if (newPassword.length < 8) {
-      console.error("[profile] updatePassword: password too short");
-      return false;
+      return { success: false, error: "Password must be at least 8 characters" };
     }
 
-    // 使用 Supabase Auth API 更新密码
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword,
+    // 通过 API 端点更新密码，确保验证旧密码
+    const response = await fetch("/api/profile/password", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ oldPassword, newPassword }),
     });
 
-    if (error) {
-      console.error("[profile] updatePassword error:", error);
-      return false;
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { success: false, error: data.error || "Failed to update password" };
     }
 
-    return true;
+    return { success: true };
   } catch (err) {
     console.error("[profile] updatePassword exception:", err);
-    return false;
+    return { success: false, error: "An unexpected error occurred" };
   }
 }

@@ -1,24 +1,16 @@
 
 > my-v0-project@0.1.0 dev /Users/puyijun/Downloads/authentication-flow-design (1)
-> next dev
+> PORT=3000 next dev -p 3000
 
-   ▲ Next.js 16.0.10 (Turbopack)
-   - Local:         http://localhost:3000
-   - Network:       http://192.168.100.9:3000
-   - Environments: .env.local
-
- ✓ Starting...
- ✓ Ready in 531ms
- ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
- ○ Compiling /_not-found/page ...
- HEAD /auth 404 in 3.7s (compile: 3.6s, render: 96ms)
- GET /auth 200 in 516ms (compile: 443ms, render: 73ms)
- ⚠ Cross origin request detected from 127.0.0.1 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
-Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
- GET /home 307 in 609ms (compile: 555ms, render: 55ms)
- GET /auth 200 in 30ms (compile: 1682µs, render: 28ms)
- GET /creator/new-post 200 in 1008ms (compile: 468ms, proxy.ts: 42ms, render: 497ms)
- GET /auth 200 in 24ms (compile: 4ms, render: 20ms)
- GET /me/wallet 200 in 822ms (compile: 559ms, render: 263ms)
- GET /auth 200 in 58ms (compile: 20ms, render: 37ms)
- GET /creator/upgrade 200 in 378ms (compile: 309ms, proxy.ts: 5ms, render: 65ms)
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+    at new Promise (<anonymous>) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+[?25h
+ ELIFECYCLE  Command failed with exit code 1.

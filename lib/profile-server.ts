@@ -85,15 +85,20 @@ export async function updateCreatorProfile(params: {
 export async function getProfile(userId: string) {
   try {
     const supabase = await getSupabaseServerClient();
-    // 先尝试获取所有字段（包括 blocked_countries）
+    // 先尝试获取所有字段（包括 blocked_countries 和 is_banned）
     let { data, error } = await supabase
       .from("profiles")
-      .select("id, role, display_name, bio, avatar_url, email, age_verified, blocked_countries")
+      .select(
+        "id, role, display_name, bio, avatar_url, email, age_verified, blocked_countries, is_banned"
+      )
       .eq("id", userId)
       .single();
 
-    // 如果 blocked_countries 字段不存在，只获取其他字段
-    if (error && error.message?.includes("blocked_countries")) {
+    // 如果字段不存在，只获取其他字段
+    if (
+      error &&
+      (error.message?.includes("blocked_countries") || error.message?.includes("is_banned"))
+    ) {
       const { data: fallbackData, error: fallbackError } = await supabase
         .from("profiles")
         .select("id, role, display_name, bio, avatar_url, email, age_verified")
@@ -109,6 +114,7 @@ export async function getProfile(userId: string) {
       return {
         ...fallbackData,
         blocked_countries: null,
+        is_banned: false,
       };
     }
 
@@ -177,37 +183,63 @@ export async function updateProfile(
 
 /**
  * 更新用户密码
+ * P1 安全修复：必须验证旧密码后才能更新
+ *
  * @param userId 用户 ID
  * @param oldPassword 旧密码
  * @param newPassword 新密码
- * @returns true 成功，false 失败
+ * @returns { success: boolean, error?: string }
  */
 export async function updatePassword(
   userId: string,
   oldPassword: string,
   newPassword: string
-): Promise<boolean> {
+): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await getSupabaseServerClient();
+
     // 验证新密码强度（至少 8 个字符）
     if (newPassword.length < 8) {
       console.error("[profile-server] updatePassword: password too short");
-      return false;
+      return { success: false, error: "Password must be at least 8 characters" };
     }
 
-    // 使用 Supabase Auth API 更新密码
-    const { error } = await supabase.auth.updateUser({
+    // P1 安全修复：首先获取用户邮箱
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user?.email) {
+      console.error("[profile-server] updatePassword: failed to get user", userError);
+      return { success: false, error: "Unable to verify user identity" };
+    }
+
+    // P1 安全修复：使用旧密码重新登录验证身份
+    // 这确保即使 session 被劫持，攻击者也无法在不知道旧密码的情况下更改密码
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: oldPassword,
+    });
+
+    if (verifyError) {
+      console.error("[profile-server] updatePassword: old password verification failed");
+      return { success: false, error: "Current password is incorrect" };
+    }
+
+    // 旧密码验证成功，现在更新密码
+    const { error: updateError } = await supabase.auth.updateUser({
       password: newPassword,
     });
 
-    if (error) {
-      console.error("[profile-server] updatePassword error:", error);
-      return false;
+    if (updateError) {
+      console.error("[profile-server] updatePassword error:", updateError);
+      return { success: false, error: "Failed to update password" };
     }
 
-    return true;
+    return { success: true };
   } catch (err) {
     console.error("[profile-server] updatePassword exception:", err);
-    return false;
+    return { success: false, error: "An unexpected error occurred" };
   }
 }

@@ -25,10 +25,13 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const success = await updatePassword(user.id, oldPassword, newPassword);
+    // P1 安全修复：updatePassword 现在返回更详细的结果
+    const result = await updatePassword(user.id, oldPassword, newPassword);
 
-    if (!success) {
-      return NextResponse.json({ error: "Failed to update password" }, { status: 500 });
+    if (!result.success) {
+      // 根据错误类型返回适当的状态码
+      const status = result.error === "Current password is incorrect" ? 401 : 400;
+      return NextResponse.json({ error: result.error || "Failed to update password" }, { status });
     }
 
     return NextResponse.json({ success: true });

@@ -4,14 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { NavHeader } from "@/components/nav-header";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { ensureProfile } from "@/lib/auth";
 import { getProfile } from "@/lib/profile";
 // listCreatorPosts, updatePost, deletePost 通过 API 调用，不直接导入
 import { type Post } from "@/lib/types";
-import { MediaDisplay } from "@/components/media-display";
 import { Edit, Trash2, Eye, Heart, DollarSign, Plus, Calendar } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
@@ -37,7 +35,6 @@ export default function CreatorPostListPage() {
     role: "fan" | "creator";
     avatar?: string;
   } | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,7 +54,6 @@ export default function CreatorPostListPage() {
         }
 
         await ensureProfile();
-        setCurrentUserId(session.user.id);
 
         const profile = await getProfile(session.user.id);
         if (profile) {
@@ -83,7 +79,7 @@ export default function CreatorPostListPage() {
         }
       } catch (err) {
         console.error("[post-list] loadData error:", err);
-        setError("加载失败，请重试");
+        setError("Failed to load. Please try again");
       } finally {
         setIsLoading(false);
       }
@@ -103,11 +99,11 @@ export default function CreatorPostListPage() {
         // 从列表中移除已删除的帖子
         setPosts((prev) => prev.filter((p) => p.id !== postId));
       } else {
-        setError(result.error || "删除失败，请重试");
+        setError(result.error || "Delete failed. Please try again");
       }
     } catch (err) {
       console.error("[post-list] delete error:", err);
-      setError("删除失败，请重试");
+      setError("Delete failed. Please try again");
     } finally {
       setDeletingPostId(null);
     }
@@ -122,14 +118,14 @@ export default function CreatorPostListPage() {
       );
     } else if (visibility === "subscribers") {
       return (
-        <Badge className="bg-primary/10 text-primary border-primary/20 rounded-lg">
-          Subscribers
+        <Badge className="glass bg-subscribe-gradient/20 text-[var(--color-pink-400)] border-[var(--border-pink-500-30)] rounded-lg shadow-sm">
+          Exclusive
         </Badge>
       );
     } else {
       return (
-        <Badge className="bg-purple-500/10 text-purple-500 border-purple-500/20 rounded-lg">
-          PPV ${((priceCents || 0) / 100).toFixed(2)}
+        <Badge className="glass bg-unlock-gradient/20 text-[var(--color-orange-400)] border-[var(--border-orange-500-30)] rounded-lg shadow-sm">
+          Premium ${((priceCents || 0) / 100).toFixed(2)}
         </Badge>
       );
     }
@@ -185,11 +181,13 @@ export default function CreatorPostListPage() {
             </Button>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6" data-testid="creator-post-list">
             {posts.map((post) => (
               <div
                 key={post.id}
                 className="bg-card border border-border rounded-3xl p-6 hover:border-border transition-colors"
+                data-testid="creator-post-list-item"
+                data-post-id={post.id}
               >
                 <div className="flex flex-col md:flex-row gap-6">
                   {/* Media Preview */}
@@ -216,10 +214,12 @@ export default function CreatorPostListPage() {
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          {getVisibilityBadge(post.visibility, post.price_cents)}
+                          {getVisibilityBadge(post.visibility ?? "free", post.price_cents ?? null)}
                           <span className="text-xs text-muted-foreground flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
-                            {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                            {post.created_at
+                              ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true })
+                              : "Unknown date"}
                           </span>
                         </div>
                         {post.title && (

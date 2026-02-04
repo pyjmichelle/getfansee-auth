@@ -1,19 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
-import { createClient } from "@supabase/supabase-js";
-
-// 使用 Service Role Key 进行管理操作
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
+import { getSupabaseAdminClient } from "@/lib/supabase-admin";
+import { requireAdmin } from "@/lib/authz";
+import { jsonError } from "@/lib/http-errors";
 
 /**
  * GET /api/admin/content-review?status=pending|approved|rejected
@@ -21,23 +9,10 @@ function getSupabaseAdmin() {
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    // 使用统一的权限 Gate
+    await requireAdmin();
 
-    const supabase = getSupabaseAdmin();
-
-    // 检查用户是否为管理员
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profile?.role !== "admin") {
-      return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
-    }
+    const supabase = getSupabaseAdminClient();
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") || "pending";
@@ -76,8 +51,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, posts });
   } catch (err: unknown) {
     console.error("[api/admin/content-review] Exception:", err);
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return jsonError(err);
   }
 }
 
@@ -87,23 +61,10 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    // 使用统一的权限 Gate
+    const { user } = await requireAdmin();
 
-    const supabase = getSupabaseAdmin();
-
-    // 检查用户是否为管理员
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profile?.role !== "admin") {
-      return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
-    }
+    const supabase = getSupabaseAdminClient();
 
     const body = await request.json();
     const { postId, action, reason } = body as {
@@ -162,7 +123,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
     console.error("[api/admin/content-review] Exception:", err);
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return jsonError(err);
   }
 }

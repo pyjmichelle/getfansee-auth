@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-interface EmptyStateProps {
+interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   icon: React.ReactNode;
   title: string;
   description?: string;
@@ -13,7 +13,6 @@ interface EmptyStateProps {
     href?: string;
     onClick?: () => void;
   };
-  className?: string;
 }
 
 /**
@@ -32,10 +31,18 @@ interface EmptyStateProps {
  *   action={{ label: "Create Post", href: "/creator/new-post" }}
  * />
  */
-export function EmptyState({ icon, title, description, action, className }: EmptyStateProps) {
+export function EmptyState({
+  icon,
+  title,
+  description,
+  action,
+  className,
+  ...props
+}: EmptyStateProps) {
   return (
     <div
       className={cn("flex flex-col items-center justify-center py-16 px-4 text-center", className)}
+      {...props}
     >
       <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
         {icon}

@@ -4,7 +4,7 @@
  */
 import { test, expect } from "@playwright/test";
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 
 test.describe("冒烟测试 - 页面可访问性", () => {
   test("首页可访问", async ({ page }) => {

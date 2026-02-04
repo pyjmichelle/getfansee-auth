@@ -31,7 +31,12 @@ export function PostLikeButton({
       disabled={isLoading || !userId}
       className={cn("gap-2 hover:bg-white/5 rounded-xl min-h-[44px] min-w-[44px]", className)}
     >
-      <Heart className={cn("w-4 h-4 transition-colors", isLiked && "fill-red-500 text-red-500")} />
+      <Heart
+        className={cn(
+          "w-4 h-4 transition-colors",
+          isLiked && "fill-[var(--color-pink-500)] text-[var(--color-pink-500)]"
+        )}
+      />
       {likesCount > 0 && <span className="text-sm">{likesCount}</span>}
       <span className="hidden sm:inline">Like</span>
     </Button>

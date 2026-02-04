@@ -1,22 +1,13 @@
 /**
  * Creator 统计数据服务
  * 从数据库获取真实的订阅、销售和收益数据
+ *
+ * P0 安全修复：改用用户 session client，确保只能查询自己的数据
+ * 依赖 RLS 策略（migration 025）进行访问控制
  */
 
-import { createClient } from "@supabase/supabase-js";
-
-// 使用 Service Role Key 绕过 RLS
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
+import { getSupabaseUniversalClient } from "./supabase-universal";
+import { getCurrentUserUniversal } from "./auth-universal";
 
 export interface CreatorStats {
   revenue: {
@@ -49,12 +40,26 @@ export interface ChartDataPoint {
 
 /**
  * 获取 Creator 统计数据
+ * P0 安全修复：验证调用者身份，确保只能查询自己的数据
  */
 export async function getCreatorStats(
   creatorId: string,
   timeRange: "7d" | "30d" | "90d" = "30d"
 ): Promise<CreatorStats> {
-  const supabase = getSupabaseAdmin();
+  // P0 安全修复：验证调用者身份
+  const currentUser = await getCurrentUserUniversal();
+  if (!currentUser || currentUser.id !== creatorId) {
+    console.error("[creator-stats] Unauthorized access attempt to stats for:", creatorId);
+    // 返回空数据而不是抛出错误，保持向后兼容
+    return {
+      revenue: { value: 0, change: 0, trend: "up" },
+      subscribers: { value: 0, change: 0, trend: "up" },
+      ppvSales: { value: 0, change: 0, trend: "up" },
+      visitors: { value: 0, change: 0, trend: "up" },
+    };
+  }
+
+  const supabase = await getSupabaseUniversalClient();
 
   // 计算时间范围
   const now = new Date();
@@ -79,10 +84,11 @@ export async function getCreatorStats(
     .gte("created_at", previousStartDate.toISOString())
     .lt("created_at", startDate.toISOString());
 
+  type RevenueRow = { amount_cents?: number };
   const currentRevenueTotal =
-    currentRevenue?.reduce((sum, t) => sum + (t.amount_cents || 0), 0) || 0;
+    currentRevenue?.reduce((sum: number, t: RevenueRow) => sum + (t.amount_cents || 0), 0) || 0;
   const previousRevenueTotal =
-    previousRevenue?.reduce((sum, t) => sum + (t.amount_cents || 0), 0) || 0;
+    previousRevenue?.reduce((sum: number, t: RevenueRow) => sum + (t.amount_cents || 0), 0) || 0;
 
   const revenueChange =
     previousRevenueTotal > 0
@@ -172,12 +178,20 @@ export async function getCreatorStats(
 
 /**
  * 获取图表数据
+ * P0 安全修复：验证调用者身份
  */
 export async function getCreatorChartData(
   creatorId: string,
   timeRange: "7d" | "30d" | "90d" = "30d"
 ): Promise<ChartDataPoint[]> {
-  const supabase = getSupabaseAdmin();
+  // P0 安全修复：验证调用者身份
+  const currentUser = await getCurrentUserUniversal();
+  if (!currentUser || currentUser.id !== creatorId) {
+    console.error("[creator-stats] Unauthorized access attempt to chart data for:", creatorId);
+    return [];
+  }
+
+  const supabase = await getSupabaseUniversalClient();
 
   const daysMap = { "7d": 7, "30d": 30, "90d": 90 };
   const days = daysMap[timeRange];
@@ -212,7 +226,8 @@ export async function getCreatorChartData(
   }
 
   // 累计收益
-  transactions?.forEach((t) => {
+  type TransactionRow = { amount_cents?: number; created_at: string };
+  transactions?.forEach((t: TransactionRow) => {
     const dateKey = t.created_at.split("T")[0];
     const existing = dataByDate.get(dateKey) || { revenue: 0, subscribers: 0 };
     existing.revenue += (t.amount_cents || 0) / 100;
@@ -220,7 +235,7 @@ export async function getCreatorChartData(
   });
 
   // 累计订阅者
-  subscriptions?.forEach((s) => {
+  subscriptions?.forEach((s: { created_at: string }) => {
     const dateKey = s.created_at.split("T")[0];
     const existing = dataByDate.get(dateKey) || { revenue: 0, subscribers: 0 };
     existing.subscribers += 1;
@@ -248,9 +263,17 @@ export async function getCreatorChartData(
 
 /**
  * 获取最近的帖子列表 (用于 Studio 首页)
+ * P0 安全修复：验证调用者身份
  */
 export async function getRecentPosts(creatorId: string, limit: number = 3) {
-  const supabase = getSupabaseAdmin();
+  // P0 安全修复：验证调用者身份
+  const currentUser = await getCurrentUserUniversal();
+  if (!currentUser || currentUser.id !== creatorId) {
+    console.error("[creator-stats] Unauthorized access attempt to posts for:", creatorId);
+    return [];
+  }
+
+  const supabase = await getSupabaseUniversalClient();
 
   const { data: posts, error } = await supabase
     .from("posts")
@@ -278,8 +301,17 @@ export async function getRecentPosts(creatorId: string, limit: number = 3) {
   }
 
   // 计算每个帖子的统计数据
+  type PostRow = {
+    id: string;
+    title: string | null;
+    content: string;
+    visibility: string;
+    price_cents: number;
+    created_at: string;
+    post_media?: { media_url: string; media_type: string }[];
+  };
   const postsWithStats = await Promise.all(
-    posts.map(async (post) => {
+    posts.map(async (post: PostRow) => {
       // 获取点赞数 (TODO: 等 post_likes 表创建后实现)
       const likes = 0;
 
@@ -294,7 +326,11 @@ export async function getRecentPosts(creatorId: string, limit: number = 3) {
           .select("paid_amount_cents")
           .eq("post_id", post.id);
 
-        revenue = (purchases?.reduce((sum, p) => sum + p.paid_amount_cents, 0) || 0) / 100;
+        revenue =
+          (purchases?.reduce(
+            (sum: number, p: { paid_amount_cents?: number }) => sum + (p.paid_amount_cents ?? 0),
+            0
+          ) || 0) / 100;
       }
 
       return {

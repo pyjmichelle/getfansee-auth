@@ -6,7 +6,6 @@
  */
 
 import { getSupabaseBrowserClient } from "./supabase-browser";
-import { getCurrentUser } from "./auth";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -150,7 +149,7 @@ export async function getTransactions(userId: string): Promise<
     amount_cents: number;
     status: string;
     created_at: string;
-    metadata: any;
+    metadata: Record<string, unknown> | null;
   }>
 > {
   try {
@@ -166,7 +165,16 @@ export async function getTransactions(userId: string): Promise<
       return [];
     }
 
-    return (data || []).map((t: any) => ({
+    type TransactionRow = {
+      id: string;
+      type: string;
+      amount_cents: number;
+      status: string;
+      created_at: string;
+      metadata: Record<string, unknown> | null;
+    };
+
+    return ((data as TransactionRow[] | null) || []).map((t) => ({
       id: t.id,
       type: t.type,
       amount_cents: t.amount_cents,

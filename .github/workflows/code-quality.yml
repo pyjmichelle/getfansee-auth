@@ -42,36 +42,56 @@ jobs:
       # 1. TypeScript 类型检查
       - name: Type Check
         run: pnpm type-check
-        continue-on-error: true
       
       # 2. ESLint 检查 (基础版)
       - name: ESLint Check
         run: pnpm lint
-        continue-on-error: true
       
       # 3. Prettier 格式检查
       - name: Format Check
         run: pnpm format:check
-        continue-on-error: true
       
-      # 4. 运行单元测试
-      - name: Run Unit Tests
-        run: pnpm test:unit
-        continue-on-error: true
+      # 4. 运行单元测试 (跳过 - 无测试文件)
+      # - name: Run Unit Tests
+      #   run: pnpm test:unit
       
       # 5. Reviewdog - ESLint (自动在 PR 上评论问题)
-      # 暂时禁用,等 PR 时再启用
-      # - name: Run Reviewdog (ESLint)
-      #   if: github.event_name == 'pull_request'
-      #   uses: reviewdog/action-eslint@v1
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     reporter: github-pr-review
-      #     eslint_flags: '.'
-      #     fail_on_error: false
-      #     filter_mode: added
+      - name: Run Reviewdog (ESLint)
+        if: github.event_name == 'pull_request'
+        uses: reviewdog/action-eslint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          eslint_flags: '.'
+          fail_on_error: false
+          filter_mode: added
+          level: warning
       
-      # 7. 构建验证
+      # 6. Reviewdog - TypeScript (自动在 PR 上评论类型错误)
+      - name: Run Reviewdog (TypeScript)
+        if: github.event_name == 'pull_request'
+        uses: EPMatt/reviewdog-action-tsc@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          tsc_flags: '--noEmit'
+          fail_on_error: false
+          filter_mode: added
+          level: error
+      
+      # 7. Reviewdog - Prettier (自动在 PR 上评论格式问题)
+      - name: Run Reviewdog (Prettier)
+        if: github.event_name == 'pull_request'
+        uses: EPMatt/reviewdog-action-prettier@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          prettier_flags: '--check'
+          fail_on_error: false
+          filter_mode: added
+          level: warning
+      
+      # 8. 构建验证
       - name: Build Check
         run: pnpm build
         env:
@@ -79,7 +99,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           CI: true
       
-      # 8. 生成代码质量报告
+      # 9. 生成代码质量报告
       - name: Generate Quality Report
         if: always()
         run: |

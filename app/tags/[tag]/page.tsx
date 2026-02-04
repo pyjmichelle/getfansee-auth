@@ -148,7 +148,7 @@ export default function TagPage() {
             <div className="space-y-4" data-testid="tag-posts">
               {posts.map((post) => (
                 <Link key={post.id} href={`/posts/${post.id}`}>
-                  <Card className="rounded-xl border shadow-sm hover:shadow-md transition-all duration-200 p-6">
+                  <Card className="rounded-xl border shadow-sm hover:shadow-md transition-[box-shadow] duration-200 motion-safe:transition-[box-shadow] motion-reduce:transition-none p-6">
                     <div className="flex gap-4">
                       {/* Creator Avatar */}
                       <Avatar className="w-12 h-12">
@@ -168,7 +168,9 @@ export default function TagPage() {
                             {post.creator?.display_name || "Creator"}
                           </span>
                           <span className="text-sm text-muted-foreground">
-                            {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                            {post.created_at
+                              ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true })
+                              : "Unknown date"}
                           </span>
                           {post.visibility !== "free" && (
                             <Badge

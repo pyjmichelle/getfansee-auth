@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { subscribe30d } from "@/lib/paywall";
+import { getCurrentUser } from "@/lib/auth-server";
 
 type SubscribePayload = {
   creatorId?: string;
@@ -11,6 +12,11 @@ export async function POST(request: NextRequest) {
 
     if (!creatorId) {
       return NextResponse.json({ success: false, error: "creatorId is required" }, { status: 400 });
+    }
+
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
     const success = await subscribe30d(creatorId);

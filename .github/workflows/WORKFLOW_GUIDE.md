@@ -59,6 +59,42 @@
 
 ---
 
+### 4. Claude Code Action（可选）
+
+需在仓库或 Org 中配置 `ANTHROPIC_API_KEY` 后以下工作流才会生效；未配置时相关 job 会因缺少密钥而失败，不影响其他 CI。
+
+#### 4.1 `claude-pr-review.yml` - Claude 语义级 PR 审查
+
+**触发条件**: PR 打开/更新（与 pr-auto-review 并行）
+
+**功能**:
+
+- 使用 [anthropics/claude-code-action](https://github.com/anthropics/claude-code-action) 对 PR 做**语义级代码审查**
+- 关注：代码质量、潜在 bug、安全（auth/Supabase RLS/API 输入）、性能、类型与 UI 规范
+- 审查标准与本地 Cursor 规则对齐（见 `.cursor/rules/github-cursor-sync.mdc`）
+- Claude 可发 PR 评论与行内评论（inline comments）
+
+**所需**: `ANTHROPIC_API_KEY`（Settings → Secrets and variables → Actions）
+
+#### 4.2 `claude-ci-helper.yml` - 评论触发 CI 失败分析
+
+**触发条件**: 在 PR 或 Issue 的评论中出现 `@claude` 时（例如：「@claude 为什么 CI 失败了」）
+
+**功能**:
+
+- Claude 在 Actions 中可查看 workflow 状态与 job 日志（需 `actions: read`）
+- 根据评论内容分析 CI 失败原因并回复评论
+
+**所需**: `ANTHROPIC_API_KEY`；workflow 已配置 `permissions: actions: read` 与 `additional_permissions: actions: read`
+
+#### 与 Cursor 的协同关系
+
+- **线下（Cursor）**: 本地开发、`.cursor/rules` / `.cursor/agents` 约束风格与质量；通过 `git push` / PR 与 GitHub 同步。
+- **线上（GitHub）**: 现有 CI + 代码质量 + PR 自动审查 +（可选）Claude PR 审查与 @claude CI 分析。
+- **闭环**: 本地改 → push/PR → 线上跑 CI 与（若启用）Claude 审查/分析 → 根据 PR 评论与 CI 结果在 Cursor 中再改。Claude Code Action 不负责代码同步，只负责线上自动化，与现有 workflow 互补。
+
+---
+
 ## 🎯 工作流协同关系
 
 ```
@@ -79,6 +115,10 @@ PR 创建
         ├─ 标签管理
         ├─ 安全检查
         └─ 汇总评论 💬
+  └─→ claude-pr-review.yml (可选，需 ANTHROPIC_API_KEY)
+        └─ Claude 语义级审查 💬
+  └─→ @claude 评论 → claude-ci-helper.yml (可选)
+        └─ CI 失败分析回复 💬
 ```
 
 ---
@@ -96,6 +136,12 @@ Settings → Secrets and variables → Actions → New repository secret
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
+
+### 可选的 GitHub Secrets（Claude Code Action）
+
+若启用 Claude PR 审查或 @claude CI 分析，需额外配置:
+
+- `ANTHROPIC_API_KEY` — Anthropic API Key；配置后 `claude-pr-review.yml` 与 `claude-ci-helper.yml` 才会成功运行。详见 [GITHUB_SECRETS_SETUP.md](../GITHUB_SECRETS_SETUP.md)。
 
 ### 权限设置
 
@@ -277,5 +323,6 @@ filter_mode: file       # 评论整个文件
 - ✅ PR 标签管理
 - ✅ 安全检查
 - ✅ 质量报告
+- ✅ （可选）Claude 语义级 PR 审查与 @claude CI 失败分析（需配置 `ANTHROPIC_API_KEY`）
 
-每次创建 PR 都会自动运行所有检查并提供反馈!
+每次创建 PR 都会自动运行所有检查并提供反馈! 线下 Cursor 与线上 GitHub 使用同一套 PR 审查标准（见 `.cursor/rules/github-cursor-sync.mdc`）。

@@ -1,0 +1,8 @@
+[Playwright Config] CI: true
+[Playwright Config] Base URL: http://127.0.0.1:3000
+
+Error: http://127.0.0.1:3000/api/health is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer.
+::error ::Error: http://127.0.0.1:3000/api/health is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer.
+
+
+::notice title=🎭 Playwright Run Summary::
