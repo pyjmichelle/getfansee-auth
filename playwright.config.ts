@@ -42,8 +42,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* CI 下重试 2 次提高稳定性，本地不重试便于快速失败 */
   retries: process.env.CI ? 2 : 0,
-  /* 使用单个 worker，先稳定再提速 */
-  workers: 1,
+  /* 2 workers：97 用例单 worker 易超 25 分钟，双 worker 约 15–25 分钟跑完 */
+  workers: 2,
   /* Reporter */
   reporter: process.env.CI ? [["html"], ["github"]] : [["html"], ["list"]],
   /* Global timeout - CI 长流程需更长时间，默认 4 分钟 */

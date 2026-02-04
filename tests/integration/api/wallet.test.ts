@@ -8,7 +8,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 
 const adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false },
@@ -40,17 +40,19 @@ describe("Wallet API Integration", () => {
       age_verified: true,
     });
 
-    // 创建钱包
-    await adminClient.from("user_wallets").upsert({
-      id: testUserId,
-      balance_cents: 1000, // $10.00
+    // 创建钱包（使用 wallet_accounts 表）
+    await adminClient.from("wallet_accounts").upsert({
+      user_id: testUserId,
+      available_balance_cents: 1000, // $10.00
+      pending_balance_cents: 0,
     });
   });
 
   afterAll(async () => {
     if (testUserId) {
       await adminClient.from("wallet_transactions").delete().eq("user_id", testUserId);
-      await adminClient.from("user_wallets").delete().eq("id", testUserId);
+      await adminClient.from("transactions").delete().eq("user_id", testUserId);
+      await adminClient.from("wallet_accounts").delete().eq("user_id", testUserId);
       await adminClient.from("profiles").delete().eq("id", testUserId);
       await adminClient.auth.admin.deleteUser(testUserId);
     }

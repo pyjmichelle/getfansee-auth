@@ -230,6 +230,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
 
   return (
     <div
+      data-testid="page-ready"
       className="auth-page min-h-screen grid lg:grid-cols-2"
       style={{ touchAction: "manipulation", overscrollBehaviorY: "contain" }}
     >

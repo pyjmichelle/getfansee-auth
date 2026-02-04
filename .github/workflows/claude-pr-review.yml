@@ -1,0 +1,46 @@
+# Claude 语义级 PR 审查（与 pr-auto-review 互补，需配置 ANTHROPIC_API_KEY 后生效）
+# 参考: https://github.com/anthropics/claude-code-action/blob/main/docs/solutions.md#automatic-pr-code-review
+name: Claude PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+jobs:
+  claude-review:
+    name: Claude Semantic Review
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Claude Code Action - PR Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Please review this pull request against the shared PR checklist (aligned with .cursor/rules/github-cursor-sync.mdc):
+            - Code quality and best practices (TypeScript/Next.js, pnpm, Server Components first)
+            - Potential bugs or logic issues
+            - Security (auth, Supabase RLS, API inputs, no hardcoded secrets)
+            - Performance considerations
+            - Types: no any, explicit types; no console.log (use logger or remove)
+            - UI: use @/components/ui and cn(), follow shadcn/ui conventions
+
+            Note: The PR branch is already checked out in the current working directory.
+
+            Use `gh pr comment` for top-level feedback.
+            Use `mcp__github_inline_comment__create_inline_comment` to highlight specific code issues.
+            Only post GitHub comments - don't submit review text as messages.
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"

@@ -110,8 +110,8 @@ test.describe("Sprint 4.0 MVP monetization flow", () => {
           .catch(() => {});
       });
     } finally {
-      await fanPage.close();
-      await creatorPage.close();
+      if (!fanPage.isClosed()) await fanPage.close();
+      if (!creatorPage.isClosed()) await creatorPage.close();
       for (const userId of createdUserIds) {
         await deleteTestUser(userId);
       }

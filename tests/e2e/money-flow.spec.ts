@@ -16,6 +16,9 @@ import {
 import {
   clearStorage,
   createConfirmedTestUser,
+  emitE2EDiagnostics,
+  expectUnlockedByServer,
+  safeClick,
   signInUser,
   signUpUser,
   waitForPageLoad,
@@ -53,42 +56,33 @@ test.describe("Money Flow - 护城河测试", () => {
   });
 
   test("E2E-1: PPV 解锁完整流程 - Creator 发布 PPV → Fan 看到锁 → 解锁成功", async ({ page }) => {
-    // 1. Fan 登录
     await signInUser(page, fixtures.fan.email, fixtures.fan.password);
     await waitForPageLoad(page);
 
-    // 2. 访问 PPV 帖子详情页
     await page.goto(`${BASE_URL}/posts/${fixtures.posts.ppv.id}`);
     await waitForPageLoad(page);
+    await expect(page.getByTestId("post-page")).toBeVisible({ timeout: 20_000 });
 
-    // 3. 验证看到锁定状态
-    await expect(page.getByTestId("post-locked-overlay")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId("post-locked-overlay")).toBeVisible({ timeout: 20_000 });
 
-    // 4. 点击解锁按钮（CI 需更长等待）
     const unlockButton = page.getByTestId("post-unlock-button");
     await expect(unlockButton).toBeVisible({ timeout: 20_000 });
+    await unlockButton.scrollIntoViewIfNeeded();
     await unlockButton.click();
 
-    // 5. 等待支付弹窗出现（点击解锁后由帖子详情页 PaywallModal 打开）
     await expect(page.getByTestId("paywall-modal")).toBeVisible({ timeout: 20_000 });
-
-    // 6. 验证显示价格和余额
     await expect(page.getByTestId("paywall-price")).toHaveText(
       `$${(fixtures.posts.ppv.priceCents! / 100).toFixed(2)}`
     );
 
-    // 7. 点击解锁按钮（弹窗内）
-    const confirmUnlockButton = page.getByTestId("paywall-unlock-button");
-    await expect(confirmUnlockButton).toBeVisible({ timeout: 5000 });
-    await confirmUnlockButton.click();
+    await safeClick(page.getByTestId("paywall-unlock-button"), { timeout: 20_000 });
 
-    // 8. 等待解锁成功
-    await expect(page.getByTestId("paywall-success-message")).toBeVisible({ timeout: 15000 });
-
-    // 9. 验证内容变清晰（锁定状态消失）
-    await page.waitForTimeout(2000); // 等待弹窗关闭
-    const lockedAfterUnlock = page.locator("text=Locked Content");
-    await expect(lockedAfterUnlock).not.toBeVisible({ timeout: 5000 });
+    // 主断言：购买记录出现 → expectUnlockedByServer 内会刷新并断言锁层消失，不依赖 success-message
+    const price = fixtures.posts.ppv.priceCents! / 100;
+    await expectUnlockedByServer(page, {
+      postId: fixtures.posts.ppv.id,
+      price,
+    });
   });
 
   test("E2E-2: 余额不足 → 提示充值 → 跳转钱包", async ({ page }) => {
@@ -170,7 +164,7 @@ test.describe("Money Flow - 护城河测试", () => {
     }
 
     // 验证页面加载成功（至少没有错误）
-    const errorText = page.locator("text=Error").or(page.locator("text=Failed"));
+    const errorText = page.locator("text=Error").or(page.locator("text=Failed")).first();
     const hasError = await errorText.isVisible().catch(() => false);
     expect(hasError).toBe(false);
   });

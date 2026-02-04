@@ -75,6 +75,12 @@ CI 已统一设置 `PLAYWRIGHT_TEST_MODE` 与 `E2E`，上述路由在 CI 中均�
 
 ## 运行测试
 
+### 全量运行时长（避免“卡住”误判）
+
+- **chromium 全量**：约 97 个用例，配置为 **2 workers**，通常 **15–25 分钟** 跑完；单 worker 约 25–40 分钟。
+- 若整条命令被设了很短超时（如 10 分钟），进程会被提前杀掉、看起来像“卡住”；可交给 CI 跑完（e2e-tests job 约 35 分钟）。
+- **先起服再跑**：若用 webServer 自动起服，首轮 build+start 会多花 1–3 分钟；可先 `pnpm build && pnpm start`，再 `PLAYWRIGHT_SKIP_SERVER=true pnpm exec playwright test --project=chromium` 避免重复起服。
+
 ### 本地必过命令（含端口/复用）
 
 playwright.config 已设置 `reuseExistingServer: true`，若 3000 端口已有服务会直接复用，不会因“端口占用”导致未跑完。

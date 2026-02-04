@@ -1,0 +1,49 @@
+# GitHub 与 Cursor 协同（线下与线上一致）
+
+本规则保证本地 Cursor 开发与 GitHub 线上 PR/CI 使用同一套标准。
+
+---
+
+## 线上 PR 流程（GitHub）
+
+- **CI**（`ci.yml`）：Lint、Type Check、Build、QA Gate、E2E、Quality Gate。
+- **代码质量**（`code-quality.yml`）：Reviewdog 行级评论（ESLint/tsc/Prettier）。
+- **PR 自动审查**（`pr-auto-review.yml`）：标签、TODO/FIXME 统计、大文件检查、依赖审计、密钥扫描、汇总评论。
+- **Claude PR 审查**（可选，`claude-pr-review.yml`）：语义级代码审查（代码质量、潜在 bug、安全、性能），需配置 `ANTHROPIC_API_KEY` 后生效。
+- **@claude 分析 CI 失败**（可选，`claude-ci-helper.yml`）：在 PR 或 Issue 评论中写「@claude 为什么 CI 失败了」可触发 Claude 查看 workflow/job 日志并回复，需配置 `ANTHROPIC_API_KEY` 与 `actions: read`。
+
+本地改代码 → push/PR → 上述流水线运行 → 根据 PR 评论与 CI 结果在 Cursor 中继续修改，形成闭环。
+
+---
+
+## 共享 PR 审查 Checklist（与 Claude 线上审查一致）
+
+线下 Cursor 与线上 Claude PR 审查应使用同一标准，提交/PR 前可自检：
+
+### 代码质量
+- [ ] 符合项目风格（TypeScript 严格、Next.js App Router、Server Components 优先）
+- [ ] 无注释掉的废代码，变量命名清晰
+- [ ] 遵循 DRY，无不当重复
+
+### 类型与规范
+- [ ] 无 `any`，使用显式类型或 `unknown` + 收窄
+- [ ] 无 `console.log` 噪音（使用 logger 或删除）
+
+### 测试与构建
+- [ ] 新逻辑有单元/集成测试（若适用）
+- [ ] `pnpm check-all` 与 `pnpm build` 通过
+
+### 安全
+- [ ] 无硬编码凭证，敏感信息走 env/Secrets
+- [ ] API/输入有校验与错误处理
+- [ ] 涉及 DB 时 RLS/权限正确
+
+### UI（若涉及）
+- [ ] 使用 `@/components/ui` 与 `cn()`，遵循 `.cursor/skills/shadcn-ui.skill.md`
+
+---
+
+## 引用
+
+- Workflow 说明：`.github/workflows/WORKFLOW_GUIDE.md`
+- Secrets 配置：`.github/GITHUB_SECRETS_SETUP.md`（含可选 `ANTHROPIC_API_KEY`）

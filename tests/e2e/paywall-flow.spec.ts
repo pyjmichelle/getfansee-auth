@@ -21,6 +21,7 @@ import {
   createConfirmedTestUser,
   emitE2EDiagnostics,
   getOrigin,
+  safeClick,
   signInUser,
   signUpUser,
   waitForPageLoad,
@@ -148,11 +149,11 @@ test.describe("Paywall Flow E2E", () => {
           );
         }
         expect(creatorIdForStatus).toBeTruthy();
-        await creatorSubscribeBtn.click();
+        await safeClick(creatorSubscribeBtn);
       } else if (await unlockTrigger.isVisible({ timeout: 5000 }).catch(() => false)) {
         // 路径 B：unlock-trigger → modal 必须出现，否则立即 fail 并输出诊断
         usedUnlockTrigger = true;
-        await unlockTrigger.click();
+        await safeClick(unlockTrigger);
         const paywallModal = page.getByTestId("paywall-modal");
         try {
           await expect(paywallModal).toBeVisible({ timeout: 15000 });
@@ -168,9 +169,8 @@ test.describe("Paywall Flow E2E", () => {
             `paywall-flow: paywall modal not visible. url=${url} onAuth=${onAuth} body(200)=${bodyText.slice(0, 200)}. Original: ${String(e)}`
           );
         }
-        const paywallSubscribeBtn = page.getByTestId("paywall-subscribe-button");
-        await expect(paywallSubscribeBtn).toBeVisible({ timeout: 5000 });
-        await paywallSubscribeBtn.click();
+        const paywallSubscribeBtn = page.getByTestId("paywall-subscribe-button").first();
+        await safeClick(paywallSubscribeBtn, { timeout: 5000 });
       } else {
         throw new Error(
           `paywall-flow: neither creator-subscribe-button nor post-unlock-trigger visible. url=${page.url()}`
@@ -232,9 +232,9 @@ test.describe("Paywall Flow E2E", () => {
         timeout: 15000,
       });
       await waitForPageLoad(page);
+      // P0: 成功 = post 页面可打开 + post-media 可见（gating 状态）；禁止依赖 img/video 外部加载做权限验证
       const postMedia = page.getByTestId("post-media");
       await expect(postMedia).toBeVisible({ timeout: 10000 });
-      await expect(postMedia.locator("img, video").first()).toBeVisible({ timeout: 10000 });
     } finally {
       if (creatorPage && !creatorPage.isClosed()) await creatorPage.close();
     }

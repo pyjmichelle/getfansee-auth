@@ -8,7 +8,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 
 const adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false },
@@ -69,10 +69,11 @@ describe("Paywall API Integration", () => {
       age_verified: true,
     });
 
-    // 创建钱包并充值 $50
-    await adminClient.from("user_wallets").upsert({
-      id: testFanId,
-      balance_cents: 5000,
+    // 创建钱包并充值 $50（使用 wallet_accounts 表）
+    await adminClient.from("wallet_accounts").upsert({
+      user_id: testFanId,
+      available_balance_cents: 5000,
+      pending_balance_cents: 0,
     });
 
     // 创建测试 PPV 帖子
@@ -100,7 +101,8 @@ describe("Paywall API Integration", () => {
     if (testFanId) {
       await adminClient.from("subscriptions").delete().eq("subscriber_id", testFanId);
       await adminClient.from("wallet_transactions").delete().eq("user_id", testFanId);
-      await adminClient.from("user_wallets").delete().eq("id", testFanId);
+      await adminClient.from("transactions").delete().eq("user_id", testFanId);
+      await adminClient.from("wallet_accounts").delete().eq("user_id", testFanId);
       await adminClient.from("profiles").delete().eq("id", testFanId);
       await adminClient.auth.admin.deleteUser(testFanId);
     }
@@ -235,10 +237,11 @@ describe("Paywall API Integration", () => {
         age_verified: true,
       });
 
-      // 钱包余额为 0
-      await adminClient.from("user_wallets").upsert({
-        id: poorFanId,
-        balance_cents: 0,
+      // 钱包余额为 0（使用 wallet_accounts 表）
+      await adminClient.from("wallet_accounts").upsert({
+        user_id: poorFanId,
+        available_balance_cents: 0,
+        pending_balance_cents: 0,
       });
 
       const { data: sessionData } = await adminClient.auth.signInWithPassword({
@@ -264,7 +267,7 @@ describe("Paywall API Integration", () => {
       expect(data.error).toContain("Insufficient balance");
 
       // 清理
-      await adminClient.from("user_wallets").delete().eq("id", poorFanId);
+      await adminClient.from("wallet_accounts").delete().eq("user_id", poorFanId);
       await adminClient.from("profiles").delete().eq("id", poorFanId);
       await adminClient.auth.admin.deleteUser(poorFanId);
     });

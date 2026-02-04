@@ -1,23 +1,13 @@
 /**
  * 评论系统服务层
  * 处理帖子评论的 CRUD 操作
+ *
+ * P0 安全修复：改用用户 session client 代替 Service Role
+ * 依赖 RLS 策略（migration 025）进行访问控制
  */
 
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseUniversalClient } from "./supabase-universal";
 import { resolveSubscriptionUserColumn } from "./subscriptions";
-
-// 使用 Service Role Key 进行特权操作
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
 
 export interface Comment {
   id: string;
@@ -42,7 +32,8 @@ export async function getPostComments(
   limit: number = 50,
   offset: number = 0
 ): Promise<{ comments: Comment[]; total: number }> {
-  const supabase = getSupabaseAdmin();
+  // P0 安全修复：使用用户 session client，依赖 RLS 进行访问控制
+  const supabase = await getSupabaseUniversalClient();
 
   try {
     // post_comments.user_id 外键指向 auth.users，无直接 FK 到 profiles，故分两次查询
@@ -115,7 +106,8 @@ export async function createComment(
   userId: string,
   content: string
 ): Promise<Comment> {
-  const supabase = getSupabaseAdmin();
+  // P0 安全修复：使用用户 session client
+  const supabase = await getSupabaseUniversalClient();
 
   try {
     // 验证帖子是否存在
@@ -181,7 +173,8 @@ export async function createComment(
  * @param userId 用户 ID（用于权限验证）
  */
 export async function deleteComment(commentId: string, userId: string): Promise<void> {
-  const supabase = getSupabaseAdmin();
+  // P0 安全修复：使用用户 session client，RLS 确保只能删除自己的评论
+  const supabase = await getSupabaseUniversalClient();
 
   try {
     // 验证评论是否属于该用户
@@ -223,7 +216,8 @@ async function checkCommentPermission(
   userId: string,
   creatorId: string
 ): Promise<boolean> {
-  const supabase = getSupabaseAdmin();
+  // P0 安全修复：使用用户 session client
+  const supabase = await getSupabaseUniversalClient();
 
   // 1. 如果是 Creator 自己，可以评论
   if (userId === creatorId) {
@@ -264,7 +258,8 @@ async function checkCommentPermission(
  * @param postId 帖子 ID
  */
 export async function getCommentCount(postId: string): Promise<number> {
-  const supabase = getSupabaseAdmin();
+  // P0 安全修复：使用用户 session client
+  const supabase = await getSupabaseUniversalClient();
 
   try {
     const { count, error } = await supabase

@@ -5,6 +5,7 @@ import {
   signUpUser,
   signInUser,
   clearStorage,
+  emitE2EDiagnostics,
   waitForVisible,
   waitForPageLoad,
   expectError,
@@ -45,6 +46,12 @@ test.describe("Fan 端完整流程测试", () => {
   test.beforeEach(async ({ page }) => {
     await clearStorage(page);
     await injectTestCookie(page); // 注入测试模式 cookie
+  });
+
+  test.afterEach(async ({ page }, testInfo) => {
+    if (testInfo.status !== "passed") {
+      await emitE2EDiagnostics(page, testInfo);
+    }
   });
 
   test.describe("1.1 用户注册与登录", () => {

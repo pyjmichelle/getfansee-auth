@@ -1,0 +1,28 @@
+# 评论触发 CI 失败分析：在 PR/Issue 中 @claude 询问「为什么 CI 失败」时，Claude 可查看 workflow/job 日志并回复
+# 参考: https://github.com/anthropics/claude-code-action/blob/main/docs/configuration.md#example-debugging-failed-ci-runs
+name: Claude CI Helper
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+
+jobs:
+  claude-ci-helper:
+    name: Claude CI Analysis
+    runs-on: ubuntu-latest
+    if: contains(github.event.comment.body, '@claude') || contains(github.event.comment.body, '@Claude')
+    steps:
+      - name: Claude Code Action - CI Debug
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          additional_permissions: |
+            actions: read
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

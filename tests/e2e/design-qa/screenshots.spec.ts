@@ -5,7 +5,11 @@
  */
 import { test, expect } from "@playwright/test";
 import path from "path";
-import { createConfirmedTestUser, injectSupabaseSession } from "../shared/helpers";
+import {
+  createConfirmedTestUser,
+  emitE2EDiagnostics,
+  injectSupabaseSession,
+} from "../shared/helpers";
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 const SCREENSHOT_DATE = "2026-01-29";
@@ -26,6 +30,12 @@ test.beforeAll(async () => {
 test.describe("Design QA Screenshots", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
+  test.afterEach(async ({ page }, testInfo) => {
+    if (testInfo.status !== "passed") {
+      await emitE2EDiagnostics(page, testInfo);
+    }
+  });
+
   test("1. index (/) → redirects, then screenshot", async ({ page }) => {
     await page.goto(BASE_URL + "/", {
       waitUntil: "domcontentloaded",
@@ -35,12 +45,12 @@ test.describe("Design QA Screenshots", () => {
     const url = page.url();
     if (url.includes("/auth")) {
       await expect(
-        page.getByTestId("auth-tab-login").or(page.getByTestId("auth-tab-signup"))
+        page.getByTestId("auth-tab-login").or(page.getByTestId("auth-tab-signup")).first()
       ).toBeVisible({ timeout: 10000 });
     } else if (url.includes("/home")) {
-      await expect(page.getByTestId("home-feed").or(page.getByTestId("page-ready"))).toBeVisible({
-        timeout: 10000,
-      });
+      await expect(
+        page.getByTestId("home-feed").or(page.getByTestId("page-ready")).first()
+      ).toBeVisible({ timeout: 10000 });
     }
     await page.screenshot({
       path: path.join(SCREENSHOT_DIR, "index.png"),
@@ -83,9 +93,9 @@ test.describe("Design QA Screenshots", () => {
       waitUntil: "domcontentloaded",
       timeout: 15000,
     });
-    await expect(page.getByTestId("home-feed").or(page.getByTestId("page-ready"))).toBeVisible({
-      timeout: 15000,
-    });
+    await expect(
+      page.getByTestId("home-feed").or(page.getByTestId("page-ready")).first()
+    ).toBeVisible({ timeout: 15000 });
     await page.screenshot({
       path: path.join(SCREENSHOT_DIR, "home.png"),
       fullPage: true,
@@ -99,9 +109,9 @@ test.describe("Design QA Screenshots", () => {
       waitUntil: "domcontentloaded",
       timeout: 15000,
     });
-    await expect(page.getByTestId("page-ready").or(page.getByTestId("creator-stats"))).toBeVisible({
-      timeout: 15000,
-    });
+    await expect(
+      page.getByTestId("page-ready").or(page.getByTestId("creator-stats")).first()
+    ).toBeVisible({ timeout: 15000 });
     await page.screenshot({
       path: path.join(SCREENSHOT_DIR, "creator-studio.png"),
       fullPage: true,
@@ -116,7 +126,7 @@ test.describe("Design QA Screenshots", () => {
       timeout: 15000,
     });
     await expect(
-      page.getByTestId("wallet-page").or(page.getByTestId("wallet-balance-section"))
+      page.getByTestId("wallet-page").or(page.getByTestId("wallet-balance-section")).first()
     ).toBeVisible({ timeout: 15000 });
     await page.screenshot({
       path: path.join(SCREENSHOT_DIR, "wallet.png"),

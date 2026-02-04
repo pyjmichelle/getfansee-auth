@@ -1,5 +1,6 @@
 import { Page, expect } from "@playwright/test";
 import type { TestInfo } from "@playwright/test";
+import type { Locator } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 
 /**
@@ -68,6 +69,9 @@ type FetchAuthedResult =
  * 使用当前页面 origin 发起带 cookie 的 fetch，避免 BASE_URL 拼接导致 cookie 隔离/CORS
  */
 export async function fetchAuthedJson(page: Page, path: string): Promise<FetchAuthedResult> {
+  if (page.isClosed()) {
+    throw new Error(`fetchAuthedJson: page already closed (path=${path})`);
+  }
   return page.evaluate(async (p: string) => {
     const origin = new URL(window.location.href).origin;
     const res = await fetch(`${origin}${p}`, { credentials: "include" });
@@ -78,6 +82,94 @@ export async function fetchAuthedJson(page: Page, path: string): Promise<FetchAu
       body,
     };
   }, path);
+}
+
+/**
+ * 同 fetchAuthedJson，失败时抛错并带上 status/body 便于诊断
+ */
+export async function fetchAuthedJsonOrThrow(page: Page, path: string): Promise<FetchAuthedResult> {
+  const result = await fetchAuthedJson(page, path);
+  if (!result.ok) {
+    throw new Error(
+      `fetchAuthedJson failed: path=${path} status=${result.status} body=${JSON.stringify(result.body)}`
+    );
+  }
+  return result;
+}
+
+export interface ExpectUnlockedOptions {
+  postId: string;
+  price: number;
+  /** 可选：用于幂等测试校验余额只扣一次 */
+  initialBalance?: number;
+}
+
+/**
+ * 以 server state 为主断言解锁成功：轮询 /api/purchases 直到该 post 有购买记录，
+ * 再做 UI 辅证（锁层或解锁 CTA 不存在）。不依赖 paywall-success-message。
+ */
+export async function expectUnlockedByServer(
+  page: Page,
+  options: ExpectUnlockedOptions
+): Promise<void> {
+  const { postId, price, initialBalance } = options;
+  if (page.isClosed()) {
+    throw new Error("expectUnlockedByServer: page already closed");
+  }
+  // 1. 轮询购买记录
+  await expect
+    .poll(
+      async () => {
+        const res = await fetchAuthedJson(page, "/api/purchases");
+        if (!res.ok) return null;
+        const list = Array.isArray((res.body as { data?: unknown[] })?.data)
+          ? (res.body as { data: unknown[] }).data
+          : [];
+        return list.filter((p: { post_id?: string }) => p.post_id === postId);
+      },
+      { timeout: 20_000, intervals: [500, 1000, 1000] }
+    )
+    .toHaveLength(1);
+
+  // 2. 可选：校验余额只扣一次（幂等）
+  if (initialBalance !== undefined) {
+    await page.goto(new URL("/me/wallet", page.url()).href, {
+      waitUntil: "domcontentloaded",
+      timeout: 15_000,
+    });
+    await expect(page.getByTestId("wallet-balance-value")).toBeVisible({ timeout: 10_000 });
+    await expect
+      .poll(
+        async () => {
+          const text = await page.getByTestId("wallet-balance-value").textContent();
+          const match = text?.match(/\$(\d+\.\d+)/);
+          return match ? parseFloat(match[1]) : null;
+        },
+        { timeout: 15_000, intervals: [500, 1000] }
+      )
+      .toBe(initialBalance - price);
+  }
+
+  // 3. UI 辅证：锁层或解锁按钮不存在（先等 page-ready 再断言）
+  await page.goto(new URL(`/posts/${postId}`, page.url()).href, {
+    waitUntil: "domcontentloaded",
+    timeout: 15_000,
+  });
+  await expect(page.getByTestId("post-page")).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId("post-locked-overlay")).not.toBeVisible({ timeout: 10_000 });
+  await expect(page.getByTestId("post-unlock-button")).not.toBeVisible({ timeout: 5_000 });
+}
+
+/**
+ * P0: click 前必须 toBeVisible + toBeEnabled + scrollIntoViewIfNeeded，禁止并发 click 同一 locator
+ */
+export async function safeClick(locator: Locator, options?: { timeout?: number }): Promise<void> {
+  const t = options?.timeout ?? 15_000;
+  const first = locator.first();
+  await expect(first).toBeVisible({ timeout: t });
+  await expect(first).toBeEnabled({ timeout: Math.min(t, 5000) });
+  await first.scrollIntoViewIfNeeded();
+  await first.click();
 }
 
 /**
@@ -385,7 +477,12 @@ export async function deleteTestUser(userId: string) {
   await adminClient.from("profiles").delete().eq("id", userId);
   await adminClient.from("creators").delete().eq("id", userId);
   await adminClient.from("wallet_accounts").delete().eq("user_id", userId);
-  await adminClient.from("user_wallets").delete().eq("id", userId);
+  // P1 修复：已统一到 wallet_accounts，保留旧表清理以兼容未迁移的数据
+  await adminClient
+    .from("user_wallets")
+    .delete()
+    .eq("id", userId)
+    .catch(() => {});
 }
 
 /**
@@ -488,6 +585,9 @@ function addCookieCheckListener(page: Page): () => void {
  * 等待页面加载完成
  */
 export async function waitForPageLoad(page: Page) {
+  if (page.isClosed()) {
+    throw new Error("waitForPageLoad: page already closed");
+  }
   await page.waitForLoadState("domcontentloaded");
 }
 

@@ -34,9 +34,10 @@ export function WalletBalancePreview({ className }: WalletBalancePreviewProps) {
           return;
         }
 
+        // P1 修复：统一使用 wallet_accounts 表
         const { data, error } = await supabase
-          .from("user_wallets")
-          .select("balance_cents")
+          .from("wallet_accounts")
+          .select("available_balance_cents")
           .eq("user_id", user.id)
           .single();
 
@@ -44,19 +45,19 @@ export function WalletBalancePreview({ className }: WalletBalancePreviewProps) {
           // 如果钱包不存在，创建默认钱包
           if (error.code === "PGRST116") {
             const { data: newWallet, error: insertError } = await supabase
-              .from("user_wallets")
-              .insert({ user_id: user.id, balance_cents: 0 })
+              .from("wallet_accounts")
+              .insert({ user_id: user.id, available_balance_cents: 0, pending_balance_cents: 0 })
               .select()
               .single();
 
             if (!insertError && newWallet) {
-              setBalance(newWallet.balance_cents);
+              setBalance(newWallet.available_balance_cents);
             }
           } else {
             console.error("[WalletBalancePreview] Error loading balance:", error);
           }
         } else if (data) {
-          setBalance(data.balance_cents);
+          setBalance(data.available_balance_cents);
         }
       } catch (err) {
         console.error("[WalletBalancePreview] Error:", err);
@@ -67,7 +68,7 @@ export function WalletBalancePreview({ className }: WalletBalancePreviewProps) {
 
     loadBalance();
 
-    // 监听钱包变化
+    // 监听钱包变化（使用 wallet_accounts 表）
     const channel = supabase
       .channel("wallet-balance-changes")
       .on(
@@ -75,7 +76,7 @@ export function WalletBalancePreview({ className }: WalletBalancePreviewProps) {
         {
           event: "*",
           schema: "public",
-          table: "user_wallets",
+          table: "wallet_accounts",
         },
         () => {
           loadBalance();

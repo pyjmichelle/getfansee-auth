@@ -1,20 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-server";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { searchMockCreators, getMockPostsWithCreators, shouldUseMockData } from "@/lib/mock-data";
-
-// Use Service Role Key for search
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
 
 /**
  * GET /api/search?q=keyword&type=all|creators|posts
@@ -39,7 +26,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const supabase = getSupabaseAdmin();
+    const supabase = getSupabaseAdminClient();
     interface SearchResults {
       success: boolean;
       creators?: Array<{
@@ -71,12 +58,11 @@ export async function GET(request: NextRequest) {
     }
     const results: SearchResults = { success: true, creators: [], posts: [] };
 
-    // Search Creators
+    // Search Creators - 使用 public_creator_profiles view（只暴露公开信息）
     if (searchType === "all" || searchType === "creators") {
       const { data: creators, error: creatorsError } = await supabase
-        .from("profiles")
+        .from("public_creator_profiles")
         .select("id, display_name, avatar_url, bio, role")
-        .eq("role", "creator")
         .or(`display_name.ilike.%${query}%,bio.ilike.%${query}%`)
         .limit(10);
 
