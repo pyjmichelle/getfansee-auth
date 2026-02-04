@@ -478,11 +478,11 @@ export async function deleteTestUser(userId: string) {
   await adminClient.from("creators").delete().eq("id", userId);
   await adminClient.from("wallet_accounts").delete().eq("user_id", userId);
   // P1 修复：已统一到 wallet_accounts，保留旧表清理以兼容未迁移的数据
-  await adminClient
-    .from("user_wallets")
-    .delete()
-    .eq("id", userId)
-    .catch(() => {});
+  try {
+    await adminClient.from("user_wallets").delete().eq("id", userId);
+  } catch {
+    // 忽略错误 - 表可能不存在
+  }
 }
 
 /**

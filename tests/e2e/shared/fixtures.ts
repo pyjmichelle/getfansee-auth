@@ -418,11 +418,11 @@ export async function teardownTestFixtures(fixtures?: TestFixtures | null): Prom
         "delete:wallet_accounts"
       );
       // P1 修复：已统一到 wallet_accounts，保留旧表清理以兼容未迁移的数据
-      await adminClient
-        .from("user_wallets")
-        .delete()
-        .eq("id", userId)
-        .catch(() => {});
+      try {
+        await adminClient.from("user_wallets").delete().eq("id", userId);
+      } catch {
+        // 忽略错误 - 表可能不存在
+      }
       await withAdminRetries(
         () => adminClient.from("creators").delete().eq("id", userId),
         "delete:creators"
