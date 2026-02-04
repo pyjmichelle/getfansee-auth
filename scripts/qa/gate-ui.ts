@@ -420,7 +420,7 @@ async function runUICheck(browser: Browser, check: UICheck): Promise<CheckResult
 
     // Check each selector
     for (const selectorCheck of check.selectors) {
-      const minCount = selectorCheck.minCount || 1;
+      const minCount = selectorCheck.minCount ?? 1; // 使用 ?? 而不是 ||，确保 0 不会被转换为 1
       const elements = await page.locator(selectorCheck.selector).all();
       const visibleCount = (
         await Promise.all(elements.map((el) => el.isVisible().catch(() => false)))
