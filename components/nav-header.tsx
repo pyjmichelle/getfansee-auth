@@ -66,22 +66,22 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/50 glass-strong">
-      <div className="container flex h-16 items-center justify-between px-4">
+    <header className="sticky top-0 z-50 w-full border-b border-border glass-strong">
+      <div className="container flex h-14 sm:h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Link href="/home" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">G</span>
+          <Link href="/home" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-primary-gradient flex items-center justify-center shadow-sm group-hover:shadow-primary-glow transition-shadow duration-200">
+              <span className="text-white font-bold text-lg">G</span>
             </div>
-            <span className="font-bold text-xl hidden md:inline">GetFanSee</span>
+            <span className="font-bold text-lg hidden md:inline text-foreground">GetFanSee</span>
           </Link>
         </div>
 
         <div className="hidden md:flex flex-1 max-w-md mx-6">
           <Button
             type="button"
-            variant="outline"
-            className="w-full justify-start text-muted-foreground bg-background hover:bg-accent hover:border-primary/50 hover:text-foreground transition-[background-color,border-color,color] duration-200 motion-safe:transition-[background-color,border-color,color] motion-reduce:transition-none border-2 rounded-xl min-h-[44px] shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            variant="secondary"
+            className="w-full justify-start text-muted-foreground hover:text-foreground min-h-[44px]"
             aria-label="Search for creators and content"
             data-testid="search-button"
             onClick={() => setSearchOpen(true)}
@@ -92,10 +92,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
               }
             }}
           >
-            <Search
-              className="w-4 h-4 mr-2 text-muted-foreground group-hover:text-foreground transition-colors"
-              aria-hidden="true"
-            />
+            <Search className="w-4 h-4 mr-2" aria-hidden="true" />
             <span className="text-sm">Search creators, posts, tags…</span>
           </Button>
         </div>
@@ -105,7 +102,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden min-h-[44px] min-w-[44px] rounded-xl hover:bg-accent hover:text-foreground transition-[background-color,color] duration-200 motion-safe:transition-[background-color,color] motion-reduce:transition-none"
+            className="md:hidden"
             asChild
             aria-label="Search creators and content"
             data-testid="search-button-mobile"
@@ -117,13 +114,9 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
 
           {/* 常驻转化入口：顶部导航栏固定展示 Become a Creator 渐变按钮 */}
           {showBecomeCreator && (
-            <Button
-              asChild
-              variant="subscribe-gradient"
-              className="hidden md:flex rounded-xl min-h-[44px] font-semibold shadow-lg"
-            >
+            <Button asChild variant="subscribe-gradient" size="sm" className="hidden md:flex">
               <Link href="/creator/upgrade">
-                <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
+                <Sparkles className="w-4 h-4 mr-1.5" aria-hidden="true" />
                 Become a Creator
               </Link>
             </Button>
@@ -134,14 +127,17 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative min-h-[44px] min-w-[44px]"
+                className="relative"
                 asChild
                 aria-label={`Notifications${notificationCount > 0 ? `, ${notificationCount} unread` : ""}`}
               >
                 <Link href="/notifications">
                   <Bell className="w-5 h-5" aria-hidden="true" />
                   {notificationCount > 0 && (
-                    <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 text-xs">
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 text-[10px]"
+                    >
                       {notificationCount}
                     </Badge>
                   )}

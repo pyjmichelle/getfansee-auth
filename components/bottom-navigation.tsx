@@ -56,11 +56,11 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-border/50 md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-border md:hidden"
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="flex items-center justify-around h-16 safe-area-inset-bottom">
+      <div className="flex items-center justify-around h-[60px] safe-area-inset-bottom">
         {navItems
           .filter((item) => !item.requireCreator || userRole === "creator")
           .map((item) => {
@@ -72,12 +72,13 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 min-w-[60px] min-h-[44px] px-2 py-1 rounded-lg",
-                  "transition-[color,background-color] motion-safe:transition-[color,background-color] motion-reduce:transition-none",
+                  "flex flex-col items-center justify-center gap-0.5 min-w-[56px] min-h-[44px] px-2 py-1.5 rounded-xl",
+                  "transition-[color,background-color,transform] duration-150 motion-safe:transition-[color,background-color,transform] motion-reduce:transition-none",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                  "active:scale-95",
                   isActive
-                    ? "text-primary bg-primary/10 glass"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                 )}
                 aria-label={item.label}
                 aria-current={isActive ? "page" : undefined}
@@ -92,21 +93,24 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
                 <div className="relative">
                   <Icon
                     className={cn(
-                      "w-5 h-5 transition-[transform] motion-safe:transition-[transform] motion-reduce:transition-none",
-                      isActive && "motion-safe:scale-110 text-[var(--color-pink-400)]"
+                      "w-5 h-5 transition-transform duration-150",
+                      isActive && "scale-105 text-primary"
                     )}
                     aria-hidden="true"
                   />
                   {item.badge && (
                     <Badge
-                      className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs bg-destructive text-destructive-foreground"
+                      variant="destructive"
+                      className="absolute -top-1.5 -right-2 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
                       aria-label={`${item.badge} unread notifications`}
                     >
                       {item.badge > 9 ? "9+" : item.badge}
                     </Badge>
                   )}
                 </div>
-                <span className="text-xs font-medium">{item.label}</span>
+                <span className={cn("text-[10px] font-medium", isActive && "text-primary")}>
+                  {item.label}
+                </span>
               </Link>
             );
           })}

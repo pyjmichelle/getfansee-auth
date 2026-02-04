@@ -203,6 +203,42 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
         return;
       }
 
+      // 如果 Supabase 返回了 session（邮箱验证已关闭），直接跳转到 home
+      if (result.session) {
+        devLog("[auth] Signup successful with session, ensuring profile and redirecting...");
+
+        // 同步 session 到服务器
+        const supabaseClient = getSupabaseBrowserClient();
+        const { data: sessionData } = await supabaseClient.auth.getSession();
+
+        if (sessionData?.session) {
+          const sessionSync = await fetch("/api/auth/session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              access_token: sessionData.session.access_token,
+              refresh_token: sessionData.session.refresh_token,
+              expires_in: sessionData.session.expires_in,
+            }),
+          });
+
+          if (!sessionSync.ok) {
+            console.warn("[auth] Session sync failed but continuing...");
+          }
+        }
+
+        // 确保 profile 存在
+        void ensureProfile().catch((err) => {
+          console.warn("[auth] ensureProfile failed:", err);
+        });
+
+        // 跳转到 home
+        router.push("/home");
+        router.refresh();
+        return;
+      }
+
+      // 如果没有 session（需要邮箱验证），显示提示消息
       setInfo("Registration successful! Please check your email to verify your account.");
       setIsLoading(false);
     } catch (err) {
