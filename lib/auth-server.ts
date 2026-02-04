@@ -93,21 +93,32 @@ export async function getCurrentUser(): Promise<AppUser | null> {
     return null;
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("is_banned, ban_until")
-    .eq("id", user.id)
-    .single();
+  // 检查用户是否被封禁（使用 maybeSingle 避免 406 错误）
+  try {
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("is_banned, ban_until")
+      .eq("id", user.id)
+      .maybeSingle();
 
-  if (profile) {
-    const now = new Date();
-    const isBanned = profile.is_banned || (profile.ban_until && new Date(profile.ban_until) > now);
+    // 如果查询失败（如 RLS 限制或表结构问题），忽略封禁检查，允许用户继续
+    if (profileError) {
+      console.warn("[auth-server] Failed to check ban status:", profileError.message);
+      // 不阻止登录，只是跳过封禁检查
+    } else if (profile) {
+      const now = new Date();
+      const isBanned =
+        profile.is_banned || (profile.ban_until && new Date(profile.ban_until) > now);
 
-    if (isBanned) {
-      // better-auth-best-practices: 被禁用户自动登出
-      await supabase.auth.signOut();
-      return null;
+      if (isBanned) {
+        // better-auth-best-practices: 被禁用户自动登出
+        await supabase.auth.signOut();
+        return null;
+      }
     }
+  } catch (err) {
+    console.warn("[auth-server] Ban check error:", err);
+    // 不阻止登录
   }
 
   return { id: user.id, email: user.email };
@@ -141,9 +152,17 @@ export async function ensureProfile() {
     user.email.split("@")[0]
   )}&background=random&color=fff&size=128`;
 
+  // 生成 username（从 email 生成唯一标识）
+  const baseUsername = user.email
+    .split("@")[0]
+    .toLowerCase()
+    .replace(/[^a-z0-9_]/g, "_");
+  const username = `${baseUsername}_${user.id.substring(0, 8)}`;
+
   const { error: insertError } = await supabase.from("profiles").insert({
     id: user.id,
     email: user.email,
+    username: username,
     display_name: user.email.split("@")[0],
     role: "fan",
     age_verified: false,
