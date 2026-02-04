@@ -137,7 +137,7 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <div className="min-h-screen bg-background pb-16 md:pb-0" data-testid="post-page-error">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <ErrorState

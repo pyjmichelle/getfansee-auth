@@ -155,7 +155,18 @@ export async function expectUnlockedByServer(
     waitUntil: "domcontentloaded",
     timeout: 15_000,
   });
-  await expect(page.getByTestId("post-page")).toBeVisible({ timeout: 15_000 });
+  // 等待 post-page 或 post-page-error 出现（先检查错误状态）
+  const postPageOrError = page.getByTestId("post-page").or(page.getByTestId("post-page-error"));
+  await expect(postPageOrError).toBeVisible({ timeout: 15_000 });
+  // 如果是错误状态，抛出明确的错误
+  if (
+    await page
+      .getByTestId("post-page-error")
+      .isVisible()
+      .catch(() => false)
+  ) {
+    throw new Error(`Post page failed to load: post ${postId} not found or API error`);
+  }
   await expect(page.getByTestId("post-locked-overlay")).not.toBeVisible({ timeout: 10_000 });
   await expect(page.getByTestId("post-unlock-button")).not.toBeVisible({ timeout: 5_000 });
 }
