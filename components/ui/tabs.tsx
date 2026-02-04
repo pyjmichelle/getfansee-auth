@@ -20,7 +20,7 @@ function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimi
     <TabsPrimitive.List
       data-slot="tabs-list"
       className={cn(
-        "glass text-muted-foreground inline-flex h-10 w-fit items-center justify-center rounded-xl p-1 border border-border/50 shadow-sm",
+        "bg-secondary text-muted-foreground inline-flex h-11 w-fit items-center justify-center rounded-xl p-1 border border-border shadow-sm",
         className
       )}
       {...props}
@@ -33,7 +33,13 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "data-[state=active]:glass data-[state=active]:text-foreground data-[state=active]:font-semibold focus-visible:border-primary focus-visible:ring-primary/50 focus-visible:outline-none text-muted-foreground inline-flex h-[calc(100%-2px)] flex-1 items-center justify-center gap-2 rounded-lg border border-transparent px-4 py-2 text-sm font-medium whitespace-nowrap transition-[color,background-color,box-shadow] duration-300 motion-safe:transition-[color,background-color,box-shadow] motion-reduce:transition-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm hover:text-foreground hover:glass [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 min-h-[44px]",
+        "text-muted-foreground inline-flex h-full flex-1 items-center justify-center gap-2 rounded-lg border border-transparent px-4 py-2 text-sm font-medium whitespace-nowrap select-none",
+        "transition-[color,background-color,box-shadow,border-color] duration-150 motion-safe:transition-[color,background-color,box-shadow,border-color] motion-reduce:transition-none",
+        "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-primary/50",
+        "disabled:pointer-events-none disabled:opacity-50",
+        "hover:text-foreground hover:bg-secondary/80",
+        "data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:shadow-sm data-[state=active]:border-border",
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 min-h-[40px]",
         className
       )}
       {...props}

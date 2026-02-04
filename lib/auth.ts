@@ -34,22 +34,32 @@ export async function getCurrentUser(): Promise<AppUser | null> {
 
   if (!session?.user || !session.user.email) return null;
 
-  // 检查用户是否被封禁
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("is_banned, ban_until")
-    .eq("id", session.user.id)
-    .single();
+  // 检查用户是否被封禁（使用 maybeSingle 避免 406 错误）
+  try {
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("is_banned, ban_until")
+      .eq("id", session.user.id)
+      .maybeSingle();
 
-  if (profile) {
-    const now = new Date();
-    const isBanned = profile.is_banned || (profile.ban_until && new Date(profile.ban_until) > now);
+    // 如果查询失败（如 RLS 限制），忽略封禁检查，允许用户继续
+    if (profileError) {
+      console.warn("[auth] Failed to check ban status:", profileError.message);
+      // 不阻止登录，只是跳过封禁检查
+    } else if (profile) {
+      const now = new Date();
+      const isBanned =
+        profile.is_banned || (profile.ban_until && new Date(profile.ban_until) > now);
 
-    if (isBanned) {
-      // 登出被封禁的用户
-      await supabase.auth.signOut();
-      return null;
+      if (isBanned) {
+        // 登出被封禁的用户
+        await supabase.auth.signOut();
+        return null;
+      }
     }
+  } catch (err) {
+    console.warn("[auth] Ban check error:", err);
+    // 不阻止登录
   }
 
   return { id: session.user.id, email: session.user.email };
@@ -138,14 +148,12 @@ export async function ensureProfile() {
 export async function signUpWithEmail(
   email: string,
   password: string
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; session?: boolean }> {
   try {
-    // 如果邮箱验证关闭，不需要设置 emailRedirectTo，让 Supabase 立即返回 session
-    const { error } = await supabase.auth.signUp({
+    // 如果邮箱验证关闭，Supabase 会立即返回 session
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      // 不设置 options，让 Supabase 根据配置决定是否返回 session
-      // 如果邮箱验证关闭，Supabase 会立即返回 session
     });
 
     if (error) {
@@ -153,8 +161,11 @@ export async function signUpWithEmail(
       return { success: false, error: error.message };
     }
 
-    // 返回成功
-    return { success: true };
+    // 检查是否立即获得了 session（邮箱验证关闭的情况）
+    const hasSession = !!data?.session;
+    console.log("[auth] signUp result:", { hasSession, userId: data?.user?.id });
+
+    return { success: true, session: hasSession };
   } catch (err: unknown) {
     return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }

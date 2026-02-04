@@ -120,14 +120,16 @@ export default function SearchPageClient() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <NavHeader user={currentUser} notificationCount={0} />
 
-      <main className="py-6 sm:py-8 lg:py-12" data-testid="search-page">
+      <main className="py-5 sm:py-6 lg:py-8" data-testid="search-page">
         <CenteredContainer maxWidth="4xl">
-          <div className="mb-8 text-center sm:text-left">
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">Search</h1>
-            <p className="text-lg text-muted-foreground">Find creators and content</p>
+          <div className="mb-6 text-center sm:text-left">
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl mb-1 text-foreground">
+              Search
+            </h1>
+            <p className="text-base text-muted-foreground">Find creators and content</p>
           </div>
 
           {/* Search Form - 居中且显眼 */}

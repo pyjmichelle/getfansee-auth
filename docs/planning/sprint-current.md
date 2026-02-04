@@ -44,6 +44,24 @@
 
 ---
 
+### P1 – UI 统一风格改造（暗色主题）
+
+- Scope:
+  - 以用户提供的 UI 截图与代码风格为主，统一全站暗色主题
+  - 覆盖全部现有页面（fan/creator/admin/支付/钱包等），不包括 landing page
+  - 调整 globals.css 主题变量、组件层（按钮/卡片/导航/弹窗）、关键页面
+- Acceptance Criteria:
+  - 主题变量与深色调一致，组件风格统一
+  - 核心页面（Feed/Explore/Subscriptions/Creator Profile/Wallet）打样完成
+  - pnpm check-all 通过
+  - 至少一个相关 UI 路由的 e2e 测试通过
+- Required Gates:
+  - pnpm check-all
+  - pnpm build
+  - 至少一个相关 e2e 测试
+
+---
+
 ### P1 – Kernel & Planning normalization
 
 - Scope:
