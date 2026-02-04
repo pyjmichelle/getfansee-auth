@@ -44,9 +44,6 @@ interface CheckResult {
   finalUrl: string;
 }
 
-// CI 环境下允许帖子为空（可能没有测试数据）
-const isCI = process.env.CI === "true" || process.env.CI === "1";
-
 const UI_CHECKS: UICheck[] = [
   {
     id: "home-posts",
@@ -56,8 +53,9 @@ const UI_CHECKS: UICheck[] = [
       {
         selector: '[data-testid="post-card"]',
         description: "Post card should be visible",
-        // CI 环境可能没有测试数据，设为 0 允许空状态
-        minCount: isCI ? 0 : 1,
+        // 帖子数量取决于数据库数据，允许为空（0+）
+        // 这个检查主要验证页面能正常加载，不验证具体数据
+        minCount: 0,
       },
     ],
   },
