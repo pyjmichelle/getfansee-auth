@@ -203,28 +203,27 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
         return;
       }
 
-      // 如果 Supabase 返回了 session（邮箱验证已关闭），直接跳转到 home
-      if (result.session) {
-        devLog("[auth] Signup successful with session, ensuring profile and redirecting...");
+      // 注册成功后，检查是否有 session
+      const supabaseClient = getSupabaseBrowserClient();
+      const { data: sessionData } = await supabaseClient.auth.getSession();
+
+      if (sessionData?.session) {
+        // 有 session，直接跳转到 home
+        devLog("[auth] Signup successful with session, redirecting...");
 
         // 同步 session 到服务器
-        const supabaseClient = getSupabaseBrowserClient();
-        const { data: sessionData } = await supabaseClient.auth.getSession();
+        const sessionSync = await fetch("/api/auth/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            access_token: sessionData.session.access_token,
+            refresh_token: sessionData.session.refresh_token,
+            expires_in: sessionData.session.expires_in,
+          }),
+        });
 
-        if (sessionData?.session) {
-          const sessionSync = await fetch("/api/auth/session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              access_token: sessionData.session.access_token,
-              refresh_token: sessionData.session.refresh_token,
-              expires_in: sessionData.session.expires_in,
-            }),
-          });
-
-          if (!sessionSync.ok) {
-            console.warn("[auth] Session sync failed but continuing...");
-          }
+        if (!sessionSync.ok) {
+          console.warn("[auth] Session sync failed but continuing...");
         }
 
         // 确保 profile 存在
@@ -238,9 +237,43 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
         return;
       }
 
-      // 如果没有 session（需要邮箱验证），显示提示消息
-      setInfo("Registration successful! Please check your email to verify your account.");
-      setIsLoading(false);
+      // 没有 session，尝试自动登录（邮箱验证关闭时应该能成功）
+      devLog("[auth] No session after signup, attempting auto-login...");
+      const { data: loginData, error: loginError } = await supabaseClient.auth.signInWithPassword({
+        email: signupEmail,
+        password: signupPassword,
+      });
+
+      if (loginError || !loginData.session) {
+        // 自动登录失败，可能需要邮箱验证
+        devLog("[auth] Auto-login failed:", loginError?.message);
+        setInfo("Registration successful! Please check your email to verify your account.");
+        setIsLoading(false);
+        return;
+      }
+
+      // 自动登录成功
+      devLog("[auth] Auto-login successful, redirecting...");
+      const sessionSync = await fetch("/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_token: loginData.session.access_token,
+          refresh_token: loginData.session.refresh_token,
+          expires_in: loginData.session.expires_in,
+        }),
+      });
+
+      if (!sessionSync.ok) {
+        console.warn("[auth] Session sync failed but continuing...");
+      }
+
+      void ensureProfile().catch((err) => {
+        console.warn("[auth] ensureProfile failed:", err);
+      });
+
+      router.push("/home");
+      router.refresh();
     } catch (err) {
       setError(getErrorMessage(err));
       setIsLoading(false);
