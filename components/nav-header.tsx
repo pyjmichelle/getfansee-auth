@@ -66,14 +66,14 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border glass-strong">
+    <header className="sticky top-0 z-50 w-full border-b border-border-base glass-strong">
       <div className="container flex h-14 sm:h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Link href="/home" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-primary-gradient flex items-center justify-center shadow-sm group-hover:shadow-primary-glow transition-shadow duration-200">
+            <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center shadow-md group-hover:shadow-glow hover-glow transition-shadow duration-200">
               <span className="text-white font-bold text-lg">G</span>
             </div>
-            <span className="font-bold text-lg hidden md:inline text-foreground">GetFanSee</span>
+            <span className="font-bold text-lg hidden md:inline text-text-primary">GetFanSee</span>
           </Link>
         </div>
 
@@ -81,7 +81,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
           <Button
             type="button"
             variant="secondary"
-            className="w-full justify-start text-muted-foreground hover:text-foreground min-h-[44px]"
+            className="w-full justify-start text-text-tertiary hover:text-text-primary min-h-[44px] bg-surface-raised border-border-base hover:border-border-strong"
             aria-label="Search for creators and content"
             data-testid="search-button"
             onClick={() => setSearchOpen(true)}
@@ -305,7 +305,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                         <Separator className="my-3" />
                         <Button
                           variant="subscribe-gradient"
-                          className="justify-start rounded-xl min-h-[48px] font-bold shadow-lg hover:shadow-subscribe-glow hover-glow transition-[box-shadow,transform] duration-200 motion-safe:transition-[box-shadow,transform] motion-reduce:transition-none"
+                          className="justify-start rounded-xl min-h-[48px] font-bold shadow-lg transition-[box-shadow,transform] duration-200 motion-safe:transition-[box-shadow,transform] motion-reduce:transition-none"
                           asChild
                           onClick={() => setMobileMenuOpen(false)}
                         >

@@ -173,97 +173,97 @@ export default function PurchasesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-24 md:pb-0">
       <NavHeader user={currentUser} notificationCount={0} />
 
-      <main className="container max-w-4xl mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Your Purchases</h1>
-          <p className="text-muted-foreground">View all your unlocked content</p>
-        </div>
+      <main className="pt-20 md:pt-24 max-w-4xl mx-auto px-4 md:px-6 py-8">
+        {/* Stats Card - Figma Style */}
+        <div className="bg-gradient-subtle border border-border-base rounded-2xl p-6 md:p-8 mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">Your Purchases</h1>
+          <p className="text-text-tertiary text-sm md:text-base mb-6">
+            View all your unlocked content
+          </p>
 
-        {/* Stats */}
-        {purchases.length > 0 && (
-          <Card className="p-6 mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Total Purchases</p>
-                <p className="text-2xl font-bold text-foreground">{purchases.length}</p>
+          {purchases.length > 0 && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-surface-base/50 rounded-xl p-4">
+                <p className="text-xs text-text-tertiary mb-1">Total Purchases</p>
+                <p className="text-2xl font-bold text-text-primary">{purchases.length}</p>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Total Spent</p>
-                <p className="text-2xl font-bold text-foreground">
+              <div className="bg-surface-base/50 rounded-xl p-4">
+                <p className="text-xs text-text-tertiary mb-1">Total Spent</p>
+                <p className="text-2xl font-bold text-brand-accent">
                   ${(totalSpent / 100).toFixed(2)}
                 </p>
               </div>
             </div>
-          </Card>
-        )}
+          )}
+        </div>
 
         {/* Purchases List */}
         {purchases.length === 0 ? (
-          <EmptyState
-            data-testid="purchases-list"
-            icon="shopping-bag"
-            title="No purchases yet"
-            description="Unlock premium content from your favorite creators"
-            action={{ label: "Browse Content", href: "/home" }}
-          />
+          <div className="bg-surface-raised border border-border-base rounded-2xl p-8">
+            <EmptyState
+              data-testid="purchases-list"
+              icon="shopping-bag"
+              title="No purchases yet"
+              description="Unlock premium content from your favorite creators"
+              action={{ label: "Browse Content", href: "/home" }}
+            />
+          </div>
         ) : (
-          <div className="space-y-4" data-testid="purchases-list">
+          <div
+            className="bg-surface-raised border border-border-base rounded-2xl divide-y divide-border-base"
+            data-testid="purchases-list"
+          >
             {purchases.map((purchase) => (
-              <Card
+              <div
                 key={purchase.id}
-                className="overflow-hidden"
+                className="p-4 md:p-6 hover:bg-surface-overlay/50 transition-colors"
                 data-testid="purchase-item"
                 data-purchase-id={purchase.id}
               >
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-3">
-                    <Link
-                      href={`/creator/${purchase.post?.creator_id}`}
-                      className="flex items-center gap-3"
-                    >
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage
-                          src={purchase.post?.creator?.avatar_url || "/placeholder.svg"}
-                        />
-                        <AvatarFallback>
-                          {purchase.post?.creator?.display_name?.[0]?.toUpperCase() || "C"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-foreground">
-                            {purchase.post?.creator?.display_name || "Creator"}
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">Creator</p>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {purchase.post?.title && (
-                    <h3 className="font-semibold text-foreground mb-2">{purchase.post.title}</h3>
-                  )}
-                  <p className="text-foreground mb-4 line-clamp-2">{purchase.post?.content}</p>
-
-                  <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4">
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="w-4 h-4" />$
-                      {(purchase.paid_amount_cents / 100).toFixed(2)}
+                <div className="flex items-start gap-3 mb-3">
+                  <Link
+                    href={`/creator/${purchase.post?.creator_id}`}
+                    className="flex items-center gap-3 flex-1"
+                  >
+                    <Avatar className="w-10 h-10 ring-2 ring-transparent hover:ring-brand-primary/30 transition-all">
+                      <AvatarImage src={purchase.post?.creator?.avatar_url || "/placeholder.svg"} />
+                      <AvatarFallback className="bg-brand-primary-alpha-10 text-brand-primary font-semibold">
+                        {purchase.post?.creator?.display_name?.[0]?.toUpperCase() || "C"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <span className="font-semibold text-text-primary block truncate">
+                        {purchase.post?.creator?.display_name || "Creator"}
+                      </span>
+                      <p className="text-xs text-text-tertiary">Creator</p>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      Purchased {formatDate(purchase.created_at)}
-                    </div>
+                  </Link>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-brand-accent">
+                      ${(purchase.paid_amount_cents / 100).toFixed(2)}
+                    </p>
+                    <p className="text-xs text-text-quaternary">
+                      {formatDate(purchase.created_at)}
+                    </p>
                   </div>
-
-                  <Button asChild variant="outline" className="bg-transparent">
-                    <Link href={`/creator/${purchase.post?.creator_id}`}>View Content</Link>
-                  </Button>
                 </div>
-              </Card>
+
+                {purchase.post?.title && (
+                  <h3 className="font-semibold text-text-primary mb-1 line-clamp-1">
+                    {purchase.post.title}
+                  </h3>
+                )}
+                <p className="text-text-secondary text-sm mb-4 line-clamp-2">
+                  {purchase.post?.content}
+                </p>
+
+                <Button asChild variant="outline" size="sm" className="rounded-xl">
+                  <Link href={`/posts/${purchase.post_id}`}>View Content</Link>
+                </Button>
+              </div>
             ))}
           </div>
         )}

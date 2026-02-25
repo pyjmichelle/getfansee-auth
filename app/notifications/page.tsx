@@ -2,7 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, Heart, DollarSign, UserPlus, Check } from "lucide-react";
+import {
+  Bell,
+  Heart,
+  DollarSign,
+  UserPlus,
+  Check,
+  CheckCheck,
+  Image,
+  MessageCircle,
+  AlertCircle,
+  CreditCard,
+  Clock,
+  Trash2,
+} from "lucide-react";
 import { NavHeader } from "@/components/nav-header";
 import { Button } from "@/components/ui/button";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
@@ -134,17 +147,75 @@ export default function NotificationsPage() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "new_post":
-        return <Bell className="w-5 h-5" />;
+        return <Image className="w-5 h-5 text-brand-primary" />;
       case "like":
-        return <Heart className="w-5 h-5" />;
+        return <Heart className="w-5 h-5 text-error" />;
+      case "comment":
+        return <MessageCircle className="w-5 h-5 text-brand-secondary" />;
       case "purchase":
-        return <DollarSign className="w-5 h-5" />;
+        return <DollarSign className="w-5 h-5 text-success" />;
       case "new_subscriber":
-        return <UserPlus className="w-5 h-5" />;
+      case "subscriber":
+        return <UserPlus className="w-5 h-5 text-success" />;
+      case "subscription_expiring":
+        return <AlertCircle className="w-5 h-5 text-warning" />;
+      case "payment":
+        return <CreditCard className="w-5 h-5 text-success" />;
+      case "tip":
+        return <DollarSign className="w-5 h-5 text-brand-accent" />;
       default:
-        return <Bell className="w-5 h-5" />;
+        return <Bell className="w-5 h-5 text-text-tertiary" />;
     }
   };
+
+  const getNotificationBgColor = (type: string) => {
+    switch (type) {
+      case "new_post":
+        return "bg-brand-primary-alpha-10";
+      case "like":
+        return "bg-error/10";
+      case "comment":
+        return "bg-brand-secondary/10";
+      case "purchase":
+        return "bg-success/10";
+      case "new_subscriber":
+      case "subscriber":
+        return "bg-success/10";
+      case "subscription_expiring":
+        return "bg-warning/10";
+      case "payment":
+        return "bg-success/10";
+      case "tip":
+        return "bg-brand-accent/10";
+      default:
+        return "bg-surface-raised";
+    }
+  };
+
+  // Group notifications by date
+  const groupedNotifications = filteredNotifications.reduce(
+    (groups: { [key: string]: typeof filteredNotifications }, notification) => {
+      const date = notification.created_at ? new Date(notification.created_at) : new Date();
+      const now = new Date();
+      const diffHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+      let dateGroup: string;
+      if (diffHours < 24) {
+        dateGroup = "Today";
+      } else if (diffHours < 48) {
+        dateGroup = "Yesterday";
+      } else {
+        dateGroup = "Earlier";
+      }
+
+      if (!groups[dateGroup]) {
+        groups[dateGroup] = [];
+      }
+      groups[dateGroup].push(notification);
+      return groups;
+    },
+    {}
+  );
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -210,11 +281,11 @@ export default function NotificationsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <div className="min-h-screen bg-background pb-24 md:pb-0">
         <NavHeader user={currentUser ?? undefined} notificationCount={0} />
-        <main className="container max-w-2xl mx-auto px-4 py-8">
+        <div className="pt-20 md:pt-24 max-w-4xl mx-auto px-4 md:px-6 py-8">
           <LoadingState type="skeleton" />
-        </main>
+        </div>
         <BottomNavigation notificationCount={0} />
       </div>
     );
@@ -225,112 +296,148 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
+    <div className="min-h-screen bg-background pb-24 md:pb-0">
       <NavHeader user={currentUser ?? undefined} notificationCount={unreadCount} />
 
-      <main className="container max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Notifications</h1>
-            <p className="text-muted-foreground">{unreadCount} unread</p>
-          </div>
-          {unreadCount > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={markAllAsRead}
-              className="border-border bg-card hover:bg-card rounded-xl"
-            >
-              <Check className="w-4 h-4 mr-2" />
-              Mark all read
-            </Button>
-          )}
-        </div>
-
-        {/* Filter Tabs */}
-        <div className="flex gap-2 mb-8">
-          <Button
-            variant={filter === "all" ? "default" : "outline"}
-            onClick={() => setFilter("all")}
-            className={`rounded-xl ${
-              filter === "all" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
-            }`}
-          >
-            All
-          </Button>
-          <Button
-            variant={filter === "unread" ? "default" : "outline"}
-            onClick={() => setFilter("unread")}
-            className={`rounded-xl ${
-              filter === "unread" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
-            }`}
-          >
-            Unread ({unreadCount})
-          </Button>
-        </div>
-
-        {/* Notifications List */}
-        {filteredNotifications.length === 0 ? (
-          <div className="text-center py-24">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-card border border-border flex items-center justify-center">
-              <Bell className="w-12 h-12 text-muted-foreground opacity-50" />
+      <div className="pt-20 md:pt-24">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
+          {/* Header - Figma Style */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-text-primary mb-2">Notifications</h1>
+              {unreadCount > 0 && (
+                <p className="text-text-tertiary flex items-center gap-2">
+                  <span className="w-2 h-2 bg-brand-primary rounded-full animate-pulse" />
+                  {unreadCount} unread notification{unreadCount !== 1 ? "s" : ""}
+                </p>
+              )}
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">Inbox Empty</h3>
-            <p className="text-muted-foreground">
-              {filter === "unread"
-                ? "You're all caught up!"
-                : "You don't have any notifications yet"}
-            </p>
+
+            {unreadCount > 0 && (
+              <button
+                onClick={markAllAsRead}
+                className="px-5 py-2.5 text-brand-primary hover:bg-brand-primary-alpha-10 rounded-xl font-semibold transition-all active:scale-95 flex items-center gap-2"
+              >
+                <CheckCheck className="w-4 h-4" />
+                Mark all read
+              </button>
+            )}
           </div>
-        ) : (
-          <div className="space-y-3">
-            {filteredNotifications.map((notification) => {
-              const notificationDate = notification.createdAt || notification.created_at;
-              return (
-                <div
-                  key={notification.id}
-                  className={`bg-card border border-border rounded-3xl p-4 md:p-6 cursor-pointer transition-[background-color] motion-safe:transition-[background-color] motion-reduce:transition-none hover:bg-card ${
-                    !notification.read ? "border-primary/30" : ""
-                  }`}
-                  onClick={async () => {
-                    await markAsRead(notification.id);
-                    if (notification.actionUrl) {
-                      // 使用 router.push 而非 window.location.href，避免改变身份上下文
-                      router.push(notification.actionUrl);
-                    }
-                  }}
+
+          {/* Filter Tabs - Figma Style */}
+          <div className="flex gap-3 mb-6">
+            <button
+              onClick={() => setFilter("all")}
+              className={`flex-1 py-3 rounded-xl font-semibold transition-all active:scale-[0.98] ${
+                filter === "all"
+                  ? "bg-brand-primary text-white shadow-glow"
+                  : "bg-surface-raised text-text-secondary hover:bg-surface-overlay border border-border-base"
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setFilter("unread")}
+              className={`flex-1 py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 active:scale-[0.98] ${
+                filter === "unread"
+                  ? "bg-brand-primary text-white shadow-glow"
+                  : "bg-surface-raised text-text-secondary hover:bg-surface-overlay border border-border-base"
+              }`}
+            >
+              Unread
+              {unreadCount > 0 && (
+                <span
+                  className={`px-2.5 py-0.5 ${filter === "unread" ? "bg-white/20" : "bg-brand-primary-alpha-10 text-brand-primary"} rounded-full text-xs font-bold`}
                 >
-                  <div className="flex items-start gap-4">
-                    {/* 未读通知左侧渐变小圆点 */}
-                    {!notification.read && (
-                      <div className="w-2 h-2 rounded-full bg-primary-gradient flex-shrink-0 mt-2"></div>
-                    )}
-                    <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                        !notification.read
-                          ? "bg-primary/10 text-primary"
-                          : "bg-border text-muted-foreground"
-                      }`}
-                    >
-                      {getNotificationIcon(notification.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className={`text-sm md:text-base ${!notification.read ? "font-semibold text-foreground" : "text-muted-foreground"}`}
-                      >
-                        {notification.message}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {notificationDate ? formatDate(notificationDate) : "Unknown date"}
-                      </p>
-                    </div>
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Notifications List - Figma Style */}
+          {filteredNotifications.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="w-24 h-24 bg-surface-raised rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <Bell className="w-10 h-10 text-text-quaternary" />
+              </div>
+              <h3 className="text-2xl font-bold mb-2 text-text-primary">
+                {filter === "unread" ? "All caught up!" : "No notifications yet"}
+              </h3>
+              <p className="text-text-tertiary text-lg">
+                {filter === "unread"
+                  ? "You've read all your notifications"
+                  : "We'll notify you when something happens"}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {Object.entries(groupedNotifications).map(([dateGroup, groupNotifications]) => (
+                <div key={dateGroup}>
+                  {/* Date Header */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <h3 className="font-bold text-text-secondary">{dateGroup}</h3>
+                    <div className="flex-1 h-px bg-border-subtle" />
+                  </div>
+
+                  {/* Notifications in this group */}
+                  <div className="space-y-3">
+                    {groupNotifications.map((notification) => {
+                      const notificationDate = notification.createdAt || notification.created_at;
+                      return (
+                        <div
+                          key={notification.id}
+                          className={`group bg-surface-raised border border-border-base rounded-2xl overflow-hidden hover:border-brand-primary/30 transition-all cursor-pointer ${
+                            !notification.read ? "ring-2 ring-brand-primary/20" : ""
+                          }`}
+                          onClick={async () => {
+                            await markAsRead(notification.id);
+                            if (notification.actionUrl) {
+                              router.push(notification.actionUrl);
+                            }
+                          }}
+                        >
+                          <div className="p-5">
+                            <div className="flex gap-4">
+                              {/* Icon */}
+                              <div
+                                className={`w-14 h-14 ${getNotificationBgColor(notification.type)} rounded-2xl flex items-center justify-center border border-border-base flex-shrink-0`}
+                              >
+                                {getNotificationIcon(notification.type)}
+                              </div>
+
+                              {/* Content */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start justify-between gap-3 mb-1">
+                                  <h4 className="font-bold text-text-primary">
+                                    {notification.title || notification.message}
+                                  </h4>
+                                  <div className="flex items-center gap-2">
+                                    {!notification.read && (
+                                      <div className="w-2.5 h-2.5 bg-brand-primary rounded-full animate-pulse" />
+                                    )}
+                                  </div>
+                                </div>
+                                <p className="text-text-secondary text-sm mb-2">
+                                  {notification.message}
+                                </p>
+                                <p className="text-text-tertiary text-xs flex items-center gap-1.5">
+                                  <Clock className="w-3 h-3" />
+                                  {notificationDate ? formatDate(notificationDate) : "Unknown date"}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </main>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
       <BottomNavigation notificationCount={unreadCount} userRole={currentUser?.role} />
     </div>

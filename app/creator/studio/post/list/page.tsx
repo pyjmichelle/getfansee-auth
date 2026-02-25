@@ -4,13 +4,29 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { NavHeader } from "@/components/nav-header";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { ensureProfile } from "@/lib/auth";
 import { getProfile } from "@/lib/profile";
-// listCreatorPosts, updatePost, deletePost 通过 API 调用，不直接导入
 import { type Post } from "@/lib/types";
-import { Edit, Trash2, Eye, Heart, DollarSign, Plus, Calendar } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  Eye,
+  Heart,
+  DollarSign,
+  Plus,
+  Calendar,
+  Search,
+  List,
+  Grid3X3,
+  Lock,
+  CheckCircle,
+  FileText,
+  MoreVertical,
+  MessageCircle,
+  Unlock,
+  Download,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import {
@@ -23,6 +39,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { BottomNavigation } from "@/components/bottom-navigation";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -37,6 +54,9 @@ export default function CreatorPostListPage() {
   } | null>(null);
   const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const [filterStatus, setFilterStatus] = useState<"all" | "published" | "locked" | "draft">("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
@@ -109,174 +129,426 @@ export default function CreatorPostListPage() {
     }
   };
 
-  const getVisibilityBadge = (visibility: string, priceCents: number | null) => {
-    if (visibility === "free") {
-      return (
-        <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 rounded-lg">
-          Free
-        </Badge>
-      );
-    } else if (visibility === "subscribers") {
-      return (
-        <Badge className="glass bg-subscribe-gradient/20 text-[var(--color-pink-400)] border-[var(--border-pink-500-30)] rounded-lg shadow-sm">
-          Exclusive
-        </Badge>
-      );
-    } else {
-      return (
-        <Badge className="glass bg-unlock-gradient/20 text-[var(--color-orange-400)] border-[var(--border-orange-500-30)] rounded-lg shadow-sm">
-          Premium ${((priceCents || 0) / 100).toFixed(2)}
-        </Badge>
-      );
-    }
-  };
+  // Filter posts based on status and search
+  const filteredPosts = posts.filter((post) => {
+    const matchesSearch =
+      searchQuery === "" ||
+      post.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.title?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter =
+      filterStatus === "all" ||
+      (filterStatus === "published" && post.visibility !== "draft") ||
+      (filterStatus === "locked" &&
+        (post.visibility === "subscribers" || post.visibility === "ppv")) ||
+      (filterStatus === "draft" && post.visibility === "draft");
+    return matchesSearch && matchesFilter;
+  });
+
+  // Stats calculations
+  const totalPosts = posts.length;
+  const publishedPosts = posts.filter((p) => p.visibility !== "draft").length;
+  const premiumPosts = posts.filter(
+    (p) => p.visibility === "subscribers" || p.visibility === "ppv"
+  ).length;
+  const totalRevenue = posts.reduce((sum, p) => sum + (p.price_cents || 0) / 100, 0);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-20 md:pb-0">
         {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-        <main className="container max-w-4xl mx-auto px-4 py-8">
+        <div className="pt-20 md:pt-24 px-4 md:px-6 max-w-7xl mx-auto pb-12">
           <div className="animate-pulse space-y-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-muted rounded-3xl"></div>
-            ))}
+            <div className="h-10 w-64 bg-surface-raised rounded" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-32 bg-surface-raised rounded-2xl" />
+              ))}
+            </div>
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-40 bg-surface-raised rounded-2xl" />
+              ))}
+            </div>
           </div>
-        </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
 
-      <main className="container max-w-4xl mx-auto px-4 md:px-8 py-8 md:py-12">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">My Posts</h1>
-            <p className="text-muted-foreground">Manage all your published content</p>
+      <div className="pt-20 md:pt-24 px-4 md:px-6 max-w-7xl mx-auto pb-12">
+        {/* Header */}
+        <div className="mb-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3 text-text-primary">
+                Content Library
+              </h1>
+              <p className="text-text-tertiary text-lg">Manage your posts and media</p>
+            </div>
+            <div className="flex gap-3">
+              <button className="px-5 py-3 bg-surface-raised border border-border-base rounded-xl font-semibold hover:bg-surface-overlay transition-all flex items-center gap-2 active:scale-95">
+                <Download size={18} />
+                Export
+              </button>
+              <Link
+                href="/creator/new-post"
+                className="px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-primary/90 transition-all flex items-center gap-2 shadow-lg shadow-brand-primary/25 active:scale-95"
+              >
+                <Plus size={18} />
+                Create Post
+              </Link>
+            </div>
           </div>
-          <Button asChild variant="gradient" size="lg" className="w-full sm:w-auto rounded-xl">
-            <Link href="/creator/new-post">
-              <Plus className="w-5 h-5 mr-2" />
-              New Post
-            </Link>
-          </Button>
         </div>
 
+        {/* Stats Overview */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+          <div className="bg-surface-base border border-border-base rounded-2xl p-6 hover:border-brand-primary/30 transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm text-text-tertiary font-semibold">Total Posts</div>
+              <div className="w-12 h-12 bg-brand-primary/10 rounded-xl flex items-center justify-center">
+                <FileText size={20} className="text-brand-primary" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-text-primary">{totalPosts}</div>
+          </div>
+          <div className="bg-surface-base border border-border-base rounded-2xl p-6 hover:border-success/30 transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm text-text-tertiary font-semibold">Published</div>
+              <div className="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center">
+                <CheckCircle size={20} className="text-success" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-text-primary">{publishedPosts}</div>
+          </div>
+          <div className="bg-surface-base border border-border-base rounded-2xl p-6 hover:border-brand-secondary/30 transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm text-text-tertiary font-semibold">Premium</div>
+              <div className="w-12 h-12 bg-brand-secondary/10 rounded-xl flex items-center justify-center">
+                <Lock size={20} className="text-brand-secondary" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-text-primary">{premiumPosts}</div>
+          </div>
+          <div className="bg-gradient-subtle border border-border-base rounded-2xl p-6 hover:border-success/30 transition-all relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-success/5 to-transparent" />
+            <div className="relative flex items-center justify-between mb-3">
+              <div className="text-sm text-text-tertiary font-semibold">Total Revenue</div>
+              <div className="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center">
+                <DollarSign size={20} className="text-success" />
+              </div>
+            </div>
+            <div className="relative text-3xl font-bold text-gradient-primary">
+              ${totalRevenue.toFixed(0)}
+            </div>
+          </div>
+        </div>
+
+        {/* Error Message */}
         {error && (
-          <div className="mb-4 p-4 bg-destructive/10 text-destructive rounded-lg border border-destructive/20">
+          <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl text-error">
             {error}
           </div>
         )}
 
-        {posts.length === 0 ? (
-          <div className="bg-card border border-border rounded-3xl p-12 text-center">
-            <p className="text-muted-foreground mb-4">No posts yet</p>
-            <Button asChild variant="gradient" className="rounded-xl">
-              <Link href="/creator/new-post">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Your First Post
-              </Link>
-            </Button>
+        {/* Controls */}
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="flex-1 relative">
+            <Search
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-text-tertiary"
+              size={18}
+            />
+            <input
+              type="text"
+              placeholder="Search content..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all placeholder:text-text-tertiary"
+            />
           </div>
-        ) : (
-          <div className="space-y-6" data-testid="creator-post-list">
-            {posts.map((post) => (
+
+          <div className="flex gap-3">
+            <div className="flex gap-1 bg-surface-raised border border-border-base rounded-xl p-1">
+              {(["all", "published", "locked", "draft"] as const).map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilterStatus(status)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize active:scale-95 ${
+                    filterStatus === status
+                      ? "bg-brand-primary text-white shadow-md"
+                      : "text-text-tertiary hover:text-text-primary hover:bg-surface-overlay"
+                  }`}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex gap-1 bg-surface-raised border border-border-base rounded-xl p-1">
+              <button
+                onClick={() => setViewMode("list")}
+                className={`p-2.5 rounded-lg transition-all active:scale-95 ${
+                  viewMode === "list"
+                    ? "bg-brand-primary text-white shadow-md"
+                    : "text-text-tertiary hover:bg-surface-overlay"
+                }`}
+              >
+                <List size={18} />
+              </button>
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`p-2.5 rounded-lg transition-all active:scale-95 ${
+                  viewMode === "grid"
+                    ? "bg-brand-primary text-white shadow-md"
+                    : "text-text-tertiary hover:bg-surface-overlay"
+                }`}
+              >
+                <Grid3X3 size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Content List */}
+        {viewMode === "list" ? (
+          <div className="space-y-4" data-testid="creator-post-list">
+            {filteredPosts.map((post) => (
               <div
                 key={post.id}
-                className="bg-card border border-border rounded-3xl p-6 hover:border-border transition-colors"
+                className="bg-surface-base border border-border-base hover:border-brand-primary/30 rounded-2xl p-6 transition-all group hover:shadow-lg"
                 data-testid="creator-post-list-item"
                 data-post-id={post.id}
               >
-                <div className="flex flex-col md:flex-row gap-6">
-                  {/* Media Preview */}
-                  {post.media && post.media.length > 0 && (
-                    <div className="md:w-48 aspect-video md:aspect-auto rounded-xl overflow-hidden bg-muted">
-                      {post.media[0].media_type === "image" ? (
+                <div className="flex gap-6">
+                  {/* Thumbnail */}
+                  <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden flex-shrink-0 bg-surface-raised">
+                    {post.media && post.media.length > 0 && post.media[0].media_url ? (
+                      post.media[0].media_type === "image" ? (
                         <img
                           src={post.media[0].media_url}
-                          alt="Post preview"
-                          className="w-full h-full object-cover"
+                          alt={post.title || "Post preview"}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
                         <video
                           src={post.media[0].media_url}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           muted
                         />
-                      )}
-                    </div>
-                  )}
-
-                  {/* Post Details */}
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          {getVisibilityBadge(post.visibility ?? "free", post.price_cents ?? null)}
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {post.created_at
-                              ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true })
-                              : "Unknown date"}
-                          </span>
-                        </div>
-                        {post.title && (
-                          <h3 className="text-lg font-semibold text-foreground mb-2">
-                            {post.title}
-                          </h3>
-                        )}
-                        <p className="text-sm text-muted-foreground line-clamp-2">{post.content}</p>
+                      )
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <FileText size={32} className="text-text-quaternary" />
                       </div>
-                    </div>
-
-                    {/* Stats (placeholder - 实际应从数据库获取) */}
-                    <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-4">
-                      <div className="flex items-center gap-1">
-                        <Eye className="w-4 h-4" />
-                        <span>0 views</span>
+                    )}
+                    {(post.visibility === "subscribers" || post.visibility === "ppv") && (
+                      <div className="absolute top-2 left-2 px-2.5 py-1.5 bg-brand-secondary/90 backdrop-blur-sm rounded-lg text-xs font-semibold flex items-center gap-1.5 text-white">
+                        <Lock size={12} />
+                        {post.visibility === "ppv"
+                          ? `$${((post.price_cents || 0) / 100).toFixed(2)}`
+                          : "Exclusive"}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Heart className="w-4 h-4" />
-                        <span>0 likes</span>
-                      </div>
-                      {post.visibility === "ppv" && (
-                        <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                          <DollarSign className="w-4 h-4" />
-                          <span>$0</span>
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex md:flex-col gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1 md:flex-none border-border bg-card hover:bg-card rounded-xl"
-                      asChild
-                    >
-                      <Link href={`/creator/studio/post/edit/${post.id}`}>
-                        <Edit className="w-4 h-4 mr-2" />
-                        Edit
-                      </Link>
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="flex-1 md:flex-none text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
-                      onClick={() => setDeletingPostId(post.id)}
-                      disabled={deletingPostId === post.id}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Delete
-                    </Button>
+                  {/* Content Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg mb-2 truncate group-hover:text-brand-primary transition-colors text-text-primary">
+                          {post.title || post.content?.slice(0, 50) || "Untitled Post"}
+                        </h3>
+                        <div className="flex items-center gap-4 text-sm text-text-tertiary">
+                          <div className="flex items-center gap-2">
+                            <Calendar size={14} />
+                            {post.created_at
+                              ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true })
+                              : "Not published"}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`w-2 h-2 rounded-full ${
+                                post.visibility !== "draft" ? "bg-success" : "bg-text-quaternary"
+                              }`}
+                            />
+                            <span className="capitalize">
+                              {post.visibility === "draft" ? "draft" : "published"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Link
+                          href={`/creator/studio/post/edit/${post.id}`}
+                          className="p-2 hover:bg-surface-raised rounded-lg transition-all active:scale-95"
+                        >
+                          <Edit size={18} className="text-text-tertiary" />
+                        </Link>
+                        <button
+                          onClick={() => setDeletingPostId(post.id)}
+                          className="p-2 hover:bg-surface-raised rounded-lg transition-all active:scale-95"
+                        >
+                          <Trash2 size={18} className="text-text-tertiary hover:text-error" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Performance Metrics */}
+                    <div className="flex items-center gap-6 text-sm flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <Eye size={16} className="text-text-tertiary" />
+                        <span className="font-semibold text-text-primary">0</span>
+                        <span className="text-text-tertiary">views</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Heart size={16} className="text-text-tertiary" />
+                        <span className="font-semibold text-text-primary">0</span>
+                        <span className="text-text-tertiary">likes</span>
+                      </div>
+                      {post.visibility === "ppv" && (
+                        <div className="ml-auto flex items-center gap-2 px-4 py-2 bg-success/10 rounded-xl">
+                          <DollarSign size={16} className="text-success" />
+                          <span className="font-bold text-success">$0.00</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+        ) : (
+          <div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            data-testid="creator-post-list"
+          >
+            {filteredPosts.map((post) => (
+              <div
+                key={post.id}
+                className="bg-surface-base border border-border-base hover:border-brand-primary/30 rounded-2xl overflow-hidden transition-all group hover:shadow-lg"
+                data-testid="creator-post-list-item"
+                data-post-id={post.id}
+              >
+                {/* Thumbnail */}
+                <div className="relative aspect-video bg-surface-raised">
+                  {post.media && post.media.length > 0 && post.media[0].media_url ? (
+                    post.media[0].media_type === "image" ? (
+                      <img
+                        src={post.media[0].media_url}
+                        alt={post.title || "Post preview"}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <video
+                        src={post.media[0].media_url}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        muted
+                      />
+                    )
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <FileText size={48} className="text-text-quaternary" />
+                    </div>
+                  )}
+                  {(post.visibility === "subscribers" || post.visibility === "ppv") && (
+                    <div className="absolute top-3 left-3 px-3 py-2 bg-brand-secondary/90 backdrop-blur-sm rounded-xl text-sm font-semibold flex items-center gap-2 text-white">
+                      <Lock size={14} />
+                      {post.visibility === "ppv"
+                        ? `$${((post.price_cents || 0) / 100).toFixed(2)}`
+                        : "Exclusive"}
+                    </div>
+                  )}
+
+                  {/* Hover Actions */}
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                    <Link
+                      href={`/posts/${post.id}`}
+                      className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl font-medium hover:bg-white/20 transition-all active:scale-95 flex items-center gap-2"
+                    >
+                      <Eye size={16} />
+                      View
+                    </Link>
+                    <Link
+                      href={`/creator/studio/post/edit/${post.id}`}
+                      className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl font-medium hover:bg-white/20 transition-all active:scale-95 flex items-center gap-2"
+                    >
+                      <Edit size={16} />
+                      Edit
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Content Info */}
+                <div className="p-5">
+                  <h3 className="font-semibold mb-3 line-clamp-2 group-hover:text-brand-primary transition-colors text-text-primary">
+                    {post.title || post.content?.slice(0, 50) || "Untitled Post"}
+                  </h3>
+
+                  <div className="flex items-center gap-3 text-xs text-text-tertiary mb-4">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          post.visibility !== "draft" ? "bg-success" : "bg-text-quaternary"
+                        }`}
+                      />
+                      <span className="capitalize">
+                        {post.visibility === "draft" ? "draft" : "published"}
+                      </span>
+                    </div>
+                    {post.created_at && (
+                      <span>
+                        {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Metrics */}
+                  <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-1.5">
+                      <Eye size={14} className="text-text-tertiary" />
+                      <span className="font-semibold text-text-primary">0</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Heart size={14} className="text-text-tertiary" />
+                      <span className="font-semibold text-text-primary">0</span>
+                    </div>
+                    {post.visibility === "ppv" && (
+                      <div className="ml-auto flex items-center gap-1 text-success">
+                        <DollarSign size={14} />
+                        <span className="font-bold">$0</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {filteredPosts.length === 0 && (
+          <div className="py-20 text-center">
+            <div className="w-20 h-20 bg-surface-raised rounded-full flex items-center justify-center mx-auto mb-6">
+              <Grid3X3 size={32} className="text-text-quaternary" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2 text-text-primary">No content found</h3>
+            <p className="text-text-tertiary mb-8">
+              {filterStatus === "all"
+                ? "Create your first post to get started"
+                : `No ${filterStatus} content yet`}
+            </p>
+            <Link
+              href="/creator/new-post"
+              className="px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-primary/90 transition-all shadow-lg shadow-brand-primary/25 active:scale-95 inline-flex items-center gap-2"
+            >
+              <Plus size={18} />
+              Create Post
+            </Link>
           </div>
         )}
 
@@ -285,28 +557,30 @@ export default function CreatorPostListPage() {
           open={deletingPostId !== null}
           onOpenChange={(open) => !open && setDeletingPostId(null)}
         >
-          <AlertDialogContent className="bg-card border-border rounded-3xl">
+          <AlertDialogContent className="bg-surface-base border-border-base rounded-2xl">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-foreground">Delete Post</AlertDialogTitle>
-              <AlertDialogDescription className="text-muted-foreground">
+              <AlertDialogTitle className="text-text-primary">Delete Post</AlertDialogTitle>
+              <AlertDialogDescription className="text-text-tertiary">
                 Are you sure you want to delete this post? This action cannot be undone. Purchase
                 records will be preserved.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="border-border bg-card hover:bg-card rounded-xl">
+              <AlertDialogCancel className="border-border-base bg-surface-raised hover:bg-surface-overlay rounded-xl">
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => deletingPostId && handleDelete(deletingPostId)}
-                className="bg-destructive hover:bg-destructive/90 rounded-xl"
+                className="bg-error hover:bg-error/90 rounded-xl text-white"
               >
                 Delete
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </main>
+      </div>
+
+      <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
     </div>
   );
 }

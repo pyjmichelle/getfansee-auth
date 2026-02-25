@@ -196,14 +196,14 @@ export function PaywallModal({
     <div className="flex flex-col" data-testid="paywall-modal">
       {/* Header */}
       <div
-        className="flex flex-col items-center text-center pb-5 border-b border-border"
+        className="flex flex-col items-center text-center pb-5 border-b border-border-base"
         data-testid="paywall-modal-header"
       >
-        <div className="w-18 h-18 rounded-full bg-primary/10 flex items-center justify-center mb-4 shadow-primary-glow">
+        <div className="w-16 h-16 rounded-full bg-primary/20 backdrop-blur-md flex items-center justify-center mb-4 border border-primary/30 shadow-glow">
           {paymentState === "success" ? (
-            <Check className="w-8 h-8 text-green-500" aria-hidden="true" />
+            <Check className="w-8 h-8 text-success" aria-hidden="true" />
           ) : paymentState === "error" ? (
-            <X className="w-8 h-8 text-destructive" aria-hidden="true" />
+            <X className="w-8 h-8 text-error" aria-hidden="true" />
           ) : (
             <Lock className="w-8 h-8 text-primary" aria-hidden="true" />
           )}
@@ -212,32 +212,32 @@ export function PaywallModal({
         {paymentState === "success" ? (
           <>
             <DialogTitle
-              className="text-2xl font-bold text-foreground mb-2"
+              className="text-2xl font-bold text-text-primary mb-2"
               data-testid="paywall-success-message"
             >
               Access Granted!
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground text-center">
+            <DialogDescription className="text-text-tertiary text-center">
               Enjoy your exclusive content...
             </DialogDescription>
           </>
         ) : paymentState === "error" ? (
           <>
-            <DialogTitle className="text-2xl font-bold text-foreground mb-2">
+            <DialogTitle className="text-2xl font-bold text-text-primary mb-2">
               Payment Failed
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground">
+            <DialogDescription className="text-text-tertiary">
               Something went wrong. Please check your payment method and try again.
             </DialogDescription>
           </>
         ) : (
           <>
-            <DialogTitle className="text-2xl font-bold text-foreground mb-2">
+            <DialogTitle className="text-2xl font-bold text-text-primary mb-2">
               {type === "subscribe"
                 ? `Join ${creatorName}'s Inner Circle`
                 : "Unlock This Hot Content"}
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground">
+            <DialogDescription className="text-text-tertiary">
               {contentPreview || "Get instant access to exclusive, uncensored content"}
             </DialogDescription>
           </>
@@ -247,25 +247,22 @@ export function PaywallModal({
       {paymentState === "idle" && (
         <>
           {/* Pricing */}
-          <div className="py-5 border-b border-border">
+          <div className="py-5 border-b border-border-base">
             <div className="flex items-baseline justify-center gap-2 mb-2">
               <span
-                className="text-4xl font-bold text-primary-gradient"
+                className="text-4xl font-bold text-gradient-primary"
                 data-testid="paywall-price"
               >
                 ${price.toFixed(2)}
               </span>
               {type === "subscribe" && (
-                <span
-                  className="text-muted-foreground text-base"
-                  data-testid="paywall-billing-period"
-                >
+                <span className="text-text-tertiary text-base" data-testid="paywall-billing-period">
                   /{billingPeriod}
                 </span>
               )}
             </div>
             {type === "subscribe" && (
-              <p className="text-center text-sm text-muted-foreground">
+              <p className="text-center text-sm text-text-tertiary">
                 Billed {billingPeriod}ly • Cancel anytime
               </p>
             )}
@@ -273,23 +270,26 @@ export function PaywallModal({
 
           {/* Benefits */}
           <div className="py-5">
-            <h3 className="font-semibold text-base text-foreground mb-3">
+            <h3 className="font-semibold text-base text-text-primary mb-3">
               {type === "subscribe" ? "What's included:" : "Instant access to:"}
             </h3>
             <ul className="space-y-2.5">
               {benefits.map((benefit, index) => (
                 <li key={index} className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
-                  <span className="text-foreground text-sm">{benefit}</span>
+                  <Check
+                    className="w-4 h-4 text-brand-primary flex-shrink-0 mt-0.5"
+                    aria-hidden="true"
+                  />
+                  <span className="text-text-primary text-sm">{benefit}</span>
                 </li>
               ))}
             </ul>
           </div>
 
           {/* Trust indicators */}
-          <div className="py-4 border-t border-border">
-            <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[var(--success)]/10 text-[var(--success)] rounded-lg">
+          <div className="py-4 border-t border-border-base">
+            <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-text-tertiary">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-success/10 text-success rounded-lg">
                 <Lock className="w-3 h-3" aria-hidden="true" />
                 <span className="font-medium">Encrypted</span>
               </div>
@@ -309,7 +309,7 @@ export function PaywallModal({
           {/* Actions */}
           <div className="flex flex-col gap-2.5 pt-2">
             {type === "ppv" && (
-              <div className="text-center text-xs text-muted-foreground mb-1">
+              <div className="text-center text-xs text-text-tertiary mb-1">
                 {isBalanceLoading ? (
                   <span
                     className="flex items-center justify-center gap-2"
@@ -322,11 +322,15 @@ export function PaywallModal({
                   <>
                     <span data-testid="paywall-balance-value">Balance: ${balance.toFixed(2)}</span>
                     {insufficientBalance && (
-                      <span className="ml-2" data-testid="paywall-balance-insufficient">
+                      <span
+                        className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-error/10 text-error text-xs font-medium"
+                        data-testid="paywall-balance-insufficient"
+                      >
+                        Low balance —
                         <Link
                           href="/me/wallet"
                           data-testid="paywall-add-funds-link"
-                          className="text-primary underline hover:text-primary/80 transition-colors"
+                          className="underline hover:text-error/80 transition-colors font-semibold"
                           aria-label="Go to wallet to add funds"
                         >
                           Add funds
@@ -335,7 +339,7 @@ export function PaywallModal({
                     )}
                   </>
                 ) : balanceError ? (
-                  <span className="text-destructive" data-testid="paywall-balance-error">
+                  <span className="text-error" data-testid="paywall-balance-error">
                     {balanceError}
                   </span>
                 ) : (
@@ -402,13 +406,16 @@ export function PaywallModal({
 
       {paymentState === "processing" && (
         <div
-          className="py-10 flex flex-col items-center justify-center gap-3"
+          className="py-10 flex flex-col items-center justify-center gap-3 animate-in fade-in duration-300"
           role="status"
           aria-live="polite"
           data-testid="paywall-processing"
         >
-          <Loader2 className="w-10 h-10 text-primary animate-spin" aria-hidden="true" />
-          <p className="text-muted-foreground text-sm">Processing your payment…</p>
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shadow-glow animate-pulse">
+            <Loader2 className="w-8 h-8 text-brand-primary animate-spin" aria-hidden="true" />
+          </div>
+          <p className="text-text-tertiary text-sm font-medium">Processing your payment…</p>
+          <p className="text-text-quaternary text-xs">Please wait, do not close this window</p>
         </div>
       )}
 
@@ -455,7 +462,7 @@ export function PaywallModal({
       <Sheet open={open} onOpenChange={handleClose}>
         <SheetContent
           side="bottom"
-          className="h-[85vh] overflow-y-auto bg-card border-t border-border rounded-t-[24px] px-5 py-6"
+          className="h-[85vh] overflow-y-auto bg-surface-base border-t border-border-base rounded-t-[24px] px-5 py-6"
         >
           {content}
         </SheetContent>
@@ -466,7 +473,7 @@ export function PaywallModal({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className="sm:max-w-[400px] bg-card border-border rounded-[20px] p-6"
+        className="sm:max-w-[400px] bg-surface-base border-border-base rounded-[20px] p-6"
         showCloseButton={paymentState !== "processing"}
         onPointerDownOutside={(event) => {
           if (paymentState !== "idle") {

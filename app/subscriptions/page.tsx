@@ -238,93 +238,106 @@ export default function SubscriptionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <NavHeader user={currentUser} notificationCount={0} />
 
-      <main className="container max-w-4xl mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">My Subscriptions</h1>
-          <p className="text-muted-foreground">Manage your subscriptions to exclusive creators</p>
+      <main className="pt-20 md:pt-24 px-4 md:px-6 max-w-5xl mx-auto">
+        {/* Hero Section - Figma Style */}
+        <div className="bg-gradient-primary p-6 rounded-2xl shadow-glow mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">My Subscriptions</h1>
+          <p className="text-white/80 text-sm md:text-base">
+            Manage your subscriptions to exclusive creators
+          </p>
         </div>
 
         {subscriptions.length === 0 ? (
-          <EmptyState
-            data-testid="subscriptions-list"
-            icon="heart"
-            title="No subscriptions found"
-            description="Subscribe to your favorite creators to unlock their exclusive content"
-            action={{ label: "Discover Creators", href: "/home" }}
-          />
+          <div className="bg-surface-raised border border-border-base rounded-2xl p-8 text-center">
+            <EmptyState
+              data-testid="subscriptions-list"
+              icon="heart"
+              title="No subscriptions found"
+              description="Subscribe to your favorite creators to unlock their exclusive content"
+              action={{ label: "Discover Creators", href: "/home" }}
+            />
+          </div>
         ) : (
-          <div className="space-y-4" data-testid="subscriptions-list">
+          <div
+            className="bg-surface-raised border border-border-base rounded-2xl divide-y divide-border-base"
+            data-testid="subscriptions-list"
+          >
             {subscriptions.map((subscription) => (
               <div
                 key={subscription.id}
-                className="bg-card border border-border rounded-3xl p-6 hover:border-border transition-colors"
+                className="p-4 md:p-6 hover:bg-surface-overlay/50 transition-colors"
                 data-testid="subscription-item"
                 data-subscription-id={subscription.id}
               >
                 <div className="flex items-start justify-between gap-4">
                   <Link
                     href={`/creator/${subscription.creator_id}`}
-                    className="flex items-center gap-4 flex-1"
+                    className="flex items-center gap-3 md:gap-4 flex-1"
                   >
-                    <Avatar className="w-16 h-16">
+                    <Avatar className="w-12 h-12 md:w-14 md:h-14 ring-2 ring-transparent hover:ring-brand-primary/30 transition-all">
                       <AvatarImage src={subscription.creator?.avatar_url || "/placeholder.svg"} />
-                      <AvatarFallback>
+                      <AvatarFallback className="bg-brand-primary-alpha-10 text-brand-primary font-semibold">
                         {subscription.creator?.display_name?.[0]?.toUpperCase() || "C"}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-lg text-foreground">
-                          {subscription.creator?.display_name || "Creator"}
-                        </h3>
-                      </div>
-                      <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-base md:text-lg text-text-primary truncate">
+                        {subscription.creator?.display_name || "Creator"}
+                      </h3>
+                      <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm text-text-tertiary mt-1">
                         <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {subscription.status === "active"
-                            ? getRenewsIn(subscription.current_period_end)
-                            : "Expired"}
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span>
+                            {subscription.status === "active"
+                              ? getRenewsIn(subscription.current_period_end)
+                              : "Expired"}
+                          </span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <span>Plan: {subscription.plan}</span>
-                        </div>
+                        <span className="text-text-quaternary">•</span>
+                        <span>{subscription.plan}</span>
                       </div>
                     </div>
                   </Link>
 
-                  <div className="flex flex-col items-end gap-3">
-                    <Badge variant={subscription.status === "active" ? "default" : "secondary"}>
+                  <div className="flex flex-col items-end gap-2">
+                    <Badge
+                      variant={subscription.status === "active" ? "default" : "secondary"}
+                      className={
+                        subscription.status === "active"
+                          ? "bg-success/10 text-success border-success/20"
+                          : ""
+                      }
+                    >
                       {subscription.status === "active" ? "Active" : "Canceled"}
                     </Badge>
-                    {subscription.status === "active" ? (
+                    {subscription.status === "active" && (
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
-                        className="border-border bg-card hover:bg-card rounded-xl"
+                        className="text-text-tertiary hover:text-error hover:bg-error/10"
                         onClick={() => setCancellingSubscriptionId(subscription.id)}
                       >
                         Cancel
                       </Button>
-                    ) : null}
+                    )}
                   </div>
                 </div>
 
                 {subscription.status === "active" && (
-                  <div className="mt-4 pt-4 border-t border-border">
-                    <p className="text-sm text-muted-foreground">
-                      Subscribed since {formatDate(subscription.created_at)} • Will end on{" "}
+                  <div className="mt-3 pt-3 border-t border-border-subtle">
+                    <p className="text-xs text-text-quaternary">
+                      Subscribed since {formatDate(subscription.created_at)} • Renews on{" "}
                       {formatDate(subscription.current_period_end)}
                     </p>
                   </div>
                 )}
 
-                {/* For canceled subscriptions, display the corresponding cancelled_at date */}
                 {subscription.status === "canceled" && subscription.cancelled_at && (
-                  <div className="mt-4 pt-4 border-t border-border">
-                    <p className="text-sm text-muted-foreground">
+                  <div className="mt-3 pt-3 border-t border-border-subtle">
+                    <p className="text-xs text-text-quaternary">
                       Cancelled on {formatDate(subscription.cancelled_at)}
                     </p>
                   </div>
@@ -340,12 +353,12 @@ export default function SubscriptionsPage() {
             open={cancellingSubscriptionId !== null}
             onOpenChange={(open) => !open && setCancellingSubscriptionId(null)}
           >
-            <AlertDialogContent className="bg-card border-border rounded-3xl">
+            <AlertDialogContent className="bg-surface-base border-border-base rounded-2xl">
               <AlertDialogHeader>
-                <AlertDialogTitle className="text-foreground">
+                <AlertDialogTitle className="text-text-primary">
                   Cancel Your Subscription
                 </AlertDialogTitle>
-                <AlertDialogDescription className="text-muted-foreground">
+                <AlertDialogDescription className="text-text-tertiary">
                   {(() => {
                     const sub = subscriptions.find((s) => s.id === cancellingSubscriptionId);
                     if (!sub) return "Are you sure you want to cancel this subscription?";
@@ -354,7 +367,7 @@ export default function SubscriptionsPage() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="border-border bg-card hover:bg-card rounded-xl">
+                <AlertDialogCancel className="border-border-base bg-surface-raised hover:bg-surface-overlay rounded-xl">
                   Keep Subscription
                 </AlertDialogCancel>
                 <AlertDialogAction
@@ -364,7 +377,7 @@ export default function SubscriptionsPage() {
                       handleCancel(sub.id, sub.creator_id);
                     }
                   }}
-                  className="bg-destructive hover:bg-destructive/90 rounded-xl"
+                  className="bg-error hover:bg-error/90 rounded-xl"
                 >
                   Cancel Subscription
                 </AlertDialogAction>

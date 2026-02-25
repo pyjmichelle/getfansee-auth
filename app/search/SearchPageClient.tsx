@@ -5,13 +5,23 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { NavHeader } from "@/components/nav-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { CenteredContainer } from "@/components/layouts/centered-container";
-import { Search, Users, FileText, Heart, Loader2, Sparkles } from "lucide-react";
+// Card, Input, Tabs, Skeleton, Badge, CenteredContainer no longer needed - using Figma inline styles
+import {
+  Search,
+  Users,
+  FileText,
+  Heart,
+  Loader2,
+  Sparkles,
+  TrendingUp,
+  Star,
+  Award,
+  Grid3X3,
+  List,
+  X,
+  Check,
+  RefreshCw,
+} from "lucide-react";
 import Link from "next/link";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { ensureProfile } from "@/lib/auth";
@@ -31,6 +41,8 @@ export default function SearchPageClient() {
 
   const [query, setQuery] = useState(initialQuery);
   const [searchType, setSearchType] = useState<"all" | "creators" | "posts">("all");
+  const [category, setCategory] = useState<"all" | "trending" | "new" | "top">("all");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [creators, setCreators] = useState<Creator[]>([]);
@@ -40,6 +52,13 @@ export default function SearchPageClient() {
     role: "fan" | "creator";
     avatar?: string;
   } | null>(null);
+
+  const categories = [
+    { id: "all", label: "All Creators", icon: Sparkles },
+    { id: "trending", label: "Trending", icon: TrendingUp },
+    { id: "new", label: "New", icon: Star },
+    { id: "top", label: "Top Rated", icon: Award },
+  ];
 
   useEffect(() => {
     const loadUser = async () => {
@@ -113,70 +132,109 @@ export default function SearchPageClient() {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-20 md:pb-0">
         <LoadingState type="spinner" text="Loading..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <NavHeader user={currentUser} notificationCount={0} />
 
-      <main className="py-6 sm:py-8 lg:py-12" data-testid="search-page">
-        <CenteredContainer maxWidth="4xl">
-          <div className="mb-8 text-center sm:text-left">
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">Search</h1>
-            <p className="text-lg text-muted-foreground">Find creators and content</p>
+      <main className="pt-20 md:pt-24" data-testid="search-page">
+        {/* Hero Section - Figma Style */}
+        <div className="relative overflow-hidden bg-gradient-dark border-b border-border-base">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-brand-primary/30 rounded-full blur-[120px]" />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-brand-accent/30 rounded-full blur-[120px]" />
           </div>
 
-          {/* Search Form - 居中且显眼 */}
-          <form onSubmit={handleSearch} className="mb-6 max-w-2xl mx-auto sm:mx-0">
-            <div className="relative">
+          <div className="relative px-4 md:px-6 max-w-4xl mx-auto py-12 md:py-16">
+            <div className="text-center mb-10">
+              <h1 className="text-3xl md:text-4xl font-bold mb-3 text-text-primary">
+                Discover Amazing Creators
+              </h1>
+              <p className="text-xl text-text-secondary max-w-2xl mx-auto">
+                Explore exclusive content from talented creators around the world
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-4 md:px-6 max-w-4xl mx-auto py-8">
+          {/* Search Bar - Figma Style */}
+          <form onSubmit={handleSearch} className="mb-6">
+            <div className="relative max-w-2xl mx-auto">
               <Search
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none"
-                aria-hidden="true"
+                className="absolute left-5 top-1/2 -translate-y-1/2 text-text-quaternary"
+                size={20}
               />
-              <Input
+              <input
                 type="text"
                 name="search"
+                placeholder="Search creators by name or username..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search creators, posts, tags…"
-                className="pl-12 pr-12 min-h-[52px] text-base rounded-xl border-2 shadow-md focus-visible:shadow-lg focus-visible:border-primary transition-[border-color,box-shadow] duration-200 motion-safe:transition-[border-color,box-shadow] motion-reduce:transition-none"
-                autoFocus={typeof window !== "undefined" && window.innerWidth >= 768}
-                aria-label="Search query"
-                disabled={isSearching}
+                className="w-full pl-14 pr-4 py-4 bg-surface-raised border border-border-base rounded-2xl text-text-primary placeholder:text-text-quaternary focus:outline-none focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary transition-all"
                 autoComplete="off"
                 spellCheck={false}
               />
-              {isSearching && (
-                <Loader2
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-primary animate-spin"
-                  aria-hidden="true"
-                  aria-live="polite"
-                />
-              )}
-              {!isSearching && query.length >= 2 && (
-                <Button
-                  type="submit"
-                  size="sm"
-                  variant="subscribe-gradient"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 min-h-[36px] px-4 font-semibold shadow-sm"
-                  aria-label="Search"
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 bg-surface-overlay rounded-full flex items-center justify-center hover:bg-border-base transition-colors"
                 >
-                  Search
-                </Button>
+                  <X size={14} className="text-text-tertiary" />
+                </button>
               )}
             </div>
-            {!query && (
-              <p className="mt-3 text-sm text-muted-foreground text-center sm:text-left px-1">
-                Try searching for creators, posts, or use{" "}
-                <kbd className="px-1.5 py-0.5 text-xs font-semibold bg-muted rounded border">#</kbd>{" "}
-                to search tags
-              </p>
-            )}
           </form>
+
+          {/* Category Filters & View Toggle - Figma Style */}
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide flex-1">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setCategory(cat.id as typeof category)}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-all ${
+                    category === cat.id
+                      ? "bg-brand-primary text-white shadow-md"
+                      : "bg-surface-raised text-text-tertiary hover:text-text-primary hover:bg-surface-overlay border border-border-base"
+                  }`}
+                >
+                  <cat.icon size={16} />
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
+            {/* View Mode Toggle */}
+            <div className="hidden md:flex items-center gap-1 bg-surface-raised border border-border-base rounded-lg p-0.5">
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`p-1.5 rounded-md transition-all ${
+                  viewMode === "grid"
+                    ? "bg-brand-primary text-white"
+                    : "text-text-tertiary hover:text-text-primary"
+                }`}
+              >
+                <Grid3X3 size={18} />
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`p-1.5 rounded-md transition-all ${
+                  viewMode === "list"
+                    ? "bg-brand-primary text-white"
+                    : "text-text-tertiary hover:text-text-primary"
+                }`}
+              >
+                <List size={18} />
+              </button>
+            </div>
+          </div>
 
           {/* Search Error */}
           {searchError && (
@@ -189,180 +247,95 @@ export default function SearchPageClient() {
             />
           )}
 
-          {/* Search Type Tabs */}
-          <Tabs
-            value={searchType}
-            onValueChange={(value) => {
-              setSearchType(value as "all" | "creators" | "posts");
-              if (query) {
-                performSearch(query);
+          {/* Results - Figma Style Grid/List */}
+          {isSearching ? (
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                  : "space-y-4 max-w-4xl mx-auto"
               }
-            }}
-            className="mb-6"
-          >
-            <TabsList className="grid w-full grid-cols-3 h-12">
-              <TabsTrigger value="all" className="text-sm sm:text-base">
-                <Search className="w-4 h-4 mr-2" aria-hidden="true" />
-                <span className="hidden sm:inline">All</span>
-                <span className="sm:hidden">All</span>
-              </TabsTrigger>
-              <TabsTrigger value="creators" className="text-sm sm:text-base">
-                <Users className="w-4 h-4 mr-2" aria-hidden="true" />
-                <span className="hidden sm:inline">Creators ({creators.length})</span>
-                <span className="sm:hidden">Creators</span>
-              </TabsTrigger>
-              <TabsTrigger value="posts" className="text-sm sm:text-base">
-                <FileText className="w-4 h-4 mr-2" aria-hidden="true" />
-                <span className="hidden sm:inline">Posts ({posts.length})</span>
-                <span className="sm:hidden">Posts</span>
-              </TabsTrigger>
-            </TabsList>
-
-            {/* All Results */}
-            <TabsContent value="all" className="space-y-6">
-              {isSearching ? (
-                <div className="space-y-4">
-                  {[1, 2, 3].map((i) => (
-                    <Card key={i} className="p-4">
-                      <div className="flex items-center gap-4">
-                        <Skeleton className="h-16 w-16 rounded-full" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-4 w-32" />
-                          <Skeleton className="h-3 w-48" />
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
+            >
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div
+                  key={i}
+                  className="bg-surface-raised border border-border-base rounded-2xl p-6 animate-pulse"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-surface-overlay rounded-2xl" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 w-32 bg-surface-overlay rounded" />
+                      <div className="h-3 w-48 bg-surface-overlay rounded" />
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <>
-                  {/* Creators Section */}
-                  {creators.length > 0 && (
-                    <div>
-                      <h2 className="text-xl font-semibold mb-4">Creators</h2>
-                      <div className="grid gap-6">
-                        {creators.slice(0, 3).map((creator) => (
-                          <CreatorCard key={creator.id} creator={creator} />
-                        ))}
-                      </div>
-                      {creators.length > 3 && (
-                        <Button
-                          variant="ghost"
-                          onClick={() => setSearchType("creators")}
-                          className="w-full mt-4 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-                        >
-                          View all {creators.length} creators
-                        </Button>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Posts Section */}
-                  {posts.length > 0 && (
-                    <div>
-                      <h2 className="text-xl font-semibold mb-4">Posts</h2>
-                      <div className="grid gap-6">
-                        {posts.slice(0, 5).map((post) => (
-                          <PostCard key={post.id} post={post} />
-                        ))}
-                      </div>
-                      {posts.length > 5 && (
-                        <Button
-                          variant="ghost"
-                          onClick={() => setSearchType("posts")}
-                          className="w-full mt-4 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-                        >
-                          View all {posts.length} posts
-                        </Button>
-                      )}
-                    </div>
-                  )}
-
-                  {/* No Results */}
-                  {!isSearching && creators.length === 0 && posts.length === 0 && query && (
-                    <div className="flex flex-col items-center justify-center py-16 px-4">
-                      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                        <Search className="w-8 h-8 text-muted-foreground" aria-hidden="true" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-foreground mb-2">
-                        No results found
-                      </h3>
-                      <p className="text-sm text-muted-foreground text-center max-w-sm">
-                        No results found for &quot;{query}&quot;. Try a different search term or
-                        browse creators.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Initial State - No Search Yet */}
-                  {!isSearching && creators.length === 0 && posts.length === 0 && !query && (
-                    <div className="flex flex-col items-center justify-center py-16 px-4">
-                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                        <Sparkles className="w-8 h-8 text-primary" aria-hidden="true" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-foreground mb-2">
-                        Discover Content
-                      </h3>
-                      <p className="text-sm text-muted-foreground text-center max-w-sm">
-                        Search for your favorite creators or explore trending content.
-                      </p>
-                    </div>
-                  )}
-                </>
-              )}
-            </TabsContent>
-
-            {/* Creators Results */}
-            <TabsContent value="creators">
-              {isSearching ? (
-                <LoadingState type="skeleton" />
-              ) : creators.length > 0 ? (
-                <div className="grid gap-4">
+              ))}
+            </div>
+          ) : (
+            <>
+              {/* Creators Grid/List */}
+              {creators.length > 0 && (
+                <div
+                  className={
+                    viewMode === "grid"
+                      ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                      : "space-y-4 max-w-4xl mx-auto"
+                  }
+                >
                   {creators.map((creator) => (
-                    <CreatorCard key={creator.id} creator={creator} />
+                    <CreatorCard key={creator.id} creator={creator} viewMode={viewMode} />
                   ))}
                 </div>
-              ) : query ? (
-                <EmptyState
-                  icon={<Users className="w-8 h-8 text-muted-foreground" />}
-                  title="No creators found"
-                  description={`No creators found for "${query}". Try a different search term.`}
-                />
-              ) : (
-                <EmptyState
-                  icon={<Users className="w-8 h-8 text-muted-foreground" />}
-                  title="Search creators"
-                  description="Enter a search term to find creators."
-                />
               )}
-            </TabsContent>
 
-            {/* Posts Results */}
-            <TabsContent value="posts">
-              {isSearching ? (
-                <LoadingState type="skeleton" />
-              ) : posts.length > 0 ? (
+              {/* Posts Grid */}
+              {posts.length > 0 && creators.length === 0 && (
                 <div className="grid gap-4">
                   {posts.map((post) => (
                     <PostCard key={post.id} post={post} />
                   ))}
                 </div>
-              ) : query ? (
-                <EmptyState
-                  icon={<FileText className="w-8 h-8 text-muted-foreground" />}
-                  title="No posts found"
-                  description={`No posts found for "${query}". Try a different search term.`}
-                />
-              ) : (
-                <EmptyState
-                  icon={<FileText className="w-8 h-8 text-muted-foreground" />}
-                  title="Search posts"
-                  description="Enter a search term to find posts."
-                />
               )}
-            </TabsContent>
-          </Tabs>
-        </CenteredContainer>
+
+              {/* No Results - Figma Style */}
+              {!isSearching && creators.length === 0 && posts.length === 0 && query && (
+                <div className="text-center py-20">
+                  <div className="w-24 h-24 bg-surface-raised rounded-3xl flex items-center justify-center mx-auto mb-6">
+                    <Search className="w-10 h-10 text-text-quaternary" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-2 text-text-primary">No results found</h3>
+                  <p className="text-text-tertiary text-lg max-w-md mx-auto">
+                    No results found for &quot;{query}&quot;. Try a different search term or browse
+                    creators.
+                  </p>
+                </div>
+              )}
+
+              {/* Initial State - Figma Style */}
+              {!isSearching && creators.length === 0 && posts.length === 0 && !query && (
+                <div className="text-center py-20">
+                  <div className="w-24 h-24 bg-brand-primary-alpha-10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                    <Sparkles className="w-10 h-10 text-brand-primary" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-2 text-text-primary">Discover Content</h3>
+                  <p className="text-text-tertiary text-lg max-w-md mx-auto">
+                    Search for your favorite creators or explore trending content.
+                  </p>
+                </div>
+              )}
+
+              {/* Load More - Figma Style */}
+              {(creators.length > 0 || posts.length > 0) && (
+                <div className="mt-10 text-center">
+                  <Button variant="outline" size="lg" className="rounded-xl">
+                    <RefreshCw className="w-5 h-5 mr-2" />
+                    Load More Creators
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </main>
 
       <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
@@ -370,56 +343,97 @@ export default function SearchPageClient() {
   );
 }
 
-function CreatorCard({ creator }: { creator: Creator }) {
-  return (
-    <Card className="p-6 hover:bg-accent/50 transition-[background-color,transform] duration-300 motion-safe:transition-[background-color,transform] motion-reduce:transition-none rounded-2xl border border-border/50 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-      <Link href={`/creator/${creator.id}`} className="flex items-center gap-4">
-        <Avatar className="h-16 w-16 ring-2 ring-border">
-          <AvatarImage src={creator.avatar_url || undefined} alt={creator.display_name} />
-          <AvatarFallback className="bg-primary/10 text-primary text-lg">
-            {creator.display_name?.[0] || "C"}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-foreground truncate">{creator.display_name}</h3>
-            {creator.role === "creator" && (
-              <Badge variant="secondary" className="text-xs">
-                Creator
-              </Badge>
+function CreatorCard({
+  creator,
+  viewMode = "grid",
+}: {
+  creator: Creator;
+  viewMode?: "grid" | "list";
+}) {
+  if (viewMode === "list") {
+    return (
+      <div className="bg-surface-base border border-border-base rounded-2xl p-6 hover:border-brand-primary/30 transition-all">
+        <Link href={`/creator/${creator.id}`} className="flex items-center gap-4">
+          <Avatar className="h-16 w-16 rounded-2xl">
+            <AvatarImage src={creator.avatar_url || undefined} alt={creator.display_name} />
+            <AvatarFallback className="bg-brand-primary-alpha-10 text-brand-primary text-lg rounded-2xl">
+              {creator.display_name?.[0] || "C"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-bold text-text-primary truncate">{creator.display_name}</h3>
+              {creator.role === "creator" && (
+                <div className="w-5 h-5 bg-brand-primary rounded-full flex items-center justify-center">
+                  <Check size={12} className="text-white" />
+                </div>
+              )}
+            </div>
+            {creator.bio && (
+              <p className="text-sm text-text-tertiary line-clamp-2">{creator.bio}</p>
             )}
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-xl hidden sm:flex border-border-base hover:bg-surface-raised"
+          >
+            View Profile
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  // Grid view - card style
+  return (
+    <div className="group bg-surface-base border border-border-base rounded-2xl overflow-hidden hover:border-brand-primary/30 transition-all hover:shadow-lg">
+      <Link href={`/creator/${creator.id}`}>
+        {/* Cover placeholder */}
+        <div className="h-32 bg-gradient-primary opacity-60" />
+
+        {/* Creator info */}
+        <div className="p-5 -mt-10 relative">
+          <Avatar className="h-16 w-16 rounded-2xl border-4 border-surface-base mb-3">
+            <AvatarImage src={creator.avatar_url || undefined} alt={creator.display_name} />
+            <AvatarFallback className="bg-brand-primary-alpha-10 text-brand-primary text-lg rounded-2xl">
+              {creator.display_name?.[0] || "C"}
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="font-bold text-text-primary">{creator.display_name}</h3>
+            {creator.role === "creator" && (
+              <div className="w-5 h-5 bg-brand-primary rounded-full flex items-center justify-center">
+                <Check size={12} className="text-white" />
+              </div>
+            )}
+          </div>
+
           {creator.bio && (
-            <p className="text-sm text-muted-foreground line-clamp-2">{creator.bio}</p>
+            <p className="text-sm text-text-tertiary line-clamp-2 mb-4">{creator.bio}</p>
           )}
+
+          <Button
+            variant="outline"
+            className="w-full rounded-xl border-border-base hover:bg-surface-raised"
+          >
+            View Profile
+          </Button>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          className="rounded-xl min-h-[40px] hidden sm:flex transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-          aria-label={`View ${creator.display_name}'s profile`}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              window.location.href = `/creator/${creator.id}`;
-            }
-          }}
-        >
-          View Profile
-        </Button>
       </Link>
-    </Card>
+    </div>
   );
 }
 
 function PostCard({ post }: { post: Post }) {
   const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
   return (
-    <Card className="p-6 hover:bg-accent/50 transition-[background-color,transform] duration-300 motion-safe:transition-[background-color,transform] motion-reduce:transition-none rounded-2xl border border-border/50 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+    <div className="bg-surface-base border border-border-base rounded-2xl p-6 hover:border-brand-primary/30 transition-all">
       <div className="flex items-start gap-4">
-        <Avatar className="h-12 w-12">
+        <Avatar className="h-12 w-12 rounded-xl">
           <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.display_name} />
-          <AvatarFallback className="bg-primary/10 text-primary">
+          <AvatarFallback className="bg-brand-primary-alpha-10 text-brand-primary rounded-xl">
             {profile?.display_name?.[0] || "C"}
           </AvatarFallback>
         </Avatar>
@@ -427,33 +441,33 @@ function PostCard({ post }: { post: Post }) {
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <Link
               href={`/creator/${post.creator_id}`}
-              className="font-semibold text-foreground hover:text-primary transition-[color] motion-safe:transition-[color] motion-reduce:transition-none"
+              className="font-bold text-text-primary hover:text-brand-primary transition-colors"
             >
               {profile?.display_name || "Creator"}
             </Link>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-text-tertiary">
               {post.created_at ? new Date(post.created_at).toLocaleDateString() : "Unknown date"}
             </span>
             {post.visibility === "ppv" && (
-              <Badge variant="secondary" className="text-xs">
+              <span className="px-2 py-0.5 bg-brand-accent/10 text-brand-accent text-xs font-semibold rounded-full">
                 ${((post.price_cents ?? 0) / 100).toFixed(2)}
-              </Badge>
+              </span>
             )}
             {post.visibility === "subscribers" && (
-              <Badge variant="outline" className="text-xs">
+              <span className="px-2 py-0.5 bg-brand-primary-alpha-10 text-brand-primary text-xs font-semibold rounded-full">
                 Subscribers
-              </Badge>
+              </span>
             )}
           </div>
           {post.title && (
             <Link href={`/posts/${post.id}`}>
-              <h3 className="font-medium text-foreground mb-1 hover:text-primary transition-[color] motion-safe:transition-[color] motion-reduce:transition-none cursor-pointer">
+              <h3 className="font-semibold text-text-primary mb-1 hover:text-brand-primary transition-colors cursor-pointer">
                 {post.title}
               </h3>
             </Link>
           )}
-          <p className="text-sm text-muted-foreground line-clamp-2">{post.content}</p>
-          <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
+          <p className="text-sm text-text-tertiary line-clamp-2">{post.content}</p>
+          <div className="flex items-center gap-4 mt-3 text-xs text-text-tertiary">
             {(post.likes_count ?? 0) > 0 && (
               <span className="flex items-center gap-1">
                 <Heart className="w-3 h-3" aria-hidden="true" />
@@ -463,6 +477,6 @@ function PostCard({ post }: { post: Post }) {
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

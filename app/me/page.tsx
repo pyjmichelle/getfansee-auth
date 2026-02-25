@@ -3,14 +3,14 @@
 import { useState, useEffect } from "react";
 import { User, Mail, Camera, Save, LogOut, Sparkles, Loader2 } from "lucide-react";
 import { NavHeader } from "@/components/nav-header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+// Card components no longer needed - using Figma div-based layout
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { LoadingState } from "@/components/loading-state";
-import { CenteredContainer } from "@/components/layouts/centered-container";
+// CenteredContainer no longer needed - using Figma max-w layout
 import { BottomNavigation } from "@/components/bottom-navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 // 所有服务器端函数都通过 API 调用，不直接导入
@@ -252,11 +252,11 @@ export default function ProfilePage() {
 
   if (isLoading || !currentUser) {
     return (
-      <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <div className="min-h-screen bg-background pb-20">
         <NavHeader user={currentUser!} notificationCount={0} />
-        <CenteredContainer className="py-12">
+        <div className="pt-20 md:pt-24 pb-12 max-w-3xl mx-auto px-4 md:px-6">
           <LoadingState type="spinner" text="Loading profile…" />
-        </CenteredContainer>
+        </div>
         <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
       </div>
     );
@@ -316,185 +316,218 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-24 md:pb-0">
       <NavHeader user={currentUser!} notificationCount={0} />
 
-      <main className="py-6 sm:py-8 lg:py-12">
-        <CenteredContainer maxWidth="2xl">
+      <div className="pt-20 md:pt-24 pb-12">
+        <div className="max-w-3xl mx-auto px-4 md:px-6">
+          {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">Your Profile</h1>
-            <p className="text-lg text-muted-foreground">Manage your account settings</p>
+            <h1 className="text-3xl font-bold mb-2 text-text-primary">Profile Settings</h1>
+            <p className="text-text-secondary">
+              Manage your profile information and account settings
+            </p>
           </div>
 
-          {/* Profile Card */}
-          <Card className="rounded-xl border shadow-sm mb-6">
-            <CardContent className="pt-6">
-              <div className="flex flex-col items-center mb-6">
-                <div className="relative">
-                  <Avatar className="w-32 h-32 ring-4 ring-border">
-                    <AvatarImage src={avatar || "/placeholder.svg"} alt="Profile picture" />
-                    <AvatarFallback className="text-2xl bg-primary/10 text-primary">
-                      {username[0]?.toUpperCase() || email[0]?.toUpperCase() || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  {isEditing && (
-                    <label className="absolute bottom-0 right-0 cursor-pointer">
-                      <Button
-                        size="icon"
-                        type="button"
-                        className="rounded-full w-10 h-10 min-h-[44px] min-w-[44px] bg-primary hover:bg-primary/90"
-                        disabled={isUploadingAvatar}
-                        aria-label="Upload new avatar"
-                      >
-                        <Camera className="w-5 h-5" aria-hidden="true" />
-                      </Button>
+          {/* Avatar Section - Figma Style */}
+          <div className="bg-surface-base border border-border-base rounded-2xl p-6 md:p-8 mb-6">
+            <h2 className="font-semibold text-lg mb-6 text-text-primary">Profile Picture</h2>
+            <div className="flex items-center gap-6">
+              <div className="relative group">
+                <Avatar className="w-24 h-24">
+                  <AvatarImage src={avatar || "/placeholder.svg"} alt="Profile picture" />
+                  <AvatarFallback className="text-2xl bg-brand-primary-alpha-10 text-brand-primary">
+                    {username[0]?.toUpperCase() || email[0]?.toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                {isEditing && (
+                  <label className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer">
+                    <Camera className="w-6 h-6 text-white" aria-hidden="true" />
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                      disabled={isUploadingAvatar}
+                      aria-label="Choose avatar file"
+                    />
+                  </label>
+                )}
+                {isUploadingAvatar && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                    <Loader2 className="w-6 h-6 text-white animate-spin" aria-hidden="true" />
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
+                <p className="text-text-secondary text-sm mb-3">
+                  Upload a new profile picture. Recommended size: 400x400px
+                </p>
+                {isEditing && (
+                  <div className="flex gap-3">
+                    <label className="px-4 py-2 bg-brand-primary text-white rounded-xl font-medium hover:bg-brand-primary-subtle transition-all cursor-pointer text-sm">
+                      Upload new
                       <input
                         type="file"
                         accept="image/jpeg,image/jpg,image/png,image/webp"
                         onChange={handleAvatarUpload}
                         className="hidden"
                         disabled={isUploadingAvatar}
-                        aria-label="Choose avatar file"
                       />
                     </label>
-                  )}
-                  {isUploadingAvatar && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
-                      <Loader2 className="w-6 h-6 text-white animate-spin" aria-hidden="true" />
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="username" className="flex items-center gap-2">
-                    <User className="w-4 h-4" aria-hidden="true" />
-                    Display Name
-                  </Label>
-                  <Input
-                    id="username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    disabled={!isEditing}
-                    className="min-h-[44px] rounded-xl"
-                    placeholder="Enter your display name"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="flex items-center gap-2">
-                    <Mail className="w-4 h-4" aria-hidden="true" />
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    disabled
-                    className="min-h-[44px] rounded-xl bg-muted"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Email cannot be changed directly. Contact support to update.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea
-                    id="bio"
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    disabled={!isEditing}
-                    placeholder="Tell us about yourself..."
-                    className="min-h-[100px] resize-none rounded-xl"
-                    maxLength={500}
-                  />
-                  {isEditing && (
-                    <p className="text-xs text-muted-foreground text-right">
-                      {bio.length}/500 characters
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex gap-3 mt-6">
-                {isEditing ? (
-                  <>
-                    <Button
-                      onClick={handleSave}
-                      disabled={isSaving}
-                      className="flex-1 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-                      aria-label="Save profile changes"
-                    >
-                      {isSaving ? (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
-                      ) : (
-                        <Save className="w-4 h-4 mr-2" aria-hidden="true" />
-                      )}
-                      {isSaving ? "Saving…" : "Save Changes"}
-                    </Button>
                     <Button
                       variant="outline"
-                      onClick={() => setIsEditing(false)}
-                      disabled={isSaving}
-                      className="flex-1 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-                      aria-label="Cancel editing"
+                      size="sm"
+                      onClick={() => setAvatar("")}
+                      className="px-4 py-2 bg-surface-raised border border-border-base rounded-xl font-medium hover:bg-surface-overlay transition-all text-text-secondary"
                     >
-                      Cancel
+                      Remove
                     </Button>
-                  </>
-                ) : (
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Basic Info - Figma Style */}
+          <div className="bg-surface-base border border-border-base rounded-2xl p-6 md:p-8 mb-6">
+            <h2 className="font-semibold text-lg mb-6 text-text-primary">Basic Information</h2>
+            <div className="space-y-5">
+              <div>
+                <Label
+                  htmlFor="username"
+                  className="block mb-2.5 text-sm font-medium text-text-secondary"
+                >
+                  Display Name
+                </Label>
+                <Input
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={!isEditing}
+                  className="w-full px-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all"
+                  placeholder="Enter your display name"
+                />
+              </div>
+
+              <div>
+                <Label
+                  htmlFor="bio"
+                  className="block mb-2.5 text-sm font-medium text-text-secondary"
+                >
+                  Bio
+                </Label>
+                <Textarea
+                  id="bio"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  disabled={!isEditing}
+                  placeholder="Tell people a bit about yourself"
+                  className="w-full px-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all resize-none min-h-[100px]"
+                  maxLength={200}
+                />
+                <div className="flex justify-between mt-2">
+                  <p className="text-sm text-text-tertiary">Tell people a bit about yourself</p>
+                  <p className="text-sm text-text-tertiary">{bio.length}/200</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Account Info - Figma Style */}
+          <div className="bg-surface-base border border-border-base rounded-2xl p-6 md:p-8 mb-6">
+            <h2 className="font-semibold text-lg mb-6 text-text-primary">Account</h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <div className="font-medium mb-1 text-text-primary">Email Address</div>
+                  <div className="text-text-tertiary text-sm">{email}</div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled
+                  className="px-4 py-2 bg-surface-raised border border-border-base rounded-xl font-medium hover:bg-surface-overlay transition-all text-sm"
+                >
+                  Change
+                </Button>
+              </div>
+
+              <div className="flex items-center justify-between py-3 border-t border-border-subtle">
+                <div>
+                  <div className="font-medium mb-1 text-text-primary">Account Type</div>
+                  <div className="text-text-tertiary text-sm capitalize">{currentUser.role}</div>
+                </div>
+                {currentUser.role === "fan" && (
                   <Button
-                    onClick={() => setIsEditing(true)}
-                    className="w-full rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-                    aria-label="Edit profile"
+                    onClick={handleCreateCreator}
+                    disabled={isCreatingCreator}
+                    data-testid="become-creator-button"
+                    className="px-4 py-2 bg-brand-primary text-white rounded-xl font-medium hover:bg-brand-primary-subtle transition-all text-sm flex items-center gap-2"
                   >
-                    Edit Profile
+                    {isCreatingCreator ? (
+                      <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <Sparkles className="w-4 h-4" aria-hidden="true" />
+                    )}
+                    {isCreatingCreator ? "Creating..." : "Become Creator"}
                   </Button>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          {/* Password Change Card */}
-          <Card className="rounded-xl border shadow-sm mb-6">
-            <CardHeader>
-              <CardTitle className="text-lg">Change Password</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="oldPassword">Current Password</Label>
+          {/* Password Section - Figma Style */}
+          <div className="bg-surface-base border border-border-base rounded-2xl p-6 md:p-8 mb-6">
+            <h2 className="font-semibold text-lg mb-6 text-text-primary">Security</h2>
+            <div className="space-y-4">
+              <div>
+                <Label
+                  htmlFor="oldPassword"
+                  className="block mb-2.5 text-sm font-medium text-text-secondary"
+                >
+                  Current Password
+                </Label>
                 <Input
                   id="oldPassword"
                   type="password"
                   value={oldPassword}
                   onChange={(e) => setOldPassword(e.target.value)}
-                  className="min-h-[44px] rounded-xl"
+                  className="w-full px-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all"
                   placeholder="Enter current password"
                   autoComplete="current-password"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="newPassword">New Password</Label>
+              <div>
+                <Label
+                  htmlFor="newPassword"
+                  className="block mb-2.5 text-sm font-medium text-text-secondary"
+                >
+                  New Password
+                </Label>
                 <Input
                   id="newPassword"
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="min-h-[44px] rounded-xl"
+                  className="w-full px-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all"
                   placeholder="Enter new password (min 8 characters)"
                   autoComplete="new-password"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <div>
+                <Label
+                  htmlFor="confirmPassword"
+                  className="block mb-2.5 text-sm font-medium text-text-secondary"
+                >
+                  Confirm New Password
+                </Label>
                 <Input
                   id="confirmPassword"
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="min-h-[44px] rounded-xl"
+                  className="w-full px-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all"
                   placeholder="Confirm new password"
                   autoComplete="new-password"
                 />
@@ -502,96 +535,106 @@ export default function ProfilePage() {
               <Button
                 onClick={handlePasswordChange}
                 disabled={isSaving || !oldPassword || !newPassword || !confirmPassword}
-                className="w-full rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
+                className="w-full px-4 py-3 bg-brand-primary text-white rounded-xl font-medium hover:bg-brand-primary-subtle transition-all disabled:opacity-50"
                 aria-label="Change password"
               >
                 {isSaving ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
-                    Changing…
+                    Updating...
                   </>
                 ) : (
-                  "Change Password"
+                  "Update Password"
                 )}
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          {/* Creator Actions */}
-          {currentUser.role === "fan" && (
-            <Card className="rounded-xl border shadow-sm mb-6">
-              <CardHeader>
-                <CardTitle className="text-lg">Become a Creator</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Start creating content and monetize your work. Upgrade your account to unlock
-                  creator features.
-                </p>
-                <Button
-                  onClick={handleCreateCreator}
-                  disabled={isCreatingCreator}
-                  data-testid="become-creator-button"
-                  className="w-full rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-                  aria-label="Create creator profile"
-                >
-                  {isCreatingCreator ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
-                  ) : (
-                    <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
-                  )}
-                  {isCreatingCreator ? "Creating..." : "Create my creator profile"}
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
+          {/* Creator Tools - Figma Style */}
           {currentUser.role === "creator" && (
-            <Card className="rounded-xl border shadow-sm mb-6">
-              <CardHeader>
-                <CardTitle className="text-lg">Creator Tools</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  onClick={handleSeedPosts}
-                  disabled={isSeeding}
-                  variant="outline"
-                  className="w-full rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-                  aria-label="Seed demo posts"
-                >
-                  {isSeeding ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
-                  ) : (
-                    <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
-                  )}
-                  {isSeeding ? "Seeding…" : "Seed demo posts"}
-                </Button>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Creates 3 demo posts: subscriber-only, PPV $4.99, PPV $9.99
-                </p>
-              </CardContent>
-            </Card>
+            <div className="bg-surface-base border border-border-base rounded-2xl p-6 md:p-8 mb-6">
+              <h2 className="font-semibold text-lg mb-6 text-text-primary">Creator Tools</h2>
+              <Button
+                onClick={handleSeedPosts}
+                disabled={isSeeding}
+                variant="outline"
+                className="w-full px-4 py-3 bg-surface-raised border border-border-base rounded-xl font-medium hover:bg-surface-overlay transition-all"
+                aria-label="Seed demo posts"
+              >
+                {isSeeding ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
+                ) : (
+                  <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
+                )}
+                {isSeeding ? "Seeding…" : "Seed demo posts"}
+              </Button>
+              <p className="text-sm text-text-tertiary mt-2">
+                Creates 3 demo posts: subscriber-only, PPV $4.99, PPV $9.99
+              </p>
+            </div>
           )}
 
-          {/* Account Actions */}
-          <Card className="rounded-xl border shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">Account Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
+          {/* Danger Zone - Figma Style */}
+          <div className="bg-surface-base border border-error/20 rounded-2xl p-6 md:p-8 mb-8">
+            <h2 className="font-semibold text-lg mb-6 text-error">Danger Zone</h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium mb-1 text-text-primary">Log Out</div>
+                  <div className="text-text-tertiary text-sm">Sign out of your account</div>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-surface-raised border border-border-base rounded-xl font-medium hover:bg-error/10 hover:border-error/30 hover:text-error transition-all text-sm"
+                  aria-label="Log out of your account"
+                >
+                  <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
+                  Log Out
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Save Button - Figma Style */}
+          <div className="flex items-center justify-between">
+            <Button
+              variant="outline"
+              onClick={() => setIsEditing(false)}
+              disabled={!isEditing}
+              className="px-6 py-3 bg-surface-base border border-border-base rounded-xl font-medium hover:bg-surface-raised transition-all"
+            >
+              Cancel
+            </Button>
+            {isEditing ? (
               <Button
-                variant="ghost"
-                onClick={handleLogout}
-                className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 min-h-[44px] transition-[color,background-color] duration-200 motion-safe:transition-[color,background-color] motion-reduce:transition-none rounded-xl"
-                aria-label="Log out of your account"
+                onClick={handleSave}
+                disabled={isSaving}
+                className="px-8 py-3 bg-brand-primary text-white rounded-xl font-medium hover:bg-brand-primary-subtle transition-all disabled:opacity-50 shadow-md"
               >
-                <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
-                Log Out
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" aria-hidden="true" />
+                    Save Changes
+                  </>
+                )}
               </Button>
-            </CardContent>
-          </Card>
-        </CenteredContainer>
-      </main>
+            ) : (
+              <Button
+                onClick={() => setIsEditing(true)}
+                className="px-8 py-3 bg-brand-primary text-white rounded-xl font-medium hover:bg-brand-primary-subtle transition-all shadow-md"
+              >
+                Edit Profile
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
 
       <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
     </div>

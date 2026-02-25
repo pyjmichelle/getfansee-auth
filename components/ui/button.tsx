@@ -14,26 +14,29 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 hover:shadow-md focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         outline:
-          "border border-border bg-transparent hover:bg-secondary/50 hover:border-border-hover active:bg-secondary/70",
+          "border border-border bg-transparent hover:bg-secondary/50 hover:border-border-strong active:bg-secondary/70",
         secondary:
-          "bg-secondary text-foreground border border-border/50 hover:bg-secondary/80 hover:border-border-hover active:bg-secondary/90",
+          "bg-secondary text-foreground border border-border/50 hover:bg-secondary/80 hover:border-border-strong active:bg-secondary/90",
         ghost: "bg-transparent hover:bg-secondary/60 hover:text-foreground active:bg-secondary/80",
-        link: "text-primary underline-offset-4 hover:underline font-medium hover:text-primary-hover",
+        link: "text-primary underline-offset-4 hover:underline font-medium hover:text-brand-primary-subtle",
         gradient:
           "bg-primary-gradient text-white font-bold shadow-md hover:shadow-subscribe-glow hover-glow",
         "accent-gradient":
           "bg-accent-gradient text-white font-bold shadow-md hover:shadow-accent-glow hover-glow",
         "subscribe-gradient":
-          "bg-subscribe-gradient text-white font-bold shadow-md hover:shadow-subscribe-glow hover-glow",
+          "bg-subscribe-gradient text-white font-bold shadow-md hover:shadow-glow hover-glow",
         "unlock-gradient":
           "bg-unlock-gradient text-white font-bold shadow-md hover:shadow-unlock-glow hover-glow",
         "success-gradient":
           "bg-success-gradient text-white font-bold shadow-md hover:shadow-success-glow hover-glow",
+        "tip-gradient":
+          "bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold shadow-md hover-glow-gold hover:from-amber-600 hover:to-amber-700 hover-glow",
       },
       size: {
-        default: "h-10 min-h-[44px] px-5 py-2.5 has-[>svg]:px-4",
+        default: "h-10 min-h-[44px] px-5 py-2.5 has-[>svg]:px-4 text-base",
         sm: "h-8 min-h-[36px] gap-1.5 px-3.5 has-[>svg]:px-3 text-sm",
         lg: "h-12 min-h-[48px] px-7 has-[>svg]:px-5 text-base",
+        xl: "h-14 min-h-[56px] px-8 has-[>svg]:px-6 text-lg",
         icon: "size-10 min-h-[44px] min-w-[44px]",
         "icon-sm": "size-8 min-h-[36px] min-w-[36px]",
         "icon-lg": "size-12 min-h-[48px] min-w-[48px]",

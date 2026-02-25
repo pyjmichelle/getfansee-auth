@@ -14,13 +14,12 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 
-import { Image as ImageIcon, Heart, FileText, Lock, Share2 } from "lucide-react";
+import { Image as ImageIcon, Heart, FileText, Lock, Share2, ChevronLeft } from "lucide-react";
 import { ReportButton } from "@/components/report-button";
 import { toast } from "sonner";
 import { BottomNavigation } from "@/components/bottom-navigation";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
-import { EmptyState } from "@/components/empty-state";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -248,159 +247,177 @@ export default function CreatorProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
-      {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
-
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* 封面图 Banner */}
-        <div className="relative w-full h-48 md:h-64 rounded-xl overflow-hidden mt-6 mb-6">
-          <div className="w-full h-full bg-gradient-to-br from-red-900/40 via-red-800/20 to-amber-900/20 shadow-inner backdrop-blur-sm"></div>
+    <div className="min-h-screen bg-background pb-20">
+      {/* Fixed Header - Figma Style */}
+      <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-border-base">
+        <div className="flex items-center justify-between px-4 h-14">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => router.back()}
+            aria-label="Go back"
+            className="text-text-primary"
+          >
+            <ChevronLeft className="w-6 h-6" aria-hidden="true" />
+          </Button>
+          <h1 className="font-semibold text-text-primary truncate max-w-[200px]">
+            {creatorProfile.display_name || "Creator"}
+          </h1>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleShare}
+            aria-label="Share profile"
+            className="text-text-primary"
+          >
+            <Share2 className="w-5 h-5" aria-hidden="true" />
+          </Button>
         </div>
+      </header>
 
-        {/* 头像和个人信息 */}
-        <div className="relative -mt-20 mb-8">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-            <div className="flex items-end gap-4 md:gap-6">
-              <Avatar className="w-24 h-24 md:w-32 md:h-32 border-4 border-background ring-2 ring-primary/30 shadow-primary-glow/50">
-                <AvatarImage
-                  src={creatorProfile.avatar_url || "/placeholder.svg"}
-                  alt={creatorProfile.display_name || "Creator"}
-                />
-                <AvatarFallback className="text-2xl md:text-3xl glass bg-subscribe-gradient/20 text-[var(--color-pink-400)]">
-                  {creatorProfile.display_name?.[0]?.toUpperCase() || "C"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="pb-2">
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
-                  {creatorProfile.display_name || "Creator"}
-                </h1>
-                {creatorProfile.bio && (
-                  <p className="text-muted-foreground text-sm md:text-base max-w-md line-clamp-2">
-                    {creatorProfile.bio}
-                  </p>
-                )}
-              </div>
+      {/* Banner - Figma Style */}
+      <div className="relative mt-14 h-56 sm:h-80">
+        <div className="w-full h-full bg-gradient-primary opacity-80"></div>
+      </div>
+
+      {/* Avatar Section - Figma Style */}
+      <div className="relative -mt-16 sm:-mt-20 mb-6 px-4">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex items-end gap-4">
+            <Avatar className="w-24 h-24 sm:w-32 sm:h-32 border-4 border-background ring-2 ring-brand-primary/30 shadow-glow">
+              <AvatarImage
+                src={creatorProfile.avatar_url || "/placeholder.svg"}
+                alt={creatorProfile.display_name || "Creator"}
+              />
+              <AvatarFallback className="text-2xl sm:text-3xl bg-brand-primary-alpha-10 text-brand-primary font-bold">
+                {creatorProfile.display_name?.[0]?.toUpperCase() || "C"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="pb-2">
+              <h1 className="text-xl sm:text-2xl font-bold text-text-primary mb-1">
+                {creatorProfile.display_name || "Creator"}
+              </h1>
+              {creatorProfile.bio && (
+                <p className="text-text-tertiary text-sm max-w-md line-clamp-2">
+                  {creatorProfile.bio}
+                </p>
+              )}
             </div>
+          </div>
 
-            {/* 订阅按钮 - 桌面端 */}
-            {currentUserId && currentUserId !== creatorId && (
-              <div className="hidden md:flex flex-col gap-3">
-                {isSubscribed ? (
-                  <Button
-                    variant="outline"
-                    onClick={handleCancelSubscription}
-                    disabled={isSubscribing}
-                    className="rounded-lg min-w-[160px] min-h-[44px]"
-                  >
-                    {isSubscribing ? "Processing…" : "Unsubscribe"}
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleSubscribe}
-                    disabled={isSubscribing}
-                    className="rounded-lg min-w-[160px] min-h-[44px]"
-                  >
-                    {isSubscribing ? "Processing…" : "Subscribe Now"}
-                  </Button>
-                )}
+          {/* Subscribe Button - Desktop */}
+          {currentUserId && currentUserId !== creatorId && (
+            <div className="hidden sm:flex flex-col gap-2">
+              {isSubscribed ? (
                 <Button
                   variant="outline"
-                  onClick={handleShare}
-                  className="rounded-lg min-w-[160px] min-h-[44px]"
-                  data-testid="share-button"
+                  onClick={handleCancelSubscription}
+                  disabled={isSubscribing}
+                  className="rounded-xl min-w-[140px]"
                 >
-                  <Share2 className="w-4 h-4 mr-2" aria-hidden="true" />
-                  Share
+                  {isSubscribing ? "..." : "Subscribed"}
                 </Button>
-                <ReportButton
-                  targetType="user"
-                  targetId={creatorId}
-                  variant="outline"
-                  className="rounded-lg min-w-[160px] min-h-[44px]"
-                />
-              </div>
-            )}
-          </div>
+              ) : (
+                <Button
+                  variant="subscribe-gradient"
+                  onClick={handleSubscribe}
+                  disabled={isSubscribing}
+                  className="rounded-xl min-w-[140px]"
+                >
+                  {isSubscribing ? "..." : "Subscribe"}
+                </Button>
+              )}
+              <ReportButton
+                targetType="user"
+                targetId={creatorId}
+                variant="ghost"
+                size="sm"
+                className="text-text-tertiary"
+              />
+            </div>
+          )}
         </div>
+      </div>
 
-        {/* Tabs: Posts, Media, Likes */}
-        <div className="mb-8">
-          <div className="flex gap-6 md:gap-8 border-b border-border relative">
+      {/* Main Content Area */}
+      <main className="max-w-2xl mx-auto">
+        {/* Tabs - Figma Style */}
+        <div className="px-4 mb-4">
+          <div className="flex border-b border-border-base">
             <button
               onClick={() => setActiveTab("posts")}
               className={cn(
-                "pb-3 text-sm md:text-base font-medium transition-colors relative min-h-[44px] flex items-center",
+                "flex-1 pb-3 text-sm font-medium transition-colors relative",
                 activeTab === "posts"
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-brand-primary"
+                  : "text-text-tertiary hover:text-text-primary"
               )}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <FileText className="w-4 h-4" aria-hidden="true" />
                 <span>Posts</span>
               </div>
               {activeTab === "posts" && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"></span>
+                <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-brand-primary rounded-full"></span>
               )}
             </button>
             <button
               onClick={() => setActiveTab("media")}
               className={cn(
-                "pb-3 text-sm md:text-base font-medium transition-colors relative min-h-[44px] flex items-center",
+                "flex-1 pb-3 text-sm font-medium transition-colors relative",
                 activeTab === "media"
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-brand-primary"
+                  : "text-text-tertiary hover:text-text-primary"
               )}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <ImageIcon className="w-4 h-4" aria-hidden="true" />
                 <span>Media</span>
               </div>
               {activeTab === "media" && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"></span>
+                <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-brand-primary rounded-full"></span>
               )}
             </button>
             <button
               onClick={() => setActiveTab("likes")}
               className={cn(
-                "pb-3 text-sm md:text-base font-medium transition-colors relative min-h-[44px] flex items-center",
+                "flex-1 pb-3 text-sm font-medium transition-colors relative",
                 activeTab === "likes"
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-brand-primary"
+                  : "text-text-tertiary hover:text-text-primary"
               )}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <Heart className="w-4 h-4" aria-hidden="true" />
                 <span>Likes</span>
               </div>
               {activeTab === "likes" && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"></span>
+                <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-brand-primary rounded-full"></span>
               )}
             </button>
           </div>
         </div>
 
-        {/* Tab Content */}
-        <div className="pb-24 md:pb-12">
+        {/* Tab Content - Grid Layout for Media */}
+        <div className="px-4 pb-24">
           {activeTab === "posts" && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {posts.length === 0 ? (
-                <EmptyState
-                  icon={<FileText className="w-8 h-8 text-muted-foreground" />}
-                  title="No Posts Yet"
-                  description="This creator hasn't posted anything yet."
-                />
+                <div className="py-12 text-center">
+                  <FileText className="w-12 h-12 mx-auto mb-3 text-text-quaternary" />
+                  <p className="text-text-tertiary">No posts yet</p>
+                </div>
               ) : (
                 posts.map((post) => {
                   const canView =
                     postViewStates.get(post.id) === true || post.creator_id === currentUserId;
 
                   return (
-                    <Card
+                    <div
                       key={post.id}
-                      className="rounded-2xl border border-border/50 shadow-lg hover:shadow-2xl hover:shadow-primary-glow/20 hover:border-primary/30 transition-[box-shadow,border-color,transform] duration-300 motion-safe:transition-[box-shadow,border-color,transform] motion-reduce:transition-none hover:-translate-y-1"
+                      className="bg-surface-base border border-border-base rounded-2xl overflow-hidden"
                     >
-                      <CardContent className="p-6 lg:p-8">
+                      <div className="p-4">
                         {post.title && (
                           <Link href={`/posts/${post.id}`}>
                             <h3 className="text-xl font-bold text-foreground mb-3 hover:text-primary transition-colors cursor-pointer line-clamp-2">
@@ -560,16 +577,21 @@ export default function CreatorProfilePage() {
                           </div>
                         )}
 
-                        <div className="pt-4 border-t flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">
+                        <div className="pt-4 border-t border-border-base flex items-center justify-between">
+                          <span className="text-sm text-text-tertiary">
                             {post.created_at ? formatDate(post.created_at) : "Unknown date"}
                           </span>
-                          <Button variant="ghost" size="sm" asChild className="rounded-lg">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            asChild
+                            className="rounded-lg text-brand-primary"
+                          >
                             <Link href={`/posts/${post.id}`}>View Details</Link>
                           </Button>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   );
                 })
               )}

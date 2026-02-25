@@ -56,11 +56,11 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-border md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-border-base md:hidden shadow-xl"
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="flex items-center justify-around h-[60px] safe-area-inset-bottom">
+      <div className="flex items-center justify-around px-2 py-2.5 safe-area-inset-bottom">
         {navItems
           .filter((item) => !item.requireCreator || userRole === "creator")
           .map((item) => {
@@ -72,13 +72,13 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-0.5 min-w-[56px] min-h-[44px] px-2 py-1.5 rounded-xl",
-                  "transition-[color,background-color,transform] duration-150 motion-safe:transition-[color,background-color,transform] motion-reduce:transition-none",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                  "flex flex-col items-center gap-1 px-5 py-2.5 rounded-xl",
+                  "transition-all duration-150 motion-safe:transition-all motion-reduce:transition-none",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2",
                   "active:scale-95",
                   isActive
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                    ? "text-brand-primary bg-brand-primary-alpha-10 ring-2 ring-brand-primary/20"
+                    : "text-text-quaternary hover:text-text-primary hover:bg-surface-raised/50"
                 )}
                 aria-label={item.label}
                 aria-current={isActive ? "page" : undefined}
@@ -93,8 +93,8 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
                 <div className="relative">
                   <Icon
                     className={cn(
-                      "w-5 h-5 transition-transform duration-150",
-                      isActive && "scale-105 text-primary"
+                      "w-[22px] h-[22px] transition-transform duration-150",
+                      isActive && "scale-105"
                     )}
                     aria-hidden="true"
                   />
@@ -108,9 +108,7 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
                     </Badge>
                   )}
                 </div>
-                <span className={cn("text-[10px] font-medium", isActive && "text-primary")}>
-                  {item.label}
-                </span>
+                <span className="text-xs font-medium">{item.label}</span>
               </Link>
             );
           })}

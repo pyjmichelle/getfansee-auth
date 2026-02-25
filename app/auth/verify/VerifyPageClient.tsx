@@ -295,41 +295,50 @@ export default function VerifyPageClient({ query }: VerifyPageClientProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <div className="w-full max-w-md">
-        <div className="bg-card border border-border rounded-lg p-8 text-center">
+    <div className="min-h-screen flex items-center justify-center px-6 py-12 bg-background relative overflow-hidden">
+      {/* Decorative Background Elements */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-primary/20 rounded-full blur-[128px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-accent/20 rounded-full blur-[128px]" />
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
+        <div className="glass-strong rounded-3xl p-8 text-center shadow-xl">
           {status === "loading" && (
             <>
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-6 shadow-glow animate-pulse">
+                <Loader2 className="w-10 h-10 text-white animate-spin" />
               </div>
-              <h1 className="text-2xl font-semibold text-foreground mb-3">Verifying...</h1>
-              <p className="text-muted-foreground">Please wait while we verify your account.</p>
+              <h1 className="text-2xl font-bold text-text-primary mb-3">Verifying...</h1>
+              <p className="text-text-secondary">Please wait while we verify your account.</p>
             </>
           )}
 
           {status === "success" && (
             <>
-              <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6">
-                <CheckCircle2 className="w-8 h-8 text-green-500" />
+              <div className="w-20 h-20 rounded-full bg-semantic-success/20 flex items-center justify-center mx-auto mb-6 ring-4 ring-semantic-success/30">
+                <CheckCircle2 className="w-10 h-10 text-semantic-success" />
               </div>
-              <h1 className="text-2xl font-semibold text-foreground mb-3">
+              <h1 className="text-2xl font-bold text-text-primary mb-3">
                 Verification Successful!
               </h1>
-              <p className="text-muted-foreground mb-6">{message}</p>
+              <p className="text-text-secondary mb-6">{message}</p>
             </>
           )}
 
           {status === "error" && (
             <>
-              <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-6">
-                <XCircle className="w-8 h-8 text-destructive" />
+              <div className="w-20 h-20 rounded-full bg-semantic-error/20 flex items-center justify-center mx-auto mb-6 ring-4 ring-semantic-error/30">
+                <XCircle className="w-10 h-10 text-semantic-error" />
               </div>
-              <h1 className="text-2xl font-semibold text-foreground mb-3">Verification Failed</h1>
-              <p className="text-muted-foreground mb-6">{message}</p>
+              <h1 className="text-2xl font-bold text-text-primary mb-3">Verification Failed</h1>
+              <p className="text-text-secondary mb-6">{message}</p>
               <div className="space-y-3">
                 {canResend && (
-                  <Button onClick={handleResend} className="w-full" variant="outline">
+                  <Button
+                    onClick={handleResend}
+                    className="w-full py-3 bg-gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg shadow-brand-primary/25"
+                  >
                     <Mail className="w-4 h-4 mr-2" />
                     Resend Confirmation Email
                   </Button>
@@ -337,7 +346,7 @@ export default function VerifyPageClient({ query }: VerifyPageClientProps) {
                 <Button
                   onClick={() => router.push("/auth")}
                   variant="outline"
-                  className="w-full bg-transparent"
+                  className="w-full py-3 bg-surface-base border border-border-base rounded-xl font-semibold hover:bg-surface-raised transition-all"
                 >
                   Go to Login
                 </Button>
