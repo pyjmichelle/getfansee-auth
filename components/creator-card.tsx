@@ -71,7 +71,7 @@ export function CreatorCard({ creator, onSubscribe, onClick, className }: Creato
           <Avatar className="w-16 h-16 ring-4 ring-card border-2 border-border">
             <AvatarImage src={creator.avatar || "/placeholder.svg"} alt={creator.name} />
             <AvatarFallback className="bg-primary-muted text-primary text-lg font-semibold">
-              {creator.name[0].toUpperCase()}
+              {(creator.name?.[0] || "C").toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </div>

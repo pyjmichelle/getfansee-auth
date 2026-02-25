@@ -189,7 +189,7 @@ export default function NewPostPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background pb-24 md:pb-0">
-        <NavHeader user={{ username: "", role: "creator" }} notificationCount={0} />
+        <NavHeader user={{ username: "Loading", role: "creator" }} notificationCount={0} />
         <div className="pt-20 md:pt-24 pb-12">
           <div className="max-w-5xl mx-auto px-4 md:px-6">
             <div className="space-y-6 animate-pulse">

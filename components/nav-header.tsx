@@ -150,7 +150,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                     <Avatar className="w-8 h-8">
                       <AvatarImage src={user.avatar || "/placeholder.svg"} />
                       <AvatarFallback className="text-sm">
-                        {user.username[0].toUpperCase()}
+                        {(user.username?.[0] || "U").toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <span className="hidden md:inline font-medium text-sm">{user.username}</span>
@@ -163,7 +163,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                       <Avatar className="w-14 h-14 ring-2 ring-primary/20 shadow-sm">
                         <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.username} />
                         <AvatarFallback className="bg-primary/10 text-primary text-lg font-semibold">
-                          {user.username[0].toUpperCase()}
+                          {(user.username?.[0] || "U").toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">

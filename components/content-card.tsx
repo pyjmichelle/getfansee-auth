@@ -93,7 +93,7 @@ export function ContentCard({
                 className="object-cover"
               />
               <AvatarFallback className="bg-brand-primary-alpha-10 text-brand-primary font-semibold text-sm">
-                {creator.name[0].toUpperCase()}
+                {(creator.name?.[0] || "C").toUpperCase()}
               </AvatarFallback>
             </Avatar>
           </Link>

@@ -60,7 +60,7 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
           <Avatar className="w-8 h-8 ring-2 ring-transparent hover:ring-primary/30 transition-all">
             <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.username} />
             <AvatarFallback className="bg-primary-muted text-primary text-sm font-semibold">
-              {user.username[0].toUpperCase()}
+              {(user.username?.[0] || "U").toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <span className="font-medium text-sm hidden md:inline">{user.username}</span>
@@ -74,7 +74,7 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
             <Avatar className="w-10 h-10">
               <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.username} />
               <AvatarFallback className="bg-primary-muted text-primary font-semibold">
-                {user.username[0].toUpperCase()}
+                {(user.username?.[0] || "U").toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
