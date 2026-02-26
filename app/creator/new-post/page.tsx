@@ -329,6 +329,24 @@ export default function NewPostPage() {
             <div className="grid md:grid-cols-3 gap-6">
               {/* Left Column - Content */}
               <div className="md:col-span-2 space-y-6">
+                {/* Post Title */}
+                <div className="bg-surface-raised border border-border-base rounded-2xl p-6 hover:border-brand-primary/30 transition-colors">
+                  <label className="font-semibold flex items-center gap-2 mb-4">
+                    <Edit3 size={18} className="text-brand-primary" />
+                    Title (optional)
+                  </label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Give your post a title..."
+                    maxLength={200}
+                    disabled={isSaving}
+                    className="w-full px-4 py-3 bg-surface-base border border-border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-all text-text-primary placeholder:text-text-quaternary"
+                    data-testid="post-title"
+                  />
+                </div>
+
                 {/* Content Textarea */}
                 <div className="bg-surface-raised border border-border-base rounded-2xl p-6 hover:border-brand-primary/30 transition-colors">
                   <div className="flex items-center justify-between mb-4">

@@ -189,7 +189,7 @@ export default function CreatorStudioPage() {
         </div>
 
         {/* Quick Actions - Figma Style */}
-        <div className="grid grid-cols-2 gap-3 mb-8">
+        <div className="grid grid-cols-2 gap-3 mb-8" data-testid="creator-nav">
           <Link
             href="/creator/new-post"
             className="px-6 py-4 bg-brand-primary text-white rounded-xl font-bold hover:bg-brand-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95"

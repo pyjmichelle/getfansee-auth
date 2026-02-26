@@ -470,6 +470,32 @@ export default function WalletPage() {
         </div>
       </div>
 
+      {/* Checkout Disclaimer */}
+      <div className="max-w-5xl mx-auto px-4 md:px-6 mb-8" data-testid="checkout-disclaimer">
+        <div className="bg-surface-raised border border-border-base rounded-2xl p-6 text-sm text-text-tertiary space-y-2">
+          <p data-testid="no-refund">All purchases are final and non-refundable.</p>
+          <p>
+            By adding funds, you agree to our{" "}
+            <a
+              href="/terms"
+              className="text-brand-primary hover:underline"
+              data-testid="terms-link"
+            >
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a
+              href="/privacy"
+              className="text-brand-primary hover:underline"
+              data-testid="privacy-link"
+            >
+              Privacy Policy
+            </a>
+            .
+          </p>
+        </div>
+      </div>
+
       {/* Add Funds Modal - Figma Style */}
       {showAddFunds && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
