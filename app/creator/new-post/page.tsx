@@ -2,24 +2,45 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { NavHeader } from "@/components/nav-header";
+import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { CenteredContainer } from "@/components/layouts/centered-container";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-// 所有服务器端函数都通过 API 调用，不直接导入
 import { type PostVisibility } from "@/lib/types";
 import { toast } from "sonner";
 import { MultiMediaUpload } from "@/components/multi-media-upload";
 import { TagSelector } from "@/components/tag-selector";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { type MediaFile } from "@/lib/storage";
-import { LoadingState } from "@/components/loading-state";
-import { ErrorState } from "@/components/error-state";
-import { BottomNavigation } from "@/components/bottom-navigation";
+import { Analytics } from "@/lib/analytics";
+import {
+  ArrowLeft,
+  Edit3,
+  Image,
+  Hash,
+  Eye,
+  Users,
+  Lock,
+  Globe,
+  Info,
+  Calendar,
+  Send,
+  Loader2,
+} from "@/lib/icons";
+import Link from "next/link";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -145,6 +166,7 @@ export default function NewPostPage() {
       const result = await response.json();
 
       if (result.success && result.postId) {
+        Analytics.postCreated(formData.visibility, mediaFiles.length > 0);
         // 如果有标签，保存标签
         if (selectedTags.length > 0) {
           try {
@@ -174,278 +196,440 @@ export default function NewPostPage() {
     }
   };
 
-  // Show minimal loading state during auth check - don't render any components that make API calls
+  // Show minimal loading state during auth check
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <LoadingState type="spinner" text="Loading…" />
-      </div>
+      <PageShell user={currentUser} notificationCount={0} maxWidth="5xl" hideBottomNav>
+        <div className="pb-12 space-y-6 animate-pulse">
+          <div className="h-10 w-64 bg-surface-raised rounded" />
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-2 space-y-6">
+              <div className="h-64 bg-surface-raised rounded-2xl" />
+              <div className="h-48 bg-surface-raised rounded-2xl" />
+            </div>
+            <div className="h-96 bg-surface-raised rounded-2xl" />
+          </div>
+        </div>
+      </PageShell>
     );
   }
 
   if (error && currentUser?.role !== "creator") {
     return (
-      <div className="min-h-screen bg-background">
-        {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
-        <main className="py-6 sm:py-8 lg:py-12">
-          <CenteredContainer maxWidth="2xl">
-            <Card className="p-6 rounded-xl border shadow-sm">
-              <div className="text-center">
-                <h1 className="text-2xl font-bold text-foreground mb-4">Become a Creator</h1>
-                <p className="text-muted-foreground mb-6">
-                  Only creators can post. Please become a creator first.
-                </p>
-                <Button
-                  onClick={() => router.push("/home")}
-                  className="rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-                >
-                  Back to Home
-                </Button>
-              </div>
-            </Card>
-          </CenteredContainer>
-        </main>
-      </div>
+      <PageShell user={currentUser} notificationCount={0} maxWidth="5xl" hideBottomNav>
+        <div className="pb-12">
+          <div className="bg-surface-raised border border-border-base rounded-2xl p-8 text-center">
+            <div className="w-16 h-16 bg-brand-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Lock size={32} className="text-brand-primary" />
+            </div>
+            <h1 className="text-2xl font-bold text-text-primary mb-2">Become a Creator</h1>
+            <p className="text-text-tertiary mb-6">
+              Only creators can post. Please become a creator first.
+            </p>
+            <Button
+              onClick={() => router.push("/home")}
+              className="px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-primary/90 transition-all shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+            >
+              Back to Home
+            </Button>
+          </div>
+        </div>
+      </PageShell>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0" data-testid="page-ready">
-      {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
+  const visibilityOptions = [
+    {
+      value: "free" as const,
+      icon: Globe,
+      label: "Free",
+      description: "Everyone can see this post",
+      color: "text-success",
+    },
+    {
+      value: "subscribers" as const,
+      icon: Users,
+      label: "Subscribers Only",
+      description: "Only your subscribers can view",
+      color: "text-brand-primary",
+    },
+    {
+      value: "ppv" as const,
+      icon: Lock,
+      label: "Pay Per View",
+      description: "One-time unlock for specific price",
+      color: "text-brand-accent",
+    },
+  ];
 
-      <main className="py-6 sm:py-8 lg:py-12">
-        <CenteredContainer maxWidth="2xl">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">Create New Post</h1>
-            <p className="text-lg text-muted-foreground">Share your content with your audience</p>
+  const canPublish =
+    formData.content.trim().length > 0 &&
+    (formData.visibility !== "ppv" || (formData.price && parseFloat(formData.price) > 0));
+  const handleDiscardAndExit = () => router.push("/creator/studio");
+
+  return (
+    <PageShell user={currentUser} notificationCount={0} maxWidth="5xl" hideBottomNav>
+      <div data-testid="page-ready" className="pb-12">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/creator/studio"
+              className="p-2.5 hover:bg-surface-raised rounded-xl transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+              aria-label="Back to Studio"
+            >
+              <ArrowLeft size={24} />
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold mb-1 text-text-primary">Create New Post</h1>
+              <p className="text-text-tertiary text-sm">Share your content with your audience</p>
+            </div>
           </div>
 
-          {error && <ErrorState title="Error" message={error} variant="inline" className="mb-8" />}
+          <div className="hidden md:flex items-center gap-3">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isSaving}
+                  className="px-5 py-2.5 bg-surface-raised border border-border-base rounded-xl font-semibold hover:bg-surface-overlay transition-all flex items-center gap-2 active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                >
+                  Discard & Exit
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Discard this post draft?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You have unsaved changes. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Keep editing</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDiscardAndExit}>
+                    Discard & Exit
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <Button
+              onClick={handleSubmit}
+              disabled={!canPublish || isSaving}
+              variant="gradient"
+              className="px-6 py-2.5 text-white rounded-xl font-semibold hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-glow flex items-center gap-2 active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+              data-testid="submit-button"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Publishing...
+                </>
+              ) : (
+                <>
+                  <Send size={18} />
+                  Publish
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
 
-          <Card className="rounded-xl border shadow-sm p-6 md:p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Title */}
-              <div className="space-y-2">
-                <Label htmlFor="title">Title (optional)</Label>
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl flex items-center gap-3">
+            <Info size={20} className="text-error flex-shrink-0" />
+            <p className="text-sm text-error">{error}</p>
+          </div>
+        )}
+
+        {/* Main Content */}
+        <form onSubmit={handleSubmit}>
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Left Column - Content */}
+            <div className="md:col-span-2 space-y-6">
+              {/* Post Title */}
+              <div className="card-block p-6">
+                <label className="font-semibold flex items-center gap-2 mb-4">
+                  <Edit3 size={18} className="text-brand-primary" />
+                  Title (optional)
+                </label>
                 <Input
                   id="title"
-                  type="text"
-                  placeholder="Post title"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="Give your post a title..."
+                  maxLength={200}
                   disabled={isSaving}
-                  className="min-h-[44px] rounded-xl"
+                  className="w-full px-4 py-3 bg-surface-base border border-border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-all text-text-primary placeholder:text-text-quaternary"
                   data-testid="post-title"
                 />
               </div>
 
-              {/* Content */}
-              <div className="space-y-2">
-                <Label htmlFor="content">
-                  Content <span className="text-destructive">*</span>
-                </Label>
+              {/* Content Textarea */}
+              <div className="card-block p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <label className="font-semibold flex items-center gap-2">
+                    <Edit3 size={18} className="text-brand-primary" />
+                    Post Content
+                  </label>
+                  <span className="text-sm text-text-tertiary">{formData.content.length}/5000</span>
+                </div>
                 <Textarea
                   id="content"
-                  placeholder="Write your post content..."
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  rows={6}
-                  required
+                  placeholder="What do you want to share with your fans? Share your thoughts, updates, or exclusive content..."
+                  rows={10}
+                  maxLength={5000}
                   disabled={isSaving}
-                  className="rounded-xl resize-none"
+                  className="w-full px-4 py-3 bg-surface-base border border-border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-all resize-none text-text-primary placeholder:text-text-quaternary"
                   data-testid="post-content"
                 />
+                <div className="flex items-center gap-4 mt-3 text-sm text-text-tertiary">
+                  <div className="flex items-center gap-1.5">
+                    <span>Markdown supported</span>
+                  </div>
+                </div>
               </div>
 
-              {/* Multi Media Upload */}
-              <div className="space-y-2" data-testid="upload-zone">
-                <Label>Media (optional, multiple files supported)</Label>
+              {/* Media Upload */}
+              <div className="card-block p-6" data-testid="upload-zone">
+                <label className="font-semibold flex items-center gap-2 mb-4">
+                  <Image size={18} className="text-brand-primary" />
+                  Media Attachments
+                </label>
                 <MultiMediaUpload
                   onUploadComplete={(files) => {
                     setMediaFiles(files);
                     toast.success(`Uploaded ${files.length} file(s)`);
                   }}
-                  onUploadError={(error) => {
-                    setError(error);
-                    toast.error(error);
+                  onUploadError={(uploadError) => {
+                    setError(uploadError);
+                    toast.error(uploadError);
                   }}
                   maxFiles={10}
                 />
                 {mediaFiles.length > 0 && (
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-sm text-text-tertiary mt-3">
                     {mediaFiles.length} file(s) uploaded
                   </p>
                 )}
               </div>
 
-              {/* Tags - Only render after auth is complete and user is creator */}
+              {/* Tags */}
               {!isLoading && currentUser?.role === "creator" && (
-                <div className="space-y-2">
-                  <Label>Tags (optional, up to 5)</Label>
+                <div className="card-block p-6">
+                  <label className="font-semibold flex items-center gap-2 mb-4">
+                    <Hash size={18} className="text-brand-primary" />
+                    Tags
+                  </label>
                   <TagSelector
                     category="content"
                     selectedTags={selectedTags}
                     onChange={setSelectedTags}
                     maxTags={5}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Add tags to help users discover your content
+                  <p className="text-sm text-text-tertiary flex items-center gap-2 mt-3">
+                    <Info size={14} />
+                    {selectedTags.length}/5 tags • Add tags to help users discover your content
                   </p>
                 </div>
               )}
+            </div>
 
-              {/* Visibility */}
-              <div className="space-y-3" data-testid="visibility-toggle">
-                <Label>Visibility</Label>
-                <div className="flex flex-col gap-3">
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="visibility"
-                      value="free"
-                      checked={formData.visibility === "free"}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          visibility: e.target.value as PostVisibility,
-                          price: "",
-                        })
-                      }
-                      disabled={isSaving}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm">Free - Public content visible to everyone</span>
-                  </label>
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="visibility"
-                      value="subscribers"
-                      checked={formData.visibility === "subscribers"}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          visibility: e.target.value as PostVisibility,
-                          price: "",
-                        })
-                      }
-                      disabled={isSaving}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm">
-                      Subscribers-only - Exclusive content for your fans
-                    </span>
-                  </label>
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="visibility"
-                      value="ppv"
-                      checked={formData.visibility === "ppv"}
-                      onChange={(e) =>
-                        setFormData({ ...formData, visibility: e.target.value as PostVisibility })
-                      }
-                      disabled={isSaving}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm">Pay-per-view - Fans pay to unlock each post</span>
-                  </label>
+            {/* Right Column - Settings */}
+            <div className="space-y-6">
+              {/* Visibility Settings */}
+              <div className="card-block p-6 sticky top-24" data-testid="visibility-toggle">
+                <label className="font-semibold flex items-center gap-2 mb-4">
+                  <Eye size={18} className="text-brand-primary" />
+                  Post Visibility
+                </label>
+
+                <div className="space-y-3">
+                  {visibilityOptions.map((option) => (
+                    <label
+                      key={option.value}
+                      className={`block p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                        formData.visibility === option.value
+                          ? "border-brand-primary shadow-glow bg-brand-primary-alpha-10"
+                          : "border-border-subtle hover:border-border-base bg-surface-base"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="radio"
+                          name="visibility"
+                          checked={formData.visibility === option.value}
+                          onChange={() =>
+                            setFormData({
+                              ...formData,
+                              visibility: option.value,
+                              price: option.value === "ppv" ? formData.price : "",
+                            })
+                          }
+                          disabled={isSaving}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <option.icon size={18} className={option.color} />
+                            <span className="font-semibold text-text-primary">{option.label}</span>
+                          </div>
+                          <p className="text-sm text-text-tertiary">{option.description}</p>
+                        </div>
+                      </div>
+                    </label>
+                  ))}
                 </div>
+
+                {/* Price Input for PPV */}
+                {formData.visibility === "ppv" && (
+                  <div className="mt-4 pt-4 border-t border-border-subtle">
+                    <label className="block mb-2 text-sm font-semibold">Set Price</label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-tertiary font-semibold">
+                        $
+                      </span>
+                      <Input
+                        id="price"
+                        type="number"
+                        value={formData.price}
+                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                        placeholder="0.00"
+                        min="1.00"
+                        step="0.01"
+                        disabled={isSaving}
+                        className="w-full pl-9 pr-4 py-3 bg-surface-base border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-all"
+                        data-testid="price-input"
+                      />
+                    </div>
+                    <p className="text-xs text-text-tertiary mt-2 flex items-center gap-1">
+                      <Info size={12} />
+                      Minimum: $1.00 • Platform fee: 20%
+                    </p>
+
+                    {/* Price Suggestions */}
+                    <div className="flex gap-2 mt-3">
+                      {["2.99", "4.99", "9.99", "19.99"].map((suggested) => (
+                        <button
+                          key={suggested}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, price: suggested })}
+                          className="flex-1 px-3 py-2 bg-surface-base border border-border-base rounded-lg text-sm font-semibold hover:bg-brand-primary/10 hover:border-brand-primary/30 transition-all"
+                        >
+                          ${suggested}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Earnings Preview */}
+                    {formData.price && parseFloat(formData.price) >= 1.0 && (
+                      <div className="mt-4 p-3 bg-success/10 border border-success/20 rounded-xl">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-text-tertiary">You&apos;ll earn:</span>
+                          <span className="font-bold text-success">
+                            ${(parseFloat(formData.price) * 0.8).toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
-              {/* Price (only for PPV) */}
-              {formData.visibility === "ppv" && (
-                <div className="space-y-2">
-                  <Label htmlFor="price">
-                    Price (USD) <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    placeholder="0.00"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    disabled={isSaving}
-                    required
-                    className="min-h-[44px] rounded-xl"
-                    data-testid="price-input"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Set the price fans pay to unlock this exclusive content (USD)
-                  </p>
+              {/* Preview/Watermark Options */}
+              {(mediaFiles.some((f) => f.type === "video") ||
+                mediaFiles.some((f) => f.type === "image")) && (
+                <div className="card-block p-6">
+                  <label className="font-semibold flex items-center gap-2 mb-4">
+                    <Calendar size={18} className="text-brand-primary" />
+                    Media Options
+                  </label>
+
+                  {/* Preview Enabled (for videos) */}
+                  {mediaFiles.some((f) => f.type === "video") && (
+                    <div className="flex items-center justify-between p-3 bg-surface-base border border-border-base rounded-xl mb-3">
+                      <div className="flex-1">
+                        <Label htmlFor="preview_enabled" className="text-sm font-semibold">
+                          Enable Preview
+                        </Label>
+                        <p className="text-xs text-text-tertiary">First 10 seconds teaser</p>
+                      </div>
+                      <Switch
+                        id="preview_enabled"
+                        checked={formData.preview_enabled}
+                        onCheckedChange={(checked) =>
+                          setFormData({ ...formData, preview_enabled: checked })
+                        }
+                        disabled={isSaving}
+                      />
+                    </div>
+                  )}
+
+                  {/* Watermark Enabled (for images) */}
+                  {mediaFiles.some((f) => f.type === "image") && (
+                    <div className="flex items-center justify-between p-3 bg-surface-base border border-border-base rounded-xl">
+                      <div className="flex-1">
+                        <Label htmlFor="watermark_enabled" className="text-sm font-semibold">
+                          Enable Watermark
+                        </Label>
+                        <p className="text-xs text-text-tertiary">Protect your images</p>
+                      </div>
+                      <Switch
+                        id="watermark_enabled"
+                        checked={formData.watermark_enabled}
+                        onCheckedChange={(checked) =>
+                          setFormData({ ...formData, watermark_enabled: checked })
+                        }
+                        disabled={isSaving}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
+            </div>
+          </div>
+        </form>
 
-              {/* Preview Enabled (for videos) */}
-              {mediaFiles.some((f) => f.type === "video") && (
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="preview_enabled">Enable Preview (first 10 seconds)</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Give fans a teaser - let them preview the first 10 seconds
-                    </p>
-                  </div>
-                  <Switch
-                    id="preview_enabled"
-                    checked={formData.preview_enabled}
-                    onCheckedChange={(checked) =>
-                      setFormData({ ...formData, preview_enabled: checked })
-                    }
-                    disabled={isSaving}
-                  />
-                </div>
-              )}
-
-              {/* Watermark Enabled (for images) */}
-              {mediaFiles.some((f) => f.type === "image") && (
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="watermark_enabled">Enable Watermark (top-left corner)</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Protect your content with a watermark on images
-                    </p>
-                  </div>
-                  <Switch
-                    id="watermark_enabled"
-                    checked={formData.watermark_enabled}
-                    onCheckedChange={(checked) =>
-                      setFormData({ ...formData, watermark_enabled: checked })
-                    }
-                    disabled={isSaving}
-                  />
-                </div>
-              )}
-
-              {/* Submit Button */}
-              <div className="flex gap-4 pt-6 border-t border-border">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => router.push("/home")}
-                  disabled={isSaving}
-                  className="flex-1 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-                  aria-label="Cancel post creation"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isSaving}
-                  className="flex-1 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-                  aria-label="Publish post"
-                  data-testid="submit-button"
-                >
-                  {isSaving ? "Publishing…" : "Publish"}
-                </Button>
-              </div>
-            </form>
-          </Card>
-        </CenteredContainer>
-      </main>
-
-      <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
-    </div>
+        {/* Mobile Action Buttons */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-surface-base border-t border-border-base flex gap-3 z-50">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isSaving}
+                className="flex-1 py-3 bg-surface-raised border border-border-base rounded-xl font-semibold hover:bg-surface-overlay transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+              >
+                Discard & Exit
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Discard this post draft?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  You have unsaved changes. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Keep editing</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDiscardAndExit}>Discard & Exit</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <Button
+            onClick={handleSubmit}
+            disabled={!canPublish || isSaving}
+            variant="gradient"
+            className="flex-1 py-3 text-white rounded-xl font-semibold disabled:opacity-40 shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary disabled:shadow-none"
+            data-testid="submit-button-mobile"
+          >
+            {isSaving ? "Publishing..." : "Publish"}
+          </Button>
+        </div>
+      </div>
+    </PageShell>
   );
 }

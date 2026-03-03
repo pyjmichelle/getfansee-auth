@@ -2,19 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { NavHeader } from "@/components/nav-header";
-import { Card } from "@/components/ui/card";
+import { PageShell } from "@/components/page-shell";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CenteredContainer } from "@/components/layouts/centered-container";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { ensureProfile } from "@/lib/auth";
 import { getProfile } from "@/lib/profile";
 import { type Post } from "@/lib/types";
 import Link from "next/link";
-import { ArrowLeft, Tag, FileText } from "lucide-react";
+import { ArrowLeft, Tag, FileText } from "@/lib/icons";
 import { formatDistanceToNow } from "date-fns";
+import { useCountUp } from "@/hooks/use-count-up";
+import { DEFAULT_AVATAR_CREATOR } from "@/lib/image-fallbacks";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -56,7 +56,6 @@ export default function TagPage() {
           });
         }
 
-        // Load posts by tag
         const response = await fetch(`/api/tags/${encodeURIComponent(tagName)}/posts`);
         if (response.ok) {
           const data = await response.json();
@@ -77,125 +76,124 @@ export default function TagPage() {
     }
   }, [tagName, router]);
 
+  const animatedPostCount = useCountUp(posts.length, { duration: 700, decimals: 0 });
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
-        <main className="py-6 sm:py-8 lg:py-12">
-          <CenteredContainer maxWidth="4xl">
-            <div className="animate-pulse space-y-4">
-              <div className="h-8 w-48 bg-muted rounded"></div>
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-32 bg-muted rounded-xl"></div>
-                ))}
-              </div>
-            </div>
-          </CenteredContainer>
-        </main>
-      </div>
+      <PageShell user={currentUser} notificationCount={0} maxWidth="4xl">
+        <div className="py-8 animate-pulse space-y-4">
+          <div className="h-8 w-48 bg-surface-raised rounded"></div>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-32 bg-surface-raised rounded-xl"></div>
+            ))}
+          </div>
+        </div>
+      </PageShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
+    <PageShell user={currentUser} notificationCount={0} maxWidth="4xl">
+      <div className="section-block py-6 sm:py-8 lg:py-12">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mb-6 -ml-2 rounded-lg min-h-[40px]"
+          onClick={() => router.back()}
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back
+        </Button>
 
-      <main className="py-6 sm:py-8 lg:py-12">
-        <CenteredContainer maxWidth="4xl">
-          {/* Back button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="mb-6 -ml-2 rounded-lg min-h-[40px]"
-            onClick={() => router.back()}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-
-          {/* Tag Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Tag className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">#{tagName}</h1>
-                {tagInfo?.category && (
-                  <Badge variant="secondary" className="mt-1">
-                    {tagInfo.category}
-                  </Badge>
-                )}
-              </div>
+        {/* Tag Hero */}
+        <div className="card-block bg-gradient-subtle p-6 md:p-8 mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-12 h-12 rounded-xl bg-brand-primary/10 flex items-center justify-center">
+              <Tag className="w-6 h-6 text-brand-primary" />
             </div>
-            <p className="text-muted-foreground">
-              {posts.length} {posts.length === 1 ? "post" : "posts"} with this tag
-            </p>
+            <div>
+              <h1 className="text-3xl font-bold text-text-primary">#{tagName}</h1>
+              {tagInfo?.category && (
+                <Badge variant="secondary" className="mt-1">
+                  {tagInfo.category}
+                </Badge>
+              )}
+            </div>
           </div>
+          <p className="text-text-secondary mt-2">
+            <span className="font-bold text-brand-primary">{animatedPostCount.toFixed(0)}</span>{" "}
+            {posts.length === 1 ? "post" : "posts"} with this tag
+          </p>
+        </div>
 
-          {/* Posts List */}
-          {posts.length === 0 ? (
-            <div className="text-center py-16">
-              <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
-              <h3 className="text-lg font-medium text-foreground mb-2">No posts found</h3>
-              <p className="text-muted-foreground mb-6">
-                There are no posts with the tag #{tagName} yet.
-              </p>
-              <Button onClick={() => router.push("/home")}>Explore Home Feed</Button>
-            </div>
-          ) : (
-            <div className="space-y-4" data-testid="tag-posts">
-              {posts.map((post) => (
-                <Link key={post.id} href={`/posts/${post.id}`}>
-                  <Card className="rounded-xl border shadow-sm hover:shadow-md transition-[box-shadow] duration-200 motion-safe:transition-[box-shadow] motion-reduce:transition-none p-6">
-                    <div className="flex gap-4">
-                      {/* Creator Avatar */}
-                      <Avatar className="w-12 h-12">
-                        <AvatarImage
-                          src={post.creator?.avatar_url || "/placeholder.svg"}
-                          alt={post.creator?.display_name || "Creator"}
-                        />
-                        <AvatarFallback className="bg-primary/10 text-primary">
-                          {post.creator?.display_name?.[0]?.toUpperCase() || "C"}
-                        </AvatarFallback>
-                      </Avatar>
+        {/* Posts List */}
+        {posts.length === 0 ? (
+          <div className="card-block text-center py-16">
+            <FileText className="w-12 h-12 mx-auto mb-4 text-text-tertiary/50" />
+            <h3 className="text-lg font-medium text-text-primary mb-2">No posts found</h3>
+            <p className="text-text-secondary mb-6">
+              There are no posts with the tag #{tagName} yet.
+            </p>
+            <Button
+              onClick={() => router.push("/home")}
+              className="bg-brand-primary text-white shadow-glow hover-bold"
+            >
+              Explore Home Feed
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4" data-testid="tag-posts">
+            {posts.map((post, index) => (
+              <Link key={post.id} href={`/posts/${post.id}`}>
+                <div
+                  className="card-block p-6 hover-bold animate-profile-reveal"
+                  style={{ animationDelay: `${index * 60}ms` }}
+                >
+                  <div className="flex gap-4">
+                    <Avatar className="w-12 h-12">
+                      <AvatarImage
+                        src={post.creator?.avatar_url || DEFAULT_AVATAR_CREATOR}
+                        alt={post.creator?.display_name || "Creator"}
+                      />
+                      <AvatarFallback className="bg-brand-primary/10 text-brand-primary">
+                        {post.creator?.display_name?.[0]?.toUpperCase() || "C"}
+                      </AvatarFallback>
+                    </Avatar>
 
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-foreground">
-                            {post.creator?.display_name || "Creator"}
-                          </span>
-                          <span className="text-sm text-muted-foreground">
-                            {post.created_at
-                              ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true })
-                              : "Unknown date"}
-                          </span>
-                          {post.visibility !== "free" && (
-                            <Badge
-                              variant={post.visibility === "ppv" ? "default" : "secondary"}
-                              className="text-xs"
-                            >
-                              {post.visibility === "ppv"
-                                ? `$${((post.price_cents || 0) / 100).toFixed(2)}`
-                                : "Subscribers"}
-                            </Badge>
-                          )}
-                        </div>
-                        {post.title && (
-                          <h3 className="font-medium text-foreground mb-1">{post.title}</h3>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-semibold text-text-primary">
+                          {post.creator?.display_name || "Creator"}
+                        </span>
+                        <span className="text-sm text-text-tertiary">
+                          {post.created_at
+                            ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true })
+                            : "Unknown date"}
+                        </span>
+                        {post.visibility !== "free" && (
+                          <Badge
+                            variant={post.visibility === "ppv" ? "default" : "secondary"}
+                            className="text-xs"
+                          >
+                            {post.visibility === "ppv"
+                              ? `$${((post.price_cents || 0) / 100).toFixed(2)}`
+                              : "Subscribers"}
+                          </Badge>
                         )}
-                        <p className="text-muted-foreground line-clamp-2">{post.content}</p>
                       </div>
+                      {post.title && (
+                        <h3 className="font-medium text-text-primary mb-1">{post.title}</h3>
+                      )}
+                      <p className="text-text-secondary line-clamp-2">{post.content}</p>
                     </div>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          )}
-        </CenteredContainer>
-      </main>
-    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </PageShell>
   );
 }

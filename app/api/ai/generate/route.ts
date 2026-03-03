@@ -8,14 +8,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
     }
 
-    // TODO: 这里调用你的 AI 服务（OpenAI, Anthropic, 等）
-    // 使用 catalog 来约束 AI 的输出
-
-    // 示例：模拟 AI 响应
-    // 实际使用时，你需要：
-    // 1. 调用 AI API（OpenAI, Anthropic, 等）
-    // 2. 在 prompt 中包含 catalog 信息
-    // 3. 使用 streaming 返回结果
+    // AI generation endpoint — currently returns a mock response.
+    // Production integration with OpenAI/Anthropic is a future milestone (P2).
 
     const mockResponse = {
       type: "Card",

@@ -2,18 +2,30 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, DollarSign, TrendingUp, Download, Clock } from "lucide-react";
-import { NavHeader } from "@/components/nav-header";
+import {
+  ArrowLeft,
+  DollarSign,
+  Download,
+  Clock,
+  Users,
+  Unlock,
+  Gift,
+  ArrowUpRight,
+  CheckCircle,
+  CreditCard,
+  ArrowRight,
+  Plus,
+  BarChart3,
+  FileText,
+} from "@/lib/icons";
+import { PageShell } from "@/components/page-shell";
+import { StatCard } from "@/components/stat-card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { ensureProfile } from "@/lib/auth";
-import { getProfile } from "@/lib/profile";
-// getCreatorEarnings 通过 API 调用，不直接导入
 import Link from "next/link";
 import { format } from "date-fns";
-
-const supabase = getSupabaseBrowserClient();
+import { useCountUp } from "@/hooks/use-count-up";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
 
 interface Transaction {
   id: string;
@@ -29,49 +41,41 @@ export default function EarningsPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "all">("30d");
+  const [_timeRange, _setTimeRange] = useState<"7d" | "30d" | "90d" | "all">("30d");
   const [currentUser, setCurrentUser] = useState<{
     username: string;
     role: "fan" | "creator";
     avatar?: string;
   } | null>(null);
+  useSkeletonMetric("creator_earnings_page", isLoading);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
 
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           router.push("/auth");
           return;
         }
+        if (bootstrap.profile?.role !== "creator") {
+          router.push("/home");
+          return;
+        }
+        setCurrentUser({
+          username: bootstrap.profile?.display_name || bootstrap.user.email.split("@")[0] || "user",
+          role: "creator",
+          avatar: bootstrap.profile?.avatar_url || undefined,
+        });
 
-        await ensureProfile();
-        const profile = await getProfile(session.user.id);
-        if (profile) {
-          setCurrentUser({
-            username: profile.display_name || "user",
-            role: (profile.role || "fan") as "fan" | "creator",
-            avatar: profile.avatar_url || undefined,
-          });
-
-          if (profile.role !== "creator") {
-            router.push("/home");
-            return;
-          }
-
-          // 加载收益数据（通过 API）
-          const response = await fetch("/api/paywall/earnings");
-          if (response.ok) {
-            const earnings = await response.json();
-            setTransactions(earnings);
-          } else {
-            console.error("[earnings] Failed to fetch earnings");
-          }
+        // 加载收益数据（通过 API）
+        const response = await fetch("/api/paywall/earnings");
+        if (response.ok) {
+          const earnings = await response.json();
+          setTransactions(earnings);
+        } else {
+          console.error("[earnings] Failed to fetch earnings");
         }
       } catch (err) {
         console.error("[earnings] loadData error:", err);
@@ -90,7 +94,7 @@ export default function EarningsPage() {
   const totalEarnings = completedTransactions.reduce((sum, t) => sum + t.amount_cents, 0) / 100;
   const pendingEarnings = pendingTransactions.reduce((sum, t) => sum + t.amount_cents, 0) / 100;
 
-  const platformFee = totalEarnings * 0.2;
+  const _platformFee = totalEarnings * 0.2;
   const yourCut = totalEarnings * 0.8;
 
   // 可提金额（已结算的）
@@ -116,269 +120,356 @@ export default function EarningsPage() {
         return "Pay Per View";
       case "commission":
         return "Commission";
+      case "tip":
+        return "Tip";
+      case "payout":
+        return "Payout";
       default:
         return type;
     }
   };
 
-  const getTypeBadge = (type: string) => {
+  const getTypeIcon = (type: string) => {
     switch (type) {
       case "subscription":
-        return (
-          <Badge className="bg-primary/10 text-primary border-primary/20 rounded-lg">
-            Subscription
-          </Badge>
-        );
+        return <Users size={20} className="text-brand-primary" />;
       case "ppv_purchase":
-        return (
-          <Badge className="glass bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)] border-[var(--border-purple-500-20)] rounded-lg">
-            Premium
-          </Badge>
-        );
-      case "commission":
-        return (
-          <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 rounded-lg">
-            Commission
-          </Badge>
-        );
+      case "unlock":
+        return <Unlock size={20} className="text-brand-secondary" />;
+      case "tip":
+        return <Gift size={20} className="text-success" />;
+      case "payout":
+        return <ArrowUpRight size={20} className="text-error" />;
       default:
-        return <Badge className="bg-muted text-muted-foreground rounded-lg">{type}</Badge>;
+        return <DollarSign size={20} className="text-text-tertiary" />;
     }
   };
 
+  const getTypeBgColor = (type: string) => {
+    switch (type) {
+      case "subscription":
+        return "bg-brand-primary/10";
+      case "ppv_purchase":
+      case "unlock":
+        return "bg-brand-secondary/10";
+      case "tip":
+        return "bg-success/10";
+      case "payout":
+        return "bg-error/10";
+      default:
+        return "bg-surface-raised";
+    }
+  };
+
+  // Revenue breakdown stats
+  const subscriptionRevenue =
+    transactions
+      .filter((t) => t.type === "subscription" && t.status === "completed")
+      .reduce((sum, t) => sum + t.amount_cents, 0) / 100;
+  const unlockRevenue =
+    transactions
+      .filter((t) => (t.type === "ppv_purchase" || t.type === "unlock") && t.status === "completed")
+      .reduce((sum, t) => sum + t.amount_cents, 0) / 100;
+  const tipRevenue =
+    transactions
+      .filter((t) => t.type === "tip" && t.status === "completed")
+      .reduce((sum, t) => sum + t.amount_cents, 0) / 100;
+
+  const totalRevenueForBreakdown = subscriptionRevenue + unlockRevenue + tipRevenue || 1;
+  const subscriptionPercent = Math.round((subscriptionRevenue / totalRevenueForBreakdown) * 100);
+  const unlockPercent = Math.round((unlockRevenue / totalRevenueForBreakdown) * 100);
+  const tipPercent = Math.round((tipRevenue / totalRevenueForBreakdown) * 100);
+  const animatedAvailable = useCountUp(availableBalance, { duration: 900, decimals: 2 });
+  const animatedPending = useCountUp(pendingBalance, { duration: 900, decimals: 2 });
+  const animatedSubsRevenue = useCountUp(subscriptionRevenue, { duration: 900, decimals: 0 });
+  const animatedUnlockRevenue = useCountUp(unlockRevenue, { duration: 900, decimals: 0 });
+  const animatedTipRevenue = useCountUp(tipRevenue, { duration: 900, decimals: 0 });
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-        <main className="container max-w-6xl mx-auto px-4 py-6">
-          <div className="animate-pulse space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-muted rounded-3xl"></div>
-            ))}
+      <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
+        <div className="pb-12 animate-pulse space-y-6">
+          <div className="h-10 w-48 bg-surface-raised rounded" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="h-48 bg-surface-raised rounded-2xl" />
+            <div className="h-48 bg-surface-raised rounded-2xl" />
           </div>
-        </main>
-      </div>
+          <div className="h-64 bg-surface-raised rounded-2xl" />
+        </div>
+      </PageShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-
-      <main className="container max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="mb-6 border-border bg-card hover:bg-card rounded-xl"
-        >
-          <Link href="/creator/studio">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Studio
-          </Link>
-        </Button>
-
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Earnings</h1>
-            <p className="text-muted-foreground">Track your revenue and payouts</p>
-          </div>
-          <Button variant="outline" className="bg-card border-border hover:bg-card rounded-xl">
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </Button>
-        </div>
-
-        {/* Time Range Filter */}
-        <div className="flex gap-2 mb-6">
-          <Button
-            variant={timeRange === "7d" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTimeRange("7d")}
-            className={`rounded-xl ${
-              timeRange === "7d"
-                ? "bg-primary-gradient glass"
-                : "border-border/50 glass hover:border-accent/30"
-            }`}
-          >
-            7 Days
-          </Button>
-          <Button
-            variant={timeRange === "30d" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTimeRange("30d")}
-            className={`rounded-xl ${
-              timeRange === "30d" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
-            }`}
-          >
-            30 Days
-          </Button>
-          <Button
-            variant={timeRange === "90d" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTimeRange("90d")}
-            className={`rounded-xl ${
-              timeRange === "90d" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
-            }`}
-          >
-            90 Days
-          </Button>
-          <Button
-            variant={timeRange === "all" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTimeRange("all")}
-            className={`rounded-xl ${
-              timeRange === "all" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
-            }`}
-          >
-            All Time
-          </Button>
-        </div>
-
-        {/* Earnings Overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-          <div
-            className="bg-card border border-border rounded-3xl p-6"
-            data-testid="earnings-balance"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-green-500/10 text-green-600 dark:text-green-400 flex items-center justify-center">
-                <DollarSign className="w-5 h-5" />
+    <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
+      <div className="pb-12 flex flex-col lg:flex-row gap-8">
+        <main className="flex-1 min-w-0">
+          {/* Header */}
+          <div className="mb-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/creator/studio"
+                  className="p-2.5 hover:bg-surface-raised rounded-xl transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                >
+                  <ArrowLeft size={24} />
+                </Link>
+                <div>
+                  <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3 text-text-primary">
+                    Earnings
+                  </h1>
+                  <p className="text-text-tertiary text-lg">Track revenue and manage payouts</p>
+                </div>
               </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">${totalEarnings.toFixed(2)}</p>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground">Total Earnings</p>
-          </div>
-
-          <div className="bg-card border border-border rounded-3xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                <TrendingUp className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">${availableBalance.toFixed(2)}</p>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground">Available Balance</p>
-          </div>
-
-          <div className="bg-card border border-border rounded-3xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)] flex items-center justify-center">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">${pendingBalance.toFixed(2)}</p>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground">Pending Balance</p>
-          </div>
-
-          <div className="bg-card border border-border rounded-3xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-muted text-muted-foreground flex items-center justify-center">
-                <DollarSign className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">${platformFee.toFixed(2)}</p>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground">Platform Fee (20%)</p>
-          </div>
-        </div>
-
-        {/* Next Payout */}
-        {pendingBalance > 0 && (
-          <div className="bg-card border border-primary/20 rounded-3xl p-6 mb-8 bg-primary/5">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">Pending Settlement</h3>
-                <p className="text-sm text-muted-foreground">
-                  {pendingTransactions.length > 0 && pendingTransactions[0].available_on
-                    ? `Available on ${formatAvailableDate(pendingTransactions[0].available_on)}`
-                    : "Settlement date will be calculated"}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold text-foreground">${pendingBalance.toFixed(2)}</p>
-                <p className="text-sm text-muted-foreground">Pending balance</p>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="px-5 py-3 bg-surface-raised border-border-base hover:bg-surface-overlay"
+                >
+                  <Download size={18} />
+                  Export
+                </Button>
+                <Button variant="subscribe-gradient" className="px-5 py-3">
+                  <ArrowRight size={18} />
+                  Request Payout
+                </Button>
               </div>
             </div>
           </div>
-        )}
 
-        {/* Transaction History */}
-        <div
-          className="bg-card border border-border rounded-3xl p-6"
-          data-testid="earnings-history"
-        >
-          <h2 className="text-lg font-semibold text-foreground mb-4">Transaction History</h2>
-          {transactions.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">No transactions yet</p>
+          {/* Primary Balance Cards */}
+          <div className="bento-grid mb-10">
+            {/* Available Balance */}
+            <div
+              className="bento-2x2 card-block bg-gradient-subtle p-8 relative overflow-hidden"
+              data-testid="earnings-balance"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-success/10 to-transparent" />
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-6">
+                  <div>
+                    <div className="text-sm text-text-tertiary font-semibold mb-2 uppercase tracking-wide">
+                      Available Balance
+                    </div>
+                    <div className="text-5xl font-bold tracking-tight mb-2 text-gradient-primary">
+                      ${animatedAvailable.toFixed(2)}
+                    </div>
+                    <div className="text-sm text-text-secondary">Ready to withdraw</div>
+                  </div>
+                  <div className="w-14 h-14 bg-success/10 rounded-2xl flex items-center justify-center">
+                    <DollarSign size={28} className="text-success" />
+                  </div>
+                </div>
+
+                <Button
+                  variant="success-gradient"
+                  className="w-full px-6 py-3.5 flex items-center justify-center gap-2"
+                >
+                  <ArrowRight size={18} />
+                  Request Payout
+                </Button>
+              </div>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {transactions.map((transaction) => {
-                const amount = transaction.amount_cents / 100;
-                const afterFee = amount * 0.8;
 
-                return (
-                  <div
-                    key={transaction.id}
-                    className="flex items-center gap-4 p-4 bg-muted rounded-xl hover:bg-card transition-colors"
-                  >
+            {/* Pending Payout */}
+            <div className="bento-2x1 card-block p-8">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <div className="text-sm text-text-tertiary font-semibold mb-2 uppercase tracking-wide">
+                    Pending Payout
+                  </div>
+                  <div className="text-5xl font-bold tracking-tight mb-2 text-text-primary">
+                    ${animatedPending.toFixed(2)}
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Clock size={14} className="text-brand-secondary" />
+                    <span className="text-text-secondary">
+                      {pendingTransactions.length > 0 && pendingTransactions[0].available_on
+                        ? `Estimated ${formatAvailableDate(pendingTransactions[0].available_on)}`
+                        : "Processing"}
+                    </span>
+                  </div>
+                </div>
+                <div className="w-14 h-14 bg-brand-secondary/10 rounded-2xl flex items-center justify-center">
+                  <Clock size={28} className="text-brand-secondary" />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-text-tertiary">
+                <CreditCard size={14} />
+                <span>Bank •••• 4242</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Revenue Breakdown */}
+          <div className="card-block p-8 mb-10">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold mb-1 text-text-primary">Revenue Breakdown</h3>
+              <p className="text-sm text-text-tertiary">Earnings by source</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <StatCard
+                title="Subscriptions"
+                value={`$${animatedSubsRevenue.toFixed(0)}`}
+                description={`${subscriptionPercent}% of total`}
+                icon={<Users className="w-5 h-5" />}
+                className="border border-border-base hover:border-brand-primary/30 transition-all"
+              />
+              <StatCard
+                title="Unlocks"
+                value={`$${animatedUnlockRevenue.toFixed(0)}`}
+                description={`${unlockPercent}% of total`}
+                icon={<Unlock className="w-5 h-5" />}
+                className="border border-border-base hover:border-brand-secondary/30 transition-all"
+              />
+              <StatCard
+                title="Tips"
+                value={`$${animatedTipRevenue.toFixed(0)}`}
+                description={`${tipPercent}% of total`}
+                icon={<Gift className="w-5 h-5" />}
+                className="border border-border-base hover:border-success/30 transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Recent Transactions */}
+          <div className="card-block overflow-hidden" data-testid="earnings-history">
+            <div className="p-6 border-b border-border-base">
+              <h3 className="text-lg font-bold text-text-primary">Recent Transactions</h3>
+            </div>
+
+            {transactions.length === 0 ? (
+              <div className="p-12 text-center">
+                <p className="text-text-tertiary">No transactions yet</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-border-subtle">
+                {transactions.map((transaction) => {
+                  const amount = transaction.amount_cents / 100;
+                  const _afterFee = amount * 0.8;
+                  const isPositive = amount > 0;
+
+                  return (
                     <div
-                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        transaction.status === "completed"
-                          ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                          : "bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)]"
+                      key={transaction.id}
+                      className="p-6 hover:bg-surface-raised transition-colors"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4 flex-1">
+                          <div
+                            className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${getTypeBgColor(
+                              transaction.type
+                            )}`}
+                          >
+                            {getTypeIcon(transaction.type)}
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold mb-1 text-text-primary">
+                              {getTypeLabel(transaction.type)}
+                            </div>
+                            <div className="text-sm text-text-tertiary">
+                              {formatDate(transaction.created_at)}
+                              {transaction.available_on && transaction.status === "pending" && (
+                                <span className="ml-2">
+                                  • Available {formatAvailableDate(transaction.available_on)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <div
+                            className={`text-lg font-bold ${
+                              isPositive ? "text-success" : "text-error"
+                            }`}
+                          >
+                            {isPositive ? "+" : ""}${Math.abs(amount).toFixed(2)}
+                          </div>
+                          <div className="text-xs text-text-tertiary capitalize flex items-center gap-1 justify-end">
+                            {transaction.status === "completed" ? (
+                              <>
+                                <CheckCircle size={12} className="text-success" />
+                                <span>Completed</span>
+                              </>
+                            ) : (
+                              <>
+                                <Clock size={12} className="text-brand-secondary" />
+                                <span>Pending</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* Sidebar: Studio nav + quick actions (PC) */}
+        <aside className="w-full lg:w-72 shrink-0">
+          <div className="sticky top-24 space-y-4">
+            <div className="card-block p-4">
+              <h2 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">
+                Studio
+              </h2>
+              <nav className="space-y-1" aria-label="Studio navigation">
+                {[
+                  { href: "/creator/new-post", icon: Plus, label: "Create Post" },
+                  { href: "/creator/studio/earnings", icon: DollarSign, label: "Earnings" },
+                  { href: "/creator/studio/subscribers", icon: Users, label: "Subscribers" },
+                  { href: "/creator/studio/post/list", icon: FileText, label: "Post List" },
+                  { href: "/creator/studio/analytics", icon: BarChart3, label: "Analytics" },
+                ].map(({ href, icon: Icon, label }) => {
+                  const isActive = href === "/creator/studio/earnings";
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary ${
+                        isActive
+                          ? "bg-brand-primary/10 text-brand-primary"
+                          : "text-text-secondary hover:bg-surface-raised hover:text-text-primary"
                       }`}
                     >
-                      <DollarSign className="w-5 h-5" />
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        {getTypeBadge(transaction.type)}
-                        <Badge
-                          variant={transaction.status === "completed" ? "default" : "secondary"}
-                          className="text-xs rounded-lg"
-                        >
-                          {transaction.status}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                        <span>{getTypeLabel(transaction.type)}</span>
-                        <span>•</span>
-                        <span>{formatDate(transaction.created_at)}</span>
-                        {transaction.available_on && transaction.status === "pending" && (
-                          <>
-                            <span>•</span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              Available {formatAvailableDate(transaction.available_on)}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-foreground">+${amount.toFixed(2)}</p>
-                      <p className="text-xs text-muted-foreground">
-                        ${afterFee.toFixed(2)} after fee
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
+                      <Icon size={16} />
+                      {label}
+                    </Link>
+                  );
+                })}
+              </nav>
             </div>
-          )}
-        </div>
-      </main>
-    </div>
+            <div className="card-block p-4">
+              <h2 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">
+                Quick actions
+              </h2>
+              <div className="space-y-2">
+                <Link
+                  href="/creator/studio/earnings"
+                  className="w-full px-4 py-3 bg-success text-white rounded-xl font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                >
+                  <ArrowRight size={18} />
+                  Request Payout
+                </Link>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full px-4 py-3 bg-surface-raised border-border-base hover:bg-surface-overlay flex items-center justify-center gap-2"
+                >
+                  <Download size={18} />
+                  Export
+                </Button>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </PageShell>
   );
 }

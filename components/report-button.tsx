@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Flag, Loader2 } from "lucide-react";
+import { Flag, Loader2 } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

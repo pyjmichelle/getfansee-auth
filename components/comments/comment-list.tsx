@@ -5,7 +5,7 @@ import { CommentItem } from "./comment-item";
 import { CommentForm } from "./comment-form";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { MessageSquare, Loader2 } from "lucide-react";
+import { MessageSquare, Loader2 } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { Comment } from "@/lib/comments";
@@ -120,9 +120,9 @@ export function CommentList({
     <div className={cn("space-y-4", className)}>
       {/* 标题 */}
       <div className="flex items-center gap-2">
-        <MessageSquare className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+        <MessageSquare className="w-5 h-5 text-text-tertiary" aria-hidden="true" />
         <h3 className="font-semibold text-lg">
-          Comments {total > 0 && <span className="text-muted-foreground">({total})</span>}
+          Comments {total > 0 && <span className="text-text-tertiary">({total})</span>}
         </h3>
       </div>
 
@@ -134,7 +134,7 @@ export function CommentList({
       )}
 
       {!canComment && currentUserId && (
-        <div className="p-4 bg-muted/50 rounded-lg text-center text-sm text-muted-foreground">
+        <div className="p-4 bg-surface-raised/50 rounded-lg text-center text-sm text-text-tertiary">
           Subscribe or purchase this content to comment
         </div>
       )}
@@ -142,11 +142,11 @@ export function CommentList({
       {/* 评论列表 */}
       {isLoading ? (
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" aria-hidden="true" />
+          <Loader2 className="w-6 h-6 animate-spin text-text-tertiary" aria-hidden="true" />
           <span className="sr-only">Loading comments...</span>
         </div>
       ) : comments.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">
+        <div className="text-center py-8 text-text-tertiary">
           <MessageSquare className="w-12 h-12 mx-auto mb-2 opacity-50" aria-hidden="true" />
           <p className="text-sm">No comments yet. Be the first to comment!</p>
         </div>

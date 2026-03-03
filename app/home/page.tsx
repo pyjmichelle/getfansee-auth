@@ -1,11 +1,19 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { cache } from "react";
+
+export const metadata: Metadata = {
+  title: "Home — GetFanSee",
+  description: "Discover exclusive content from your favorite creators on GetFanSee.",
+  robots: { index: false, follow: false },
+};
 import { ensureProfile, getCurrentUser } from "@/lib/auth-server";
 import { getProfile } from "@/lib/profile-server";
 import { listFeed } from "@/lib/posts";
 import { type Post } from "@/lib/types";
 import { canViewPost } from "@/lib/paywall";
 import { HomeFeedClient } from "./components/HomeFeedClient";
+import { MOCK_POSTS, MOCK_CREATORS } from "@/lib/mock-data";
 
 // 使用 React.cache() 进行请求去重（server-cache-react 规则）
 const getCachedUser = cache(getCurrentUser);
@@ -13,15 +21,15 @@ const getCachedProfile = cache(getProfile);
 const getCachedFeed = cache(listFeed);
 
 export default async function HomePage() {
-  // 1-3. 并行获取用户信息、确保 profile、获取 profile（server-parallel-fetching 规则）
-  const [user, _] = await Promise.all([
-    getCachedUser(),
-    ensureProfile(), // ensureProfile 不需要缓存，因为它可能有副作用
-  ]);
+  const user = await getCachedUser();
+  const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === "true";
 
   if (!user) {
     redirect("/auth");
   }
+
+  // 使用已解析的 user，避免 ensureProfile 内部重复 getCurrentUser 请求。
+  await ensureProfile(user);
 
   // 3. 获取用户 profile（使用缓存版本）
   const userProfile = await getCachedProfile(user.id);
@@ -31,29 +39,63 @@ export default async function HomePage() {
 
   // 4. 获取 feed 数据（使用缓存版本）
   let posts: Post[] = [];
-  try {
-    posts = await getCachedFeed(20);
-  } catch (err) {
-    console.error("[home] listFeed error", err);
+  if (!isTestMode) {
+    try {
+      posts = await getCachedFeed(20);
+    } catch (err) {
+      console.error("[home] listFeed error", err);
+    }
+  }
+
+  // 当 DB 为空时，在测试/开发模式下显示 Mock 数据（让首页有内容可展示）
+  const usingMockPosts = isTestMode || posts.length === 0;
+  if (usingMockPosts) {
+    const creatorMap = new Map(MOCK_CREATORS.map((c) => [c.id, c]));
+    posts = MOCK_POSTS.map((mp) => ({
+      id: mp.id,
+      creator_id: mp.creator_id,
+      title: mp.title,
+      content: mp.content,
+      media_url: mp.media_url,
+      visibility: mp.visibility,
+      price_cents: mp.price_cents,
+      is_locked: mp.visibility !== "free",
+      likes_count: mp.likes_count,
+      created_at: mp.created_at,
+      preview_enabled: true,
+      creator: {
+        display_name: creatorMap.get(mp.creator_id)?.display_name,
+        avatar_url: creatorMap.get(mp.creator_id)?.avatar_url,
+      },
+    })) as Post[];
   }
 
   // 5. 在服务端检查每个 post 的可见性状态（并行执行，避免异步瀑布流）
   const unlockedStates = new Map<string, boolean>();
 
+  // Mock 帖子直接预设解锁状态（ID 非真实 DB ID，跳过 canViewPost 查询）
+  if (usingMockPosts) {
+    posts.forEach((post) => {
+      unlockedStates.set(post.id, post.visibility === "free");
+    });
+  }
+
   // 先处理不需要异步检查的 posts（creator 本人和免费内容）
   const postsToCheck: Array<{ post: Post; index: number }> = [];
-  posts.forEach((post, index) => {
-    // Creator 本人永远可见
-    if (post.creator_id === user.id) {
-      unlockedStates.set(post.id, true);
-    } else if (post.visibility === "free") {
-      // 免费内容永远可见
-      unlockedStates.set(post.id, true);
-    } else {
-      // 需要异步检查的 posts
-      postsToCheck.push({ post, index });
-    }
-  });
+  if (!usingMockPosts) {
+    posts.forEach((post, index) => {
+      // Creator 本人永远可见
+      if (post.creator_id === user.id) {
+        unlockedStates.set(post.id, true);
+      } else if (post.visibility === "free") {
+        // 免费内容永远可见
+        unlockedStates.set(post.id, true);
+      } else {
+        // 需要异步检查的 posts
+        postsToCheck.push({ post, index });
+      }
+    });
+  }
 
   // 并行执行所有 canViewPost 检查（使用 Promise.all 避免瀑布流）
   if (postsToCheck.length > 0) {
@@ -78,11 +120,14 @@ export default async function HomePage() {
     <HomeFeedClient
       initialPosts={posts}
       initialUnlockedStates={unlockedStates}
-      currentUserId={user.id}
-      userProfile={{
+      currentUser={{
+        id: user.id,
+        email: user.email || "",
         role: userProfile.role || "fan",
-        display_name: userProfile.display_name,
-        avatar_url: userProfile.avatar_url || undefined,
+        user_metadata: {
+          avatar_url: userProfile.avatar_url || undefined,
+        },
+        username: userProfile.display_name,
       }}
     />
   );

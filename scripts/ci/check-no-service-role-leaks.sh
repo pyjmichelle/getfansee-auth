@@ -7,7 +7,9 @@
 # 防止 Service Role Key 被意外引入到客户端代码中。
 #
 # 允许的位置：
-# - lib/supabase-admin.ts (唯一入口)
+# - lib/supabase-admin.ts (re-export)
+# - lib/server/supabase-admin.ts (唯一使用 Service Role Key 的实现)
+# - lib/env.ts (仅声明变量名用于校验，不暴露 key 值)
 # - scripts/ (开发/测试脚本)
 # - tests/ (测试代码)
 # - .env* 文件
@@ -37,6 +39,8 @@ PATTERN="SUPABASE_SERVICE_ROLE_KEY"
 # 定义允许的路径（正则表达式）
 ALLOWED_PATHS=(
   "lib/supabase-admin.ts"
+  "lib/server/supabase-admin.ts"
+  "lib/env.ts"
   "scripts/"
   "tests/"
   "\.env"
@@ -82,7 +86,7 @@ if [ -n "$LEAKS" ]; then
     echo "  - $file"
   done
   echo ""
-  echo "Service Role Key should only be used in lib/supabase-admin.ts"
+  echo "Service Role Key should only be used in lib/server/supabase-admin.ts or lib/env.ts (schema)"
   echo "Please refactor these files to import from lib/supabase-admin.ts"
   echo ""
   exit 1
@@ -91,7 +95,8 @@ fi
 echo "✅ No Service Role Key leaks found"
 echo ""
 echo "Verified: SUPABASE_SERVICE_ROLE_KEY is only used in:"
-echo "  - lib/supabase-admin.ts (production code)"
+echo "  - lib/server/supabase-admin.ts (production code)"
+echo "  - lib/env.ts (env schema only)"
 echo "  - scripts/ (development scripts)"
 echo "  - tests/ (test code)"
 echo ""

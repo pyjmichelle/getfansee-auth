@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { Loader2 } from "@/lib/icons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -51,11 +51,11 @@ export function LoadingState({
         aria-live="polite"
       >
         <div className="flex space-x-2">
-          <div className="w-3 h-3 bg-primary rounded-full animate-pulse" />
-          <div className="w-3 h-3 bg-primary rounded-full animate-pulse delay-75" />
-          <div className="w-3 h-3 bg-primary rounded-full animate-pulse delay-150" />
+          <div className="loading-dot" />
+          <div className="loading-dot" />
+          <div className="loading-dot" />
         </div>
-        {text && <span className="ml-3 text-muted-foreground">{text}</span>}
+        {text && <span className="ml-3 text-text-muted text-[13px]">{text}</span>}
       </div>
     );
   }
@@ -67,10 +67,10 @@ export function LoadingState({
       aria-live="polite"
     >
       <Loader2
-        className={cn(sizeClasses[size], "animate-spin text-muted-foreground")}
+        className={cn(sizeClasses[size], "animate-spin text-violet-500")}
         aria-hidden="true"
       />
-      {text && <p className="text-sm text-muted-foreground">{text}</p>}
+      {text && <p className="text-[13px] text-text-muted">{text}</p>}
       <span className="sr-only">{text || "Loading…"}</span>
     </div>
   );

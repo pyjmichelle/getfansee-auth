@@ -1,17 +1,20 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "@/components/ui/toaster";
 import { UnlockProvider } from "@/contexts/unlock-context";
 import { AgeGate } from "@/components/age-gate";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
+import { RoutePerfTracker } from "@/components/providers/route-perf-tracker";
+import { AuthSyncProvider } from "@/components/providers/auth-sync-provider";
+import { Suspense } from "react";
 import "./globals.css";
 
-// Configure Inter font with fallback for CI/offline environments
-// In CI or test mode, font download may fail, so we use system font fallback
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
+  variable: "--font-inter",
   fallback: [
     "system-ui",
     "-apple-system",
@@ -20,18 +23,34 @@ const inter = Inter({
     "Roboto",
     "sans-serif",
   ],
-  // Reduce font loading attempts in CI/test environments
   adjustFontFallback: true,
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-playfair",
+  weight: ["400", "500", "600", "700"],
+  fallback: ["Georgia", "Times New Roman", "serif"],
 });
 
 export const metadata: Metadata = {
   title: "GetFanSee - Where fans get closer",
   description: "Premium adult creator subscription platform",
-  generator: "v0.app",
   manifest: "/manifest.json",
   icons: {
     icon: "/icon.svg",
     apple: "/apple-icon.png",
+  },
+  openGraph: {
+    title: "GetFanSee - Where fans get closer",
+    description: "Premium adult creator subscription platform",
+    type: "website",
+    siteName: "GetFanSee",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
@@ -45,12 +64,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} antialiased`}>
-        <UnlockProvider>
-          <AgeGate>{children}</AgeGate>
-        </UnlockProvider>
-        <Toaster />
-        {!isTestMode && <Analytics />}
+      <head>
+        <meta name="theme-color" content="#000000" />
+      </head>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+        <Suspense fallback={null}>
+          <PostHogProvider>
+            <AuthSyncProvider>
+              <RoutePerfTracker />
+              <UnlockProvider>
+                <AgeGate>{children}</AgeGate>
+              </UnlockProvider>
+              <Toaster />
+              {!isTestMode && <Analytics />}
+            </AuthSyncProvider>
+          </PostHogProvider>
+        </Suspense>
       </body>
     </html>
   );

@@ -2,16 +2,26 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, Heart, DollarSign, UserPlus, Check } from "lucide-react";
-import { NavHeader } from "@/components/nav-header";
-import { Button } from "@/components/ui/button";
+import {
+  Bell,
+  Heart,
+  DollarSign,
+  UserPlus,
+  CheckCheck,
+  Image,
+  MessageCircle,
+  AlertCircle,
+  CreditCard,
+  Clock,
+} from "@/lib/icons";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { BottomNavigation } from "@/components/bottom-navigation";
-import { LoadingState } from "@/components/loading-state";
-import { getProfile } from "@/lib/profile";
-import { ensureProfile } from "@/lib/auth";
+import { PageShell } from "@/components/page-shell";
 import type { Notification } from "@/lib/types";
 import { formatDistanceToNow } from "date-fns";
+import { useCountUp } from "@/hooks/use-count-up";
+import { FilterTabBar } from "@/components/filter-tab-bar";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -25,32 +35,73 @@ export default function NotificationsPage() {
     role: "fan" | "creator";
     avatar?: string;
   } | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  useSkeletonMetric("notifications_page", isLoading);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
 
-        // 强制使用 getSession() 获取当前用户
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           router.push("/auth");
           return;
         }
+        const userId = bootstrap.user.id;
+        setCurrentUserId(userId);
+        setCurrentUser({
+          username: bootstrap.profile?.display_name || bootstrap.user.email.split("@")[0] || "user",
+          role: (bootstrap.profile?.role || "fan") as "fan" | "creator",
+          avatar: bootstrap.profile?.avatar_url || undefined,
+        });
 
-        await ensureProfile();
-
-        // 加载用户信息
-        const profile = await getProfile(session.user.id);
-        if (profile) {
-          setCurrentUser({
-            username: profile.display_name || "user",
-            role: (profile.role || "fan") as "fan" | "creator",
-            avatar: profile.avatar_url || undefined,
-          });
+        // 测试模式：设置好用户后立刻显示 Mock 通知（不等 DB 查询完成）
+        if (process.env.NEXT_PUBLIC_TEST_MODE === "true") {
+          setNotifications([
+            {
+              id: "mock-notif-1",
+              user_id: userId,
+              type: "new_post",
+              title: "New post from Elena Rivers",
+              message: "Elena Rivers just published exclusive content for subscribers.",
+              read: false,
+              created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+              createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+            },
+            {
+              id: "mock-notif-2",
+              user_id: userId,
+              type: "like",
+              title: "Alex Martinez liked your post",
+              message: "Alex Martinez liked your recent post.",
+              read: false,
+              created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+              createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+            },
+            {
+              id: "mock-notif-3",
+              user_id: userId,
+              type: "new_subscriber",
+              title: "New subscriber!",
+              message: "You have a new subscriber on your creator page.",
+              read: true,
+              created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+              createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+            },
+            {
+              id: "mock-notif-4",
+              user_id: userId,
+              type: "purchase",
+              title: "Content unlocked",
+              message: "Sophie Laurent unlocked your premium content.",
+              read: true,
+              created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+              createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+            },
+          ] as Notification[]);
+          setIsLoading(false);
+          return;
         }
 
         // 从数据库加载通知（使用当前用户的真实 ID）
@@ -58,14 +109,47 @@ export default function NotificationsPage() {
         const { data: notificationsData, error } = await supabase
           .from("notifications")
           .select("*")
-          .eq("user_id", session.user.id)
+          .eq("user_id", userId)
           .order("created_at", { ascending: false })
           .limit(50);
 
         if (error) {
           console.error("[notifications] load error:", error);
-          // 如果表不存在，使用空数组
           setNotifications([]);
+        } else if (!notificationsData?.length && process.env.NEXT_PUBLIC_TEST_MODE === "true") {
+          // 测试模式下无通知时，使用 Mock 数据展示通知样式
+          setNotifications([
+            {
+              id: "mock-notif-1",
+              user_id: userId,
+              type: "new_post",
+              title: "New post from Elena Rivers",
+              message: "Elena Rivers just published exclusive content for subscribers.",
+              read: false,
+              created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+              createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+            },
+            {
+              id: "mock-notif-2",
+              user_id: userId,
+              type: "like",
+              title: "Someone liked your post",
+              message: "Alex Martinez liked your recent post.",
+              read: false,
+              created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+              createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+            },
+            {
+              id: "mock-notif-3",
+              user_id: userId,
+              type: "new_subscriber",
+              title: "New subscriber!",
+              message: "You have a new subscriber on your creator page.",
+              read: true,
+              created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+              createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+            },
+          ] as Notification[]);
         } else {
           interface NotificationData {
             id: string;
@@ -102,27 +186,64 @@ export default function NotificationsPage() {
     };
 
     loadData();
+  }, [router]);
 
-    // 监听通知变化
+  useEffect(() => {
+    if (!currentUserId) return;
     const channel = supabase
-      .channel("notifications-changes")
+      .channel(`notifications-changes-${currentUserId}`)
       .on(
         "postgres_changes",
         {
           event: "*",
           schema: "public",
           table: "notifications",
+          filter: `user_id=eq.${currentUserId}`,
         },
         () => {
-          loadData();
+          // Re-fetch notifications when DB changes
+          supabase
+            .from("notifications")
+            .select("*")
+            .eq("user_id", currentUserId)
+            .order("created_at", { ascending: false })
+            .limit(50)
+            .then(({ data }) => {
+              if (data?.length) {
+                interface NotificationData {
+                  id: string;
+                  user_id?: string;
+                  type?: string;
+                  title?: string;
+                  message?: string;
+                  link?: string;
+                  action_url?: string;
+                  read?: boolean;
+                  created_at?: string;
+                }
+                setNotifications(
+                  data.map((n: NotificationData) => ({
+                    id: n.id,
+                    user_id: n.user_id || "",
+                    type: (n.type || "new_post") as Notification["type"],
+                    title: n.title || "",
+                    message: n.message || "",
+                    link: n.link || undefined,
+                    actionUrl: n.action_url || n.link || undefined,
+                    read: n.read || false,
+                    created_at: n.created_at,
+                    createdAt: n.created_at,
+                  }))
+                );
+              }
+            });
         }
       )
       .subscribe();
-
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [router]);
+  }, [currentUserId]);
 
   const filteredNotifications = notifications.filter((notif) => {
     if (filter === "unread") return !notif.read;
@@ -130,21 +251,80 @@ export default function NotificationsPage() {
   });
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const animatedUnreadCount = useCountUp(unreadCount, { duration: 700, decimals: 0 });
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "new_post":
-        return <Bell className="w-5 h-5" />;
+        return <Image className="w-4 h-4 text-brand-primary" />;
       case "like":
-        return <Heart className="w-5 h-5" />;
+        return <Heart className="w-4 h-4 text-error" />;
+      case "comment":
+        return <MessageCircle className="w-4 h-4 text-brand-secondary" />;
       case "purchase":
-        return <DollarSign className="w-5 h-5" />;
+        return <DollarSign className="w-4 h-4 text-success" />;
       case "new_subscriber":
-        return <UserPlus className="w-5 h-5" />;
+      case "subscriber":
+        return <UserPlus className="w-4 h-4 text-success" />;
+      case "subscription_expiring":
+        return <AlertCircle className="w-4 h-4 text-warning" />;
+      case "payment":
+        return <CreditCard className="w-4 h-4 text-success" />;
+      case "tip":
+        return <DollarSign className="w-4 h-4 text-brand-accent" />;
       default:
-        return <Bell className="w-5 h-5" />;
+        return <Bell className="w-4 h-4 text-text-tertiary" />;
     }
   };
+
+  const getNotificationBgColor = (type: string) => {
+    switch (type) {
+      case "new_post":
+        return "bg-brand-primary-alpha-10";
+      case "like":
+        return "bg-error/10";
+      case "comment":
+        return "bg-brand-secondary/10";
+      case "purchase":
+        return "bg-success/10";
+      case "new_subscriber":
+      case "subscriber":
+        return "bg-success/10";
+      case "subscription_expiring":
+        return "bg-warning/10";
+      case "payment":
+        return "bg-success/10";
+      case "tip":
+        return "bg-brand-accent/10";
+      default:
+        return "bg-white/8";
+    }
+  };
+
+  // Group notifications by date
+  const groupedNotifications = filteredNotifications.reduce(
+    (groups: { [key: string]: typeof filteredNotifications }, notification) => {
+      const date = notification.created_at ? new Date(notification.created_at) : new Date();
+      const now = new Date();
+      const diffHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+      let dateGroup: string;
+      if (diffHours < 24) {
+        dateGroup = "Today";
+      } else if (diffHours < 48) {
+        dateGroup = "Yesterday";
+      } else {
+        dateGroup = "Earlier";
+      }
+
+      if (!groups[dateGroup]) {
+        groups[dateGroup] = [];
+      }
+      groups[dateGroup].push(notification);
+      return groups;
+    },
+    {}
+  );
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -154,19 +334,14 @@ export default function NotificationsPage() {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      // 强制使用 getSession() 获取当前用户
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) return;
+      if (!currentUserId) return;
 
       // 更新数据库
       const { error } = await supabase
         .from("notifications")
         .update({ read: true })
         .eq("id", notificationId)
-        .eq("user_id", session.user.id);
+        .eq("user_id", currentUserId);
 
       if (error) {
         console.error("[notifications] markAsRead error:", error);
@@ -183,18 +358,13 @@ export default function NotificationsPage() {
 
   const markAllAsRead = async () => {
     try {
-      // 强制使用 getSession() 获取当前用户
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) return;
+      if (!currentUserId) return;
 
       // 更新数据库
       const { error } = await supabase
         .from("notifications")
         .update({ read: true })
-        .eq("user_id", session.user.id)
+        .eq("user_id", currentUserId)
         .eq("read", false);
 
       if (error) {
@@ -210,129 +380,213 @@ export default function NotificationsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background pb-16 md:pb-0">
-        <NavHeader user={currentUser ?? undefined} notificationCount={0} />
-        <main className="container max-w-2xl mx-auto px-4 py-8">
-          <LoadingState type="skeleton" />
-        </main>
-        <BottomNavigation notificationCount={0} />
-      </div>
+      <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
+        <div className="py-8 space-y-4">
+          {/* Skeleton header */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="space-y-2">
+              <div className="h-8 w-40 bg-white/8 rounded-lg animate-pulse" />
+              <div className="h-4 w-56 bg-white/8 rounded animate-pulse" />
+            </div>
+            <div className="h-10 w-32 bg-white/8 rounded-xl animate-pulse hidden md:block" />
+          </div>
+          {/* Filter skeleton */}
+          <div className="flex gap-3 mb-6">
+            <div className="h-10 w-24 bg-white/8 rounded-xl animate-pulse" />
+            <div className="h-10 w-28 bg-white/8 rounded-xl animate-pulse" />
+          </div>
+          {/* Items skeleton */}
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="card-block p-3 flex gap-3 animate-pulse">
+              <div className="w-10 h-10 rounded-xl bg-surface-raised flex-shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3.5 w-32 bg-white/8 rounded" />
+                <div className="h-3 w-full bg-white/8 rounded" />
+                <div className="h-3 w-20 bg-white/8 rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </PageShell>
     );
   }
 
   if (!currentUser) {
-    return null; // 正在重定向
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
-      <NavHeader user={currentUser ?? undefined} notificationCount={unreadCount} />
-
-      <main className="container max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
-        <div className="flex items-center justify-between mb-8">
+    <PageShell user={currentUser} notificationCount={unreadCount} maxWidth="5xl">
+      <div className="py-8" data-testid="notifications-list">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Notifications</h1>
-            <p className="text-muted-foreground">{unreadCount} unread</p>
+            <h1 className="text-3xl font-bold text-text-primary mb-1">Notifications</h1>
+            {unreadCount > 0 && (
+              <p className="text-text-tertiary flex items-center gap-2 text-sm">
+                <span className="w-2 h-2 bg-brand-primary rounded-full animate-pulse" />
+                {animatedUnreadCount.toFixed(0)} unread
+              </p>
+            )}
           </div>
           {unreadCount > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
+            <button
               onClick={markAllAsRead}
-              className="border-border bg-card hover:bg-card rounded-xl"
+              className="px-5 py-2.5 text-brand-primary hover:bg-brand-primary-alpha-10 rounded-xl font-semibold transition-all active:scale-95 focus-visible:outline-2 focus-visible:outline-brand-primary flex items-center gap-2 text-sm"
             >
-              <Check className="w-4 h-4 mr-2" />
-              Mark all read
-            </Button>
+              <CheckCheck className="w-4 h-4" />
+              <span className="hidden sm:inline">Mark all read</span>
+            </button>
           )}
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex gap-2 mb-8">
-          <Button
-            variant={filter === "all" ? "default" : "outline"}
-            onClick={() => setFilter("all")}
-            className={`rounded-xl ${
-              filter === "all" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
-            }`}
-          >
-            All
-          </Button>
-          <Button
-            variant={filter === "unread" ? "default" : "outline"}
-            onClick={() => setFilter("unread")}
-            className={`rounded-xl ${
-              filter === "unread" ? "bg-primary-gradient" : "border-border bg-card hover:bg-card"
-            }`}
-          >
-            Unread ({unreadCount})
-          </Button>
-        </div>
+        <FilterTabBar
+          active={filter}
+          onChange={(id) => setFilter(id as "all" | "unread")}
+          items={[
+            { id: "all", label: "All" },
+            { id: "unread", label: "Unread", count: unreadCount > 0 ? unreadCount : undefined },
+          ]}
+        />
 
-        {/* Notifications List */}
-        {filteredNotifications.length === 0 ? (
-          <div className="text-center py-24">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-card border border-border flex items-center justify-center">
-              <Bell className="w-12 h-12 text-muted-foreground opacity-50" />
-            </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">Inbox Empty</h3>
-            <p className="text-muted-foreground">
-              {filter === "unread"
-                ? "You're all caught up!"
-                : "You don't have any notifications yet"}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {filteredNotifications.map((notification) => {
-              const notificationDate = notification.createdAt || notification.created_at;
-              return (
-                <div
-                  key={notification.id}
-                  className={`bg-card border border-border rounded-3xl p-4 md:p-6 cursor-pointer transition-[background-color] motion-safe:transition-[background-color] motion-reduce:transition-none hover:bg-card ${
-                    !notification.read ? "border-primary/30" : ""
-                  }`}
-                  onClick={async () => {
-                    await markAsRead(notification.id);
-                    if (notification.actionUrl) {
-                      // 使用 router.push 而非 window.location.href，避免改变身份上下文
-                      router.push(notification.actionUrl);
-                    }
-                  }}
-                >
-                  <div className="flex items-start gap-4">
-                    {/* 未读通知左侧渐变小圆点 */}
-                    {!notification.read && (
-                      <div className="w-2 h-2 rounded-full bg-primary-gradient flex-shrink-0 mt-2"></div>
-                    )}
-                    <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                        !notification.read
-                          ? "bg-primary/10 text-primary"
-                          : "bg-border text-muted-foreground"
-                      }`}
-                    >
-                      {getNotificationIcon(notification.type)}
+        {/* Two-column layout on Desktop */}
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Notifications List */}
+          <div className="flex-1 min-w-0">
+            {filteredNotifications.length === 0 ? (
+              <div className="text-center py-20 card-block">
+                <div className="w-24 h-24 bg-white/8 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                  <Bell className="w-10 h-10 text-text-quaternary" />
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-text-primary">
+                  {filter === "unread" ? "All caught up!" : "No notifications yet"}
+                </h3>
+                <p className="text-text-tertiary">
+                  {filter === "unread"
+                    ? "You've read all your notifications"
+                    : "We'll notify you when something happens"}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {Object.entries(groupedNotifications).map(([dateGroup, groupNotifications]) => (
+                  <div key={dateGroup}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <h3 className="font-bold text-text-secondary text-sm">{dateGroup}</h3>
+                      <div className="flex-1 h-px bg-border-subtle" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className={`text-sm md:text-base ${!notification.read ? "font-semibold text-foreground" : "text-muted-foreground"}`}
-                      >
-                        {notification.message}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {notificationDate ? formatDate(notificationDate) : "Unknown date"}
-                      </p>
+                    <div className="space-y-2">
+                      {groupNotifications.map((notification) => {
+                        const notificationDate = notification.createdAt || notification.created_at;
+                        return (
+                          <div
+                            key={notification.id}
+                            className={`group card-block overflow-hidden cursor-pointer hover-bold transition-all active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-brand-primary ${
+                              !notification.read ? "ring-2 ring-brand-primary/20" : ""
+                            }`}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={async (e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                await markAsRead(notification.id);
+                                if (notification.actionUrl) router.push(notification.actionUrl);
+                              }
+                            }}
+                            onClick={async () => {
+                              await markAsRead(notification.id);
+                              if (notification.actionUrl) router.push(notification.actionUrl);
+                            }}
+                          >
+                            <div className="p-3 md:p-4 flex gap-3">
+                              <div
+                                className={`w-10 h-10 ${getNotificationBgColor(notification.type)} rounded-xl flex items-center justify-center border border-border-base flex-shrink-0`}
+                              >
+                                {getNotificationIcon(notification.type)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start justify-between gap-3 mb-0.5">
+                                  <h4 className="font-bold text-text-primary text-sm">
+                                    {notification.title || notification.message}
+                                  </h4>
+                                  {!notification.read && (
+                                    <div className="w-2.5 h-2.5 bg-brand-primary rounded-full animate-pulse flex-shrink-0 mt-1" />
+                                  )}
+                                </div>
+                                <p className="text-text-secondary text-xs mb-1.5 line-clamp-2">
+                                  {notification.message}
+                                </p>
+                                <p className="text-text-tertiary text-xs flex items-center gap-1.5">
+                                  <Clock className="w-3 h-3" />
+                                  {notificationDate ? formatDate(notificationDate) : "Unknown date"}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </main>
 
-      <BottomNavigation notificationCount={unreadCount} userRole={currentUser?.role} />
-    </div>
+          {/* Desktop Sidebar: Summary Panel */}
+          <aside className="hidden lg:block w-72 shrink-0">
+            <div className="sticky top-24 space-y-4">
+              <div className="card-block p-5">
+                <h3 className="text-sm font-semibold text-text-primary mb-4">Summary</h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center justify-between text-text-secondary">
+                    <span>Total</span>
+                    <span className="font-semibold text-text-primary">{notifications.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-text-secondary">
+                    <span>Unread</span>
+                    <span className="font-semibold text-brand-primary">{unreadCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-text-secondary">
+                    <span>Read</span>
+                    <span className="font-semibold text-success">
+                      {notifications.length - unreadCount}
+                    </span>
+                  </div>
+                </div>
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="mt-4 w-full py-2 px-4 bg-brand-primary-alpha-10 text-brand-primary rounded-xl font-semibold text-sm transition-all hover:bg-brand-primary/20 active:scale-95 focus-visible:outline-2 focus-visible:outline-brand-primary flex items-center justify-center gap-2"
+                  >
+                    <CheckCheck className="w-4 h-4" />
+                    Mark All Read
+                  </button>
+                )}
+              </div>
+
+              {/* Notification categories legend */}
+              <div className="card-block p-5">
+                <h3 className="text-sm font-semibold text-text-primary mb-3">Categories</h3>
+                <div className="space-y-2 text-xs text-text-tertiary">
+                  {[
+                    { label: "New Posts", color: "bg-brand-primary-alpha-10" },
+                    { label: "Likes", color: "bg-error/10" },
+                    { label: "Comments", color: "bg-brand-secondary/10" },
+                    { label: "Purchases", color: "bg-success/10" },
+                    { label: "Subscribers", color: "bg-success/10" },
+                  ].map((cat) => (
+                    <div key={cat.label} className="flex items-center gap-2">
+                      <span className={`w-4 h-4 rounded-lg ${cat.color} flex-shrink-0`} />
+                      {cat.label}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </PageShell>
   );
 }

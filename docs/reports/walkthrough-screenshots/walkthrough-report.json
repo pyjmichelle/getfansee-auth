@@ -1,0 +1,290 @@
+[
+  {
+    "page": "mb-auth",
+    "url": "/auth",
+    "desc": "登录/注册页面",
+    "status": "warning",
+    "issues": ["重定向: /auth → /auth?mode=login"],
+    "consoleErrors": [
+      "%c%s%c [auth-server] getUser error background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   AuthSessionMissingError: Auth session missing!\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?9:4149:32)\n    at SupabaseAuthClient._useSession (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?10:4021:26)\n    at SupabaseAuthClient._getUser (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?11:4137:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?12:4121:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?13:3969:28)\n    at resolveErrorDev (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1882:106)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1434:28)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1548:50)\n    at Object.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1372:17)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1602:50)\n    at Array.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at resolveConsoleEntry (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2008:96)\n    at processFullStringRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2409:17)\n    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2349:9)\n    at processBinaryChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2459:98)\n    at progress (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2628:13)",
+      "%c%s%c [auth-server] getUser error background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   AuthSessionMissingError: Auth session missing!\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?9:4149:32)\n    at SupabaseAuthClient._useSession (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?10:4021:26)\n    at SupabaseAuthClient._getUser (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?11:4137:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?12:4121:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?13:3969:28)\n    at resolveErrorDev (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1882:106)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1434:28)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1548:50)\n    at Object.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1372:17)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1602:50)\n    at Array.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at resolveConsoleEntry (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2008:96)\n    at processFullStringRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2409:17)\n    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2349:9)\n    at processBinaryChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2459:98)\n    at progress (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2628:13)",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "actualUrl": "http://localhost:3000/auth?mode=login"
+  },
+  {
+    "page": "mb-home",
+    "url": "/home",
+    "desc": "首页 Feed",
+    "status": "warning",
+    "issues": ["重定向: /home → /auth?mode=login", "2 个控制台错误"],
+    "consoleErrors": [
+      "%c%s%c [auth-server] getUser error background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   AuthSessionMissingError: Auth session missing!\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?9:4149:32)\n    at SupabaseAuthClient._useSession (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?10:4021:26)\n    at SupabaseAuthClient._getUser (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?11:4137:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?12:4121:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?13:3969:28)\n    at resolveErrorDev (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1882:106)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1434:28)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1548:50)\n    at Object.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1372:17)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1602:50)\n    at Array.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at resolveConsoleEntry (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2008:96)\n    at processFullStringRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2409:17)\n    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2349:9)\n    at processBinaryChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2459:98)\n    at progress (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2628:13)",
+      "%c%s%c [auth-server] getUser error background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   AuthSessionMissingError: Auth session missing!\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?9:4149:32)\n    at SupabaseAuthClient._useSession (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?10:4021:26)\n    at SupabaseAuthClient._getUser (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?11:4137:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?12:4121:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?13:3969:28)\n    at resolveErrorDev (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1882:106)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1434:28)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1548:50)\n    at Object.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1372:17)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1602:50)\n    at Array.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at resolveConsoleEntry (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2008:96)\n    at processFullStringRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2409:17)\n    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2349:9)\n    at processBinaryChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2459:98)\n    at progress (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2628:13)",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "actualUrl": "http://localhost:3000/auth?mode=login"
+  },
+  {
+    "page": "mb-search",
+    "url": "/search",
+    "desc": "搜索/发现页",
+    "status": "warning",
+    "issues": ["12 个控制台错误"],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "actualUrl": "http://localhost:3000/search"
+  },
+  {
+    "page": "mb-notifications",
+    "url": "/notifications",
+    "desc": "通知页",
+    "status": "warning",
+    "issues": ["重定向: /notifications → /auth?mode=login"],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/auth?mode=login"
+  },
+  {
+    "page": "mb-me",
+    "url": "/me",
+    "desc": "用户中心",
+    "status": "warning",
+    "issues": ["重定向: /me → /auth?mode=login"],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/auth?mode=login"
+  },
+  {
+    "page": "mb-me-wallet",
+    "url": "/me/wallet",
+    "desc": "钱包页",
+    "status": "warning",
+    "issues": ["重定向: /me/wallet → /auth?mode=login"],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/auth?mode=login"
+  },
+  {
+    "page": "mb-subscriptions",
+    "url": "/subscriptions",
+    "desc": "订阅列表",
+    "status": "success",
+    "issues": [],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/subscriptions"
+  },
+  {
+    "page": "mb-purchases",
+    "url": "/purchases",
+    "desc": "购买历史",
+    "status": "success",
+    "issues": [],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/purchases"
+  },
+  {
+    "page": "mb-creator-onboarding",
+    "url": "/creator/onboarding",
+    "desc": "创作者引导",
+    "status": "warning",
+    "issues": ["重定向: /creator/onboarding → /auth?mode=login"],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/auth?mode=login"
+  },
+  {
+    "page": "mb-creator-studio",
+    "url": "/creator/studio",
+    "desc": "Studio 首页",
+    "status": "warning",
+    "issues": ["重定向: /creator/studio → /auth?redirect=%2Fcreator%2Fstudio&mode=login"],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/auth?redirect=%2Fcreator%2Fstudio&mode=login"
+  },
+  {
+    "page": "mb-creator-studio-analytics",
+    "url": "/creator/studio/analytics",
+    "desc": "数据分析",
+    "status": "warning",
+    "issues": [
+      "重定向: /creator/studio/analytics → /auth?redirect=%2Fcreator%2Fstudio%2Fanalytics&mode=login"
+    ],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/auth?redirect=%2Fcreator%2Fstudio%2Fanalytics&mode=login"
+  },
+  {
+    "page": "mb-creator-studio-earnings",
+    "url": "/creator/studio/earnings",
+    "desc": "收益",
+    "status": "warning",
+    "issues": [
+      "重定向: /creator/studio/earnings → /auth?redirect=%2Fcreator%2Fstudio%2Fearnings&mode=login"
+    ],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/auth?redirect=%2Fcreator%2Fstudio%2Fearnings&mode=login"
+  },
+  {
+    "page": "mb-creator-new-post",
+    "url": "/creator/new-post",
+    "desc": "新建帖子",
+    "status": "warning",
+    "issues": ["重定向: /creator/new-post → /auth?redirect=%2Fcreator%2Fnew-post&mode=login"],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/auth?redirect=%2Fcreator%2Fnew-post&mode=login"
+  },
+  {
+    "page": "mb-terms",
+    "url": "/terms",
+    "desc": "服务条款",
+    "status": "success",
+    "issues": [],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/terms"
+  },
+  {
+    "page": "mb-privacy",
+    "url": "/privacy",
+    "desc": "隐私政策",
+    "status": "success",
+    "issues": [],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/privacy"
+  },
+  {
+    "page": "mb-dmca",
+    "url": "/dmca",
+    "desc": "DMCA 政策",
+    "status": "success",
+    "issues": [],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/dmca"
+  },
+  {
+    "page": "mb-admin",
+    "url": "/admin",
+    "desc": "管理后台",
+    "status": "warning",
+    "issues": ["重定向: /admin → /auth?redirect=%2Fadmin&mode=login"],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/auth?redirect=%2Fadmin&mode=login"
+  },
+  {
+    "page": "pc-auth",
+    "url": "/auth",
+    "desc": "登录/注册页面",
+    "status": "warning",
+    "issues": ["重定向: /auth → /auth?mode=login"],
+    "consoleErrors": [
+      "%c%s%c [auth-server] getUser error background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   AuthSessionMissingError: Auth session missing!\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?9:4149:32)\n    at SupabaseAuthClient._useSession (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?10:4021:26)\n    at SupabaseAuthClient._getUser (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?11:4137:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?12:4121:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?13:3969:28)\n    at resolveErrorDev (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1882:106)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1434:28)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1548:50)\n    at Object.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1372:17)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1602:50)\n    at Array.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at resolveConsoleEntry (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2008:96)\n    at processFullStringRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2409:17)\n    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2349:9)\n    at processBinaryChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2459:98)\n    at progress (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2628:13)",
+      "%c%s%c [auth-server] getUser error background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   AuthSessionMissingError: Auth session missing!\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?9:4149:32)\n    at SupabaseAuthClient._useSession (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?10:4021:26)\n    at SupabaseAuthClient._getUser (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?11:4137:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?12:4121:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?13:3969:28)\n    at resolveErrorDev (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1882:106)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1434:28)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1548:50)\n    at Object.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1372:17)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1602:50)\n    at Array.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at resolveConsoleEntry (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2008:96)\n    at processFullStringRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2409:17)\n    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2349:9)\n    at processBinaryChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2459:98)\n    at progress (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2628:13)",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "actualUrl": "http://localhost:3000/auth?mode=login"
+  },
+  {
+    "page": "pc-home",
+    "url": "/home",
+    "desc": "首页 Feed",
+    "status": "warning",
+    "issues": ["重定向: /home → /auth?mode=login", "2 个控制台错误"],
+    "consoleErrors": [
+      "%c%s%c [auth-server] getUser error background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   AuthSessionMissingError: Auth session missing!\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?9:4149:32)\n    at SupabaseAuthClient._useSession (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?10:4021:26)\n    at SupabaseAuthClient._getUser (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?11:4137:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?12:4121:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?13:3969:28)\n    at resolveErrorDev (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1882:106)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1434:28)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1548:50)\n    at Object.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1372:17)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1602:50)\n    at Array.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at resolveConsoleEntry (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2008:96)\n    at processFullStringRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2409:17)\n    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2349:9)\n    at processBinaryChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2459:98)\n    at progress (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2628:13)",
+      "%c%s%c [auth-server] getUser error background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   AuthSessionMissingError: Auth session missing!\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?9:4149:32)\n    at SupabaseAuthClient._useSession (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?10:4021:26)\n    at SupabaseAuthClient._getUser (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?11:4137:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?12:4121:20)\n    at <anonymous> (about://React/Server/file:///Users/puyijun/Downloads/authentication-flow-design%20(1)/.next/dev/server/chunks/ssr/9e750_@supabase_auth-js_dist_module_32bbaa29._.js?13:3969:28)\n    at resolveErrorDev (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1882:106)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1434:28)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1548:50)\n    at Object.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at getOutlinedModel (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1372:17)\n    at parseModelString (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1602:50)\n    at Array.<anonymous> (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2475:51)\n    at JSON.parse (<anonymous>)\n    at initializeModelChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:1053:30)\n    at resolveConsoleEntry (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2008:96)\n    at processFullStringRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2409:17)\n    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2349:9)\n    at processBinaryChunk (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2459:98)\n    at progress (http://localhost:3000/_next/static/chunks/a319a_next_dist_compiled_react-server-dom-turbopack_64f8cb68._.js:2628:13)",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "actualUrl": "http://localhost:3000/auth?mode=login"
+  },
+  {
+    "page": "pc-search",
+    "url": "/search",
+    "desc": "搜索/发现页",
+    "status": "warning",
+    "issues": ["12 个控制台错误"],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "actualUrl": "http://localhost:3000/search"
+  },
+  {
+    "page": "pc-me",
+    "url": "/me",
+    "desc": "用户中心",
+    "status": "warning",
+    "issues": ["重定向: /me → /auth?mode=login"],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/auth?mode=login"
+  },
+  {
+    "page": "pc-creator-studio",
+    "url": "/creator/studio",
+    "desc": "Studio 首页",
+    "status": "warning",
+    "issues": ["重定向: /creator/studio → /auth?redirect=%2Fcreator%2Fstudio&mode=login"],
+    "consoleErrors": [],
+    "actualUrl": "http://localhost:3000/auth?redirect=%2Fcreator%2Fstudio&mode=login"
+  }
+]

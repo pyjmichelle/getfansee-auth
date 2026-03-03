@@ -160,29 +160,21 @@ test.describe("Creator 端完整流程测试", () => {
       await page.goto(`${BASE_URL}/creator/new-post`);
 
       // 验证页面加载
-      await waitForVisible(page, "main, [role='main']", 5000);
+      await waitForVisible(page, '[data-testid="page-ready"]', 10000);
 
       // 验证表单字段存在
-      const contentInput = page
-        .locator('textarea[name="content"], textarea[placeholder*="content" i]')
-        .first();
-      await expect(contentInput).toBeVisible({ timeout: 5000 });
+      const contentInput = page.getByTestId("post-content");
+      await expect(contentInput).toBeVisible({ timeout: 10000 });
     });
 
     test("创建免费 Post（无媒体）", async ({ page }) => {
       await page.goto(`${BASE_URL}/creator/new-post`);
 
       // 等待表单加载
-      await waitForVisible(
-        page,
-        'textarea[name="content"], textarea[placeholder*="content" i]',
-        5000
-      );
+      await waitForVisible(page, '[data-testid="post-content"]', 10000);
 
       // 填写内容
-      const contentInput = page
-        .locator('textarea[name="content"], textarea[placeholder*="content" i]')
-        .first();
+      const contentInput = page.getByTestId("post-content");
       const postContent = `Test Free Post ${Date.now()}`;
       await contentInput.fill(postContent);
 
@@ -194,7 +186,8 @@ test.describe("Creator 端完整流程测试", () => {
 
       // 查找发布按钮
       const publishButton = page
-        .locator('button:has-text("发布"), button:has-text("Publish"), button:has-text("Post")')
+        .getByTestId("submit-button")
+        .or(page.getByTestId("submit-button-mobile"))
         .first();
 
       if (await publishButton.isVisible()) {
@@ -214,11 +207,7 @@ test.describe("Creator 端完整流程测试", () => {
       await page.goto(`${BASE_URL}/creator/new-post`);
 
       // 等待表单加载
-      await waitForVisible(
-        page,
-        'textarea[name="content"], textarea[placeholder*="content" i]',
-        5000
-      );
+      await waitForVisible(page, '[data-testid="post-content"]', 10000);
 
       // 查找文件上传输入
       const fileInput = page.locator('input[type="file"]').first();
@@ -230,15 +219,14 @@ test.describe("Creator 端完整流程测试", () => {
         // await fileInput.setInputFiles('path/to/test-image.jpg');
 
         // 填写内容
-        const contentInput = page
-          .locator('textarea[name="content"], textarea[placeholder*="content" i]')
-          .first();
+        const contentInput = page.getByTestId("post-content");
         const postContent = `Test Post with Image ${Date.now()}`;
         await contentInput.fill(postContent);
 
         // 发布（即使没有上传文件）
         const publishButton = page
-          .locator('button:has-text("发布"), button:has-text("Publish")')
+          .getByTestId("submit-button")
+          .or(page.getByTestId("submit-button-mobile"))
           .first();
         if (await publishButton.isVisible()) {
           await publishButton.click();
@@ -251,30 +239,23 @@ test.describe("Creator 端完整流程测试", () => {
       await page.goto(`${BASE_URL}/creator/new-post`);
 
       // 等待表单加载
-      await waitForVisible(
-        page,
-        'textarea[name="content"], textarea[placeholder*="content" i]',
-        5000
-      );
+      await waitForVisible(page, '[data-testid="post-content"]', 10000);
 
       // 填写内容
-      const contentInput = page
-        .locator('textarea[name="content"], textarea[placeholder*="content" i]')
-        .first();
+      const contentInput = page.getByTestId("post-content");
       const postContent = `Test Subscriber Post ${Date.now()}`;
       await contentInput.fill(postContent);
 
       // 设置可见性为 Subscribers
-      const visibilityOption = page
-        .locator('input[name="visibility"][value="subscribers"]')
-        .first();
-      if (await visibilityOption.isVisible()) {
-        await visibilityOption.check();
+      const subscriberOption = page.locator("label", { hasText: "Subscribers Only" }).first();
+      if (await subscriberOption.isVisible()) {
+        await subscriberOption.click();
       }
 
       // 发布
       const publishButton = page
-        .locator('button:has-text("发布"), button:has-text("Publish")')
+        .getByTestId("submit-button")
+        .or(page.getByTestId("submit-button-mobile"))
         .first();
       if (await publishButton.isVisible()) {
         await publishButton.click();
@@ -286,23 +267,17 @@ test.describe("Creator 端完整流程测试", () => {
       await page.goto(`${BASE_URL}/creator/new-post`);
 
       // 等待表单加载
-      await waitForVisible(
-        page,
-        'textarea[name="content"], textarea[placeholder*="content" i]',
-        5000
-      );
+      await waitForVisible(page, '[data-testid="post-content"]', 10000);
 
       // 填写内容
-      const contentInput = page
-        .locator('textarea[name="content"], textarea[placeholder*="content" i]')
-        .first();
+      const contentInput = page.getByTestId("post-content");
       const postContent = `Test PPV Post ${Date.now()}`;
       await contentInput.fill(postContent);
 
       // 设置可见性为 PPV
-      const visibilityOption = page.locator('input[name="visibility"][value="ppv"]').first();
-      if (await visibilityOption.isVisible()) {
-        await visibilityOption.check();
+      const ppvOption = page.locator("label", { hasText: "Pay Per View" }).first();
+      if (await ppvOption.isVisible()) {
+        await ppvOption.click();
       }
 
       // 设置价格（如果存在价格输入）
@@ -313,7 +288,8 @@ test.describe("Creator 端完整流程测试", () => {
 
       // 发布
       const publishButton = page
-        .locator('button:has-text("发布"), button:has-text("Publish")')
+        .getByTestId("submit-button")
+        .or(page.getByTestId("submit-button-mobile"))
         .first();
       if (await publishButton.isVisible()) {
         await publishButton.click();
@@ -434,8 +410,7 @@ test.describe("Creator 端完整流程测试", () => {
       await waitForVisible(page, "main, [role='main']", 5000);
 
       // 验证收益相关信息显示
-      const earningsInfo = page.locator("text=/earning|revenue|income/i");
-      await expect(earningsInfo.first()).toBeVisible({ timeout: 5000 });
+      await expect(page.getByTestId("earnings-balance")).toBeVisible({ timeout: 10000 });
     });
   });
 

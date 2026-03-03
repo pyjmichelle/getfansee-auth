@@ -1,4 +1,4 @@
-import { AlertCircle, ArrowLeft } from "lucide-react";
+import { AlertCircle, ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -56,12 +56,12 @@ export default function AuthErrorPage({ searchParams }: AuthErrorPageProps) {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <div className="w-full max-w-md">
-        <div className="bg-card border border-border rounded-lg p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-6">
-            <AlertCircle className="w-8 h-8 text-destructive" />
+        <div className="card-block p-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-6">
+            <AlertCircle className="w-8 h-8 text-error" />
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-3">{errorInfo.title}</h1>
-          <p className="text-muted-foreground mb-6">{errorInfo.message}</p>
+          <h1 className="text-2xl font-semibold text-text-primary mb-3">{errorInfo.title}</h1>
+          <p className="text-text-tertiary mb-6">{errorInfo.message}</p>
           <div className="space-y-3">
             <Button asChild className="w-full">
               <Link href={errorInfo.action.href}>{errorInfo.action.text}</Link>

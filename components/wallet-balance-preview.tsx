@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Wallet, Plus } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Wallet, Plus } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { getCurrentUser } from "@/lib/auth";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +23,7 @@ interface WalletBalancePreviewProps {
 }
 
 export function WalletBalancePreview({ className }: WalletBalancePreviewProps) {
+  const pathname = usePathname();
   const [balance, setBalance] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -28,25 +31,27 @@ export function WalletBalancePreview({ className }: WalletBalancePreviewProps) {
   useEffect(() => {
     const loadBalance = async () => {
       try {
-        const user = await getCurrentUser();
-        if (!user) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           setIsLoading(false);
           return;
         }
 
-        // P1 修复：统一使用 wallet_accounts 表
         const { data, error } = await supabase
           .from("wallet_accounts")
           .select("available_balance_cents")
-          .eq("user_id", user.id)
+          .eq("user_id", bootstrap.user.id)
           .single();
 
         if (error) {
-          // 如果钱包不存在，创建默认钱包
           if (error.code === "PGRST116") {
             const { data: newWallet, error: insertError } = await supabase
               .from("wallet_accounts")
-              .insert({ user_id: user.id, available_balance_cents: 0, pending_balance_cents: 0 })
+              .insert({
+                user_id: bootstrap.user.id,
+                available_balance_cents: 0,
+                pending_balance_cents: 0,
+              })
               .select()
               .single();
 
@@ -68,26 +73,23 @@ export function WalletBalancePreview({ className }: WalletBalancePreviewProps) {
 
     loadBalance();
 
-    // 监听钱包变化（使用 wallet_accounts 表）
-    const channel = supabase
-      .channel("wallet-balance-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "wallet_accounts",
-        },
-        () => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    // Avoid duplicate realtime subscriptions on wallet page itself.
+    if (pathname !== "/me/wallet") {
+      channel = supabase
+        .channel("wallet-balance-changes")
+        .on("postgres_changes", { event: "*", schema: "public", table: "wallet_accounts" }, () => {
           loadBalance();
-        }
-      )
-      .subscribe();
+        })
+        .subscribe();
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
-  }, []);
+  }, [pathname]);
 
   const balanceDollars = balance !== null ? (balance / 100).toFixed(2) : "0.00";
 
@@ -96,26 +98,27 @@ export function WalletBalancePreview({ className }: WalletBalancePreviewProps) {
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-3 h-auto py-3 px-4 hover:bg-white/5 ${className}`}
+          className={`w-full justify-start gap-3 h-auto py-3 px-4 hover:bg-brand-primary/5 active:scale-95 transition-all focus-visible:ring-2 focus-visible:ring-brand-primary min-h-[56px] ${className}`}
+          aria-label={`Wallet balance: $${balanceDollars}. Click to add funds.`}
         >
-          <div className="w-10 h-10 rounded-lg bg-[#14B8A6]/10 flex items-center justify-center">
-            <Wallet className="w-5 h-5 text-[#14B8A6]" />
+          <div className="w-10 h-10 rounded-lg bg-brand-accent/10 flex items-center justify-center shrink-0">
+            <Wallet className="w-5 h-5 text-brand-accent" aria-hidden="true" />
           </div>
           <div className="flex-1 text-left">
-            <p className="text-xs text-muted-foreground">Wallet Balance</p>
+            <p className="text-xs text-text-tertiary">Wallet Balance</p>
             {isLoading ? (
-              <p className="text-sm font-semibold text-foreground">Loading...</p>
+              <Skeleton className="h-5 w-20 mt-0.5" />
             ) : (
-              <p className="text-lg font-bold text-foreground">${balanceDollars}</p>
+              <p className="text-lg font-bold text-gradient-primary">${balanceDollars}</p>
             )}
           </div>
-          <Plus className="w-4 h-4 text-muted-foreground" />
+          <Plus className="w-4 h-4 text-text-tertiary shrink-0" aria-hidden="true" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-[#0a0a0a] border-[#1A1A1A] text-foreground">
+      <DialogContent className="bg-surface-base border-border-base text-text-primary">
         <DialogHeader>
-          <DialogTitle className="text-foreground">Recharge Wallet</DialogTitle>
-          <DialogDescription className="text-muted-foreground">
+          <DialogTitle className="text-text-primary">Recharge Wallet</DialogTitle>
+          <DialogDescription className="text-text-tertiary">
             Choose an amount to add to your wallet
           </DialogDescription>
         </DialogHeader>
@@ -124,11 +127,11 @@ export function WalletBalancePreview({ className }: WalletBalancePreviewProps) {
             <Button
               key={amount}
               variant="outline"
-              className="border-[#1A1A1A] hover:bg-[#14B8A6]/10 hover:border-[#14B8A6] hover:scale-105 active:scale-95"
-              onClick={async () => {
-                // TODO: 实现充值逻辑
+              className="border-border-base hover:bg-brand-primary/10 hover:border-brand-primary/40 active:scale-95 transition-all min-h-[44px] focus-visible:ring-2 focus-visible:ring-brand-primary"
+              onClick={() => {
                 setIsDialogOpen(false);
               }}
+              aria-label={`Add $${amount} to wallet`}
             >
               ${amount}
             </Button>

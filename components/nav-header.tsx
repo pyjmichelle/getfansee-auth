@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import {
   Bell,
   Search,
-  Menu,
   Home,
   Heart,
   CreditCard,
@@ -15,17 +14,22 @@ import {
   DollarSign,
   Sparkles,
   LogOut,
-} from "lucide-react";
+  Wallet,
+} from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut } from "@/lib/auth";
 import { WalletBalancePreview } from "@/components/wallet-balance-preview";
 import { SearchModal } from "@/components/search-modal";
+import { AccountPanel } from "@/components/account-panel";
+import { cn } from "@/lib/utils";
+import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
+import { startRouteTransition } from "@/lib/perf-client";
 
 interface NavHeaderProps {
   user?: {
@@ -44,141 +48,204 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
   const [searchOpen, setSearchOpen] = useState(false);
 
   const isCreator = user?.role === "creator";
-  // 常驻转化入口：仅在用户尚未通过创作者认证时显示
   const showBecomeCreator = user && !isCreator;
 
   const handleSignOut = async () => {
     try {
-      // 清除浏览器 Session
       await signOut();
-
-      // 清除 LocalStorage
       if (typeof window !== "undefined") {
-        localStorage.clear();
+        localStorage.removeItem("pending_signup_email");
+        localStorage.removeItem("pending_signup_username");
       }
-
-      // 强制重定向至首页
       router.push("/");
-      router.refresh();
     } catch (err) {
       console.error("[NavHeader] signOut error:", err);
     }
   };
 
+  const navItemClass = (active: boolean | undefined) =>
+    cn(
+      "flex items-center gap-3 w-full h-10 px-3 rounded-[var(--radius-sm)]",
+      "text-[13px] font-medium transition-[background-color,color] duration-100",
+      active
+        ? "bg-violet-500/10 text-white border-l-2 border-violet-500"
+        : "text-text-secondary hover:bg-white/5 hover:text-white"
+    );
+
+  const trackRouteStart = (href: string) => {
+    startRouteTransition(href, pathname ?? undefined);
+  };
+
+  const warmRoute = (href: string) => {
+    router.prefetch(href);
+  };
+
+  useEffect(() => {
+    const baseRoutes = ["/home", "/search", "/notifications", "/me", "/me/wallet"];
+    baseRoutes.forEach((route) => router.prefetch(route));
+    if (isCreator) {
+      [
+        "/creator/studio",
+        "/creator/new-post",
+        "/creator/studio/earnings",
+        "/creator/studio/subscribers",
+        "/creator/studio/post/list",
+      ].forEach((route) => router.prefetch(route));
+      ["/admin", "/admin/reports", "/admin/content-review", "/admin/creator-verifications"].forEach(
+        (route) => router.prefetch(route)
+      );
+    } else {
+      ["/subscriptions", "/purchases", "/creator/upgrade"].forEach((route) =>
+        router.prefetch(route)
+      );
+    }
+  }, [isCreator, router]);
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border glass-strong">
-      <div className="container flex h-14 sm:h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-6">
-          <Link href="/home" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-primary-gradient flex items-center justify-center shadow-sm group-hover:shadow-primary-glow transition-shadow duration-200">
-              <span className="text-white font-bold text-lg">G</span>
-            </div>
-            <span className="font-bold text-lg hidden md:inline text-foreground">GetFanSee</span>
-          </Link>
-        </div>
+    <header
+      className="sticky top-0 w-full glass-nav"
+      style={{
+        zIndex: "var(--z-nav)" as unknown as number,
+        paddingTop: "env(safe-area-inset-top)",
+      }}
+    >
+      <div className="flex h-12 md:h-[52px] items-center justify-between px-3 md:px-5 max-w-[1280px] mx-auto">
+        {/* Logo */}
+        <Link
+          href="/home"
+          className="flex items-center gap-2 group shrink-0"
+          onMouseEnter={() => warmRoute("/home")}
+          onTouchStart={() => warmRoute("/home")}
+          onClick={() => trackRouteStart("/home")}
+        >
+          <div className="w-7 h-7 rounded-[var(--radius-sm)] bg-gradient-to-br from-violet-600 to-violet-400 flex items-center justify-center shadow-glow-violet group-hover:shadow-glow-violet-lg transition-shadow duration-200">
+            <span className="text-white font-bold text-[13px]">G</span>
+          </div>
+          <span className="font-bold text-[15px] hidden md:inline text-white tracking-tight">
+            GetFanSee
+          </span>
+        </Link>
 
-        <div className="hidden md:flex flex-1 max-w-md mx-6">
-          <Button
+        {/* Desktop search bar */}
+        <div className="hidden md:flex flex-1 max-w-[240px] mx-6">
+          <button
             type="button"
-            variant="secondary"
-            className="w-full justify-start text-muted-foreground hover:text-foreground min-h-[44px]"
-            aria-label="Search for creators and content"
-            data-testid="search-button"
+            className={cn(
+              "w-full flex items-center gap-2 h-8 px-3",
+              "glass-input rounded-[var(--radius-sm)]",
+              "text-[13px] text-white/30",
+              "hover:border-white/15 transition-[border-color] duration-150"
+            )}
             onClick={() => setSearchOpen(true)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setSearchOpen(true);
-              }
-            }}
+            aria-label="Search creators, tags..."
+            data-testid="search-button"
           >
-            <Search className="w-4 h-4 mr-2" aria-hidden="true" />
-            <span className="text-sm">Search creators, posts, tags…</span>
-          </Button>
+            <Search className="size-[14px] shrink-0" aria-hidden="true" />
+            <span>Search creators, tags...</span>
+          </button>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* 移动端搜索按钮 */}
+        {/* Right actions */}
+        <div className="flex items-center gap-1.5">
+          {/* Mobile search */}
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="md:hidden size-9"
             asChild
-            aria-label="Search creators and content"
+            aria-label="Search"
             data-testid="search-button-mobile"
           >
-            <Link href="/search">
-              <Search className="w-5 h-5" aria-hidden="true" />
+            <Link
+              href="/search"
+              onMouseEnter={() => warmRoute("/search")}
+              onTouchStart={() => warmRoute("/search")}
+              onClick={() => trackRouteStart("/search")}
+            >
+              <Search className="size-[18px]" />
             </Link>
           </Button>
 
-          {/* 常驻转化入口：顶部导航栏固定展示 Become a Creator 渐变按钮 */}
+          {/* Become Creator CTA */}
           {showBecomeCreator && (
-            <Button asChild variant="subscribe-gradient" size="sm" className="hidden md:flex">
-              <Link href="/creator/upgrade">
-                <Sparkles className="w-4 h-4 mr-1.5" aria-hidden="true" />
-                Become a Creator
+            <Button asChild variant="violet" size="sm" className="hidden md:flex gap-1.5">
+              <Link
+                href="/creator/upgrade"
+                onMouseEnter={() => warmRoute("/creator/upgrade")}
+                onTouchStart={() => warmRoute("/creator/upgrade")}
+                onClick={() => trackRouteStart("/creator/upgrade")}
+              >
+                <Sparkles className="size-[13px]" />
+                Start Creating
               </Link>
             </Button>
           )}
 
-          {user && (
+          {user ? (
             <>
+              {/* Notifications */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative"
+                className="relative size-9"
                 asChild
                 aria-label={`Notifications${notificationCount > 0 ? `, ${notificationCount} unread` : ""}`}
               >
-                <Link href="/notifications">
-                  <Bell className="w-5 h-5" aria-hidden="true" />
+                <Link
+                  href="/notifications"
+                  onMouseEnter={() => warmRoute("/notifications")}
+                  onTouchStart={() => warmRoute("/notifications")}
+                  onClick={() => trackRouteStart("/notifications")}
+                >
+                  <Bell className="size-[18px]" aria-hidden="true" />
                   {notificationCount > 0 && (
                     <Badge
-                      variant="destructive"
-                      className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 text-[10px]"
+                      variant="purple"
+                      className="absolute -top-0.5 -right-0.5 h-[18px] min-w-[18px] flex items-center justify-center p-0 text-[10px] rounded-full bg-violet-500 text-white border-none"
                     >
-                      {notificationCount}
+                      {notificationCount > 9 ? "9+" : notificationCount}
                     </Badge>
                   )}
                 </Link>
               </Button>
 
+              {/* PC端：AccountPanel DropdownMenu */}
+              <AccountPanel user={user} onSignOut={handleSignOut} className="hidden md:flex" />
+
+              {/* 移动端：Sheet 侧滑菜单 */}
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2 px-3">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage src={user.avatar || "/placeholder.svg"} />
-                      <AvatarFallback className="text-sm">
-                        {user.username[0].toUpperCase()}
-                      </AvatarFallback>
+                  <button
+                    className="flex md:hidden items-center gap-1.5 px-1 py-1 rounded-[var(--radius-sm)] hover:bg-white/8 transition-colors duration-100"
+                    aria-label="Open menu"
+                  >
+                    <Avatar className="size-7">
+                      <AvatarImage src={user.avatar || DEFAULT_AVATAR_FAN} />
+                      <AvatarFallback>{(user.username?.[0] || "U").toUpperCase()}</AvatarFallback>
                     </Avatar>
-                    <span className="hidden md:inline font-medium text-sm">{user.username}</span>
-                    <Menu className="w-4 h-4 md:hidden" />
-                  </Button>
+                  </button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[85vw] max-w-sm">
-                  <div className="mb-6 pt-6 px-1">
-                    <div className="flex items-center gap-4 mb-6 px-2">
-                      <Avatar className="w-14 h-14 ring-2 ring-primary/20 shadow-sm">
-                        <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.username} />
-                        <AvatarFallback className="bg-primary/10 text-primary text-lg font-semibold">
-                          {user.username[0].toUpperCase()}
+
+                <SheetContent side="right" className="w-[85vw] max-w-[320px] overflow-y-auto">
+                  {/* User info */}
+                  <div className="px-4 py-4">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Avatar className="size-12 ring-1 ring-white/10">
+                        <AvatarImage src={user.avatar || DEFAULT_AVATAR_FAN} alt={user.username} />
+                        <AvatarFallback className="text-[16px] font-semibold">
+                          {(user.username?.[0] || "U").toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-foreground text-base truncate">
+                        <p className="font-semibold text-[14px] text-white truncate">
                           {user.username}
                         </p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant="secondary" className="text-xs font-medium">
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <Badge variant={isCreator ? "purple" : "default"} className="text-[10px]">
                             {isCreator ? "Creator" : "Fan"}
                           </Badge>
                           {isCreator && user.creatorStatus === "pending" && (
-                            <Badge
-                              variant="secondary"
-                              className="text-xs bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)] border-[var(--border-purple-500-20)]"
-                            >
+                            <Badge variant="warning" className="text-[10px]">
                               Pending
                             </Badge>
                           )}
@@ -186,159 +253,194 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                       </div>
                     </div>
 
-                    {/* Wallet Balance Preview */}
-                    <div className="mb-6 px-2">
+                    {/* Wallet */}
+                    <div className="mb-3">
                       <WalletBalancePreview />
                     </div>
-                    <Separator className="mb-6" />
+                    <Separator />
                   </div>
 
-                  <nav className="flex flex-col gap-1.5 px-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 mt-1">
+                  <nav className="flex flex-col px-4 pb-4 gap-0.5">
+                    <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-1.5 mt-1">
                       Discover
                     </p>
-                    <Button
-                      variant={pathname === "/home" ? "secondary" : "ghost"}
-                      className="justify-start min-h-[48px] rounded-xl transition-[background-color,color] duration-200 motion-safe:transition-[background-color,color] motion-reduce:transition-none hover:bg-accent/80"
-                      asChild
-                      onClick={() => setMobileMenuOpen(false)}
+                    <Link
+                      href="/home"
+                      className={navItemClass(pathname === "/home")}
+                      onMouseEnter={() => warmRoute("/home")}
+                      onTouchStart={() => warmRoute("/home")}
+                      onClick={() => {
+                        trackRouteStart("/home");
+                        setMobileMenuOpen(false);
+                      }}
                     >
-                      <Link href="/home">
-                        <Home className="w-5 h-5 mr-3" aria-hidden="true" />
-                        <span className="font-medium">Feed</span>
-                      </Link>
-                    </Button>
-                    <Separator className="my-3" />
+                      <Home className="size-[16px]" />
+                      Feed
+                    </Link>
 
                     {!isCreator && (
                       <>
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 mt-1">
+                        <Separator className="my-2" />
+                        <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-1.5">
                           Your Content
                         </p>
-                        <Button
-                          variant={pathname === "/subscriptions" ? "secondary" : "ghost"}
-                          className="justify-start min-h-[48px] rounded-xl transition-[background-color,color] duration-200 motion-safe:transition-[background-color,color] motion-reduce:transition-none hover:bg-accent/80"
-                          asChild
-                          onClick={() => setMobileMenuOpen(false)}
+                        <Link
+                          href="/subscriptions"
+                          className={navItemClass(pathname === "/subscriptions")}
+                          onMouseEnter={() => warmRoute("/subscriptions")}
+                          onTouchStart={() => warmRoute("/subscriptions")}
+                          onClick={() => {
+                            trackRouteStart("/subscriptions");
+                            setMobileMenuOpen(false);
+                          }}
                         >
-                          <Link href="/subscriptions">
-                            <Heart className="w-5 h-5 mr-3" aria-hidden="true" />
-                            <span className="font-medium">Subscriptions</span>
-                          </Link>
-                        </Button>
-                        <Button
-                          variant={pathname === "/purchases" ? "secondary" : "ghost"}
-                          className="justify-start min-h-[48px] rounded-xl transition-[background-color,color] duration-200 motion-safe:transition-[background-color,color] motion-reduce:transition-none hover:bg-accent/80"
-                          asChild
-                          onClick={() => setMobileMenuOpen(false)}
+                          <Heart className="size-[16px]" />
+                          Subscriptions
+                        </Link>
+                        <Link
+                          href="/purchases"
+                          className={navItemClass(pathname === "/purchases")}
+                          onMouseEnter={() => warmRoute("/purchases")}
+                          onTouchStart={() => warmRoute("/purchases")}
+                          onClick={() => {
+                            trackRouteStart("/purchases");
+                            setMobileMenuOpen(false);
+                          }}
                         >
-                          <Link href="/purchases">
-                            <CreditCard className="w-5 h-5 mr-3" aria-hidden="true" />
-                            <span className="font-medium">Purchases</span>
-                          </Link>
-                        </Button>
-                        <Separator className="my-3" />
+                          <CreditCard className="size-[16px]" />
+                          Purchases
+                        </Link>
                       </>
                     )}
 
                     {isCreator && (
                       <>
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
+                        <Separator className="my-2" />
+                        <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-1.5">
                           Creator Studio
                         </p>
-                        <Button
-                          variant={pathname === "/creator/studio" ? "secondary" : "ghost"}
-                          className="justify-start min-h-[48px] rounded-xl transition-[background-color,color] duration-200 motion-safe:transition-[background-color,color] motion-reduce:transition-none hover:bg-accent/80"
-                          asChild
-                          onClick={() => setMobileMenuOpen(false)}
+                        <Link
+                          href="/creator/studio"
+                          className={navItemClass(pathname === "/creator/studio")}
+                          onMouseEnter={() => warmRoute("/creator/studio")}
+                          onTouchStart={() => warmRoute("/creator/studio")}
+                          onClick={() => {
+                            trackRouteStart("/creator/studio");
+                            setMobileMenuOpen(false);
+                          }}
                         >
-                          <Link href="/creator/studio">
-                            <LayoutDashboard className="w-5 h-5 mr-3" aria-hidden="true" />
-                            <span className="font-medium">Dashboard</span>
-                          </Link>
-                        </Button>
-                        <Button
-                          variant={
-                            pathname?.startsWith("/creator/new-post") ? "secondary" : "ghost"
-                          }
-                          className="justify-start min-h-[48px] rounded-xl transition-[background-color,color] duration-200 motion-safe:transition-[background-color,color] motion-reduce:transition-none hover:bg-accent/80"
-                          asChild
-                          onClick={() => setMobileMenuOpen(false)}
+                          <LayoutDashboard className="size-[16px]" />
+                          Dashboard
+                        </Link>
+                        <Link
+                          href="/creator/new-post"
+                          className={navItemClass(pathname?.startsWith("/creator/new-post"))}
+                          onMouseEnter={() => warmRoute("/creator/new-post")}
+                          onTouchStart={() => warmRoute("/creator/new-post")}
+                          onClick={() => {
+                            trackRouteStart("/creator/new-post");
+                            setMobileMenuOpen(false);
+                          }}
                         >
-                          <Link href="/creator/new-post">
-                            <FileText className="w-5 h-5 mr-3" aria-hidden="true" />
-                            <span className="font-medium">New Post</span>
-                          </Link>
-                        </Button>
-                        <Button
-                          variant={pathname === "/creator/studio/earnings" ? "secondary" : "ghost"}
-                          className="justify-start min-h-[48px] rounded-xl transition-[background-color,color] duration-200 motion-safe:transition-[background-color,color] motion-reduce:transition-none hover:bg-accent/80"
-                          asChild
-                          onClick={() => setMobileMenuOpen(false)}
+                          <FileText className="size-[16px]" />
+                          New Post
+                        </Link>
+                        <Link
+                          href="/creator/studio/earnings"
+                          className={navItemClass(pathname === "/creator/studio/earnings")}
+                          onMouseEnter={() => warmRoute("/creator/studio/earnings")}
+                          onTouchStart={() => warmRoute("/creator/studio/earnings")}
+                          onClick={() => {
+                            trackRouteStart("/creator/studio/earnings");
+                            setMobileMenuOpen(false);
+                          }}
                         >
-                          <Link href="/creator/studio/earnings">
-                            <DollarSign className="w-5 h-5 mr-3" aria-hidden="true" />
-                            <span className="font-medium">Earnings</span>
-                          </Link>
-                        </Button>
-                        <Separator className="my-3" />
+                          <DollarSign className="size-[16px]" />
+                          Earnings
+                        </Link>
                       </>
                     )}
 
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 mt-1">
+                    <Separator className="my-2" />
+                    <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-1.5">
                       Account
                     </p>
-                    <Button
-                      variant={pathname === "/me" ? "secondary" : "ghost"}
-                      className="justify-start min-h-[48px] rounded-xl transition-[background-color,color] duration-200 motion-safe:transition-[background-color,color] motion-reduce:transition-none hover:bg-accent/80"
-                      asChild
-                      onClick={() => setMobileMenuOpen(false)}
+                    <Link
+                      href="/me"
+                      className={navItemClass(pathname === "/me")}
+                      onMouseEnter={() => warmRoute("/me")}
+                      onTouchStart={() => warmRoute("/me")}
+                      onClick={() => {
+                        trackRouteStart("/me");
+                        setMobileMenuOpen(false);
+                      }}
                     >
-                      <Link href="/me">
-                        <User className="w-5 h-5 mr-3" aria-hidden="true" />
-                        <span className="font-medium">Profile</span>
-                      </Link>
-                    </Button>
+                      <User className="size-[16px]" />
+                      Profile
+                    </Link>
+                    <Link
+                      href="/me/wallet"
+                      className={navItemClass(pathname === "/me/wallet")}
+                      onMouseEnter={() => warmRoute("/me/wallet")}
+                      onTouchStart={() => warmRoute("/me/wallet")}
+                      onClick={() => {
+                        trackRouteStart("/me/wallet");
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      <Wallet className="size-[16px]" />
+                      Wallet
+                    </Link>
 
                     {showBecomeCreator && (
                       <>
-                        <Separator className="my-3" />
-                        <Button
-                          variant="subscribe-gradient"
-                          className="justify-start rounded-xl min-h-[48px] font-bold shadow-lg hover:shadow-subscribe-glow hover-glow transition-[box-shadow,transform] duration-200 motion-safe:transition-[box-shadow,transform] motion-reduce:transition-none"
-                          asChild
-                          onClick={() => setMobileMenuOpen(false)}
+                        <Separator className="my-2" />
+                        <Link
+                          href="/creator/upgrade"
+                          className="flex items-center gap-2 w-full h-9 px-3 rounded-[var(--radius-sm)] bg-gradient-to-r from-violet-600 to-violet-500 text-white text-[13px] font-medium shadow-glow-violet hover:brightness-110 transition-[filter] duration-150"
+                          onMouseEnter={() => warmRoute("/creator/upgrade")}
+                          onTouchStart={() => warmRoute("/creator/upgrade")}
+                          onClick={() => {
+                            trackRouteStart("/creator/upgrade");
+                            setMobileMenuOpen(false);
+                          }}
                         >
-                          <Link href="/creator/upgrade">
-                            <Sparkles className="w-5 h-5 mr-3" aria-hidden="true" />
-                            <span>Become a Creator</span>
-                          </Link>
-                        </Button>
+                          <Sparkles className="size-[14px]" />
+                          Start Creating
+                        </Link>
                       </>
                     )}
 
-                    {/* 退出登录：在个人菜单底部增加真实的 Sign Out 动作 */}
-                    <Separator className="my-3" />
-                    <Button
-                      variant="ghost"
-                      className="justify-start text-destructive hover:text-destructive hover:bg-destructive/10 min-h-[48px] rounded-xl transition-[color,background-color] duration-200 motion-safe:transition-[color,background-color] motion-reduce:transition-none"
+                    <Separator className="my-2" />
+                    <button
+                      className="flex items-center gap-3 w-full h-10 px-3 rounded-[var(--radius-sm)] text-[13px] font-medium text-red-400 hover:bg-red-500/10 transition-colors duration-100"
                       onClick={async () => {
                         setMobileMenuOpen(false);
                         await handleSignOut();
                       }}
-                      aria-label="Sign out of your account"
+                      aria-label="Sign out"
                     >
-                      <LogOut className="w-5 h-5 mr-3" aria-hidden="true" />
-                      <span className="font-medium">Sign Out</span>
-                    </Button>
+                      <LogOut className="size-[16px]" />
+                      Sign Out
+                    </button>
                   </nav>
                 </SheetContent>
               </Sheet>
             </>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/auth">Sign In</Link>
+              </Button>
+              <Button asChild variant="violet" size="sm">
+                <Link href="/auth?tab=signup">Join</Link>
+              </Button>
+            </div>
           )}
         </div>
-        <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
       </div>
+
+      <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 }

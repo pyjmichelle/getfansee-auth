@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listFeed } from "@/lib/posts";
 import { canViewPost } from "@/lib/paywall";
-import { getCurrentUser } from "@/lib/auth-server";
 import { getMockPostsWithCreators, shouldUseMockData } from "@/lib/mock-data";
 import { type Post } from "@/lib/types";
+import { withAuth, serverError } from "@/lib/route-handler";
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, { user }) => {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     // Parse pagination params
     const { searchParams } = new URL(request.url);
     const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 50);
@@ -65,12 +60,12 @@ export async function GET(request: NextRequest) {
       pagination: {
         limit,
         offset,
-        hasMore: posts.length === limit, // 如果返回数量等于 limit，可能还有更多
+        hasMore: posts.length === limit,
       },
     });
   } catch (err: unknown) {
     console.error("[api] feed error:", err);
     const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return serverError(message);
   }
-}
+});

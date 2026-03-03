@@ -60,6 +60,21 @@
   - pnpm build
   - 至少一个相关 e2e 测试
 
+### P1 – Discover 页面像素级复刻（Figma 1:1345）
+
+- Scope:
+  - 粉丝点击 Discover 后页面按 Figma `node-id=1:1345` 做像素级视觉复刻
+  - 覆盖顶部导航、Hero、推荐大卡、搜索栏、Trend 标签、创作者卡片网格、Load More
+  - 保持 `/home` 为登录后 Feed 首页，不改动其业务流
+- Acceptance Criteria:
+  - `Discover (/search)` 截图与 Figma 布局、层级、主色风格一致
+  - 包含 trend 标签交互与搜索过滤交互
+  - `data-testid="search-page"` 与结果区 testid 保持可用于走查
+  - `pnpm type-check` 通过
+- Required Gates:
+  - pnpm type-check
+  - pnpm compliance:walkthrough
+
 ---
 
 ### P1 – Kernel & Planning normalization

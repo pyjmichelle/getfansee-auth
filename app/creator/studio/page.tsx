@@ -1,41 +1,33 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DollarSign, Users, Eye, Heart, Plus, BarChart3, Calendar, FileText } from "lucide-react";
-import { NavHeader } from "@/components/nav-header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { StatCard } from "@/components/stat-card";
-import { CenteredContainer } from "@/components/layouts/centered-container";
-import { BottomNavigation } from "@/components/bottom-navigation";
-import { EmptyState } from "@/components/empty-state";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { getProfile } from "@/lib/profile";
-import { ensureProfile } from "@/lib/auth";
+import { DollarSign, Users, Eye, Heart, Plus, Coins } from "@/lib/icons";
+import { PageShell } from "@/components/page-shell";
+// Card, Badge, Skeleton, StatCard, CenteredContainer no longer needed - using Figma inline styles
+// EmptyState no longer needed - using Figma inline styles
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { DEFAULT_POST_MEDIA } from "@/lib/image-fallbacks";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
+import { formatDistanceToNow } from "date-fns";
+import { ErrorState } from "@/components/error-state";
 
 // 延迟加载图表组件以提高首屏加载速度
-const StudioChart = dynamic(
+const _StudioChart = dynamic(
   () => import("@/components/studio-chart").then((mod) => mod.StudioChart),
   {
     loading: () => (
-      <div className="w-full h-[300px] flex items-center justify-center bg-muted/50 rounded-lg">
-        <Skeleton className="w-full h-full" />
-      </div>
+      <div className="w-full h-[300px] flex items-center justify-center bg-white/8 rounded-lg animate-pulse" />
     ),
     ssr: false,
   }
 );
 
-const supabase = getSupabaseBrowserClient();
-
 export default function CreatorStudioPage() {
   const router = useRouter();
-  const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d">("30d");
+  const [_timeRange, _setTimeRange] = useState<"7d" | "30d" | "90d">("30d");
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<{
     username: string;
@@ -43,6 +35,7 @@ export default function CreatorStudioPage() {
     avatar?: string;
   } | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  useSkeletonMetric("creator_studio_page", isLoading);
 
   const [stats, setStats] = useState({
     revenue: { value: 0, change: 0, trend: "up" as "up" | "down" },
@@ -51,43 +44,35 @@ export default function CreatorStudioPage() {
     visitors: { value: 0, change: 0, trend: "up" as "up" | "down" },
   });
 
-  const [chartData, setChartData] = useState<
+  const [_chartData, _setChartData] = useState<
     Array<{ date: string; revenue: number; subscribers: number }>
   >([]);
+  const [statsError, setStatsError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
 
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           router.push("/auth");
           return;
         }
 
-        await ensureProfile();
-        setCurrentUserId(session.user.id);
-
-        const profile = await getProfile(session.user.id);
-        if (profile) {
-          setCurrentUser({
-            username: profile.display_name || "user",
-            role: (profile.role || "fan") as "fan" | "creator",
-            avatar: profile.avatar_url || undefined,
-          });
-
-          if (profile.role !== "creator") {
-            router.push("/home");
-            return;
-          }
+        if (bootstrap.profile?.role !== "creator") {
+          router.push("/home");
+          return;
         }
+        setCurrentUserId(bootstrap.user.id);
+        setCurrentUser({
+          username: bootstrap.profile?.display_name || bootstrap.user.email.split("@")[0] || "user",
+          role: "creator",
+          avatar: bootstrap.profile?.avatar_url || undefined,
+        });
 
-        // 加载真实统计数据
-        await loadStats();
+        // 并行加载统计和最近帖子，减少切页等待。
+        await Promise.all([loadStats(), loadRecentPosts()]);
       } catch (err) {
         console.error("[studio] loadData error:", err);
       } finally {
@@ -101,19 +86,23 @@ export default function CreatorStudioPage() {
   // 加载统计数据
   const loadStats = async () => {
     try {
+      setStatsError(null);
       const response = await fetch(
-        `/api/creator/stats?timeRange=${timeRange}&includeChart=true&includePosts=false`
+        `/api/creator/stats?timeRange=${_timeRange}&includeChart=true&includePosts=false`
       );
       const data = await response.json();
 
       if (data.success) {
         setStats(data.stats);
         if (data.chartData) {
-          setChartData(data.chartData);
+          _setChartData(data.chartData);
         }
+      } else {
+        setStatsError("Failed to load studio stats. Please try again.");
       }
     } catch (err) {
       console.error("[studio] loadStats error:", err);
+      setStatsError("Failed to load studio stats. Please try again.");
     }
   };
 
@@ -122,7 +111,7 @@ export default function CreatorStudioPage() {
     if (currentUserId) {
       loadStats();
     }
-  }, [timeRange, currentUserId]);
+  }, [_timeRange, currentUserId]);
 
   const [recentPosts, setRecentPosts] = useState<
     Array<{
@@ -138,25 +127,18 @@ export default function CreatorStudioPage() {
     }>
   >([]);
 
-  // 加载最近的帖子
-  useEffect(() => {
-    const loadRecentPosts = async () => {
-      if (!currentUserId) return;
+  const loadRecentPosts = async () => {
+    try {
+      const response = await fetch("/api/creator/stats?includePosts=true");
+      const data = await response.json();
 
-      try {
-        const response = await fetch("/api/creator/stats?includePosts=true");
-        const data = await response.json();
-
-        if (data.success && data.recentPosts) {
-          setRecentPosts(data.recentPosts);
-        }
-      } catch (err) {
-        console.error("[studio] loadRecentPosts error:", err);
+      if (data.success && data.recentPosts) {
+        setRecentPosts(data.recentPosts);
       }
-    };
-
-    loadRecentPosts();
-  }, [currentUserId]);
+    } catch (err) {
+      console.error("[studio] loadRecentPosts error:", err);
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -164,292 +146,350 @@ export default function CreatorStudioPage() {
       day: "numeric",
     });
   };
+  const totalRevenue = Math.max(stats.revenue.value, 0);
+  const unlocksRevenueRaw = recentPosts
+    .filter((post) => post.type === "ppv")
+    .reduce((sum, post) => sum + Math.max(post.revenue, 0), 0);
+  const tipsRevenueRaw = recentPosts
+    .filter((post) => post.type === "free")
+    .reduce((sum, post) => sum + Math.max(post.revenue, 0), 0);
+  const unlocksRevenue = Math.min(unlocksRevenueRaw, totalRevenue);
+  const tipsRevenue = Math.min(tipsRevenueRaw, Math.max(totalRevenue - unlocksRevenue, 0));
+  const subscriptionsRevenue = Math.max(totalRevenue - unlocksRevenue - tipsRevenue, 0);
+  const revenueBreakdown = [
+    {
+      label: "Subscriptions",
+      amount: subscriptionsRevenue,
+      percent: totalRevenue > 0 ? (subscriptionsRevenue / totalRevenue) * 100 : 0,
+      barClass: "bg-brand-primary",
+    },
+    {
+      label: "Unlocks",
+      amount: unlocksRevenue,
+      percent: totalRevenue > 0 ? (unlocksRevenue / totalRevenue) * 100 : 0,
+      barClass: "bg-accent",
+    },
+    {
+      label: "Tips",
+      amount: tipsRevenue,
+      percent: totalRevenue > 0 ? (tipsRevenue / totalRevenue) * 100 : 0,
+      barClass: "bg-gradient-to-r from-amber-500 to-amber-600",
+    },
+  ];
+  const recentActivity = recentPosts.slice(0, 4).map((post) => ({
+    icon: post.type === "subscribers" ? Users : post.type === "ppv" ? Coins : Heart,
+    text:
+      post.type === "ppv"
+        ? `PPV post earned $${post.revenue.toFixed(2)}`
+        : post.type === "subscribers"
+          ? `Subscriber post gained ${post.views.toLocaleString()} views`
+          : `Free post received ${post.likes.toLocaleString()} likes`,
+    time: formatDistanceToNow(new Date(post.createdAt), { addSuffix: true }),
+    color:
+      post.type === "ppv" ? "amber-500" : post.type === "subscribers" ? "brand-primary" : "error",
+  }));
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background pb-16 md:pb-0">
-        {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
-        <main className="py-6 sm:py-8 lg:py-12">
-          <CenteredContainer maxWidth="7xl">
-            <div className="space-y-8">
-              <Skeleton className="h-8 w-64" />
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                {[1, 2, 3, 4].map((i) => (
-                  <Card key={i} className="rounded-xl border shadow-sm">
-                    <CardContent className="pt-6">
-                      <Skeleton className="h-12 w-12 rounded-lg mb-4" />
-                      <Skeleton className="h-8 w-20 mb-2" />
-                      <Skeleton className="h-4 w-24" />
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-              <Skeleton className="h-64 rounded-xl" />
-            </div>
-          </CenteredContainer>
-        </main>
-      </div>
+      <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
+        <div className="pb-12 space-y-6 animate-pulse">
+          <div className="card-block bg-gradient-subtle p-6 md:p-8">
+            <div className="h-8 w-56 bg-white/8 rounded mb-3" />
+            <div className="h-4 w-80 bg-white/8 rounded mb-6" />
+            <div className="h-10 w-40 bg-white/8 rounded-xl" />
+          </div>
+          <div className="bento-grid">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="card-block h-28 bg-white/8" />
+            ))}
+          </div>
+          <div className="h-64 bg-white/8 rounded-2xl" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[1, 2].map((i) => (
+              <div key={i} className="h-40 bg-white/8 rounded-2xl" />
+            ))}
+          </div>
+        </div>
+      </PageShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0" data-testid="page-ready">
-      {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
-
-      <main className="py-6 sm:py-8 lg:py-12">
-        <CenteredContainer maxWidth="7xl">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">Creator Studio</h1>
-              <p className="text-lg text-muted-foreground">
-                Manage your content, track earnings, and grow your fanbase
-              </p>
-            </div>
-            <Button
-              asChild
-              size="lg"
-              className="w-full sm:w-auto rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-            >
-              <Link href="/creator/new-post">
-                <Plus className="w-5 h-5 mr-2" aria-hidden="true" />
-                New Post
-              </Link>
-            </Button>
-          </div>
-
-          {/* Time Range Filter */}
-          <div className="flex gap-2 mb-8" role="tablist" aria-label="Time range filter">
-            <Button
-              variant={timeRange === "7d" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setTimeRange("7d")}
-              className="rounded-xl transition-[color,background-color] duration-200 motion-safe:transition-[color,background-color] motion-reduce:transition-none"
-              role="tab"
-              aria-selected={timeRange === "7d"}
-            >
-              7 Days
-            </Button>
-            <Button
-              variant={timeRange === "30d" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setTimeRange("30d")}
-              className="rounded-xl transition-[color,background-color] duration-200 motion-safe:transition-[color,background-color] motion-reduce:transition-none"
-              role="tab"
-              aria-selected={timeRange === "30d"}
-            >
-              30 Days
-            </Button>
-            <Button
-              variant={timeRange === "90d" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setTimeRange("90d")}
-              className="rounded-xl transition-[color,background-color] duration-200 motion-safe:transition-[color,background-color] motion-reduce:transition-none"
-              role="tab"
-              aria-selected={timeRange === "90d"}
-            >
-              90 Days
-            </Button>
-          </div>
-
-          {/* Stats Grid - 使用 StatCard 组件 */}
-          <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8"
-            data-testid="creator-stats"
-          >
-            <StatCard
-              title="Total Revenue"
-              value={`$${stats.revenue.value.toFixed(2)}`}
-              change={{ value: stats.revenue.change, trend: stats.revenue.trend }}
-              icon={<DollarSign className="w-5 h-5" aria-hidden="true" />}
-            />
-            <StatCard
-              title="New Subscribers"
-              value={stats.subscribers.value}
-              change={{ value: stats.subscribers.change, trend: stats.subscribers.trend }}
-              icon={<Users className="w-5 h-5" aria-hidden="true" />}
-            />
-            <StatCard
-              title="PPV Sales"
-              value={stats.ppvSales.value}
-              change={{ value: stats.ppvSales.change, trend: stats.ppvSales.trend }}
-              icon={<DollarSign className="w-5 h-5" aria-hidden="true" />}
-            />
-            <StatCard
-              title="Visitors"
-              value={stats.visitors.value.toLocaleString()}
-              change={{ value: stats.visitors.change, trend: stats.visitors.trend }}
-              icon={<Eye className="w-5 h-5" aria-hidden="true" />}
-            />
-          </div>
-
-          {/* Chart - 平滑面积图，渐变紫色线条（延迟加载） */}
-          <Card className="rounded-xl border shadow-sm mb-8">
-            <CardHeader>
-              <CardTitle className="text-xl">Revenue & Subscribers</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <StudioChart data={chartData} />
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
-            data-testid="creator-nav"
-          >
-            <Button
-              asChild
-              variant="outline"
-              className="h-auto py-4 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-            >
-              <Link href="/creator/studio/analytics" className="flex items-center gap-3">
-                <BarChart3 className="w-5 h-5" aria-hidden="true" />
-                <div className="text-left">
-                  <p className="font-semibold">Analytics</p>
-                  <p className="text-xs text-muted-foreground">Detailed performance metrics</p>
-                </div>
-              </Link>
-            </Button>
-
-            <Button
-              asChild
-              variant="outline"
-              className="h-auto py-4 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-            >
-              <Link href="/creator/studio/subscribers" className="flex items-center gap-3">
-                <Users className="w-5 h-5" aria-hidden="true" />
-                <div className="text-left">
-                  <p className="font-semibold">Subscribers</p>
-                  <p className="text-xs text-muted-foreground">Manage your subscriber base</p>
-                </div>
-              </Link>
-            </Button>
-
-            <Button
-              asChild
-              variant="outline"
-              className="h-auto py-4 rounded-xl min-h-[44px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-            >
-              <Link href="/creator/studio/earnings" className="flex items-center gap-3">
-                <DollarSign className="w-5 h-5" aria-hidden="true" />
-                <div className="text-left">
-                  <p className="font-semibold">Earnings</p>
-                  <p className="text-xs text-muted-foreground">View revenue and payouts</p>
-                </div>
-              </Link>
-            </Button>
-          </div>
-
-          {/* Recent Posts */}
+    <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
+      <div data-testid="page-ready" className="pb-12">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-foreground">Recent Posts</h2>
-              <Button
-                asChild
-                variant="ghost"
-                size="sm"
-                className="transition-[color,background-color] duration-200 motion-safe:transition-[color,background-color] motion-reduce:transition-none"
+            <h1 className="text-3xl font-bold mb-1 text-text-primary">Creator Dashboard</h1>
+            <p className="text-text-tertiary text-sm">Track your performance and earnings</p>
+          </div>
+          <Link
+            href="/creator/new-post"
+            className="px-5 py-2.5 bg-brand-primary text-white rounded-xl font-bold hover-bold shadow-glow transition-all flex items-center justify-center gap-2 active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary w-full sm:w-auto"
+          >
+            <Plus size={18} />
+            Create Post
+          </Link>
+        </div>
+        {statsError && (
+          <ErrorState
+            className="mb-6"
+            title="Studio stats unavailable"
+            message={statsError}
+            retry={loadStats}
+          />
+        )}
+
+        {/* PC: Two-column | Mobile: Single-column */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Main content column */}
+          <div className="flex-1 min-w-0">
+            {/* Quick Actions (mobile) */}
+            <div className="grid grid-cols-2 gap-3 mb-6 lg:hidden" data-testid="creator-nav">
+              <Link
+                href="/creator/studio/earnings"
+                className="px-4 py-3.5 bg-surface-raised border border-border-base rounded-xl font-semibold hover:bg-surface-overlay transition-all flex items-center justify-center gap-2 active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary text-sm"
               >
-                <Link href="/creator/studio/post/list">View All</Link>
-              </Button>
+                <DollarSign size={18} />
+                Earnings
+              </Link>
+              <Link
+                href="/creator/studio/subscribers"
+                className="px-4 py-3.5 bg-surface-raised border border-border-base rounded-xl font-semibold hover:bg-surface-overlay transition-all flex items-center justify-center gap-2 active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary text-sm"
+              >
+                <Users size={18} />
+                Subscribers
+              </Link>
             </div>
 
-            <div className="space-y-4">
-              {recentPosts.length === 0 ? (
-                <EmptyState
-                  icon={<FileText className="w-8 h-8 text-muted-foreground" />}
-                  title="No Posts Yet"
-                  description="Create your first post to get started"
-                  action={{ label: "Create Post", href: "/creator/new-post" }}
-                />
-              ) : (
-                recentPosts.map((post) => (
-                  <Card
+            {/* Key Stats - Figma Style */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" data-testid="creator-stats">
+              <div className="card-block p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-success/10 rounded-lg flex items-center justify-center">
+                    <DollarSign size={20} className="text-success" />
+                  </div>
+                </div>
+                <div className="text-3xl font-bold mb-1 text-text-primary">
+                  ${stats.revenue.value.toFixed(0)}
+                </div>
+                <div className="text-sm text-text-tertiary">This month</div>
+                <div
+                  className={`text-xs mt-2 ${stats.revenue.trend === "down" ? "text-error" : "text-success"}`}
+                >
+                  {stats.revenue.trend === "down" ? "-" : "+"}
+                  {Math.abs(stats.revenue.change)}% from last month
+                </div>
+              </div>
+
+              <div className="card-block p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-brand-primary-alpha-10 rounded-lg flex items-center justify-center">
+                    <Users size={20} className="text-brand-primary" />
+                  </div>
+                </div>
+                <div className="text-3xl font-bold mb-1 text-text-primary">
+                  {stats.subscribers.value.toLocaleString()}
+                </div>
+                <div className="text-sm text-text-tertiary">Subscribers</div>
+                <div
+                  className={`text-xs mt-2 ${stats.subscribers.trend === "down" ? "text-error" : "text-success"}`}
+                >
+                  {stats.subscribers.trend === "down" ? "-" : "+"}
+                  {Math.abs(stats.subscribers.change)} this month
+                </div>
+              </div>
+
+              <div className="card-block p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                    <Eye size={20} className="text-accent" />
+                  </div>
+                </div>
+                <div className="text-3xl font-bold mb-1 text-text-primary">
+                  {stats.visitors.value.toLocaleString()}
+                </div>
+                <div className="text-sm text-text-tertiary">Total views</div>
+                <div
+                  className={`text-xs mt-2 ${stats.visitors.trend === "down" ? "text-error" : "text-success"}`}
+                >
+                  {stats.visitors.trend === "down" ? "-" : "+"}
+                  {Math.abs(stats.visitors.change)}% from last month
+                </div>
+              </div>
+
+              <div className="card-block p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-brand-secondary/10 rounded-lg flex items-center justify-center">
+                    <Heart size={20} className="text-brand-secondary" />
+                  </div>
+                </div>
+                <div className="text-3xl font-bold mb-1 text-text-primary">
+                  {stats.ppvSales.value}
+                </div>
+                <div className="text-sm text-text-tertiary">PPV Sales</div>
+                <div
+                  className={`text-xs mt-2 ${stats.ppvSales.trend === "down" ? "text-error" : "text-success"}`}
+                >
+                  {stats.ppvSales.trend === "down" ? "-" : "+"}
+                  {Math.abs(stats.ppvSales.change)}% from last month
+                </div>
+              </div>
+            </div>
+
+            {/* Top Performing Posts - Figma Style */}
+            <div className="mb-8">
+              <h3 className="text-xl font-bold mb-4 text-text-primary">Top Performing Posts</h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                {recentPosts.slice(0, 3).map((post, index) => (
+                  <div
                     key={post.id}
-                    className="rounded-xl border shadow-sm overflow-hidden hover:shadow-md transition-[box-shadow] duration-200 motion-safe:transition-[box-shadow] motion-reduce:transition-none"
+                    className="card-block overflow-hidden hover:border-brand-primary/30 transition-all cursor-pointer group"
+                    onClick={() => router.push(`/posts/${post.id}`)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        router.push(`/posts/${post.id}`);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
                   >
-                    <div className="flex flex-col md:flex-row">
-                      {/* Media Preview */}
-                      <div className="relative bg-muted md:w-48 aspect-video md:aspect-auto">
-                        <img
-                          src={post.mediaUrl || "/placeholder.svg"}
-                          alt="Post preview"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-
-                      {/* Post Details */}
-                      <div className="flex-1 p-4 md:p-6">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge
-                                variant={post.type === "free" ? "secondary" : "default"}
-                                className="rounded-lg"
-                              >
-                                {post.type === "free"
-                                  ? "Free"
-                                  : post.type === "subscribers"
-                                    ? "Exclusive"
-                                    : `Premium $${post.price}`}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                {formatDate(post.createdAt)}
-                              </span>
-                            </div>
-                            <p className="text-foreground mb-3">{post.content}</p>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-wrap gap-6 text-sm">
-                          <div className="flex items-center gap-1 text-muted-foreground">
-                            <Eye className="w-4 h-4" aria-hidden="true" />
-                            {post.views.toLocaleString()} views
-                          </div>
-                          <div className="flex items-center gap-1 text-muted-foreground">
-                            <Heart className="w-4 h-4" aria-hidden="true" />
-                            {post.likes} likes
-                          </div>
-                          {post.revenue > 0 && (
-                            <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                              <DollarSign className="w-4 h-4" aria-hidden="true" />${post.revenue}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="p-4 md:p-6 flex md:flex-col gap-2 border-t md:border-t-0 md:border-l border-border">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex-1 md:flex-none rounded-xl min-h-[40px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-                          aria-label="Edit post"
-                          disabled
-                          title="Coming soon"
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="flex-1 md:flex-none rounded-xl min-h-[40px] transition-[transform,opacity] duration-200 motion-safe:transition-[transform,opacity] motion-reduce:transition-none"
-                          aria-label="View post"
-                          asChild
-                        >
-                          <Link href={`/posts/${post.id}`}>View</Link>
-                        </Button>
+                    <div className="relative aspect-video overflow-hidden bg-black">
+                      <img
+                        src={post.mediaUrl || DEFAULT_POST_MEDIA}
+                        alt={post.content}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute top-2 left-2 w-8 h-8 bg-brand-primary rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
+                        #{index + 1}
                       </div>
                     </div>
-                  </Card>
-                ))
-              )}
+                    <div className="p-4">
+                      <h4 className="font-semibold mb-2 line-clamp-2 text-text-primary">
+                        {post.content}
+                      </h4>
+                      <div className="text-xs text-text-tertiary mb-3">
+                        {formatDate(post.createdAt)}
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-1">
+                            <Eye size={16} className="text-text-tertiary" />
+                            <span className="font-medium">{post.views.toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Heart size={16} className="text-text-tertiary" />
+                            <span className="font-medium">{post.likes}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 text-success font-bold">
+                          <DollarSign size={16} />
+                          <span>${post.revenue.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Revenue Breakdown - Figma Style */}
+            <div className="card-block p-6 mb-8">
+              <h3 className="text-xl font-bold mb-6 text-text-primary">Revenue Breakdown</h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                {revenueBreakdown.map((item) => (
+                  <div key={item.label}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-text-secondary">{item.label}</span>
+                      <span className="font-bold text-text-primary">
+                        {item.percent.toFixed(0)}%
+                      </span>
+                    </div>
+                    <div className="h-2 bg-white/8 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full ${item.barClass} rounded-full`}
+                        style={{ width: `${item.percent}%` }}
+                      />
+                    </div>
+                    <div className="text-2xl font-bold mt-3 text-gradient">
+                      ${item.amount.toFixed(0)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Recent Activity - Figma Style */}
+            <div className="card-block p-6">
+              <h3 className="text-xl font-bold mb-4 text-text-primary">Recent Activity</h3>
+              <div className="space-y-4">
+                {recentActivity.map((activity, i) => {
+                  let bgClass = "bg-brand-primary/10";
+                  let textClass = "text-brand-primary";
+
+                  if (activity.color === "amber-500") {
+                    bgClass = "bg-amber-500/10";
+                    textClass = "text-amber-500";
+                  } else if (activity.color === "error") {
+                    bgClass = "bg-error/10";
+                    textClass = "text-error";
+                  } else if (activity.color === "brand-secondary") {
+                    bgClass = "bg-brand-secondary/10";
+                    textClass = "text-brand-secondary";
+                  }
+
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-center gap-4 p-3 hover:bg-white/8 rounded-lg transition-colors"
+                    >
+                      <div
+                        className={`w-10 h-10 ${bgClass} rounded-lg flex items-center justify-center flex-shrink-0`}
+                      >
+                        <activity.icon size={20} className={textClass} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-text-primary">{activity.text}</p>
+                        <p className="text-xs text-text-tertiary mt-1">{activity.time}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </CenteredContainer>
-      </main>
 
-      <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
-    </div>
+          {/* Sidebar: Navigation links (PC only) */}
+          <aside className="hidden lg:block w-64 shrink-0">
+            <div className="sticky top-24 space-y-3">
+              <div className="card-block p-4" data-testid="creator-nav">
+                <h2 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">
+                  Studio
+                </h2>
+                <nav className="space-y-1">
+                  {[
+                    { href: "/creator/new-post", icon: Plus, label: "Create Post" },
+                    { href: "/creator/studio/earnings", icon: DollarSign, label: "Earnings" },
+                    { href: "/creator/studio/subscribers", icon: Users, label: "Subscribers" },
+                    { href: "/creator/studio/post/list", icon: Eye, label: "Post List" },
+                    { href: "/creator/studio/analytics", icon: Heart, label: "Analytics" },
+                  ].map(({ href, icon: Icon, label }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-text-secondary hover:bg-surface-raised hover:text-text-primary transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                    >
+                      <Icon size={16} />
+                      {label}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </PageShell>
   );
 }

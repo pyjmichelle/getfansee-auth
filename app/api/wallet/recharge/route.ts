@@ -1,5 +1,7 @@
+import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
+import { requireUser } from "@/lib/authz";
+import { jsonError } from "@/lib/http-errors";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
 type RechargePayload = {
@@ -8,106 +10,40 @@ type RechargePayload = {
 
 export async function POST(request: NextRequest) {
   try {
-    // 验证用户身份
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: "User not authenticated" },
-        { status: 401 }
-      );
-    }
+    // 路由层显式鉴权
+    const { user } = await requireUser();
 
     const body = (await request.json()) as RechargePayload;
     const { amount } = body;
 
-    // 验证金额
     if (!amount || amount <= 0) {
       return NextResponse.json({ success: false, error: "Invalid amount" }, { status: 400 });
     }
 
-    // Removed debug console.log - vercel-react-best-practices
-
-    // 使用 Admin 客户端绕过 RLS
     const supabase = getSupabaseAdminClient();
     const amountCents = Math.round(amount * 100);
+    // 幂等键：优先取请求头，否则生成新 UUID
+    const idempotencyKey = request.headers.get("Idempotency-Key") ?? randomUUID();
 
-    // 1. 获取或创建钱包账户
-    const { data: wallet, error: walletError } = await supabase
-      .from("wallet_accounts")
-      .select("available_balance_cents")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (walletError) {
-      console.error("[api/wallet/recharge] Error fetching wallet:", walletError);
-      return NextResponse.json(
-        { success: false, error: "Failed to fetch wallet" },
-        { status: 500 }
-      );
-    }
-
-    let newBalance: number;
-
-    if (!wallet) {
-      // 创建新钱包
-      const { error: insertError } = await supabase.from("wallet_accounts").insert({
-        user_id: user.id,
-        available_balance_cents: amountCents,
-        pending_balance_cents: 0,
-      });
-
-      if (insertError) {
-        console.error("[api/wallet/recharge] Error creating wallet:", insertError);
-        return NextResponse.json(
-          { success: false, error: "Failed to create wallet" },
-          { status: 500 }
-        );
-      }
-
-      newBalance = amountCents;
-    } else {
-      // 更新现有钱包
-      newBalance = wallet.available_balance_cents + amountCents;
-      const { error: updateError } = await supabase
-        .from("wallet_accounts")
-        .update({ available_balance_cents: newBalance })
-        .eq("user_id", user.id);
-
-      if (updateError) {
-        console.error("[api/wallet/recharge] Error updating wallet:", updateError);
-        return NextResponse.json(
-          { success: false, error: "Failed to update wallet" },
-          { status: 500 }
-        );
-      }
-    }
-
-    // 2. 创建交易记录
-    const { error: transactionError } = await supabase.from("transactions").insert({
-      user_id: user.id,
-      type: "deposit",
-      amount_cents: amountCents,
-      status: "completed",
-      metadata: {
-        payment_method: "mock",
-        amount_usd: amount,
-      },
+    // 原子操作：在单 RPC/事务内完成钱包更新 + 交易写入，消除账实不一致风险
+    const { data, error } = await supabase.rpc("recharge_wallet", {
+      p_user_id: user.id,
+      p_amount_cents: amountCents,
+      p_idempotency_key: idempotencyKey,
     });
 
-    if (transactionError) {
-      console.error("[api/wallet/recharge] Error creating transaction:", transactionError);
-      // 不返回错误，因为余额已更新
+    if (error) {
+      console.error("[api/wallet/recharge] RPC error:", error);
+      return NextResponse.json({ success: false, error: "Recharge failed" }, { status: 500 });
     }
 
-    // Removed debug console.log - vercel-react-best-practices
+    const result = data as { success: boolean; balance_cents: number; idempotent: boolean };
 
     return NextResponse.json({
       success: true,
-      balance: newBalance / 100,
+      balance: result.balance_cents / 100,
     });
   } catch (err: unknown) {
-    console.error("[api/wallet/recharge] Exception:", err);
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return jsonError(err);
   }
 }

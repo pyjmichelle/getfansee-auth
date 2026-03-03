@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { User, DollarSign, Check, ArrowRight } from "lucide-react";
+import { User, DollarSign, Check, ArrowRight } from "@/lib/icons";
 import { NavHeader } from "@/components/nav-header";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,23 +38,29 @@ export default function CreatorOnboardPage() {
         }}
       />
 
-      <main className="container max-w-2xl mx-auto px-4 py-12">
-        {/* Progress */}
+      <main className="section-block container max-w-2xl mx-auto px-4 py-12">
+        {/* Animated Progress Bar */}
         <div className="flex items-center justify-center gap-2 mb-8">
-          <div className={`w-3 h-3 rounded-full ${step >= 1 ? "bg-primary" : "bg-muted"}`} />
-          <div className="w-12 h-0.5 bg-muted" />
-          <div className={`w-3 h-3 rounded-full ${step >= 2 ? "bg-primary" : "bg-muted"}`} />
+          <div
+            className={`w-3 h-3 rounded-full transition-colors ${step >= 1 ? "bg-brand-primary" : "bg-surface-raised"}`}
+          />
+          <div
+            className={`w-12 h-0.5 transition-colors ${step >= 2 ? "bg-brand-primary" : "bg-surface-raised"}`}
+          />
+          <div
+            className={`w-3 h-3 rounded-full transition-colors ${step >= 2 ? "bg-brand-primary" : "bg-surface-raised"}`}
+          />
         </div>
 
-        <Card className="p-8">
+        <div className="card-block p-8">
           {step === 1 ? (
             <div className="space-y-6">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <User className="w-8 h-8 text-primary" />
+                <div className="w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <User className="w-8 h-8 text-brand-primary" />
                 </div>
-                <h1 className="text-2xl font-bold text-foreground mb-2">Create Your Profile</h1>
-                <p className="text-muted-foreground">Let fans know who you are</p>
+                <h1 className="text-2xl font-bold text-text-primary mb-2">Create Your Profile</h1>
+                <p className="text-text-secondary">Let fans know who you are</p>
               </div>
 
               <div className="space-y-4">
@@ -80,19 +85,21 @@ export default function CreatorOnboardPage() {
                     required
                     className="min-h-[120px] resize-none"
                   />
-                  <p className="text-xs text-muted-foreground">{bio.length}/200</p>
+                  <p className="text-xs text-text-tertiary">{bio.length}/200</p>
                 </div>
 
                 {/* Preview */}
-                <div className="border border-border rounded-lg p-4 bg-muted/30">
-                  <p className="text-xs text-muted-foreground mb-3">Preview:</p>
+                <div className="border border-border-base rounded-lg p-4 bg-surface-raised/30">
+                  <p className="text-xs text-text-tertiary mb-3">Preview:</p>
                   <div className="flex items-start gap-3">
                     <Avatar className="w-12 h-12">
                       <AvatarFallback>{username ? username[0].toUpperCase() : "U"}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-semibold text-foreground">{username || "your_username"}</p>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="font-semibold text-text-primary">
+                        {username || "your_username"}
+                      </p>
+                      <p className="text-sm text-text-secondary mt-1">
                         {bio || "Your bio will appear here..."}
                       </p>
                     </div>
@@ -102,7 +109,7 @@ export default function CreatorOnboardPage() {
 
               <Button
                 size="lg"
-                className="w-full"
+                className="w-full bg-brand-primary text-white shadow-glow hover-bold"
                 onClick={handleContinue}
                 disabled={!username || !bio}
               >
@@ -113,20 +120,20 @@ export default function CreatorOnboardPage() {
           ) : (
             <div className="space-y-6">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <DollarSign className="w-8 h-8 text-primary" />
+                <div className="w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <DollarSign className="w-8 h-8 text-brand-primary" />
                 </div>
-                <h1 className="text-2xl font-bold text-foreground mb-2">
+                <h1 className="text-2xl font-bold text-text-primary mb-2">
                   Set Your Subscription Price
                 </h1>
-                <p className="text-muted-foreground">You can always change this later</p>
+                <p className="text-text-secondary">You can always change this later</p>
               </div>
 
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="price">Monthly Subscription Price (USD) *</Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary">
                       $
                     </span>
                     <Input
@@ -141,42 +148,36 @@ export default function CreatorOnboardPage() {
                       className="pl-8"
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-text-tertiary">
                     Recommended range: $5 - $25 per month
                   </p>
                 </div>
 
                 {/* Earnings Preview */}
-                <div className="border border-border rounded-lg p-4 bg-muted/30 space-y-3">
-                  <p className="text-xs text-muted-foreground">Estimated monthly earnings:</p>
+                <div className="border border-border-base rounded-lg p-4 bg-surface-raised/30 space-y-3">
+                  <p className="text-xs text-text-tertiary">Estimated monthly earnings:</p>
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">10 subscribers</span>
-                      <span className="font-semibold text-foreground">
-                        ${(Number.parseFloat(subscriptionPrice || "0") * 10).toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">50 subscribers</span>
-                      <span className="font-semibold text-foreground">
-                        ${(Number.parseFloat(subscriptionPrice || "0") * 50).toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">100 subscribers</span>
-                      <span className="font-semibold text-primary">
-                        ${(Number.parseFloat(subscriptionPrice || "0") * 100).toFixed(2)}
-                      </span>
-                    </div>
+                    {[10, 50, 100].map((subs) => (
+                      <div key={subs} className="flex items-center justify-between">
+                        <span className="text-text-secondary">{subs} subscribers</span>
+                        <span
+                          className={`font-semibold ${subs === 100 ? "text-brand-primary" : "text-text-primary"}`}
+                        >
+                          ${(Number.parseFloat(subscriptionPrice || "0") * subs).toFixed(2)}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                <div className="bg-brand-primary/5 border border-brand-primary/20 rounded-lg p-4">
                   <div className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <Check className="w-5 h-5 text-brand-primary flex-shrink-0 mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-semibold text-foreground mb-1">You keep 90% of earnings</p>
-                      <p className="text-muted-foreground">
+                      <p className="font-semibold text-text-primary mb-1">
+                        You keep 90% of earnings
+                      </p>
+                      <p className="text-text-secondary">
                         Platform fee is 10%. Payouts are processed monthly.
                       </p>
                     </div>
@@ -186,7 +187,7 @@ export default function CreatorOnboardPage() {
 
               <Button
                 size="lg"
-                className="w-full"
+                className="w-full bg-brand-primary text-white shadow-glow hover-bold"
                 onClick={handleContinue}
                 disabled={!subscriptionPrice || isSubmitting}
               >
@@ -194,7 +195,7 @@ export default function CreatorOnboardPage() {
               </Button>
             </div>
           )}
-        </Card>
+        </div>
       </main>
     </div>
   );

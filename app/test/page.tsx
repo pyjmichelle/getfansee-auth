@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "@/lib/icons";
 
 export default function TestPage() {
   // Only accessible when NEXT_PUBLIC_TEST_MODE is enabled

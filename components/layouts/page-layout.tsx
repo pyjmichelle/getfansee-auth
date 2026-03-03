@@ -28,7 +28,7 @@ export function PageLayout({
           {title && (
             <div className="mb-8">
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">{title}</h1>
-              {description && <p className="text-lg text-muted-foreground">{description}</p>}
+              {description && <p className="text-lg text-text-tertiary">{description}</p>}
             </div>
           )}
           {children}

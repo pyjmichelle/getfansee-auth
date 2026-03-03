@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSupabaseAdminClient } from "@/lib/supabase-admin";
+
+// Session cookie sync endpoint: called by the client after Supabase JS login
+// to persist the session token in httpOnly cookies for SSR.
+// Security: validates the access_token against Supabase before setting cookies.
 
 type SessionPayload = {
   access_token?: string;
@@ -18,17 +23,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing tokens" }, { status: 400 });
     }
 
-    const response = NextResponse.json({ success: true });
+    // Basic JWT structure check (header.payload.signature)
+    const jwtPattern = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
+    if (!jwtPattern.test(access_token)) {
+      return NextResponse.json({ error: "Invalid token format" }, { status: 400 });
+    }
+
+    // Server-side token validation: reject tokens not issued by our Supabase instance
+    const admin = getSupabaseAdminClient();
+    const { data: userData, error: verifyError } = await admin.auth.getUser(access_token);
+    if (verifyError || !userData?.user?.id) {
+      return NextResponse.json({ error: "Token verification failed" }, { status: 401 });
+    }
+
+    const safeMaxAge = Math.min(Math.max(Number(expires_in) || 3600, 60), 86400);
     const isSecure =
       request.nextUrl.protocol === "https:" || request.headers.get("x-forwarded-proto") === "https";
-    const maxAge = Number(expires_in);
+
+    const response = NextResponse.json({ success: true });
 
     response.cookies.set("sb-access-token", access_token, {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
       secure: isSecure,
-      maxAge,
+      maxAge: safeMaxAge,
     });
 
     response.cookies.set("sb-refresh-token", refresh_token, {
@@ -36,7 +55,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       sameSite: "lax",
       secure: isSecure,
-      maxAge: maxAge * 4,
+      maxAge: safeMaxAge * 4,
     });
 
     return response;

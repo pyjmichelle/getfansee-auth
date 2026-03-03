@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import SearchPageClient from "./SearchPageClient";
-import { Loader2 } from "lucide-react";
+import { Loader2 } from "@/lib/icons";
 
 function SearchLoadingFallback() {
   return (
@@ -10,7 +10,7 @@ function SearchLoadingFallback() {
       aria-live="polite"
       data-testid="search-loading"
     >
-      <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" aria-hidden="true" />
+      <Loader2 className="w-8 h-8 animate-spin text-text-tertiary" aria-hidden="true" />
       <span className="sr-only">Loading search...</span>
     </div>
   );

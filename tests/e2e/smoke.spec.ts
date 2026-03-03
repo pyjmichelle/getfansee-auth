@@ -66,13 +66,7 @@ test.describe("冒烟测试 - 认证流程", () => {
     // 等待页面加载
     await page.waitForLoadState("domcontentloaded");
 
-    // 验证是注册模式
-    const pageContent = await page.content();
-    const hasSignUp =
-      pageContent.toLowerCase().includes("sign up") ||
-      pageContent.toLowerCase().includes("register") ||
-      pageContent.toLowerCase().includes("创建账户");
-
-    expect(hasSignUp).toBe(true);
+    // 验证注册 tab 处于激活状态（比全文检索文案更稳定）
+    await expect(page.getByTestId("auth-tab-signup")).toHaveAttribute("data-state", "active");
   });
 });

@@ -1,219 +1,286 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { NavHeader } from "@/components/nav-header";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { LoadingState } from "@/components/loading-state";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { ensureProfile } from "@/lib/auth";
-import { getProfile } from "@/lib/profile";
-import { submitReport, type ReportType } from "@/lib/reports";
-import { toast } from "sonner";
-import { AlertTriangle, ArrowLeft } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Shield, CheckCircle, AlertCircle, Lock, FileText } from "@/lib/icons";
+import { cn } from "@/lib/utils";
+import { PageShell } from "@/components/page-shell";
 
-const supabase = getSupabaseBrowserClient();
+type ReportType = "post" | "comment" | "user";
 
-type ReportPageClientProps = {
+interface ReportPageClientProps {
   initialType: ReportType;
   initialId: string;
-};
+  postId?: string;
+  creatorId?: string;
+}
 
 const REPORT_REASONS = [
-  "Inappropriate content",
-  "Spam or scam",
-  "Harassment or bullying",
-  "Copyright violation",
-  "False information",
-  "Other",
+  { id: "spam", label: "Spam or Scam", description: "Misleading or repetitive content" },
+  {
+    id: "explicit",
+    label: "Undisclosed Explicit Content",
+    description: "Adult content not properly labeled",
+  },
+  {
+    id: "minors",
+    label: "Content Involving Minors",
+    description: "Sexualization or harm to minors",
+  },
+  {
+    id: "harassment",
+    label: "Harassment or Bullying",
+    description: "Targeted harassment or abuse",
+  },
+  {
+    id: "intellectual",
+    label: "Intellectual Property Violation",
+    description: "Unauthorized use of copyrighted material",
+  },
+  { id: "violence", label: "Violence or Threats", description: "Threatening or violent content" },
+  { id: "other", label: "Other", description: "Something else not listed above" },
 ];
 
-export default function ReportPageClient({ initialType, initialId }: ReportPageClientProps) {
+export default function ReportPageClient({
+  initialType,
+  initialId,
+  postId,
+  creatorId,
+}: ReportPageClientProps) {
   const router = useRouter();
-  const type = initialType;
-  const id = initialId;
-
-  const [isLoading, setIsLoading] = useState(true);
+  const [selectedReason, setSelectedReason] = useState<string>("");
+  const [details, setDetails] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{
-    username: string;
-    role: "fan" | "creator";
-    avatar?: string;
-  } | null>(null);
-  const [formData, setFormData] = useState({
-    reason: "",
-    description: "",
-  });
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true);
-
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
-          router.push("/auth");
-          return;
-        }
-
-        await ensureProfile();
-        const profile = await getProfile(session.user.id);
-        if (profile) {
-          setCurrentUser({
-            username: profile.display_name || "user",
-            role: (profile.role || "fan") as "fan" | "creator",
-            avatar: profile.avatar_url || undefined,
-          });
-        }
-      } catch (err) {
-        console.error("[report] loadData error:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, [router]);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!formData.reason) {
-      toast.error("Please select a report reason");
-      return;
-    }
-
-    if (!id) {
-      toast.error("Invalid report target");
+    if (!selectedReason) {
+      setError("Please select a reason for your report.");
       return;
     }
 
     setIsSubmitting(true);
+    setError(null);
+
     try {
-      const success = await submitReport({
-        reported_type: type,
-        reported_id: id,
-        reason: formData.reason,
-        description: formData.description.trim() || undefined,
+      const response = await fetch("/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: initialType,
+          id: initialId,
+          postId: postId || initialId,
+          creatorId,
+          reason: selectedReason,
+          details: details.trim(),
+        }),
       });
 
-      if (success) {
-        toast.success("Report submitted. We will review it shortly");
-        setTimeout(() => {
-          router.back();
-        }, 1500);
-      } else {
-        toast.error("Submission failed. Please try again");
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Failed to submit report");
       }
+
+      setSuccess(true);
     } catch (err) {
-      console.error("[report] submit error:", err);
-      toast.error("Submission failed. Please try again");
+      console.error("[ReportPageClient] submit error:", err);
+      setError(err instanceof Error ? err.message : "Failed to submit report. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (isLoading) {
+  if (success) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <LoadingState type="spinner" text="Loading..." />
-      </div>
+      <PageShell user={null} maxWidth="md">
+        <div className="flex items-center justify-center py-16">
+          <div className="card-block p-10 text-center w-full">
+            <div className="w-16 h-16 mx-auto rounded-full bg-success/10 flex items-center justify-center mb-4">
+              <CheckCircle className="w-8 h-8 text-success" aria-hidden="true" />
+            </div>
+            <h2 className="text-xl font-bold mb-2 text-text-primary">Report Submitted</h2>
+            <p className="text-text-secondary text-sm mb-6">
+              Thank you for helping keep GetFanSee safe. Our moderation team will review your report
+              within 24–48 hours.
+            </p>
+            <Button
+              variant="subscribe-gradient"
+              className="w-full min-h-[44px] shadow-glow active:scale-95"
+              onClick={() => router.back()}
+              aria-label="Return to previous page"
+            >
+              Go Back
+            </Button>
+          </div>
+        </div>
+      </PageShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-
-      <main className="container max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mb-6 border-border bg-card hover:bg-card rounded-xl"
-          onClick={() => router.back()}
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
-        </Button>
-
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Report Content</h1>
-          <p className="text-muted-foreground">Help us keep the community safe</p>
+    <PageShell user={null} maxWidth="4xl">
+      <div className="py-4">
+        {/* Page Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-error/10 flex items-center justify-center">
+            <Shield className="w-5 h-5 text-error" aria-hidden="true" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-text-primary">Report Content</h1>
+            <p className="text-sm text-text-tertiary">Help us maintain a safe community</p>
+          </div>
         </div>
 
-        <Card className="bg-card border border-border rounded-3xl p-6 md:p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex items-start gap-3 p-4 bg-[var(--bg-purple-500-10)] border border-[var(--border-purple-500-20)] rounded-xl">
-              <AlertTriangle className="w-5 h-5 text-[var(--color-purple-400)] flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-muted-foreground">
-                <p className="font-medium text-foreground mb-1">Reporting {type}</p>
-                <p>
-                  Please provide accurate information. False reports may result in account
-                  restrictions.
-                </p>
-              </div>
-            </div>
+        {error && (
+          <Alert variant="destructive" className="mb-6" role="alert">
+            <AlertCircle className="h-4 w-4" aria-hidden="true" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-            <div className="space-y-2">
-              <Label htmlFor="reason">
-                Reason <span className="text-destructive">*</span>
+        {/* Two-column layout on Desktop */}
+        <div className="md:grid md:grid-cols-[1fr_280px] md:gap-8 md:items-start">
+          {/* Form */}
+          <form onSubmit={handleSubmit} aria-label="Report content form">
+            {/* Reason Selection */}
+            <div className="card-block p-5 mb-4">
+              <Label className="text-sm font-semibold text-text-primary mb-3 block">
+                Reason for Report <span className="text-error">*</span>
               </Label>
-              <select
-                id="reason"
-                value={formData.reason}
-                onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                required
-                className="w-full h-11 px-3 bg-card border border-border rounded-xl text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              <fieldset>
+                <legend className="sr-only">Select a reason for your report</legend>
+                <div className="space-y-2">
+                  {REPORT_REASONS.map((reason) => {
+                    const isSelected = selectedReason === reason.id;
+                    return (
+                      <label
+                        key={reason.id}
+                        className={cn(
+                          "flex items-start gap-3 p-3 rounded-xl cursor-pointer hover-bold transition-all min-h-[44px]",
+                          "border border-transparent focus-within:border-brand-primary/50",
+                          isSelected
+                            ? "bg-brand-primary/10 border-brand-primary/30"
+                            : "hover:bg-surface-raised"
+                        )}
+                        aria-label={`${reason.label}: ${reason.description}`}
+                      >
+                        <input
+                          type="radio"
+                          name="reason"
+                          value={reason.id}
+                          checked={isSelected}
+                          onChange={() => setSelectedReason(reason.id)}
+                          className="mt-0.5 accent-brand-primary"
+                        />
+                        <div>
+                          <p
+                            className={cn(
+                              "text-sm font-medium",
+                              isSelected ? "text-brand-primary" : "text-text-primary"
+                            )}
+                          >
+                            {reason.label}
+                          </p>
+                          <p className="text-xs text-text-tertiary">{reason.description}</p>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            </div>
+
+            {/* Additional Details */}
+            <div className="card-block p-5 mb-4">
+              <Label
+                htmlFor="report-details"
+                className="text-sm font-semibold text-text-primary mb-2 block"
               >
-                <option value="">Select a reason</option>
-                {REPORT_REASONS.map((reason) => (
-                  <option key={reason} value={reason}>
-                    {reason}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">Additional Details (Optional)</Label>
+                Additional Details{" "}
+                <span className="text-text-tertiary font-normal">(optional)</span>
+              </Label>
               <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Please provide any additional information that might help us understand the issue..."
-                rows={6}
-                className="bg-card border-border rounded-xl"
+                id="report-details"
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                placeholder="Provide any additional context that might help our moderation team..."
+                className="min-h-[100px] resize-none bg-surface-raised border-border-base text-text-primary placeholder:text-text-tertiary focus:border-brand-primary/50 transition-colors"
+                maxLength={1000}
               />
+              <p className="text-xs text-text-tertiary mt-1.5 text-right">{details.length}/1000</p>
             </div>
 
-            <div className="flex gap-3 pt-4">
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 type="button"
                 variant="outline"
+                className="sm:flex-1 min-h-[44px] active:scale-95 hover:bg-surface-raised focus-visible:ring-2 focus-visible:ring-brand-primary"
                 onClick={() => router.back()}
-                disabled={isSubmitting}
-                className="flex-1 border-border bg-card hover:bg-card rounded-xl"
+                aria-label="Cancel and go back"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                disabled={isSubmitting}
-                variant="gradient"
-                className="flex-1 rounded-xl"
+                variant="subscribe-gradient"
+                disabled={!selectedReason || isSubmitting}
+                className="sm:flex-1 min-h-[44px] shadow-glow active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                aria-label={isSubmitting ? "Submitting report…" : "Submit report"}
               >
-                {isSubmitting ? "Submitting..." : "Submit Report"}
+                {isSubmitting ? "Submitting…" : "Submit Report"}
               </Button>
             </div>
           </form>
-        </Card>
-      </main>
-    </div>
+
+          {/* Info Panel — Mobile: after form, Desktop: sticky sidebar */}
+          <aside
+            className="mt-6 md:mt-0 space-y-4 md:sticky md:top-20"
+            aria-label="Report information"
+          >
+            {/* Anonymous */}
+            <div className="card-block p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Lock className="w-4 h-4 text-brand-primary" aria-hidden="true" />
+                <h2 className="text-sm font-semibold text-text-primary">Anonymous Report</h2>
+              </div>
+              <p className="text-xs text-text-tertiary">
+                Your identity is kept confidential. The reported user will not know who submitted
+                this report.
+              </p>
+            </div>
+
+            {/* Process */}
+            <div className="card-block p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="w-4 h-4 text-brand-accent" aria-hidden="true" />
+                <h2 className="text-sm font-semibold text-text-primary">Review Process</h2>
+              </div>
+              <ol className="space-y-2">
+                {[
+                  "You submit a report with a reason",
+                  "Our team reviews within 24–48 hours",
+                  "Content is actioned if it violates our guidelines",
+                  "You may receive a follow-up if needed",
+                ].map((step, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-text-tertiary">
+                    <span className="flex-shrink-0 w-4 h-4 rounded-full bg-brand-primary/10 text-brand-primary text-[10px] font-bold flex items-center justify-center mt-0.5">
+                      {i + 1}
+                    </span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </PageShell>
   );
 }

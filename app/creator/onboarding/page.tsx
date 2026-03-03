@@ -2,19 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { NavHeader } from "@/components/nav-header";
+import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload } from "lucide-react";
+import { Upload } from "@/lib/icons";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 // 所有服务器端函数都通过 API 调用，不直接导入
 import { submitVerification } from "@/lib/kyc";
 import { toast } from "sonner";
+import { Analytics } from "@/lib/analytics";
 import { LoadingState } from "@/components/loading-state";
+import { DEFAULT_AVATAR_CREATOR, PLACEHOLDER_GENERIC } from "@/lib/image-fallbacks";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -178,49 +180,68 @@ export default function CreatorOnboardingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <PageShell user={null} notificationCount={0} maxWidth="3xl">
         <LoadingState type="spinner" text="Loading profile..." />
-      </div>
+      </PageShell>
     );
   }
 
   const currentUser = {
     username: profile?.display_name || "user",
     role: (profile?.role || "fan") as "fan" | "creator",
-    avatar: profile?.avatar_url || "/placeholder.svg",
+    avatar: profile?.avatar_url || DEFAULT_AVATAR_CREATOR,
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <NavHeader user={currentUser} notificationCount={0} />
-
-      <main className="container max-w-2xl mx-auto px-4 py-6">
+    <PageShell user={currentUser} notificationCount={0} maxWidth="3xl">
+      <div className="py-6" data-testid="onboarding-ready">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Become a Creator</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold text-text-primary mb-2">Become a Creator</h1>
+          <p className="text-text-tertiary">
             Set up your profile and start monetizing your content
           </p>
         </div>
 
+        <div className="card-block p-4 mb-6">
+          <div className="flex items-center gap-3">
+            {["Profile", "KYC", "Complete"].map((label, index) => {
+              const isActive =
+                (currentStep === "profile" && index === 0) || (currentStep === "kyc" && index >= 1);
+              return (
+                <div key={label} className="flex-1">
+                  <div className="text-xs text-text-tertiary mb-1">{label}</div>
+                  <div className="h-1.5 rounded-full bg-surface-raised overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        isActive ? "w-full bg-brand-primary" : "w-0 bg-brand-primary"
+                      }`}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {error && (
-          <div className="bg-destructive/10 border border-destructive/20 rounded-3xl p-4 mb-6">
-            <p className="text-destructive font-medium">Error</p>
-            <p className="text-sm text-muted-foreground mt-1">{error}</p>
+          <div className="bg-error/10 border border-error/20 rounded-xl p-4 mb-6">
+            <p className="text-error font-medium">Error</p>
+            <p className="text-sm text-text-tertiary mt-1">{error}</p>
           </div>
         )}
 
-        <Card className="p-6">
+        <Card className="card-block p-6">
           {currentStep === "profile" ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Avatar */}
               <div className="flex flex-col items-center mb-6">
                 <Avatar className="w-24 h-24 mb-4">
-                  <AvatarImage src={formData.avatar_url || "/placeholder.svg"} />
+                  <AvatarImage src={formData.avatar_url || PLACEHOLDER_GENERIC} />
                   <AvatarFallback className="text-2xl">
                     {formData.display_name[0]?.toUpperCase() || "U"}
                   </AvatarFallback>
                 </Avatar>
-                <Label htmlFor="avatar_url" className="text-sm text-muted-foreground">
+                <Label htmlFor="avatar_url" className="text-sm text-text-tertiary">
                   Avatar URL (Optional)
                 </Label>
                 <Input
@@ -229,14 +250,14 @@ export default function CreatorOnboardingPage() {
                   placeholder="https://example.com/avatar.jpg"
                   value={formData.avatar_url}
                   onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-                  className="mt-2 max-w-md bg-card border-border rounded-xl"
+                  className="mt-2 max-w-md bg-surface-base border-border-base rounded-xl"
                 />
               </div>
 
               {/* Display Name */}
               <div className="space-y-2">
                 <Label htmlFor="display_name">
-                  Display Name <span className="text-destructive">*</span>
+                  Display Name <span className="text-error">*</span>
                 </Label>
                 <Input
                   id="display_name"
@@ -246,7 +267,7 @@ export default function CreatorOnboardingPage() {
                   onChange={(e) => setFormData({ ...formData, display_name: e.target.value })}
                   required
                   disabled={isSaving}
-                  className="bg-card border-border rounded-xl"
+                  className="bg-surface-base border-border-base rounded-xl"
                 />
               </div>
 
@@ -260,7 +281,7 @@ export default function CreatorOnboardingPage() {
                   onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                   rows={4}
                   disabled={isSaving}
-                  className="bg-card border-border rounded-xl"
+                  className="bg-surface-base border-border-base rounded-xl"
                 />
               </div>
 
@@ -271,7 +292,7 @@ export default function CreatorOnboardingPage() {
                   variant="outline"
                   onClick={() => router.push("/home")}
                   disabled={isSaving}
-                  className="flex-1 border-border bg-card hover:bg-card rounded-xl"
+                  className="flex-1 border-border-base bg-surface-base hover:bg-surface-raised rounded-xl active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
                 >
                   Cancel
                 </Button>
@@ -279,7 +300,7 @@ export default function CreatorOnboardingPage() {
                   type="submit"
                   disabled={isSaving}
                   variant="gradient"
-                  className="flex-1 rounded-xl"
+                  className="flex-1 rounded-xl shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50 disabled:shadow-none"
                 >
                   {isSaving ? "Saving…" : "Next"}
                 </Button>
@@ -296,14 +317,14 @@ export default function CreatorOnboardingPage() {
               )}
 
               {verificationStatus?.status === "rejected" && (
-                <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-4">
-                  <p className="text-sm text-destructive font-medium mb-2">Verification Rejected</p>
+                <div className="bg-error/10 border border-error/20 rounded-xl p-4">
+                  <p className="text-sm text-error font-medium mb-2">Verification Rejected</p>
                   {verificationStatus.rejection_reason && (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-text-tertiary">
                       Reason: {verificationStatus.rejection_reason}
                     </p>
                   )}
-                  <p className="text-sm text-muted-foreground mt-2">
+                  <p className="text-sm text-text-tertiary mt-2">
                     You can resubmit your application.
                   </p>
                 </div>
@@ -317,7 +338,7 @@ export default function CreatorOnboardingPage() {
                   <Button
                     onClick={() => router.push("/home")}
                     variant="gradient"
-                    className="mt-4 rounded-xl"
+                    className="mt-4 rounded-xl shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
                   >
                     Complete
                   </Button>
@@ -350,6 +371,7 @@ export default function CreatorOnboardingPage() {
                       });
 
                       if (success) {
+                        Analytics.kycSubmitted();
                         toast.success("Verification request submitted. Awaiting review");
                         // 通过 API 获取验证状态
                         const verificationResponse = await fetch("/api/kyc/verification");
@@ -376,7 +398,7 @@ export default function CreatorOnboardingPage() {
                 >
                   <div className="space-y-2">
                     <Label htmlFor="real_name">
-                      Legal Name <span className="text-destructive">*</span>
+                      Legal Name <span className="text-error">*</span>
                     </Label>
                     <Input
                       id="real_name"
@@ -385,13 +407,13 @@ export default function CreatorOnboardingPage() {
                       onChange={(e) => setKycData({ ...kycData, real_name: e.target.value })}
                       required
                       disabled={isSubmittingKYC}
-                      className="bg-card border-border rounded-xl"
+                      className="bg-surface-base border-border-base rounded-xl"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="birth_date">
-                      Date of Birth <span className="text-destructive">*</span>
+                      Date of Birth <span className="text-error">*</span>
                     </Label>
                     <Input
                       id="birth_date"
@@ -400,13 +422,13 @@ export default function CreatorOnboardingPage() {
                       onChange={(e) => setKycData({ ...kycData, birth_date: e.target.value })}
                       required
                       disabled={isSubmittingKYC}
-                      className="bg-card border-border rounded-xl"
+                      className="bg-surface-base border-border-base rounded-xl"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="country">
-                      Country <span className="text-destructive">*</span>
+                      Country <span className="text-error">*</span>
                     </Label>
                     <Input
                       id="country"
@@ -416,15 +438,15 @@ export default function CreatorOnboardingPage() {
                       placeholder="e.g., US, CN, JP"
                       required
                       disabled={isSubmittingKYC}
-                      className="bg-card border-border rounded-xl"
+                      className="bg-surface-base border-border-base rounded-xl"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label>
-                      ID Document Photos <span className="text-destructive">*</span>
+                      ID Document Photos <span className="text-error">*</span>
                     </Label>
-                    <div className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-border transition-colors">
+                    <div className="border-2 border-dashed border-border-base rounded-xl p-6 text-center hover:border-brand-primary/50 transition-colors">
                       <input
                         type="file"
                         accept="image/jpeg,image/jpg,image/png,image/webp"
@@ -441,8 +463,8 @@ export default function CreatorOnboardingPage() {
                         htmlFor="id_doc_upload"
                         className="cursor-pointer flex flex-col items-center gap-2"
                       >
-                        <Upload className="w-8 h-8 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">
+                        <Upload className="w-8 h-8 text-text-tertiary" />
+                        <span className="text-sm text-text-tertiary">
                           {kycData.id_doc_files.length > 0
                             ? `${kycData.id_doc_files.length} file${kycData.id_doc_files.length > 1 ? "s" : ""} selected`
                             : "Click to upload ID document photos (multiple files supported)"}
@@ -454,7 +476,7 @@ export default function CreatorOnboardingPage() {
                         {kycData.id_doc_files.map((file, index) => (
                           <div
                             key={index}
-                            className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded"
+                            className="text-xs text-text-tertiary bg-surface-raised px-2 py-1 rounded"
                           >
                             {file.name}
                           </div>
@@ -469,7 +491,7 @@ export default function CreatorOnboardingPage() {
                       variant="outline"
                       onClick={() => setCurrentStep("profile")}
                       disabled={isSubmittingKYC}
-                      className="flex-1 border-border bg-card hover:bg-card rounded-xl"
+                      className="flex-1 border-border-base bg-surface-base hover:bg-surface-raised rounded-xl active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
                     >
                       Previous
                     </Button>
@@ -477,7 +499,7 @@ export default function CreatorOnboardingPage() {
                       type="submit"
                       disabled={isSubmittingKYC}
                       variant="gradient"
-                      className="flex-1 rounded-xl"
+                      className="flex-1 rounded-xl shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50 disabled:shadow-none"
                     >
                       {isSubmittingKYC ? "Submitting…" : "Submit Verification"}
                     </Button>
@@ -487,7 +509,7 @@ export default function CreatorOnboardingPage() {
             </div>
           )}
         </Card>
-      </main>
-    </div>
+      </div>
+    </PageShell>
   );
 }

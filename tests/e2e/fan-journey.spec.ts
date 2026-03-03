@@ -112,11 +112,12 @@ test.describe("Fan 端完整流程测试", () => {
         { timeout: 10000 }
       );
 
-      // 验证错误提示显示 - 使用更宽松的选择器
-      const errorContainer = page.locator(
-        ".bg-destructive\\/10, [class*='error'], [class*='destructive']"
-      );
-      await expect(errorContainer.first()).toBeVisible({ timeout: 5000 });
+      // 验证错误提示显示（兼容新版 auth UI）
+      const errorContainer = page
+        .locator('[role="alert"], [data-testid="auth-error"]')
+        .or(page.getByText(/invalid|wrong|error/i))
+        .first();
+      await expect(errorContainer).toBeVisible({ timeout: 5000 });
     });
 
     test("登录错误处理 - 不存在的邮箱", async ({ page }) => {
@@ -153,12 +154,8 @@ test.describe("Fan 端完整流程测试", () => {
     test("访问 Feed 页面并验证内容加载", async ({ page }) => {
       await page.goto(`${BASE_URL}/home`);
 
-      // 验证 Feed 容器存在
-      await waitForVisible(page, "main, [role='main']", 10000);
-
-      // 验证页面标题或关键元素
-      const feedContent = page.locator("main, [role='main']");
-      await expect(feedContent).toBeVisible();
+      // 验证稳定的 feed 容器 testid，避免多 main 导致 strict mode 冲突
+      await expect(page.getByTestId("home-feed")).toBeVisible({ timeout: 10000 });
     });
 
     test("验证免费内容可见", async ({ page }) => {

@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Lock } from "lucide-react";
+import { Lock } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { addWatermarkToImage, shouldAddWatermark } from "@/lib/watermark";
 import { PaywallModal } from "@/components/paywall-modal";
+import { DEFAULT_POST_MEDIA } from "@/lib/image-fallbacks";
 import type { Post } from "@/lib/types";
 
 // 视频播放器组件（支持自动播放和预览标签）
@@ -427,8 +428,14 @@ export function MediaDisplay({
             );
           })
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            <p>No media available</p>
+          <div className="rounded-3xl overflow-hidden bg-surface-raised border border-border-base">
+            <img
+              src={DEFAULT_POST_MEDIA}
+              alt="No media for this post"
+              className="w-full h-auto object-cover max-h-[400px] rounded-3xl"
+              loading="lazy"
+            />
+            <p className="text-center py-4 text-sm text-text-tertiary">No media available</p>
           </div>
         )}
       </div>
