@@ -1,6 +1,6 @@
 "use client";
 
-import { Lock, DollarSign, Check } from "lucide-react";
+import { Lock, DollarSign, Check } from "@/lib/icons";
 import { Badge } from "@/components/ui/badge";
 
 interface LockBadgeProps {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Upload, X, Video, Loader2 } from "lucide-react";
+import { Upload, X, Video, Loader2 } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { uploadFiles, validateFile, type MediaFile } from "@/lib/storage";
 
@@ -159,10 +159,10 @@ export function MultiMediaUpload({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={`
-            border-2 border-dashed rounded-xl p-8 text-center cursor-pointer
-            transition-colors
-            ${isDragging ? "border-primary bg-primary/5" : "border-border/50 glass"}
-            hover:border-primary/50
+            border-2 border-dashed rounded-xl p-8 md:p-12 text-center cursor-pointer
+            transition-all focus-visible:outline-2 focus-visible:outline-brand-primary
+            ${isDragging ? "border-brand-primary bg-brand-primary/5" : "border-border-base"}
+            hover:border-brand-primary/50 active:border-brand-primary
           `}
           onClick={() => fileInputRef.current?.click()}
         >
@@ -177,12 +177,14 @@ export function MultiMediaUpload({
             data-testid="file-input"
           />
 
-          <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-sm font-medium mb-1">Click or drag files here to upload</p>
-          <p className="text-xs text-muted-foreground">
+          <Upload className="w-12 h-12 mx-auto mb-4 text-text-tertiary" aria-hidden="true" />
+          <p className="text-sm font-medium mb-1 text-text-primary">
+            Click or drag files here to upload
+          </p>
+          <p className="text-xs text-text-tertiary">
             Supports images (jpg, png, webp) and videos (mp4, mov)
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-text-tertiary mt-1">
             Images max 20MB, videos max 2GB, up to {maxFiles} files
           </p>
         </div>
@@ -196,9 +198,9 @@ export function MultiMediaUpload({
               onDrop={handleDrop}
               className={`
                 border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
-                transition-colors
-                ${isDragging ? "border-primary bg-primary/5" : "border-border/50 glass"}
-                ${isUploading ? "opacity-50 cursor-not-allowed" : "hover:border-primary/50"}
+                transition-all focus-visible:outline-2 focus-visible:outline-brand-primary
+                ${isDragging ? "border-brand-primary bg-brand-primary/5" : "border-border-base"}
+                ${isUploading ? "opacity-50 cursor-not-allowed" : "hover:border-brand-primary/50 active:border-brand-primary"}
               `}
               onClick={() => !isUploading && fileInputRef.current?.click()}
             >
@@ -214,13 +216,13 @@ export function MultiMediaUpload({
 
               {isUploading ? (
                 <div className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                  <span className="text-sm text-muted-foreground">Uploading...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-brand-primary" aria-hidden="true" />
+                  <span className="text-sm text-text-tertiary">Uploading...</span>
                 </div>
               ) : (
                 <div className="flex items-center justify-center gap-2">
-                  <Upload className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Add more files</span>
+                  <Upload className="w-4 h-4 text-text-tertiary" aria-hidden="true" />
+                  <span className="text-sm text-text-tertiary">Add more files</span>
                 </div>
               )}
             </div>
@@ -234,7 +236,7 @@ export function MultiMediaUpload({
 
               return (
                 <div key={index} className="relative group">
-                  <div className="relative rounded-xl overflow-hidden border border-border bg-card">
+                  <div className="relative rounded-xl overflow-hidden border border-border-base bg-surface-base">
                     {file.type === "image" ? (
                       <img
                         src={file.url}
@@ -242,23 +244,29 @@ export function MultiMediaUpload({
                         className="w-full h-32 object-cover"
                       />
                     ) : (
-                      <div className="w-full h-32 bg-muted flex items-center justify-center">
-                        <Video className="w-8 h-8 text-muted-foreground" />
+                      <div className="w-full h-32 bg-surface-raised flex items-center justify-center">
+                        <Video className="w-8 h-8 text-text-tertiary" aria-hidden="true" />
                       </div>
                     )}
 
                     {isUploadingFile && (
                       <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center">
-                        <Loader2 className="w-6 h-6 mb-2 animate-spin text-white" />
+                        <Loader2
+                          className="w-6 h-6 mb-2 animate-spin text-white"
+                          aria-hidden="true"
+                        />
                         <p className="text-xs text-white mb-2">
                           {progress?.percentage.toFixed(0)}%
                         </p>
-                        {/* Primary Gradient 进度条 */}
-                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-card">
+                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-surface-base">
                           <div
-                            className="h-full bg-primary-gradient backdrop-blur-sm transition-[width] duration-300 motion-safe:transition-[width] motion-reduce:transition-none"
+                            className="h-full bg-brand-primary transition-[width] duration-300"
                             style={{ width: `${progress?.percentage || 0}%` }}
-                          ></div>
+                            role="progressbar"
+                            aria-valuenow={Math.round(progress?.percentage || 0)}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                          />
                         </div>
                       </div>
                     )}
@@ -266,18 +274,17 @@ export function MultiMediaUpload({
                     <Button
                       variant="destructive"
                       size="icon"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 active:opacity-100 focus-visible:opacity-100 transition-opacity min-h-[44px] min-w-[44px] active:scale-95"
                       onClick={() => handleRemove(index)}
-                      disabled={isUploadingFile}
+                      disabled={!!isUploadingFile}
+                      aria-label={`Remove ${file.fileName}`}
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-4 h-4" aria-hidden="true" />
                     </Button>
                   </div>
 
-                  <div className="mt-1 text-xs text-muted-foreground truncate">{file.fileName}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {formatFileSize(file.fileSize)}
-                  </div>
+                  <div className="mt-1 text-xs text-text-secondary truncate">{file.fileName}</div>
+                  <div className="text-xs text-text-tertiary">{formatFileSize(file.fileSize)}</div>
                 </div>
               );
             })}

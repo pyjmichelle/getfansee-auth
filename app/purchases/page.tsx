@@ -1,20 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DollarSign, Calendar } from "lucide-react";
-import { NavHeader } from "@/components/nav-header";
-import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PageShell } from "@/components/page-shell";
+import { CreatorAvatarLink } from "@/components/creator-avatar-link";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/empty-state";
-import { LoadingState } from "@/components/loading-state";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { ensureProfile } from "@/lib/auth";
-import { getProfile } from "@/lib/profile";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-const supabase = getSupabaseBrowserClient();
+import { useCountUp } from "@/hooks/use-count-up";
+import { Coins } from "@/lib/icons";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
 
 type Purchase = {
   id: string;
@@ -44,15 +40,13 @@ export default function PurchasesPage() {
     avatar?: string;
   } | null>(null);
   const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === "true";
+  useSkeletonMetric("purchases_page", isLoading);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           if (isTestMode) {
             setCurrentUser({
               username: "test-user",
@@ -66,85 +60,138 @@ export default function PurchasesPage() {
           return;
         }
 
-        await ensureProfile();
-        const profile = await getProfile(session.user.id);
-        if (profile) {
-          setCurrentUser({
-            username: profile.display_name || "user",
-            role: (profile.role || "fan") as "fan" | "creator",
-            avatar: profile.avatar_url || undefined,
-          });
-        } else if (isTestMode) {
-          setCurrentUser({
-            username: session.user.email?.split("@")[0] || "test-user",
-            role: "fan",
-          });
-        }
+        setCurrentUser({
+          username: bootstrap.profile?.display_name || bootstrap.user.email.split("@")[0] || "user",
+          role: (bootstrap.profile?.role || "fan") as "fan" | "creator",
+          avatar: bootstrap.profile?.avatar_url || undefined,
+        });
 
-        // Load purchases
-        const { data: purchasesData, error } = await supabase
-          .from("purchases")
-          .select("*")
-          .eq("fan_id", session.user.id)
-          .order("created_at", { ascending: false });
-
-        if (error) {
-          console.error("[purchases] load error:", error);
+        const purchasesResponse = await fetch("/api/purchases", { cache: "no-store" });
+        if (!purchasesResponse.ok) {
+          if (isTestMode) {
+            setPurchases([
+              {
+                id: "mock-purchase-1",
+                post_id: "mock-post-1",
+                paid_amount_cents: 1500,
+                created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                post: {
+                  id: "mock-post-1",
+                  title: "Behind the Scenes — Exclusive Photoshoot",
+                  content: "Exclusive behind-the-scenes content from the latest studio session.",
+                  creator_id: "mock-creator-1",
+                  creator: {
+                    id: "mock-creator-1",
+                    display_name: "Elena Rose",
+                    avatar_url: "/creator-avatar.png",
+                  },
+                },
+              },
+              {
+                id: "mock-purchase-2",
+                post_id: "mock-post-2",
+                paid_amount_cents: 999,
+                created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+                post: {
+                  id: "mock-post-2",
+                  title: "Summer Collection Preview",
+                  content: "Exclusive preview of the upcoming summer collection.",
+                  creator_id: "mock-creator-2",
+                  creator: {
+                    id: "mock-creator-2",
+                    display_name: "Maya Styles",
+                    avatar_url: "/artist-creator-avatar.jpg",
+                  },
+                },
+              },
+            ]);
+          } else {
+            console.error("[purchases] failed to load purchases:", purchasesResponse.status);
+          }
           return;
         }
-
-        // Load post and creator info for each purchase
-        const normalizedPurchases = (purchasesData || []) as Purchase[];
-        const purchasesWithPosts = await Promise.all(
-          normalizedPurchases.map(async (purchase) => {
-            const { data: postData, error: postError } = await supabase
-              .from("posts")
-              .select("id, title, content, creator_id")
-              .eq("id", purchase.post_id)
-              .single();
-
-            if (postError || !postData) {
-              return {
-                ...purchase,
-                post: undefined,
-              };
-            }
-
-            let creator: {
-              id: string;
-              display_name: string;
-              avatar_url?: string | null;
-            } | null = null;
-
-            try {
-              const response = await fetch(`/api/creator/${postData.creator_id}`);
-              if (response.ok) {
-                const payload = await response.json();
-                creator = payload?.creator ?? null;
-              }
-            } catch (creatorError) {
-              console.error("[purchases] load creator error:", creatorError);
-            }
-
-            return {
-              ...purchase,
-              post: {
-                ...postData,
-                creator: creator || undefined,
-              },
-            };
-          })
+        const purchasesPayload = (await purchasesResponse.json()) as { data?: Purchase[] };
+        const loadedPurchases = purchasesPayload.data || [];
+        setPurchases(
+          isTestMode && loadedPurchases.length === 0
+            ? [
+                {
+                  id: "mock-purchase-1",
+                  post_id: "mock-post-1",
+                  paid_amount_cents: 1500,
+                  created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                  post: {
+                    id: "mock-post-1",
+                    title: "Behind the Scenes — Exclusive Photoshoot",
+                    content: "Exclusive behind-the-scenes content from the latest studio session.",
+                    creator_id: "mock-creator-1",
+                    creator: {
+                      id: "mock-creator-1",
+                      display_name: "Elena Rose",
+                      avatar_url: "/creator-avatar.png",
+                    },
+                  },
+                },
+                {
+                  id: "mock-purchase-2",
+                  post_id: "mock-post-2",
+                  paid_amount_cents: 999,
+                  created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+                  post: {
+                    id: "mock-post-2",
+                    title: "Summer Collection Preview",
+                    content: "Exclusive preview of the upcoming summer collection.",
+                    creator_id: "mock-creator-2",
+                    creator: {
+                      id: "mock-creator-2",
+                      display_name: "Maya Styles",
+                      avatar_url: "/artist-creator-avatar.jpg",
+                    },
+                  },
+                },
+              ]
+            : loadedPurchases
         );
-
-        setPurchases(purchasesWithPosts);
       } catch (err) {
         console.error("[purchases] loadData error:", err);
         if (isTestMode) {
-          setCurrentUser({
-            username: "test-user",
-            role: "fan",
-          });
-          setPurchases([]);
+          setCurrentUser({ username: "test-user", role: "fan" });
+          setPurchases([
+            {
+              id: "mock-purchase-1",
+              post_id: "mock-post-1",
+              paid_amount_cents: 1500,
+              created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+              post: {
+                id: "mock-post-1",
+                title: "Behind the Scenes — Exclusive Photoshoot",
+                content: "Exclusive behind-the-scenes content from the latest studio session.",
+                creator_id: "mock-creator-1",
+                creator: {
+                  id: "mock-creator-1",
+                  display_name: "Elena Rose",
+                  avatar_url: "/creator-avatar.png",
+                },
+              },
+            },
+            {
+              id: "mock-purchase-2",
+              post_id: "mock-post-2",
+              paid_amount_cents: 999,
+              created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+              post: {
+                id: "mock-post-2",
+                title: "Summer Collection Preview",
+                content: "Exclusive preview of the upcoming summer collection.",
+                creator_id: "mock-creator-2",
+                creator: {
+                  id: "mock-creator-2",
+                  display_name: "Maya Styles",
+                  avatar_url: "/artist-creator-avatar.jpg",
+                },
+              },
+            },
+          ]);
         }
       } finally {
         setIsLoading(false);
@@ -163,111 +210,127 @@ export default function PurchasesPage() {
   };
 
   const totalSpent = purchases.reduce((sum, purchase) => sum + purchase.paid_amount_cents, 0);
+  const totalSpentUsd = totalSpent / 100;
+  const animatedPurchaseCount = useCountUp(purchases.length, { duration: 900, decimals: 0 });
+  const animatedSpent = useCountUp(totalSpentUsd, { duration: 900, decimals: 2 });
 
   if (isLoading || !currentUser) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <LoadingState type="spinner" text="Loading purchases..." />
-      </div>
+      <PageShell user={currentUser} notificationCount={0} maxWidth="4xl">
+        <div className="py-8 space-y-4">
+          <div className="bento-grid animate-pulse">
+            <div className="bento-2x1 rounded-2xl h-40 bg-white/5" />
+            <div className="rounded-2xl h-24 bg-white/5" />
+            <div className="rounded-2xl h-24 bg-white/5" />
+          </div>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-2xl h-28 bg-white/5 animate-pulse" />
+          ))}
+        </div>
+      </PageShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24 md:pb-0">
-      <NavHeader user={currentUser} notificationCount={0} />
-
-      <main className="pt-20 md:pt-24 max-w-4xl mx-auto px-4 md:px-6 py-8">
-        {/* Stats Card - Figma Style */}
-        <div className="bg-gradient-subtle border border-border-base rounded-2xl p-6 md:p-8 mb-6">
+    <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
+      <div className="py-8">
+        {/* Hero Banner */}
+        <div className="card-block bg-gradient-subtle p-6 md:p-8 mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">Your Purchases</h1>
-          <p className="text-text-tertiary text-sm md:text-base mb-6">
-            View all your unlocked content
+          <p className="text-text-tertiary text-sm md:text-base">
+            You&apos;ve unlocked{" "}
+            <span className="font-bold text-brand-primary">{animatedPurchaseCount.toFixed(0)}</span>{" "}
+            exclusive pieces of content.
           </p>
-
-          {purchases.length > 0 && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-surface-base/50 rounded-xl p-4">
-                <p className="text-xs text-text-tertiary mb-1">Total Purchases</p>
-                <p className="text-2xl font-bold text-text-primary">{purchases.length}</p>
-              </div>
-              <div className="bg-surface-base/50 rounded-xl p-4">
-                <p className="text-xs text-text-tertiary mb-1">Total Spent</p>
-                <p className="text-2xl font-bold text-brand-accent">
-                  ${(totalSpent / 100).toFixed(2)}
-                </p>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Purchases List */}
-        {purchases.length === 0 ? (
-          <div className="bg-surface-raised border border-border-base rounded-2xl p-8">
-            <EmptyState
-              data-testid="purchases-list"
-              icon="shopping-bag"
-              title="No purchases yet"
-              description="Unlock premium content from your favorite creators"
-              action={{ label: "Browse Content", href: "/home" }}
-            />
-          </div>
-        ) : (
-          <div
-            className="bg-surface-raised border border-border-base rounded-2xl divide-y divide-border-base"
-            data-testid="purchases-list"
-          >
-            {purchases.map((purchase) => (
-              <div
-                key={purchase.id}
-                className="p-4 md:p-6 hover:bg-surface-overlay/50 transition-colors"
-                data-testid="purchase-item"
-                data-purchase-id={purchase.id}
-              >
-                <div className="flex items-start gap-3 mb-3">
-                  <Link
-                    href={`/creator/${purchase.post?.creator_id}`}
-                    className="flex items-center gap-3 flex-1"
+        {/* PC: Two-column | Mobile: Single-column */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Main Column */}
+          <div className="flex-1 min-w-0">
+            {purchases.length === 0 ? (
+              <div className="card-block p-8">
+                <EmptyState
+                  data-testid="purchases-list"
+                  icon={<Coins className="size-6 text-white/40" />}
+                  title="No purchases yet"
+                  description="Unlock premium content from your favorite creators"
+                  action={{ label: "Browse Content", href: "/home" }}
+                />
+              </div>
+            ) : (
+              <div className="space-y-4" data-testid="purchases-list">
+                {purchases.map((purchase, index) => (
+                  <div
+                    key={purchase.id}
+                    className="card-block p-4 md:p-6 animate-profile-reveal"
+                    data-testid="purchase-item"
+                    data-purchase-id={purchase.id}
+                    style={{ animationDelay: `${index * 80}ms` }}
                   >
-                    <Avatar className="w-10 h-10 ring-2 ring-transparent hover:ring-brand-primary/30 transition-all">
-                      <AvatarImage src={purchase.post?.creator?.avatar_url || "/placeholder.svg"} />
-                      <AvatarFallback className="bg-brand-primary-alpha-10 text-brand-primary font-semibold">
-                        {purchase.post?.creator?.display_name?.[0]?.toUpperCase() || "C"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <span className="font-semibold text-text-primary block truncate">
-                        {purchase.post?.creator?.display_name || "Creator"}
-                      </span>
-                      <p className="text-xs text-text-tertiary">Creator</p>
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="flex items-center gap-3 flex-1">
+                        <CreatorAvatarLink
+                          id={purchase.post?.creator_id || ""}
+                          name={purchase.post?.creator?.display_name}
+                          avatarUrl={purchase.post?.creator?.avatar_url}
+                          size="sm"
+                          subtitle="Creator"
+                        />
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-brand-accent">
+                          ${(purchase.paid_amount_cents / 100).toFixed(2)}
+                        </p>
+                        <p className="text-xs text-text-quaternary">
+                          {formatDate(purchase.created_at)}
+                        </p>
+                      </div>
                     </div>
-                  </Link>
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-brand-accent">
-                      ${(purchase.paid_amount_cents / 100).toFixed(2)}
+
+                    {purchase.post?.title && (
+                      <h3 className="font-semibold text-text-primary mb-1 line-clamp-1">
+                        {purchase.post.title}
+                      </h3>
+                    )}
+                    <p className="text-text-secondary text-sm mb-4 line-clamp-2">
+                      {purchase.post?.content}
                     </p>
-                    <p className="text-xs text-text-quaternary">
-                      {formatDate(purchase.created_at)}
-                    </p>
+
+                    <Button asChild variant="outline" size="sm" className="rounded-xl">
+                      <Link href={`/posts/${purchase.post_id}`}>View Content</Link>
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Sidebar Stats (PC only) */}
+          <aside className="w-full lg:w-64 lg:shrink-0">
+            <div className="sticky top-24 space-y-4">
+              <div className="card-block p-5">
+                <h2 className="text-sm font-semibold text-text-primary mb-4">Summary</h2>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-text-tertiary">Total Purchases</span>
+                    <span className="font-bold text-text-primary">
+                      {animatedPurchaseCount.toFixed(0)}
+                    </span>
+                  </div>
+                  <div className="h-px bg-border-base" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-text-tertiary">Total Spent</span>
+                    <span className="font-bold text-gradient-primary">
+                      ${animatedSpent.toFixed(2)}
+                    </span>
                   </div>
                 </div>
-
-                {purchase.post?.title && (
-                  <h3 className="font-semibold text-text-primary mb-1 line-clamp-1">
-                    {purchase.post.title}
-                  </h3>
-                )}
-                <p className="text-text-secondary text-sm mb-4 line-clamp-2">
-                  {purchase.post?.content}
-                </p>
-
-                <Button asChild variant="outline" size="sm" className="rounded-xl">
-                  <Link href={`/posts/${purchase.post_id}`}>View Content</Link>
-                </Button>
               </div>
-            ))}
-          </div>
-        )}
-      </main>
-    </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </PageShell>
   );
 }

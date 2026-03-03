@@ -3,11 +3,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, MessageCircle, Share2, Clock, Lock, MoreHorizontal, Gift } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  Share2,
+  Lock,
+  MoreHorizontal,
+  DollarSign,
+  CheckCircle2,
+} from "@/lib/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import { DEFAULT_AVATAR_CREATOR } from "@/lib/image-fallbacks";
 
 interface ContentCardProps {
   creator: {
@@ -16,18 +26,21 @@ interface ContentCardProps {
     username: string;
     avatar?: string;
     subscriptionPrice?: number;
+    isVerified?: boolean;
   };
   content: {
     id: string;
     text?: string;
     image?: string;
     isLocked: boolean;
+    lockType?: "subscription" | "ppv";
     price?: number;
     likes: number;
     comments: number;
     createdAt: string | Date;
     isLiked?: boolean;
     isExclusive?: boolean;
+    isPurchased?: boolean;
   };
   onUnlock?: (id: string) => void;
   onSubscribe?: (creatorId: string) => void;
@@ -35,19 +48,10 @@ interface ContentCardProps {
   onComment?: (id: string) => void;
   onShare?: (id: string) => void;
   onTip?: (id: string) => void;
-  onCreatorClick?: () => void;
+  onMore?: (id: string) => void;
   className?: string;
 }
 
-/**
- * ContentCard - Figma Premium Design Style
- *
- * Features:
- * - Compact Fansly-style layout
- * - Urgency badge for exclusive content
- * - Gold tip button
- * - Enhanced lock overlay with emotional copy
- */
 export function ContentCard({
   creator,
   content,
@@ -57,198 +61,229 @@ export function ContentCard({
   onComment,
   onShare,
   onTip,
-  onCreatorClick,
+  onMore,
   className,
 }: ContentCardProps) {
   const [isLiked, setIsLiked] = useState(content.isLiked ?? false);
   const [likesCount, setLikesCount] = useState(content.likes);
+  const [copied, setCopied] = useState(false);
 
   const handleLike = () => {
-    setIsLiked(!isLiked);
-    setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+    setIsLiked((v) => !v);
+    setLikesCount((c) => (isLiked ? c - 1 : c + 1));
     onLike?.(content.id);
   };
 
-  const handleCreatorClick = () => {
-    onCreatorClick?.();
+  const handleShare = async () => {
+    onShare?.(content.id);
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* ignore */
+    }
   };
 
-  const timeAgo = formatDistanceToNow(new Date(content.createdAt), {
-    addSuffix: true,
-  });
+  const timeAgo = formatDistanceToNow(new Date(content.createdAt), { addSuffix: true });
 
   return (
-    <article className={cn("bg-surface-base", className)}>
-      {/* Creator Header - Compact */}
-      <div className="px-3 py-2.5 flex items-center gap-2.5">
-        <div
-          className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 cursor-pointer ring-2 ring-transparent hover:ring-brand-primary/30 transition-all active:scale-95 transform"
-          onClick={handleCreatorClick}
-        >
-          <Link href={`/creator/${creator.id}`}>
-            <Avatar className="w-full h-full">
-              <AvatarImage
-                src={creator.avatar || "/placeholder.svg"}
-                alt={creator.name}
-                className="object-cover"
-              />
-              <AvatarFallback className="bg-brand-primary-alpha-10 text-brand-primary font-semibold text-sm">
-                {(creator.name?.[0] || "C").toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          </Link>
-        </div>
+    <article
+      className={cn(
+        "glass-card rounded-[var(--radius-md)] overflow-hidden",
+        "border border-white/6",
+        className
+      )}
+    >
+      {/* Creator header */}
+      <div className="flex items-center gap-2.5 px-3 py-2.5">
+        <Link href={`/creator/${creator.id}`} className="shrink-0">
+          <Avatar className="size-8 ring-1 ring-white/10 hover:ring-violet-500/30 transition-[box-shadow] duration-150">
+            <AvatarImage src={creator.avatar || DEFAULT_AVATAR_CREATOR} alt={creator.name} />
+            <AvatarFallback className="text-[12px] font-bold">
+              {(creator.name?.[0] || "C").toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
+
         <div className="flex-1 min-w-0">
-          <Link
-            href={`/creator/${creator.id}`}
-            className="text-sm font-semibold truncate text-text-primary cursor-pointer hover:text-brand-primary transition-colors active:scale-95 inline-block"
-            onClick={handleCreatorClick}
-          >
-            {creator.name}
-          </Link>
-          <div className="text-xs text-text-tertiary">
-            @{creator.username} · {timeAgo}
+          <div className="flex items-center gap-1">
+            <Link
+              href={`/creator/${creator.id}`}
+              className="text-[13px] font-semibold text-white hover:text-violet-400 transition-colors duration-150 truncate"
+            >
+              {creator.name}
+            </Link>
+            {creator.isVerified && <CheckCircle2 className="size-[12px] text-amber-400 shrink-0" />}
           </div>
+          <p className="text-[11px] text-text-muted">
+            @{creator.username} · {timeAgo}
+          </p>
         </div>
+
+        {/* Badges */}
+        <div className="flex items-center gap-1.5">
+          {content.isExclusive && (
+            <Badge variant="purple" className="text-[10px] badge-exclusive">
+              Exclusive
+            </Badge>
+          )}
+          {content.isPurchased && (
+            <Badge variant="gold" className="text-[10px]">
+              Purchased
+            </Badge>
+          )}
+        </div>
+
         <Button
           variant="ghost"
-          size="icon-sm"
-          className="p-1.5 -mr-1.5 text-text-tertiary hover:text-text-primary"
+          size="icon-xs"
+          className="text-text-muted hover:text-white shrink-0"
+          onClick={() => onMore?.(content.id)}
+          aria-label="More options"
         >
-          <MoreHorizontal size={18} />
+          <MoreHorizontal className="size-[16px]" />
         </Button>
       </div>
 
-      {/* Content Text */}
+      {/* Caption */}
       {content.text && (
-        <div className="px-3 pb-2.5 text-sm text-text-primary leading-relaxed">{content.text}</div>
+        <div className="px-3 pb-2 text-[13px] text-text-secondary leading-relaxed">
+          {content.text}
+        </div>
       )}
 
-      {/* Image/Media - Full width */}
+      {/* Media */}
       {content.image && (
-        <div className="relative bg-black">
-          <Image
-            src={content.image}
-            alt="Content"
-            width={800}
-            height={600}
-            className={cn(
-              "w-full transition-all duration-300",
-              content.isLocked && "blur-2xl opacity-40"
-            )}
-            style={{ maxHeight: "80vh", objectFit: "contain" }}
-          />
+        <Link href={`/posts/${content.id}`} className="block">
+          <div className="relative overflow-hidden bg-black aspect-post-portrait">
+            <Image
+              src={content.image}
+              alt="Post content"
+              fill
+              className={cn(
+                "object-cover transition-all duration-300",
+                content.isLocked && "blur-locked"
+              )}
+            />
 
-          {/* Lock Overlay - Premium Design */}
-          {content.isLocked && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-black/20 via-black/40 to-black/60">
-              <div className="text-center px-6 max-w-sm">
-                {/* Urgency Badge */}
-                {content.isExclusive && (
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-error/20 border border-error/40 rounded-full text-error text-xs font-bold mb-4 animate-pulse">
-                    <Clock size={14} className="shrink-0" />
-                    <span>24HR EXCLUSIVE</span>
-                  </div>
-                )}
-
-                <div className="w-16 h-16 mx-auto mb-4 bg-brand-primary/20 backdrop-blur-md rounded-full flex items-center justify-center border border-brand-primary/30 shadow-glow">
-                  <Lock size={28} className="text-brand-primary" />
+            {/* Lock overlay */}
+            {content.isLocked && (
+              <div className="lock-overlay">
+                {/* Lock icon */}
+                <div className="size-12 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shadow-glow-gold mb-3">
+                  <Lock className="size-5 text-amber-400" />
                 </div>
 
-                <p className="text-white/90 text-sm mb-1 font-medium">Unlock Exclusive Content</p>
-                <p className="text-white/60 text-xs mb-4">Behind-the-scenes · High quality</p>
-
-                <Button
-                  variant="subscribe-gradient"
-                  size="lg"
-                  onClick={() => onUnlock?.(content.id)}
-                  className="w-full px-8 py-4 text-lg font-bold rounded-xl mb-3"
-                >
-                  <div className="flex flex-col items-center">
-                    <div className="flex items-center gap-2">
-                      <Lock size={20} />
-                      <span>Unlock Now · ${content.price?.toFixed(2)}</span>
-                    </div>
-                    <p className="text-xs text-white/70 font-normal mt-0.5">
-                      One-time access · Instant delivery
-                    </p>
-                  </div>
-                </Button>
-
-                {creator.subscriptionPrice && onSubscribe && (
-                  <p className="text-xs text-white/60">
-                    Or{" "}
-                    <button
-                      onClick={() => onSubscribe(creator.id)}
-                      className="text-brand-primary font-semibold underline hover:text-brand-primary/80 transition-colors"
+                {content.lockType === "ppv" ? (
+                  <>
+                    <p className="text-[13px] font-medium text-white mb-1">Unlock this post</p>
+                    <Button
+                      variant="gold"
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onUnlock?.(content.id);
+                      }}
+                      className="mt-1"
                     >
-                      subscribe for ${creator.subscriptionPrice.toFixed(2)}/mo
-                    </button>{" "}
-                    for unlimited access
-                  </p>
+                      Unlock for ${content.price?.toFixed(2)}
+                    </Button>
+                    {creator.subscriptionPrice && (
+                      <button
+                        className="text-[11px] text-white/50 mt-2 hover:text-white/70 transition-colors"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onSubscribe?.(creator.id);
+                        }}
+                      >
+                        or Subscribe for ${creator.subscriptionPrice.toFixed(2)}/mo
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[13px] font-medium text-white mb-1">Subscribe to unlock</p>
+                    <Button
+                      variant="violet"
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onSubscribe?.(creator.id);
+                      }}
+                      className="mt-1 shadow-glow-violet"
+                    >
+                      Subscribe for ${creator.subscriptionPrice?.toFixed(2)}/mo
+                    </Button>
+                  </>
                 )}
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        </Link>
       )}
 
-      {/* Actions Bar - Premium Design */}
-      <div className="px-3 py-2.5">
-        <div className="flex items-center gap-1 mb-2">
-          {/* Like */}
-          <button
-            onClick={handleLike}
-            className={cn(
-              "flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all active:scale-95 transform",
-              isLiked
-                ? "text-error bg-error/10"
-                : "text-text-tertiary hover:text-error hover:bg-error/5"
-            )}
-          >
-            <Heart size={20} className={cn(isLiked && "fill-current")} />
-            {likesCount > 0 && (
-              <span className="text-sm font-semibold">{likesCount.toLocaleString()}</span>
-            )}
-          </button>
+      {/* Actions bar */}
+      <div className="flex items-center gap-0.5 px-2.5 py-2 border-t border-white/4">
+        {/* Like */}
+        <button
+          onClick={handleLike}
+          className={cn(
+            "flex items-center gap-1 px-2 py-1.5 rounded-[var(--radius-xs)]",
+            "text-[12px] transition-[color,background-color] duration-100",
+            "active:scale-95",
+            isLiked
+              ? "text-violet-500"
+              : "text-text-muted hover:text-violet-400 hover:bg-violet-500/5"
+          )}
+          aria-label={isLiked ? "Unlike" : "Like"}
+        >
+          <Heart className={cn("size-[16px]", isLiked && "fill-current animate-like-pop")} />
+          {likesCount > 0 && <span className="font-medium">{likesCount.toLocaleString()}</span>}
+        </button>
 
-          {/* Comment */}
-          <button
-            onClick={() => onComment?.(content.id)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-text-tertiary hover:text-brand-primary hover:bg-brand-primary/5 transition-all active:scale-95 transform"
-          >
-            <MessageCircle size={20} />
-            {content.comments > 0 && (
-              <span className="text-sm font-semibold">{content.comments}</span>
-            )}
-          </button>
+        {/* Comment */}
+        <Link
+          href={`/posts/${content.id}#comments`}
+          className={cn(
+            "flex items-center gap-1 px-2 py-1.5 rounded-[var(--radius-xs)]",
+            "text-[12px] text-text-muted hover:text-white hover:bg-white/5",
+            "transition-[color,background-color] duration-100"
+          )}
+          onClick={() => onComment?.(content.id)}
+          aria-label="Comments"
+        >
+          <MessageCircle className="size-[16px]" />
+          {content.comments > 0 && <span className="font-medium">{content.comments}</span>}
+        </Link>
 
-          {/* Share */}
-          <button
-            onClick={() => onShare?.(content.id)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-text-tertiary hover:text-brand-primary hover:bg-brand-primary/5 transition-all active:scale-95 transform"
-          >
-            <Share2 size={20} />
-          </button>
+        {/* Share */}
+        <button
+          onClick={handleShare}
+          className={cn(
+            "flex items-center gap-1 px-2 py-1.5 rounded-[var(--radius-xs)]",
+            "text-[12px] transition-[color,background-color] duration-100",
+            "active:scale-95",
+            copied ? "text-emerald-400" : "text-text-muted hover:text-white hover:bg-white/5"
+          )}
+          aria-label={copied ? "Copied!" : "Share"}
+        >
+          {copied ? <CheckCircle2 className="size-[16px]" /> : <Share2 className="size-[16px]" />}
+        </button>
 
-          {/* Tip - Gold Button */}
+        {/* Tip (spacer + right-aligned) */}
+        <div className="flex-1" />
+        {!content.isLocked && (
           <Button
-            variant="tip-gradient"
-            size="sm"
+            variant="gold"
+            size="xs"
+            className="gap-1 rounded-full"
             onClick={() => onTip?.(content.id)}
-            className="ml-auto gap-1.5 px-4 py-2 rounded-full"
+            aria-label="Send tip"
           >
-            <Gift size={18} />
-            <span className="hidden sm:inline">Send Tip</span>
-            <span className="sm:hidden">Tip</span>
+            <DollarSign className="size-[11px]" />
+            <span>Tip</span>
           </Button>
-        </div>
-
-        {/* Like count text - subtle */}
-        {likesCount > 0 && (
-          <p className="text-xs text-text-tertiary mb-1">
-            {likesCount.toLocaleString()} {likesCount === 1 ? "like" : "likes"}
-          </p>
         )}
       </div>
     </article>

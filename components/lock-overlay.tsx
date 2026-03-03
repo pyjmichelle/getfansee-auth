@@ -1,6 +1,6 @@
 "use client";
 
-import { Lock, Clock, Sparkles } from "lucide-react";
+import { Lock, Clock, Sparkles } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -56,10 +56,10 @@ export function LockOverlay({
 
         {/* Lock Icon with Glow */}
         <div
-          className="w-16 h-16 mx-auto mb-4 bg-primary/20 backdrop-blur-md rounded-full flex items-center justify-center border border-primary/30 shadow-glow"
+          className="w-16 h-16 mx-auto mb-4 bg-brand-primary/20 backdrop-blur-md rounded-full flex items-center justify-center border border-brand-primary/30 shadow-glow"
           data-testid="lock-overlay-icon"
         >
-          <Lock size={28} className="text-primary" />
+          <Lock size={28} className="text-brand-primary" />
         </div>
 
         {/* Title & Description */}
@@ -80,7 +80,7 @@ export function LockOverlay({
             data-testid="lock-overlay-button"
             variant={type === "subscribe" ? "subscribe-gradient" : "unlock-gradient"}
             size="lg"
-            className="w-full px-8 py-4 text-lg font-bold rounded-xl mb-3"
+            className="w-full px-8 py-4 text-lg font-bold rounded-xl mb-3 active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
             onClick={(event) => {
               event.stopPropagation();
               onUnlock();

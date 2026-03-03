@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle } from "lucide-react";
+import { CheckCircle } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -49,13 +49,10 @@ export function SuccessState({
         role="status"
         aria-live="polite"
       >
-        <CheckCircle
-          className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0"
-          aria-hidden="true"
-        />
+        <CheckCircle className="w-5 h-5 text-success flex-shrink-0" aria-hidden="true" />
         <div className="flex-1">
-          {title && <h3 className="text-sm font-semibold text-foreground mb-1">{title}</h3>}
-          <p className="text-sm text-muted-foreground">{message}</p>
+          {title && <h3 className="text-sm font-semibold text-text-primary mb-1">{title}</h3>}
+          <p className="text-sm text-text-secondary">{message}</p>
         </div>
         {action &&
           (action.href ? (
@@ -83,11 +80,11 @@ export function SuccessState({
       role="status"
       aria-live="polite"
     >
-      <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
-        <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" aria-hidden="true" />
+      <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mb-4">
+        <CheckCircle className="w-8 h-8 text-success" aria-hidden="true" />
       </div>
-      <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
-      <p className="text-sm text-muted-foreground mb-6 max-w-sm">{message}</p>
+      <h3 className="text-lg font-semibold text-text-primary mb-2">{title}</h3>
+      <p className="text-sm text-text-secondary mb-6 max-w-sm">{message}</p>
       {action &&
         (action.href ? (
           <Button asChild variant="outline" className="gap-2 rounded-xl min-h-[44px]">

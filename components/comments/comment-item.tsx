@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2 } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import type { Comment } from "@/lib/comments";
 
@@ -51,16 +51,18 @@ export function CommentItem({
         {comment.user.avatar_url && (
           <AvatarImage src={comment.user.avatar_url} alt={comment.user.display_name} />
         )}
-        <AvatarFallback className="bg-primary/10 text-primary text-sm">{initials}</AvatarFallback>
+        <AvatarFallback className="bg-brand-primary/10 text-brand-primary text-sm">
+          {initials}
+        </AvatarFallback>
       </Avatar>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-semibold text-sm">{comment.user.display_name}</span>
-          <span className="text-xs text-muted-foreground">{formatDate(comment.created_at)}</span>
+          <span className="text-xs text-text-tertiary">{formatDate(comment.created_at)}</span>
         </div>
 
-        <p className="mt-1 text-sm text-foreground break-words whitespace-pre-wrap">
+        <p className="mt-1 text-sm text-text-primary break-words whitespace-pre-wrap">
           {comment.content}
         </p>
       </div>
@@ -74,7 +76,7 @@ export function CommentItem({
           className={cn(
             "opacity-0 group-hover:opacity-100 transition-[opacity] motion-safe:transition-[opacity] motion-reduce:transition-none",
             "h-8 w-8 p-0 flex-shrink-0 min-h-[32px] min-w-[32px]",
-            "hover:bg-destructive/10 hover:text-destructive"
+            "hover:bg-error/10 hover:text-error active:scale-95 focus-visible:ring-2 focus-visible:ring-error"
           )}
           aria-label="Delete comment"
           onKeyDown={(e) => {

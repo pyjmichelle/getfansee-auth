@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { postId, action, reason } = body as {
       postId: string;
-      action: "approve" | "reject";
+      action: "approve" | "reject" | "remove";
       reason?: string;
     };
 
@@ -80,11 +80,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (action !== "approve" && action !== "reject") {
+    if (action !== "approve" && action !== "reject" && action !== "remove") {
       return NextResponse.json({ success: false, error: "Invalid action" }, { status: 400 });
     }
 
-    if (action === "reject" && !reason) {
+    if ((action === "reject" || action === "remove") && !reason) {
       return NextResponse.json(
         { success: false, error: "Rejection reason is required" },
         { status: 400 }
@@ -102,6 +102,8 @@ export async function POST(request: NextRequest) {
         reviewed_by: user.id,
         reviewed_at: now,
         rejection_reason: action === "reject" ? reason : null,
+        deleted_at: action === "remove" ? now : null,
+        removed_by_admin: action === "remove",
       })
       .eq("id", postId);
 
@@ -118,7 +120,7 @@ export async function POST(request: NextRequest) {
       reason,
     });
 
-    // TODO: 发送通知给 Creator
+    // Notification to creator is handled asynchronously via DB trigger (migration 022).
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {

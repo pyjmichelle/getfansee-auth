@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X } from "@/lib/icons";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -15,15 +15,6 @@ interface MobileSheetProps {
   className?: string;
 }
 
-/**
- * MobileSheet - Figma Make style bottom sheet for mobile
- *
- * Features:
- * - Drag handle indicator
- * - Optional title with close button
- * - Slide up animation
- * - Safe area bottom padding
- */
 export function MobileSheet({
   open,
   onOpenChange,
@@ -38,14 +29,14 @@ export function MobileSheet({
       <SheetContent
         side="bottom"
         className={cn(
-          "h-auto max-h-[90vh] rounded-t-2xl bg-card border-t border-border p-0 overflow-hidden",
+          "h-auto max-h-[90vh] rounded-t-2xl bg-surface-base border-t border-border-base p-0 overflow-hidden",
           className
         )}
       >
         {/* Handle */}
         {showHandle && (
-          <div className="flex justify-center py-3">
-            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+          <div className="flex justify-center py-3" aria-hidden="true">
+            <div className="w-10 h-1 rounded-full bg-border-strong" />
           </div>
         )}
 
@@ -53,16 +44,17 @@ export function MobileSheet({
         {(title || showCloseButton) && (
           <SheetHeader className="flex flex-row items-center justify-between px-4 pb-4">
             {title && (
-              <SheetTitle className="text-lg font-semibold text-foreground">{title}</SheetTitle>
+              <SheetTitle className="text-lg font-semibold text-text-primary">{title}</SheetTitle>
             )}
             {showCloseButton && (
               <Button
                 variant="ghost"
                 size="icon-sm"
                 onClick={() => onOpenChange(false)}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-text-tertiary hover:text-text-primary hover:bg-surface-raised active:scale-95 transition-all min-h-[44px] min-w-[44px] focus-visible:ring-2 focus-visible:ring-brand-primary"
+                aria-label="Close"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </Button>
             )}
           </SheetHeader>
@@ -75,9 +67,6 @@ export function MobileSheet({
   );
 }
 
-/**
- * MobileSheetItem - List item for mobile sheet menus
- */
 interface MobileSheetItemProps {
   icon?: React.ReactNode;
   label: string;
@@ -103,24 +92,25 @@ export function MobileSheetItem({
         <div
           className={cn(
             "w-10 h-10 rounded-xl flex items-center justify-center",
-            destructive ? "bg-destructive-muted text-destructive" : "bg-muted text-foreground"
+            destructive ? "bg-error/10 text-error" : "bg-surface-raised text-text-primary"
           )}
+          aria-hidden="true"
         >
           {icon}
         </div>
       )}
       <div className="flex-1 min-w-0">
-        <p className={cn("font-medium", destructive ? "text-destructive" : "text-foreground")}>
+        <p className={cn("font-medium", destructive ? "text-error" : "text-text-primary")}>
           {label}
         </p>
-        {description && <p className="text-sm text-muted-foreground truncate">{description}</p>}
+        {description && <p className="text-sm text-text-tertiary truncate">{description}</p>}
       </div>
     </>
   );
 
   const baseClassName = cn(
-    "flex items-center gap-3 w-full p-3 rounded-xl transition-colors",
-    "hover:bg-muted active:bg-muted/80",
+    "flex items-center gap-3 w-full p-3 rounded-xl transition-all min-h-[44px]",
+    "hover:bg-surface-raised active:scale-95 focus-visible:outline-2 focus-visible:outline-brand-primary cursor-pointer",
     className
   );
 
@@ -133,7 +123,7 @@ export function MobileSheetItem({
   }
 
   return (
-    <button onClick={onClick} className={baseClassName}>
+    <button onClick={onClick} className={baseClassName} type="button">
       {content}
     </button>
   );

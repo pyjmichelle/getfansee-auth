@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, XCircle, Loader2, Mail } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, Mail } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { ensureProfile } from "@/lib/auth";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
@@ -316,8 +316,8 @@ export default function VerifyPageClient({ query }: VerifyPageClientProps) {
 
           {status === "success" && (
             <>
-              <div className="w-20 h-20 rounded-full bg-semantic-success/20 flex items-center justify-center mx-auto mb-6 ring-4 ring-semantic-success/30">
-                <CheckCircle2 className="w-10 h-10 text-semantic-success" />
+              <div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-6 ring-4 ring-success/30">
+                <CheckCircle2 className="w-10 h-10 text-success" />
               </div>
               <h1 className="text-2xl font-bold text-text-primary mb-3">
                 Verification Successful!
@@ -328,8 +328,8 @@ export default function VerifyPageClient({ query }: VerifyPageClientProps) {
 
           {status === "error" && (
             <>
-              <div className="w-20 h-20 rounded-full bg-semantic-error/20 flex items-center justify-center mx-auto mb-6 ring-4 ring-semantic-error/30">
-                <XCircle className="w-10 h-10 text-semantic-error" />
+              <div className="w-20 h-20 rounded-full bg-error/20 flex items-center justify-center mx-auto mb-6 ring-4 ring-error/30">
+                <XCircle className="w-10 h-10 text-error" />
               </div>
               <h1 className="text-2xl font-bold text-text-primary mb-3">Verification Failed</h1>
               <p className="text-text-secondary mb-6">{message}</p>
@@ -337,16 +337,18 @@ export default function VerifyPageClient({ query }: VerifyPageClientProps) {
                 {canResend && (
                   <Button
                     onClick={handleResend}
-                    className="w-full py-3 bg-gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg shadow-brand-primary/25"
+                    className="w-full min-h-[48px] bg-gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                    aria-label="Resend confirmation email"
                   >
-                    <Mail className="w-4 h-4 mr-2" />
+                    <Mail className="w-4 h-4 mr-2" aria-hidden="true" />
                     Resend Confirmation Email
                   </Button>
                 )}
                 <Button
                   onClick={() => router.push("/auth")}
                   variant="outline"
-                  className="w-full py-3 bg-surface-base border border-border-base rounded-xl font-semibold hover:bg-surface-raised transition-all"
+                  className="w-full min-h-[48px] bg-surface-base border border-border-base rounded-xl font-semibold hover:bg-surface-raised transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                  aria-label="Go to login page"
                 >
                   Go to Login
                 </Button>

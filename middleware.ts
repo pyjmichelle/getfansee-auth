@@ -1,35 +1,29 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/auth-helpers-nextjs";
-
-function getEnv(key: string): string {
-  const value = process.env[key];
-  if (!value) {
-    throw new Error(`[supabase] Missing environment variable: ${key}`);
-  }
-  return value;
-}
+import { env } from "@/lib/env";
 
 /**
- * 中间件：保护 Creator 路由
- * 检查用户是否已登录，以及是否有 creator 权限
+ * 中间件：保护 Creator 和 Admin 路由
+ * 检查用户是否已登录，以及是否有对应权限
  */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next();
 
+  const isAdminPath = pathname.startsWith("/admin");
+
   // 保护 Creator 路由（除了公开的 /creator/[id] 查看页面）
   const creatorProtectedPaths = ["/creator/new-post", "/creator/studio"];
-
   const isCreatorProtectedPath = creatorProtectedPaths.some((path) => pathname.startsWith(path));
 
-  if (!isCreatorProtectedPath) {
+  if (!isCreatorProtectedPath && !isAdminPath) {
     return response;
   }
 
   const supabase = createServerClient(
-    getEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    getEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {
@@ -45,47 +39,57 @@ export async function middleware(request: NextRequest) {
     }
   );
   const {
-    data: { session },
+    data: { user },
     error,
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getUser();
 
   if (error) {
-    console.error("[middleware] getSession error:", error);
+    console.error("[middleware] getUser error:", error);
   }
 
-  if (!session) {
+  if (!user) {
     const loginUrl = new URL("/auth", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // 检查角色是否为 creator
-  try {
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", session.user.id)
-      .single();
+  // Admin 路由：必须是 admin 角色（只信任 app_metadata，不信任用户可自改的 user_metadata）
+  if (isAdminPath) {
+    let userRole: string | null = (user.app_metadata?.role as string | undefined) ?? null;
+    if (!userRole) {
+      try {
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
 
-    if (profileError) {
-      console.error("[middleware] fetch profile error:", profileError);
+        if (profileError) {
+          console.error("[middleware] fetch profile error:", profileError);
+        }
+
+        userRole = profile?.role ?? null;
+      } catch (profileErr) {
+        console.error("[middleware] unexpected profile check error:", profileErr);
+      }
     }
 
-    if (profile?.role !== "creator") {
-      const upgradeUrl = new URL("/creator/upgrade", request.url);
-      upgradeUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(upgradeUrl);
+    if (userRole !== "admin") {
+      return NextResponse.redirect(new URL("/home", request.url));
     }
-  } catch (profileErr) {
-    console.error("[middleware] unexpected profile check error:", profileErr);
-    const upgradeUrl = new URL("/creator/upgrade", request.url);
-    upgradeUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(upgradeUrl);
+    return response;
   }
+
+  // Creator 路由只要求登录；角色判定下沉到页面/API，减少切页时额外数据库查询。
 
   return response;
 }
 
 export const config = {
-  matcher: ["/creator/new-post/:path*", "/creator/onboarding/:path*", "/creator/studio/:path*"],
+  matcher: [
+    "/creator/new-post/:path*",
+    "/creator/onboarding/:path*",
+    "/creator/studio/:path*",
+    "/admin/:path*",
+  ],
 };

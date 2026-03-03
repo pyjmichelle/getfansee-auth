@@ -4,10 +4,13 @@
  * This file provides static mock data for when the database is empty
  * or when NEXT_PUBLIC_USE_MOCK_DATA=true is set.
  *
- * Uses stable online image services:
+ * Uses stable online image services and local placeholders:
  * - ui-avatars.com for avatars (100% reliable, generates from name)
- * - picsum.photos with seed for consistent content images
+ * - Local /images/placeholders/ for some post media when available
+ * - picsum.photos with seed for remaining content images
  */
+
+const LOCAL_POST_PLACEHOLDER = "/images/placeholders/post-media-1-pc.jpg";
 
 export interface MockCreator {
   id: string;
@@ -109,7 +112,7 @@ export const MOCK_POSTS: MockPost[] = [
     title: "Exclusive Digital Artwork",
     content:
       "Just finished this piece! Took me about 20 hours. Subscribers get access to the full resolution version and process video.",
-    media_url: "https://picsum.photos/seed/art1/800/600",
+    media_url: LOCAL_POST_PLACEHOLDER,
     media_type: "image",
     visibility: "subscribers",
     price_cents: null,
@@ -123,7 +126,7 @@ export const MOCK_POSTS: MockPost[] = [
     title: "Behind the Scenes - Photo Shoot",
     content:
       "Here's a sneak peek from yesterday's shoot. The full gallery with 50+ photos is available for subscribers!",
-    media_url: "https://picsum.photos/seed/photo2/800/600",
+    media_url: LOCAL_POST_PLACEHOLDER,
     media_type: "image",
     visibility: "free",
     price_cents: null,
@@ -137,7 +140,7 @@ export const MOCK_POSTS: MockPost[] = [
     title: "Morning Routine Secrets",
     content:
       "My complete morning routine that helped me transform my life. Includes workout, skincare, and mindset tips.",
-    media_url: "https://picsum.photos/seed/lifestyle3/800/600",
+    media_url: LOCAL_POST_PLACEHOLDER,
     media_type: "image",
     visibility: "ppv",
     price_cents: 499,

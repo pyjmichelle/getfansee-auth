@@ -2,17 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { NavHeader } from "@/components/nav-header";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { ensureProfile } from "@/lib/auth";
 import { getProfile } from "@/lib/profile";
-import { listPendingVerifications, reviewVerification } from "@/lib/kyc";
-import { Check, X, Calendar, Globe, FileText } from "lucide-react";
+import { Check, X, Calendar, Globe, FileText } from "@/lib/icons";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { Analytics } from "@/lib/analytics";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -73,19 +73,23 @@ export default function CreatorVerificationsPage() {
         await ensureProfile();
         const profile = await getProfile(session.user.id);
         if (profile) {
+          if (profile.role !== "admin") {
+            router.push("/home");
+            return;
+          }
           setCurrentUser({
             username: profile.display_name || "user",
             role: (profile.role || "fan") as "fan" | "creator",
             avatar: profile.avatar_url || undefined,
           });
-
-          // TODO: 检查是否为管理员（这里简化处理，实际应该检查 admin 角色）
-          // 暂时允许所有用户访问，实际应该添加权限检查
         }
 
-        // 加载待审核列表
-        const pending = await listPendingVerifications();
-        setVerifications(pending);
+        // 加载待审核列表（通过安全的 API Route）
+        const res = await fetch("/api/admin/kyc");
+        if (res.ok) {
+          const data = await res.json();
+          setVerifications(data.verifications || []);
+        }
       } catch (err) {
         console.error("[admin-verifications] loadData error:", err);
       } finally {
@@ -100,17 +104,27 @@ export default function CreatorVerificationsPage() {
     try {
       setIsReviewing(true);
 
-      const success = await reviewVerification(
-        verificationId,
-        approve,
-        approve ? undefined : rejectionReason.trim() || undefined
-      );
+      const response = await fetch("/api/admin/kyc", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          verificationId,
+          approve,
+          reason: approve ? undefined : rejectionReason.trim() || undefined,
+        }),
+      });
 
-      if (success) {
+      const result = await response.json();
+
+      if (result.success) {
+        Analytics.adminKycReviewed(verificationId, approve ? "approved" : "rejected");
         toast.success(approve ? "Verification approved" : "Verification rejected");
-        // 重新加载列表
-        const pending = await listPendingVerifications();
-        setVerifications(pending);
+        // 重新加载列表（通过安全的 API Route）
+        const res = await fetch("/api/admin/kyc");
+        if (res.ok) {
+          const data = await res.json();
+          setVerifications(data.verifications || []);
+        }
         setReviewingId(null);
         setRejectionReason("");
       } else {
@@ -126,75 +140,81 @@ export default function CreatorVerificationsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-        <main className="container max-w-6xl mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-muted rounded-3xl"></div>
-            ))}
-          </div>
-        </main>
+      <div className="p-8">
+        <div className="animate-pulse space-y-4 max-w-4xl">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-48 bg-surface-raised rounded-2xl"></div>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-
-      <main className="container max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
+    <div className="p-8">
+      <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Creator Verifications</h1>
-          <p className="text-muted-foreground">Review and approve creator identity verifications</p>
+          <h1 className="text-3xl font-bold text-text-primary mb-2">Creator Verifications</h1>
+          <p className="text-text-tertiary">Review and approve creator identity verifications</p>
+        </div>
+        <div className="bento-grid mb-6">
+          <div className="bento-2x1 card-block p-5">
+            <p className="text-sm text-text-tertiary">Pending</p>
+            <p className="text-3xl font-bold text-brand-secondary">{verifications.length}</p>
+          </div>
+          <div className="card-block p-5">
+            <p className="text-sm text-text-tertiary">Approved</p>
+            <p className="text-3xl font-bold text-success">0</p>
+          </div>
+          <div className="card-block p-5">
+            <p className="text-sm text-text-tertiary">Rejected</p>
+            <p className="text-3xl font-bold text-error">0</p>
+          </div>
         </div>
 
         {verifications.length === 0 ? (
-          <div className="bg-card border border-border rounded-3xl p-12 text-center">
-            <p className="text-muted-foreground">No pending verifications</p>
+          <div className="card-block p-12 text-center">
+            <p className="text-text-tertiary">No pending verifications</p>
           </div>
         ) : (
           <div className="space-y-6">
             {verifications.map((verification) => (
-              <div
-                key={verification.id}
-                className="bg-card border border-border rounded-3xl p-6 hover:border-border transition-colors"
-              >
+              <div key={verification.id} className="card-block p-6">
                 <div className="flex items-start gap-6">
                   <Avatar className="w-16 h-16">
-                    <AvatarImage src={verification.user?.avatar_url || "/placeholder.svg"} />
-                    <AvatarFallback className="bg-primary/10 text-primary">
+                    <AvatarImage src={verification.user?.avatar_url || DEFAULT_AVATAR_FAN} />
+                    <AvatarFallback className="bg-brand-primary-alpha-10 text-brand-primary">
                       {verification.user?.display_name?.[0]?.toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
 
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-4">
-                      <h3 className="text-lg font-semibold text-foreground">
+                      <h3 className="text-lg font-semibold text-text-primary">
                         {verification.user?.display_name ||
                           `User ${verification.user_id.slice(0, 8)}`}
                       </h3>
-                      <Badge className="bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)] border-[var(--border-purple-500-20)] rounded-lg">
+                      <Badge className="bg-brand-secondary/10 text-brand-secondary border-brand-secondary/20 rounded-lg">
                         Pending
                       </Badge>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2 text-sm text-text-tertiary">
                         <FileText className="w-4 h-4" />
                         <span>Name: {verification.real_name}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2 text-sm text-text-tertiary">
                         <Calendar className="w-4 h-4" />
                         <span>
                           Birth Date: {format(new Date(verification.birth_date), "MMM d, yyyy")}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2 text-sm text-text-tertiary">
                         <Globe className="w-4 h-4" />
                         <span>Country: {verification.country}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2 text-sm text-text-tertiary">
                         <Calendar className="w-4 h-4" />
                         <span>
                           Submitted: {format(new Date(verification.created_at), "MMM d, yyyy")}
@@ -204,9 +224,7 @@ export default function CreatorVerificationsPage() {
 
                     {/* ID Documents */}
                     <div className="mb-4">
-                      <Label className="text-sm text-muted-foreground mb-2 block">
-                        ID Documents:
-                      </Label>
+                      <Label className="text-sm text-text-tertiary mb-2 block">ID Documents:</Label>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                         {verification.id_doc_urls.map((url, index) => (
                           <a
@@ -214,7 +232,7 @@ export default function CreatorVerificationsPage() {
                             href={url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="relative aspect-video bg-muted rounded-xl overflow-hidden hover:opacity-80 transition-opacity"
+                            className="relative aspect-video bg-surface-raised rounded-xl overflow-hidden hover:opacity-80 transition-opacity"
                           >
                             <img
                               src={url}
@@ -227,7 +245,7 @@ export default function CreatorVerificationsPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-3 pt-4 border-t border-border">
+                    <div className="flex gap-3 pt-4 border-t border-border-base">
                       <Button
                         onClick={() => handleReview(verification.id, true)}
                         disabled={isReviewing}
@@ -241,7 +259,7 @@ export default function CreatorVerificationsPage() {
                         onClick={() => setReviewingId(verification.id)}
                         disabled={isReviewing}
                         variant="outline"
-                        className="flex-1 border-destructive text-destructive hover:bg-destructive/10 rounded-xl"
+                        className="flex-1 border-error text-error hover:bg-error/10 rounded-xl"
                       >
                         <X className="w-4 h-4 mr-2" />
                         Reject
@@ -259,10 +277,10 @@ export default function CreatorVerificationsPage() {
           open={reviewingId !== null}
           onOpenChange={(open) => !open && setReviewingId(null)}
         >
-          <AlertDialogContent className="bg-card border-border rounded-3xl">
+          <AlertDialogContent className="bg-surface-base border-border-base rounded-2xl">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-foreground">Reject Verification</AlertDialogTitle>
-              <AlertDialogDescription className="text-muted-foreground">
+              <AlertDialogTitle className="text-text-primary">Reject Verification</AlertDialogTitle>
+              <AlertDialogDescription className="text-text-tertiary">
                 Please provide a reason for rejection (optional but recommended).
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -274,25 +292,25 @@ export default function CreatorVerificationsPage() {
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
                   placeholder="e.g., ID photos are unclear, information doesn't match, etc."
-                  className="bg-card border-border rounded-xl"
+                  className="bg-surface-base border-border-base rounded-xl"
                   rows={4}
                 />
               </div>
             </div>
             <AlertDialogFooter>
-              <AlertDialogCancel className="border-border bg-card hover:bg-card rounded-xl">
+              <AlertDialogCancel className="border-border-base bg-surface-base hover:bg-surface-raised rounded-xl">
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => reviewingId && handleReview(reviewingId, false)}
-                className="bg-destructive hover:bg-destructive/90 rounded-xl"
+                className="bg-error hover:bg-error/90 rounded-xl"
               >
                 Reject
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </main>
+      </div>
     </div>
   );
 }

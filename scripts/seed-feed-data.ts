@@ -102,23 +102,24 @@ const demoCreators = [
   },
 ];
 
-// 假数据：图片 URL（使用更可靠的图片服务）
+// 假数据：图片 URL（优先使用本地占位图，其余保留外网图以丰富首屏）
+const LOCAL_PLACEHOLDER = "/images/placeholders/post-media-1-pc.jpg";
 const demoImages = [
-  "https://picsum.photos/800/600?random=1", // 风景
-  "https://picsum.photos/800/600?random=2", // 艺术
-  "https://picsum.photos/800/600?random=3", // 咖啡
-  "https://picsum.photos/800/600?random=4", // 自然
-  "https://picsum.photos/800/600?random=5", // 森林
-  "https://picsum.photos/800/600?random=6", // 山景
-  "https://picsum.photos/800/600?random=7", // 城市
-  "https://picsum.photos/800/600?random=8", // 城市夜景
-  "https://picsum.photos/800/600?random=9", // 食物
-  "https://picsum.photos/800/600?random=10", // 健身
-  "https://picsum.photos/800/600?random=11", // 健身进度
-  "https://picsum.photos/800/600?random=12", // 音乐工作室
-  "https://picsum.photos/800/600?random=13", // 额外
-  "https://picsum.photos/800/600?random=14", // 额外
-  "https://picsum.photos/800/600?random=15", // 额外
+  LOCAL_PLACEHOLDER,
+  LOCAL_PLACEHOLDER,
+  LOCAL_PLACEHOLDER,
+  "https://picsum.photos/800/600?random=4",
+  "https://picsum.photos/800/600?random=5",
+  "https://picsum.photos/800/600?random=6",
+  LOCAL_PLACEHOLDER,
+  "https://picsum.photos/800/600?random=8",
+  "https://picsum.photos/800/600?random=9",
+  "https://picsum.photos/800/600?random=10",
+  "https://picsum.photos/800/600?random=11",
+  "https://picsum.photos/800/600?random=12",
+  "https://picsum.photos/800/600?random=13",
+  "https://picsum.photos/800/600?random=14",
+  "https://picsum.photos/800/600?random=15",
 ];
 
 // 假数据：视频 URL（使用更可靠的视频服务）

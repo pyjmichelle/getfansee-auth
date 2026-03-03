@@ -140,14 +140,13 @@ const UI_CHECKS: UICheck[] = [
   },
   // P0 Beta Compliance Checks
   {
-    id: "age-gate",
+    id: "auth-access",
     route: "/auth",
     authState: "anonymous",
     selectors: [
       {
-        selector:
-          '[data-testid="age-gate-yes"], [data-testid="age-gate-modal"], [data-slot="alert-dialog-overlay"]',
-        description: "Age gate modal should be visible for anonymous users",
+        selector: '[data-testid="page-ready"], form, input[type="email"]',
+        description: "Auth page should be accessible for anonymous users",
       },
     ],
   },

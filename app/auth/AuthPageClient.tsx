@@ -9,11 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ensureProfile, signInWithGoogle, signUpWithEmail } from "@/lib/auth";
 import { captureReferralFromUrl } from "@/lib/referral";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { Analytics } from "@/lib/analytics";
+import { invalidateAuthBootstrap, prefetchAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { AlertCircle, Loader2, Eye, EyeOff, Users, DollarSign, Sparkles, Star } from "@/lib/icons";
+import { useCountUp } from "@/hooks/use-count-up";
+import { TrustStrip } from "@/components/trust-strip";
 
 type AuthPageClientProps = {
   initialMode?: "login" | "signup";
@@ -42,6 +45,13 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
   const [info, setInfo] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"login" | "signup">(initialMode);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
+
+  // Social proof counters
+  const creatorCount = useCountUp(12480, { duration: 1200, decimals: 0 });
+  const fanCount = useCountUp(89340, { duration: 1400, decimals: 0 });
+  const earningsCount = useCountUp(2400000, { duration: 1600, decimals: 0 });
 
   const resetAuthState = useCallback(() => {
     setError(null);
@@ -51,6 +61,8 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
     setSignupEmail("");
     setSignupPassword("");
     setAgeConfirmed(false);
+    setShowLoginPassword(false);
+    setShowSignupPassword(false);
   }, []);
 
   useEffect(() => {
@@ -154,10 +166,14 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
       void ensureProfile().catch((err) => {
         console.warn("[auth] ensureProfile failed:", err);
       });
+      invalidateAuthBootstrap();
+      prefetchAuthBootstrap();
+
+      Analytics.identify(data.user.id);
+      Analytics.userLoggedIn("email");
 
       devLog("[auth] Profile ensured, navigating to /home");
       router.push("/home");
-      router.refresh(); // Force refresh to ensure navigation
 
       devLog("[auth] Navigation initiated");
     } catch (err) {
@@ -195,15 +211,12 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
         return;
       }
 
-      // 注册成功后，检查是否有 session
       const supabaseClient = getSupabaseBrowserClient();
       const { data: sessionData } = await supabaseClient.auth.getSession();
 
       if (sessionData?.session) {
-        // 有 session，直接跳转到 home
         devLog("[auth] Signup successful with session, redirecting...");
 
-        // 同步 session 到服务器
         const sessionSync = await fetch("/api/auth/session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -218,18 +231,16 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
           console.warn("[auth] Session sync failed but continuing...");
         }
 
-        // 确保 profile 存在
         void ensureProfile().catch((err) => {
           console.warn("[auth] ensureProfile failed:", err);
         });
+        invalidateAuthBootstrap();
+        prefetchAuthBootstrap();
 
-        // 跳转到 home
         router.push("/home");
-        router.refresh();
         return;
       }
 
-      // 没有 session，尝试自动登录（邮箱验证关闭时应该能成功）
       devLog("[auth] No session after signup, attempting auto-login...");
       const { data: loginData, error: loginError } = await supabaseClient.auth.signInWithPassword({
         email: signupEmail,
@@ -237,15 +248,15 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
       });
 
       if (loginError || !loginData.session) {
-        // 自动登录失败，可能需要邮箱验证
         devLog("[auth] Auto-login failed:", loginError?.message);
         setInfo("Registration successful! Please check your email to verify your account.");
         setIsLoading(false);
         return;
       }
 
-      // 自动登录成功
       devLog("[auth] Auto-login successful, redirecting...");
+      Analytics.identify(loginData.session.user.id);
+      Analytics.userRegistered("email");
       const sessionSync = await fetch("/api/auth/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -263,9 +274,10 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
       void ensureProfile().catch((err) => {
         console.warn("[auth] ensureProfile failed:", err);
       });
+      invalidateAuthBootstrap();
+      prefetchAuthBootstrap();
 
       router.push("/home");
-      router.refresh();
     } catch (err) {
       setError(getErrorMessage(err));
       setIsLoading(false);
@@ -289,312 +301,398 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
     }
   };
 
+  const socialProofItems = [
+    {
+      icon: Users,
+      label: "Active Creators",
+      value: creatorCount.toLocaleString(),
+      color: "text-brand-primary",
+      bg: "bg-brand-primary/10",
+    },
+    {
+      icon: Star,
+      label: "Happy Fans",
+      value: fanCount.toLocaleString(),
+      color: "text-brand-accent",
+      bg: "bg-brand-accent/10",
+    },
+    {
+      icon: DollarSign,
+      label: "Paid to Creators",
+      value: `$${(earningsCount / 1_000_000).toFixed(1)}M+`,
+      color: "text-success",
+      bg: "bg-success/10",
+    },
+  ];
+
   return (
     <div
       data-testid="page-ready"
-      className="min-h-screen flex items-center justify-center px-6 py-12 bg-background relative overflow-hidden"
+      className="auth-layout bg-bg-base"
       style={{ touchAction: "manipulation", overscrollBehaviorY: "contain" }}
     >
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-primary/20 rounded-full blur-[128px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-accent/20 rounded-full blur-[128px]" />
-      </div>
+      {/* ── PC Hero Side (left 45%) ─────────────────────── */}
+      <aside className="auth-hero relative bg-bg-surface overflow-hidden">
+        <img
+          src="/images/auth/hero-pc.jpg"
+          alt="GetFanSee creator community"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Vignette overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/20" />
 
-      <div className="w-full max-w-md relative z-10">
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-12 cursor-pointer group">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-14 h-14 bg-gradient-primary rounded-2xl group-hover:scale-105 transition-transform shadow-glow flex items-center justify-center">
-              <span className="text-2xl font-bold text-white">GF</span>
+        {/* Bottom branding */}
+        <div className="absolute bottom-0 left-0 right-0 p-8">
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="size-9 rounded-[var(--radius-sm)] bg-gradient-to-br from-violet-600 to-violet-400 flex items-center justify-center shadow-glow-violet">
+              <span className="text-white font-bold text-[13px]">G</span>
             </div>
-            <span className="text-3xl font-bold text-gradient-primary tracking-tight">
-              GetFanSee
-            </span>
-          </Link>
-        </div>
+            <span className="font-bold text-[18px] text-white tracking-tight">GetFanSee</span>
+          </div>
+          <p className="text-[22px] font-serif font-bold text-white leading-snug mb-2">
+            Where Creators
+            <br />
+            <span className="text-gradient-primary">Get Paid.</span>
+          </p>
+          <p className="text-[13px] text-white/60">Join 50,000+ fans worldwide</p>
 
-        {/* Auth Card */}
-        <div className="glass-strong rounded-3xl p-8 shadow-xl">
+          {/* Social proof stats */}
+          <div className="flex items-center gap-4 mt-4">
+            {socialProofItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.label} className="text-center">
+                  <Icon className="size-[14px] text-violet-400 mx-auto mb-0.5" aria-hidden="true" />
+                  <p className="text-[13px] font-bold text-white">{item.value}</p>
+                  <p className="text-[10px] text-white/50">{item.label}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </aside>
+
+      {/* ── Form Side (right 55%) ───────────────────────── */}
+      <section className="auth-form bg-bg-base">
+        <div className="w-full max-w-sm">
+          {/* Logo (mobile only — desktop logo is in hero) */}
+          <div className="flex items-center gap-2 mb-6 lg:hidden">
+            <div className="size-8 rounded-[var(--radius-sm)] bg-gradient-to-br from-violet-600 to-violet-400 flex items-center justify-center shadow-glow-violet">
+              <span className="text-white font-bold text-[12px]">G</span>
+            </div>
+            <span className="font-bold text-[16px] text-white">GetFanSee</span>
+          </div>
+
+          {/* Heading */}
+          <div className="mb-6">
+            <h1 className="font-serif text-h1 text-white mb-1">
+              {activeTab === "login" ? "Welcome back" : "Join the community"}
+            </h1>
+            <p className="text-[13px] text-text-muted">
+              {activeTab === "login"
+                ? "Sign in to access your exclusive content"
+                : "Create your account and discover exclusive creators"}
+            </p>
+          </div>
+
+          {/* Tabs */}
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8 h-12 bg-surface-raised rounded-xl p-1">
-              <TabsTrigger
-                value="login"
-                data-testid="auth-tab-login"
-                className="rounded-lg text-base font-semibold data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
-              >
-                Login
+            <TabsList className="w-full mb-5">
+              <TabsTrigger value="login" data-testid="auth-tab-login" className="flex-1">
+                Sign In
               </TabsTrigger>
-              <TabsTrigger
-                value="signup"
-                data-testid="auth-tab-signup"
-                className="rounded-lg text-base font-semibold data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
-              >
-                Sign Up
+              <TabsTrigger value="signup" data-testid="auth-tab-signup" className="flex-1">
+                Create Account
               </TabsTrigger>
             </TabsList>
 
-            {/* 错误和信息提示 */}
+            {/* Alerts */}
             {error && (
-              <Alert variant="destructive" className="mb-6">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
+              <div
+                className="flex items-start gap-2 mb-4 p-3 rounded-[var(--radius-sm)] bg-red-500/10 border border-red-500/20"
+                role="alert"
+              >
+                <AlertCircle className="size-[14px] text-red-400 shrink-0 mt-0.5" />
+                <p className="text-[12px] text-red-400">{error}</p>
+              </div>
             )}
-
             {info && (
-              <Alert className="mb-6">
-                <AlertDescription>{info}</AlertDescription>
-              </Alert>
+              <div
+                className="mb-4 p-3 rounded-[var(--radius-sm)] bg-emerald-500/10 border border-emerald-500/20"
+                role="status"
+              >
+                <p className="text-[12px] text-emerald-400">{info}</p>
+              </div>
             )}
 
-            {/* 登录表单 */}
+            {/* ── Sign In Tab ── */}
             <TabsContent value="login">
-              <div className="space-y-5">
-                <form onSubmit={handleLoginSubmit} className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email" className="text-sm font-semibold">
-                      Email
-                    </Label>
-                    <Input
-                      id="login-email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={loginEmail}
-                      onChange={(e) => setLoginEmail(e.target.value)}
-                      disabled={isLoading}
-                      required
-                      data-testid="auth-email"
-                      className="w-full px-4 py-3 bg-surface-base border border-border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-all"
-                    />
-                  </div>
+              <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="login-email">Email</Label>
+                  <Input
+                    id="login-email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    disabled={isLoading}
+                    required
+                    autoComplete="email"
+                    data-testid="auth-email"
+                  />
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password" className="text-sm font-semibold">
-                      Password
-                    </Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="login-password">Password</Label>
+                  <div className="relative">
                     <Input
                       id="login-password"
-                      type="password"
+                      type={showLoginPassword ? "text" : "password"}
                       placeholder="Enter your password"
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
                       disabled={isLoading}
                       required
+                      autoComplete="current-password"
                       data-testid="auth-password"
-                      className="w-full px-4 py-3 bg-surface-base border border-border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-all"
+                      className="pr-10"
                     />
-                  </div>
-
-                  <div className="flex items-center justify-end">
                     <button
                       type="button"
-                      className="text-sm text-brand-primary hover:text-brand-primary/80 transition-colors"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-white transition-colors rounded-sm p-0.5"
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                      aria-label={showLoginPassword ? "Hide password" : "Show password"}
                     >
-                      Forgot password?
+                      {showLoginPassword ? (
+                        <EyeOff className="size-[14px]" />
+                      ) : (
+                        <Eye className="size-[14px]" />
+                      )}
                     </button>
                   </div>
+                </div>
 
-                  <Button
-                    type="submit"
-                    className="w-full py-3 bg-gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg shadow-brand-primary/25"
-                    disabled={isLoading}
-                    aria-label="Sign in to your account"
-                    data-testid="auth-submit"
+                <div className="flex justify-end">
+                  <Link
+                    href="/auth/resend-verification"
+                    className="text-[12px] text-violet-400 hover:text-violet-300 transition-colors"
                   >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-                        Signing in…
-                      </>
-                    ) : (
-                      "Login"
-                    )}
-                  </Button>
-                </form>
+                    Forgot password?
+                  </Link>
+                </div>
 
-                {!isTestMode && (
-                  <>
-                    <div className="relative my-6">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-border-base" />
-                      </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-surface-raised px-3 text-text-tertiary">
-                          Or continue with
-                        </span>
-                      </div>
+                <Button
+                  type="submit"
+                  variant="violet"
+                  size="lg"
+                  className="w-full"
+                  disabled={isLoading}
+                  data-testid="auth-submit"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="size-[14px] animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    "Sign In"
+                  )}
+                </Button>
+              </form>
+
+              {!isTestMode && (
+                <div className="mt-4">
+                  <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-white/8" />
                     </div>
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full py-3 bg-surface-base border border-border-base rounded-xl font-semibold hover:bg-surface-raised transition-all"
-                      onClick={handleGoogleSignIn}
-                      disabled={isLoading}
-                    >
-                      <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                        <path
-                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                          fill="#4285F4"
-                        />
-                        <path
-                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                          fill="#34A853"
-                        />
-                        <path
-                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                          fill="#FBBC05"
-                        />
-                        <path
-                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                          fill="#EA4335"
-                        />
-                      </svg>
-                      Google
-                    </Button>
-                  </>
-                )}
-              </div>
+                    <div className="relative flex justify-center">
+                      <span className="bg-bg-base px-3 text-[11px] text-text-muted uppercase tracking-wider">
+                        Or continue with
+                      </span>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="default"
+                    className="w-full"
+                    onClick={handleGoogleSignIn}
+                    disabled={isLoading}
+                  >
+                    <Sparkles className="size-[14px]" />
+                    Continue with Google
+                  </Button>
+                </div>
+              )}
             </TabsContent>
 
-            {/* 注册表单 */}
+            {/* ── Sign Up Tab ── */}
             <TabsContent value="signup">
-              <div className="space-y-5">
-                <form onSubmit={handleSignupSubmit} className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email" className="text-sm font-semibold">
-                      Email
-                    </Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={signupEmail}
-                      onChange={(e) => setSignupEmail(e.target.value)}
-                      disabled={isLoading}
-                      required
-                      data-testid="auth-email"
-                      className="w-full px-4 py-3 bg-surface-base border border-border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-all"
-                    />
-                  </div>
+              <form onSubmit={handleSignupSubmit} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="signup-email">Email</Label>
+                  <Input
+                    id="signup-email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={signupEmail}
+                    onChange={(e) => setSignupEmail(e.target.value)}
+                    disabled={isLoading}
+                    required
+                    autoComplete="email"
+                    data-testid="auth-email"
+                  />
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password" className="text-sm font-semibold">
-                      Password
-                    </Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="signup-password">Password</Label>
+                  <div className="relative">
                     <Input
                       id="signup-password"
-                      type="password"
-                      placeholder="Create a password"
+                      type={showSignupPassword ? "text" : "password"}
+                      placeholder="At least 8 characters"
                       value={signupPassword}
                       onChange={(e) => setSignupPassword(e.target.value)}
                       disabled={isLoading}
                       required
+                      autoComplete="new-password"
                       data-testid="auth-password"
-                      className="w-full px-4 py-3 bg-surface-base border border-border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-all"
+                      className="pr-10"
                     />
-                    <p className="text-xs text-text-tertiary">At least 8 characters</p>
-                  </div>
-
-                  <div className="space-y-3 py-2">
-                    <div className="flex items-start gap-3">
-                      <Checkbox
-                        id="age-confirm"
-                        checked={ageConfirmed}
-                        onCheckedChange={(checked) => setAgeConfirmed(checked === true)}
-                        disabled={isLoading}
-                        data-testid="auth-age-checkbox"
-                        className="mt-0.5"
-                        aria-label="I confirm I am 18+ and agree to the Terms"
-                      />
-                      <label
-                        htmlFor="age-confirm"
-                        className="text-sm leading-relaxed cursor-pointer select-none flex-1 text-text-secondary"
-                      >
-                        I confirm I am 18+ and agree to the{" "}
-                        <Link href="/terms" className="text-brand-primary hover:underline">
-                          Terms of Service
-                        </Link>{" "}
-                        and{" "}
-                        <Link href="/privacy" className="text-brand-primary hover:underline">
-                          Privacy Policy
-                        </Link>
-                      </label>
-                    </div>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full py-3 bg-gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg shadow-brand-primary/25 disabled:opacity-40"
-                    disabled={isLoading || !ageConfirmed}
-                    aria-label="Create your account"
-                    data-testid="auth-submit"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-                        Creating account…
-                      </>
-                    ) : (
-                      "Create Account"
-                    )}
-                  </Button>
-                </form>
-
-                {!isTestMode && (
-                  <>
-                    <div className="relative my-6">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-border-base" />
-                      </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-surface-raised px-3 text-text-tertiary">
-                          Or continue with
-                        </span>
-                      </div>
-                    </div>
-
-                    <Button
+                    <button
                       type="button"
-                      variant="outline"
-                      className="w-full py-3 bg-surface-base border border-border-base rounded-xl font-semibold hover:bg-surface-raised transition-all"
-                      onClick={handleGoogleSignIn}
-                      disabled={isLoading}
-                      aria-label="Sign up with Google"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-white transition-colors rounded-sm p-0.5"
+                      onClick={() => setShowSignupPassword(!showSignupPassword)}
+                      aria-label={showSignupPassword ? "Hide password" : "Show password"}
                     >
-                      <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                          fill="#4285F4"
-                        />
-                        <path
-                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                          fill="#34A853"
-                        />
-                        <path
-                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                          fill="#FBBC05"
-                        />
-                        <path
-                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                          fill="#EA4335"
-                        />
-                      </svg>
-                      Google
-                    </Button>
-                  </>
+                      {showSignupPassword ? (
+                        <EyeOff className="size-[14px]" />
+                      ) : (
+                        <Eye className="size-[14px]" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5 pt-1">
+                  <Checkbox
+                    id="age-confirm"
+                    checked={ageConfirmed}
+                    onCheckedChange={(checked) => setAgeConfirmed(checked === true)}
+                    disabled={isLoading}
+                    data-testid="auth-age-checkbox"
+                    className="mt-0.5"
+                  />
+                  <label
+                    htmlFor="age-confirm"
+                    className="text-[12px] text-text-muted leading-relaxed cursor-pointer"
+                  >
+                    I confirm I am 18 years or older and agree to the{" "}
+                    <Link href="/terms" className="text-violet-400 hover:underline">
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="/privacy" className="text-violet-400 hover:underline">
+                      Privacy Policy
+                    </Link>
+                  </label>
+                </div>
+
+                {!ageConfirmed && (
+                  <p className="text-[11px] text-text-muted" data-testid="auth-age-hint">
+                    You must confirm you are 18+ to create an account.
+                  </p>
                 )}
-              </div>
+
+                <Button
+                  type="submit"
+                  variant="violet"
+                  size="lg"
+                  className="w-full"
+                  disabled={isLoading || !ageConfirmed}
+                  data-testid="auth-submit"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="size-[14px] animate-spin" />
+                      Creating account...
+                    </>
+                  ) : (
+                    "Create Account"
+                  )}
+                </Button>
+              </form>
+
+              {!isTestMode && (
+                <div className="mt-4">
+                  <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-white/8" />
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="bg-bg-base px-3 text-[11px] text-text-muted uppercase tracking-wider">
+                        Or continue with
+                      </span>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="default"
+                    className="w-full"
+                    onClick={handleGoogleSignIn}
+                    disabled={isLoading}
+                  >
+                    <Sparkles className="size-[14px]" />
+                    Continue with Google
+                  </Button>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
-        </div>
 
-        {/* Footer Links */}
-        <div className="mt-6 text-center text-sm text-text-tertiary">
-          <p>© 2026 GetFanSee. All rights reserved.</p>
+          {/* Trust strip */}
+          <TrustStrip
+            className="mt-6"
+            items={["Secure & Encrypted", "24/7 Support", "Private & Discreet"]}
+          />
+
+          {/* Mobile social proof — hidden on desktop (hero already shows it) */}
+          <div className="mt-5 pt-5 border-t border-white/6 lg:hidden">
+            <p className="text-center text-[11px] text-text-muted mb-3 uppercase tracking-wider font-medium">
+              Trusted by
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {socialProofItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={item.label}
+                    className="flex flex-col items-center gap-1 p-2.5 rounded-[var(--radius-sm)] bg-white/4 border border-white/6"
+                  >
+                    <div
+                      className={`size-7 rounded-full ${item.bg} flex items-center justify-center`}
+                    >
+                      <Icon className={`size-[13px] ${item.color}`} aria-hidden="true" />
+                    </div>
+                    <p className={`text-[13px] font-bold ${item.color}`}>{item.value}</p>
+                    <p className="text-[10px] text-text-muted text-center leading-tight">
+                      {item.label}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <p className="mt-4 text-center text-[11px] text-text-disabled">
+            © 2026 GetFanSee. All rights reserved.
+          </p>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

@@ -3,15 +3,34 @@ import { withSentryConfig } from "@sentry/nextjs";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
-    // 开发环境允许类型错误，生产环境必须修复
     ignoreBuildErrors: process.env.NODE_ENV === 'development',
   },
   images: {
-    // 不使用 Next Image 优化（如果需要可以启用）
+    // Allow remote images from Supabase storage and other CDN sources
     unoptimized: true,
+    remotePatterns: [
+      { protocol: "https", hostname: "**.supabase.co" },
+      { protocol: "https", hostname: "**.supabase.in" },
+    ],
   },
-  // 注释掉静态导出，Vercel 部署不需要
-  // output: "export",
+  // Remove X-Powered-By header to avoid leaking Next.js fingerprint
+  poweredByHeader: false,
+  experimental: {
+    optimizePackageImports: ['@phosphor-icons/react'],
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          // Prevent tech stack inference via common headers
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+      },
+    ];
+  },
 }
 
 // Sentry 配置选项

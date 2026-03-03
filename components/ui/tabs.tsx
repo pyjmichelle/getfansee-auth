@@ -9,7 +9,7 @@ function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
-      className={cn("flex flex-col gap-2", className)}
+      className={cn("flex flex-col gap-0", className)}
       {...props}
     />
   );
@@ -20,7 +20,8 @@ function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimi
     <TabsPrimitive.List
       data-slot="tabs-list"
       className={cn(
-        "bg-secondary text-muted-foreground inline-flex h-11 w-fit items-center justify-center rounded-xl p-1 border border-border shadow-sm",
+        "inline-flex items-center gap-0 border-b border-white/8",
+        "text-text-muted w-full",
         className
       )}
       {...props}
@@ -33,13 +34,16 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "text-muted-foreground inline-flex h-full flex-1 items-center justify-center gap-2 rounded-lg border border-transparent px-4 py-2 text-sm font-medium whitespace-nowrap select-none",
-        "transition-[color,background-color,box-shadow,border-color] duration-150 motion-safe:transition-[color,background-color,box-shadow,border-color] motion-reduce:transition-none",
-        "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-primary/50",
-        "disabled:pointer-events-none disabled:opacity-50",
-        "hover:text-foreground hover:bg-secondary/80",
-        "data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:shadow-sm data-[state=active]:border-border",
-        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 min-h-[40px]",
+        "inline-flex items-center justify-center gap-1.5",
+        "px-3 py-2.5 text-[13px] font-medium whitespace-nowrap select-none",
+        "relative border-b-2 border-transparent -mb-px",
+        "text-text-muted",
+        "transition-[color,border-color] duration-150",
+        "focus-visible:outline-none",
+        "disabled:pointer-events-none disabled:opacity-30",
+        "hover:text-text-secondary",
+        "data-[state=active]:text-white data-[state=active]:border-b-violet-500",
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-[14px]",
         className
       )}
       {...props}
@@ -51,7 +55,7 @@ function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPr
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn("flex-1 outline-none", className)}
+      className={cn("flex-1 outline-none mt-3", className)}
       {...props}
     />
   );

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Mail, FileText, AlertCircle } from "lucide-react";
+import { ArrowLeft, Mail, FileText, AlertCircle } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -11,41 +11,41 @@ export const metadata: Metadata = {
 
 export default function DMCAPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-4 py-12">
+    <div className="min-h-dvh bg-bg-base">
+      <div className="max-w-4xl mx-auto px-4 py-12 section-block">
         <Link href="/">
-          <Button variant="ghost" className="mb-8">
+          <Button variant="ghost" className="mb-8 hover-bold">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
         </Link>
 
         <h1 className="text-4xl font-bold mb-4">DMCA & Copyright Policy</h1>
-        <p className="text-muted-foreground mb-8">
+        <p className="text-text-secondary mb-8">
           GetFanSee respects intellectual property rights and responds to valid DMCA takedown
           requests.
         </p>
 
         <div className="space-y-8">
           {/* Quick Submit Card */}
-          <Card className="border-primary/20">
+          <Card className="card-block border-brand-primary/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Mail className="w-5 h-5 text-primary" />
+                <Mail className="w-5 h-5 text-brand-primary" />
                 Submit a DMCA Takedown Request
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
+              <p className="text-text-secondary">
                 To submit a DMCA takedown request, please send an email to:
               </p>
               <a
                 href="mailto:dmca@getfansee.com"
-                className="inline-flex items-center gap-2 text-primary font-semibold text-lg hover:underline"
+                className="inline-flex items-center gap-2 text-brand-primary font-semibold text-lg hover:underline"
               >
                 dmca@getfansee.com
               </a>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-text-secondary">
                 Please include all required information listed below in your request.
               </p>
             </CardContent>
@@ -57,39 +57,41 @@ export default function DMCAPage() {
               <FileText className="w-5 h-5" />
               Required Information
             </h2>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-text-secondary mb-4">
               Your DMCA takedown notice must include the following information:
             </p>
-            <ol className="list-decimal pl-6 text-muted-foreground space-y-3">
+            <ol className="list-decimal pl-6 text-text-secondary space-y-3">
               <li>
-                <strong className="text-foreground">Identification of the copyrighted work</strong>{" "}
+                <strong className="text-brand-primary">
+                  Identification of the copyrighted work
+                </strong>{" "}
                 - A description of the copyrighted work you claim has been infringed. If multiple
                 works are covered, you may provide a representative list.
               </li>
               <li>
-                <strong className="text-foreground">
+                <strong className="text-brand-primary">
                   Identification of the infringing material
                 </strong>{" "}
                 - The URL(s) or specific location of the content you claim is infringing, with
                 enough detail for us to locate it.
               </li>
               <li>
-                <strong className="text-foreground">Your contact information</strong> - Your full
+                <strong className="text-brand-primary">Your contact information</strong> - Your full
                 legal name, mailing address, telephone number, and email address.
               </li>
               <li>
-                <strong className="text-foreground">Good faith statement</strong> - A statement that
-                you have a good faith belief that the use of the material is not authorized by the
-                copyright owner, its agent, or the law.
+                <strong className="text-brand-primary">Good faith statement</strong> - A statement
+                that you have a good faith belief that the use of the material is not authorized by
+                the copyright owner, its agent, or the law.
               </li>
               <li>
-                <strong className="text-foreground">Accuracy statement</strong> - A statement that
-                the information in your notice is accurate, and under penalty of perjury, that you
-                are authorized to act on behalf of the copyright owner.
+                <strong className="text-brand-primary">Accuracy statement</strong> - A statement
+                that the information in your notice is accurate, and under penalty of perjury, that
+                you are authorized to act on behalf of the copyright owner.
               </li>
               <li>
-                <strong className="text-foreground">Electronic or physical signature</strong> - Your
-                electronic or physical signature.
+                <strong className="text-brand-primary">Electronic or physical signature</strong> -
+                Your electronic or physical signature.
               </li>
             </ol>
           </section>
@@ -97,9 +99,9 @@ export default function DMCAPage() {
           {/* Email Template */}
           <section>
             <h2 className="text-2xl font-semibold mb-4">Email Template</h2>
-            <Card className="bg-muted/30">
+            <Card className="bg-surface-raised/30">
               <CardContent className="pt-6">
-                <pre className="text-sm text-muted-foreground whitespace-pre-wrap font-mono">
+                <pre className="text-sm text-text-secondary whitespace-pre-wrap font-mono">
                   {`Subject: DMCA Takedown Request
 
 To: dmca@getfansee.com
@@ -141,11 +143,11 @@ Date: [Current date]`}
           {/* Counter-Notice Section */}
           <section>
             <h2 className="text-2xl font-semibold mb-4">Counter-Notification</h2>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-text-secondary mb-4">
               If you believe your content was wrongly removed due to a DMCA notice, you may submit a
               counter-notification. Your counter-notice must include:
             </p>
-            <ul className="list-disc pl-6 text-muted-foreground space-y-2">
+            <ul className="list-disc pl-6 text-text-secondary space-y-2">
               <li>Your physical or electronic signature</li>
               <li>Identification of the removed material and its previous location</li>
               <li>
@@ -157,22 +159,23 @@ Date: [Current date]`}
           </section>
 
           {/* Warning Section */}
-          <Card className="border-destructive/30 bg-destructive/5">
+          <Card className="border-error/30 bg-error/5">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-destructive">
+              <CardTitle className="flex items-center gap-2 text-error">
                 <AlertCircle className="w-5 h-5" />
                 Important Notice
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-muted-foreground space-y-3">
+            <CardContent className="text-text-secondary space-y-3">
               <p>
-                <strong className="text-foreground">False claims:</strong> Filing a false DMCA
+                <strong className="text-brand-primary">False claims:</strong> Filing a false DMCA
                 notice or counter-notice is illegal. Under Section 512(f) of the DMCA, you may be
                 liable for damages if you knowingly misrepresent material or activity as infringing.
               </p>
               <p>
-                <strong className="text-foreground">Repeat infringers:</strong> GetFanSee maintains
-                a policy of terminating accounts of users who are found to be repeat infringers.
+                <strong className="text-brand-primary">Repeat infringers:</strong> GetFanSee
+                maintains a policy of terminating accounts of users who are found to be repeat
+                infringers.
               </p>
             </CardContent>
           </Card>
@@ -180,11 +183,11 @@ Date: [Current date]`}
           {/* Response Time */}
           <section>
             <h2 className="text-2xl font-semibold mb-4">Response Time</h2>
-            <p className="text-muted-foreground">
+            <p className="text-text-secondary">
               We aim to respond to valid DMCA takedown requests within <strong>48-72 hours</strong>.
               Upon receiving a valid request, we will:
             </p>
-            <ul className="list-disc pl-6 text-muted-foreground space-y-2 mt-4">
+            <ul className="list-disc pl-6 text-text-secondary space-y-2 mt-4">
               <li>Remove or disable access to the allegedly infringing content</li>
               <li>Notify the user who posted the content</li>
               <li>Provide the user with a copy of the takedown notice</li>
@@ -195,17 +198,17 @@ Date: [Current date]`}
           {/* Contact Section */}
           <section className="pt-8 border-t">
             <h2 className="text-2xl font-semibold mb-4">DMCA Agent Contact</h2>
-            <div className="text-muted-foreground space-y-2">
+            <div className="text-text-secondary space-y-2">
               <p>
-                <strong className="text-foreground">Email:</strong> dmca@getfansee.com
+                <strong className="text-brand-primary">Email:</strong> dmca@getfansee.com
               </p>
               <p>
-                <strong className="text-foreground">Subject Line:</strong> DMCA Takedown Request
+                <strong className="text-brand-primary">Subject Line:</strong> DMCA Takedown Request
               </p>
             </div>
-            <p className="text-sm text-muted-foreground mt-4">
+            <p className="text-sm text-text-secondary mt-4">
               For general inquiries, please visit our{" "}
-              <Link href="/support" className="text-primary underline hover:no-underline">
+              <Link href="/support" className="text-brand-primary underline hover:no-underline">
                 Support page
               </Link>
               .

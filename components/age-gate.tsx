@@ -2,61 +2,51 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { ShieldAlert } from "lucide-react";
+import { ShieldAlert } from "@/lib/icons";
 
 const AGE_VERIFIED_KEY = "getfansee_age_verified";
 const AGE_VERIFIED_VALUE = "true";
 
-// Routes that don't require age verification
-const EXEMPT_ROUTES = ["/age-denied", "/terms", "/privacy", "/dmca"];
+const EXEMPT_ROUTES = [
+  "/age-denied",
+  "/terms",
+  "/privacy",
+  "/dmca",
+  "/auth",
+  "/auth/verify",
+  "/auth/error",
+  "/auth/resend-verification",
+];
 
 interface AgeGateProps {
   children: React.ReactNode;
 }
 
 export function AgeGate({ children }: AgeGateProps) {
-  const [isVerified, setIsVerified] = useState<boolean | null>(() => {
-    if (process.env.NEXT_PUBLIC_TEST_MODE === "true") {
-      return true;
-    }
-
-    if (typeof document !== "undefined" && document.cookie.includes("playwright-test-mode=1")) {
-      return true;
-    }
-
-    return null;
-  });
+  const [isVerified, setIsVerified] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
   const [showDenied, setShowDenied] = useState(false);
   const pathname = usePathname();
 
-  // Check if current route is exempt
   const isExemptRoute = EXEMPT_ROUTES.some(
     (route) => pathname === route || pathname?.startsWith(route + "/")
   );
 
   useEffect(() => {
     const isTestMode =
-      process.env.NEXT_PUBLIC_TEST_MODE === "true" ||
-      (typeof document !== "undefined" && document.cookie.includes("playwright-test-mode=1"));
+      typeof document !== "undefined" && document.cookie.includes("playwright-test-mode=1");
 
     if (isTestMode) {
       localStorage.setItem(AGE_VERIFIED_KEY, AGE_VERIFIED_VALUE);
       setIsVerified(true);
+      setIsChecking(false);
       return;
     }
 
-    // Check localStorage on mount
     const verified = localStorage.getItem(AGE_VERIFIED_KEY) === AGE_VERIFIED_VALUE;
     setIsVerified(verified);
+    setIsChecking(false);
   }, []);
 
   const handleConfirmAge = () => {
@@ -68,32 +58,25 @@ export function AgeGate({ children }: AgeGateProps) {
     setShowDenied(true);
   };
 
-  // Still loading
-  if (isVerified === null) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
-      </div>
-    );
-  }
+  if (isExemptRoute) return <>{children}</>;
 
-  // Exempt routes don't need verification
-  if (isExemptRoute) {
-    return <>{children}</>;
-  }
-
-  // User denied age - show blocked message
+  // Denied state — full screen message (no deadclick risk, children not rendered)
   if (showDenied) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="max-w-md text-center space-y-4" data-testid="age-denied-message">
-          <ShieldAlert className="w-16 h-16 mx-auto text-destructive" />
-          <h1 className="text-2xl font-bold text-foreground">Access Denied</h1>
-          <p className="text-muted-foreground">
+      <div className="min-h-dvh bg-bg-base flex items-center justify-center p-4">
+        <div
+          className="max-w-sm w-full text-center glass-panel rounded-[var(--radius-lg)] p-8 space-y-4"
+          data-testid="age-denied-message"
+        >
+          <div className="size-14 mx-auto rounded-full bg-red-500/10 flex items-center justify-center">
+            <ShieldAlert className="size-6 text-red-400" aria-hidden="true" />
+          </div>
+          <h1 className="text-[18px] font-semibold text-white">Access Denied</h1>
+          <p className="text-[13px] text-text-muted">
             You must be 18 years or older to access this website. This site contains adult content
             that is not suitable for minors.
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-[12px] text-text-disabled">
             If you believe you received this message in error, please close this browser window and
             try again.
           </p>
@@ -102,69 +85,78 @@ export function AgeGate({ children }: AgeGateProps) {
     );
   }
 
-  // User not verified - show age gate modal
-  if (!isVerified) {
-    return (
-      <>
-        {/* Show blurred/hidden content behind */}
-        <div className="min-h-screen bg-background opacity-20 pointer-events-none">{children}</div>
-
-        <AlertDialog open={true}>
-          <AlertDialogContent className="max-w-md" data-testid="age-gate-modal">
-            <AlertDialogHeader className="text-center sm:text-center">
-              <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <ShieldAlert className="w-8 h-8 text-primary" />
-              </div>
-              <AlertDialogTitle className="text-xl">Age Verification Required</AlertDialogTitle>
-              <AlertDialogDescription className="space-y-3">
-                <span className="block">
-                  This website contains adult content and is intended for individuals who are 18
-                  years of age or older.
-                </span>
-                <span className="block font-medium text-foreground">
-                  Are you at least 18 years old?
-                </span>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-
-            <AlertDialogFooter className="sm:justify-center gap-3 mt-4">
-              <Button
-                variant="outline"
-                onClick={handleDenyAge}
-                className="min-w-[120px]"
-                data-testid="age-gate-no"
-              >
-                No, I am under 18
-              </Button>
-              <Button
-                onClick={handleConfirmAge}
-                className="min-w-[120px]"
-                data-testid="age-gate-yes"
-              >
-                Yes, I am 18+
-              </Button>
-            </AlertDialogFooter>
-
-            <div className="mt-4 pt-4 border-t text-center">
-              <p className="text-xs text-muted-foreground">
-                By clicking "Yes, I am 18+", you confirm that you are of legal age to view adult
-                content in your jurisdiction and agree to our{" "}
-                <a href="/terms" className="underline hover:text-foreground">
-                  Terms of Service
-                </a>{" "}
-                and{" "}
-                <a href="/privacy" className="underline hover:text-foreground">
-                  Privacy Policy
-                </a>
-                .
-              </p>
-            </div>
-          </AlertDialogContent>
-        </AlertDialog>
-      </>
-    );
+  // Verified: render children directly, no overlay
+  if (!isChecking && isVerified) {
+    return <>{children}</>;
   }
 
-  // User verified - show content
-  return <>{children}</>;
+  // Checking or unverified: render children underneath the gate overlay.
+  // Children are always interactive-eligible — the fixed overlay captures pointer events,
+  // eliminating the "visible but unclickable" deadclick window from the previous approach.
+  return (
+    <>
+      {children}
+      {/* Gate overlay — shown while checking or while unverified */}
+      <div
+        className="fixed inset-0 glass-overlay flex items-center justify-center p-4"
+        style={{ zIndex: "var(--z-age-gate)" as unknown as number }}
+        aria-modal="true"
+        role="dialog"
+        aria-label="Age verification"
+      >
+        {isChecking ? (
+          // Brief loading state while reading localStorage — avoids layout flash
+          <div className="min-h-dvh bg-bg-base" aria-hidden="true" />
+        ) : (
+          <div
+            className="glass-panel rounded-[var(--radius-lg)] border border-white/10 p-6 max-w-sm w-full"
+            data-testid="age-gate-modal"
+          >
+            <div className="flex flex-col items-center text-center mb-5">
+              <div className="size-12 rounded-full bg-violet-500/15 border border-violet-500/20 flex items-center justify-center mb-3 shadow-glow-violet">
+                <ShieldAlert className="size-5 text-violet-400" aria-hidden="true" />
+              </div>
+              <h2 className="text-[18px] font-semibold text-white mb-1">
+                Age Verification Required
+              </h2>
+              <p className="text-[13px] text-text-muted">
+                This website contains age-restricted content. By entering, you confirm you are 18
+                years or older.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="violet"
+                size="lg"
+                className="w-full"
+                onClick={handleConfirmAge}
+                data-testid="age-gate-yes"
+                aria-label="I am 18 or older — confirm and enter site"
+              >
+                Enter Site — I am 18+
+              </Button>
+              <Button
+                variant="ghost"
+                size="default"
+                className="w-full"
+                onClick={handleDenyAge}
+                data-testid="age-gate-no"
+                aria-label="I am under 18 years old"
+              >
+                Exit
+              </Button>
+            </div>
+
+            <p className="text-[11px] text-text-disabled mt-4 text-center">
+              By continuing you agree to our{" "}
+              <a href="/terms" className="underline hover:text-text-muted transition-colors">
+                Terms of Service
+              </a>
+            </p>
+          </div>
+        )}
+      </div>
+    </>
+  );
 }

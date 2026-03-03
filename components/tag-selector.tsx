@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X } from "@/lib/icons";
 
 interface Tag {
   id: string;
@@ -59,7 +59,7 @@ export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: T
   };
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading tags...</p>;
+    return <p className="text-sm text-text-tertiary">Loading tags...</p>;
   }
 
   return (
@@ -79,7 +79,7 @@ export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: T
                     toggleTag(tagId);
                   }
                 }}
-                className="ml-2 hover:text-destructive min-h-[20px] min-w-[20px]"
+                className="ml-2 hover:text-error active:scale-95 transition-all min-h-[20px] min-w-[20px] focus-visible:outline-2 focus-visible:outline-brand-primary cursor-pointer"
                 aria-label={`Remove tag ${getTagName(tagId)}`}
               >
                 <X className="w-3 h-3" aria-hidden="true" />
@@ -109,7 +109,7 @@ export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: T
                 }
               }}
               disabled={selectedTags.length >= maxTags}
-              className="h-8 min-h-[32px]"
+              className="h-8 min-h-[32px] cursor-pointer hover:bg-brand-primary/10 hover:text-brand-primary hover:border-brand-primary/30 active:scale-95 transition-all focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={`Add tag ${tag.name}`}
               aria-disabled={selectedTags.length >= maxTags}
             >
@@ -119,7 +119,7 @@ export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: T
       </div>
 
       {selectedTags.length >= maxTags && (
-        <p className="text-xs text-muted-foreground">Maximum {maxTags} tags selected</p>
+        <p className="text-xs text-text-tertiary">Maximum {maxTags} tags selected</p>
       )}
     </div>
   );

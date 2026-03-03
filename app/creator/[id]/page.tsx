@@ -2,26 +2,74 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { NavHeader } from "@/components/nav-header";
-import { Card, CardContent } from "@/components/ui/card";
+import { PageShell } from "@/components/page-shell";
+import { PostCard } from "@/components/post-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// 所有服务器端函数都通过 API 调用，不直接导入
 import { type Post } from "@/lib/types";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { MediaDisplay } from "@/components/media-display";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
-import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
-
-import { Image as ImageIcon, Heart, FileText, Lock, Share2, ChevronLeft } from "lucide-react";
+import {
+  Image as ImageIcon,
+  Heart,
+  FileText,
+  Lock,
+  Share2,
+  ChevronLeft,
+  Users,
+  Grid3X3,
+  Star,
+} from "@/lib/icons";
 import { ReportButton } from "@/components/report-button";
+import { PaywallModal } from "@/components/paywall-modal";
 import { toast } from "sonner";
-import { BottomNavigation } from "@/components/bottom-navigation";
-import { LoadingState } from "@/components/loading-state";
+import { Analytics } from "@/lib/analytics";
 import { ErrorState } from "@/components/error-state";
+import { DEFAULT_AVATAR_CREATOR } from "@/lib/image-fallbacks";
+import { useCountUp } from "@/hooks/use-count-up";
 
 const supabase = getSupabaseBrowserClient();
+
+/* -------------------------------------------------------------------------- */
+/* Skeleton                                                                     */
+/* -------------------------------------------------------------------------- */
+function CreatorProfileSkeleton() {
+  return (
+    <>
+      {/* Banner */}
+      <div className="relative mt-14 h-48 md:h-64">
+        <Skeleton className="w-full h-full" />
+      </div>
+      {/* Avatar + info */}
+      <div className="px-4 md:px-6 -mt-12 mb-6">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div className="flex items-end gap-4">
+            <Skeleton className="w-24 h-24 md:w-28 md:h-28 rounded-2xl flex-shrink-0" />
+            <div className="pb-2 space-y-2">
+              <Skeleton className="h-6 w-40 rounded" />
+              <Skeleton className="h-4 w-64 rounded" />
+            </div>
+          </div>
+          <Skeleton className="h-10 w-36 rounded-xl hidden md:block" />
+        </div>
+      </div>
+      {/* Stats */}
+      <div className="px-4 md:px-6 mb-6 grid grid-cols-3 gap-3">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-20 rounded-2xl" />
+        ))}
+      </div>
+      {/* Posts */}
+      <div className="px-4 md:px-6 space-y-4">
+        {[1, 2].map((i) => (
+          <Skeleton key={i} className="h-48 rounded-2xl" />
+        ))}
+      </div>
+    </>
+  );
+}
 
 export default function CreatorProfilePage() {
   const params = useParams();
@@ -45,8 +93,17 @@ export default function CreatorProfilePage() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [subscriptionPrice, setSubscriptionPrice] = useState(9.99);
   const [postViewStates, setPostViewStates] = useState<Map<string, boolean>>(new Map());
   const [activeTab, setActiveTab] = useState<"posts" | "media" | "likes">("posts");
+
+  const totalPosts = posts.length;
+  const mediaPosts = posts.filter(
+    (post) => (post.media && post.media.length > 0) || post.media_url
+  ).length;
+  const totalLikes = posts.reduce((sum, post) => sum + (post.likes_count || 0), 0);
+  const animatedLikes = useCountUp(totalLikes, { duration: 800, decimals: 0 });
 
   useEffect(() => {
     const loadData = async () => {
@@ -54,7 +111,6 @@ export default function CreatorProfilePage() {
         setIsLoading(true);
         setError(null);
 
-        // 检查认证
         const {
           data: { session },
         } = await supabase.auth.getSession();
@@ -64,11 +120,9 @@ export default function CreatorProfilePage() {
           return;
         }
 
-        // 确保 profile 存在（通过 API）
         await fetch("/api/auth/ensure-profile", { method: "POST" });
         setCurrentUserId(session.user.id);
 
-        // 加载当前用户信息（用于 NavHeader）- 通过 API
         const profileResponse = await fetch("/api/profile");
         if (profileResponse.ok) {
           const profileData = await profileResponse.json();
@@ -82,15 +136,12 @@ export default function CreatorProfilePage() {
           }
         }
 
-        // 检查是否已订阅（如果不是 creator 本人）
         if (session.user.id !== creatorId) {
           const statusResponse = await fetch(`/api/subscription/status?creatorId=${creatorId}`);
           const statusData = await statusResponse.json();
-          const subscribed = statusData.isSubscribed || false;
-          setIsSubscribed(subscribed);
+          setIsSubscribed(statusData.isSubscribed || false);
         }
 
-        // 加载 creator profile (from creators table) - 通过 API
         const creatorResponse = await fetch(`/api/creator/${creatorId}`);
         if (!creatorResponse.ok) {
           setError("Creator not found");
@@ -103,20 +154,22 @@ export default function CreatorProfilePage() {
           return;
         }
 
+        Analytics.creatorProfileViewed(creatorId);
         setCreatorProfile({
           id: creator.id,
           display_name: creator.display_name,
           bio: creator.bio,
           avatar_url: creator.avatar_url,
         });
+        // Subscription price (cents → dollars); default 9.99 if not set
+        if (creator.subscription_price_cents && creator.subscription_price_cents > 0) {
+          setSubscriptionPrice(creator.subscription_price_cents / 100);
+        }
 
-        // 加载 creator posts（通过 API）
         const postsResponse = await fetch(`/api/creator/${creatorId}/posts`);
         if (postsResponse.ok) {
           const postsData = await postsResponse.json();
           setPosts(postsData.posts || []);
-
-          // 使用 API 返回的解锁状态
           const states = new Map<string, boolean>();
           for (const post of postsData.posts || []) {
             states.set(post.id, postsData.unlockedStates?.[post.id] || false);
@@ -134,63 +187,45 @@ export default function CreatorProfilePage() {
     loadData();
   }, [creatorId, router]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background pb-16 md:pb-0">
-        {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <LoadingState type="skeleton" />
-        </main>
-        <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
-      </div>
-    );
-  }
+  const reloadPosts = async () => {
+    const postsResponse = await fetch(`/api/creator/${creatorId}/posts`);
+    if (postsResponse.ok) {
+      const postsData = await postsResponse.json();
+      setPosts(postsData.posts || []);
+      const states = new Map<string, boolean>();
+      for (const post of postsData.posts || []) {
+        states.set(post.id, postsData.unlockedStates?.[post.id] || false);
+      }
+      setPostViewStates(states);
+    }
+  };
 
-  if (error || !creatorProfile) {
-    return (
-      <div className="min-h-screen bg-background pb-16 md:pb-0">
-        {currentUser && <NavHeader user={currentUser!} notificationCount={0} />}
-        <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <ErrorState
-            title="Creator Not Found"
-            message={error || "This creator does not exist"}
-            retry={() => router.push("/home")}
-            variant="centered"
-          />
-        </main>
-        <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
-      </div>
-    );
-  }
+  // Opens the PaywallModal for user to confirm subscription
+  const handleSubscribe = () => {
+    setShowSubscribeModal(true);
+  };
 
-  const handleSubscribe = async () => {
+  // Called by PaywallModal.onSuccess after user confirms
+  const confirmSubscribe = async () => {
+    setIsSubscribing(true);
     try {
-      setIsSubscribing(true);
       const response = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ creatorId }),
       });
       const data = await response.json();
-      const success = data.success;
-      if (success) {
+      if (data.success) {
         setIsSubscribed(true);
-        // 重新加载 posts（通过 API）
-        const postsResponse = await fetch(`/api/creator/${creatorId}/posts`);
-        if (postsResponse.ok) {
-          const postsData = await postsResponse.json();
-          setPosts(postsData.posts || []);
-
-          // 使用 API 返回的解锁状态
-          const states = new Map<string, boolean>();
-          for (const post of postsData.posts || []) {
-            states.set(post.id, postsData.unlockedStates?.[post.id] || false);
-          }
-          setPostViewStates(states);
-        }
+        toast.success(`Subscribed to ${creatorProfile?.display_name || "creator"}!`);
+        await reloadPosts();
+      } else {
+        toast.error(data.error || "Subscription failed. Please try again.");
+        throw new Error(data.error || "Subscription failed");
       }
     } catch (err) {
-      console.error("[creator] subscribe30d error", err);
+      console.error("[creator] subscribe error", err);
+      throw err;
     } finally {
       setIsSubscribing(false);
     }
@@ -205,22 +240,9 @@ export default function CreatorProfilePage() {
         body: JSON.stringify({ creatorId }),
       });
       const data = await response.json();
-      const success = data.success;
-      if (success) {
+      if (data.success) {
         setIsSubscribed(false);
-        // 重新加载 posts（通过 API）
-        const postsResponse = await fetch(`/api/creator/${creatorId}/posts`);
-        if (postsResponse.ok) {
-          const postsData = await postsResponse.json();
-          setPosts(postsData.posts || []);
-
-          // 使用 API 返回的解锁状态
-          const states = new Map<string, boolean>();
-          for (const post of postsData.posts || []) {
-            states.set(post.id, postsData.unlockedStates?.[post.id] || false);
-          }
-          setPostViewStates(states);
-        }
+        await reloadPosts();
       }
     } catch (err) {
       console.error("[creator] cancelSubscription error", err);
@@ -235,28 +257,52 @@ export default function CreatorProfilePage() {
       await navigator.clipboard.writeText(shareUrl);
       toast.success("Link copied to clipboard!");
     } catch {
-      // Fallback for browsers that don't support clipboard API
-      const textarea = document.createElement("textarea");
-      textarea.value = shareUrl;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
-      toast.success("Link copied to clipboard!");
+      toast.success("Link copied!");
     }
   };
 
+  const isOwnProfile = currentUserId === creatorId;
+
+  if (isLoading) {
+    return (
+      <PageShell user={currentUser} notificationCount={0} noPadding>
+        <CreatorProfileSkeleton />
+      </PageShell>
+    );
+  }
+
+  if (error || !creatorProfile) {
+    return (
+      <PageShell user={currentUser} notificationCount={0} maxWidth="2xl">
+        <div className="py-8">
+          <ErrorState
+            title="Creator Not Found"
+            message={error || "This creator does not exist"}
+            retry={() => router.push("/home")}
+            variant="centered"
+          />
+        </div>
+      </PageShell>
+    );
+  }
+
+  const tabs = [
+    { id: "posts" as const, label: "Posts", icon: FileText, count: totalPosts },
+    { id: "media" as const, label: "Media", icon: ImageIcon, count: mediaPosts },
+    { id: "likes" as const, label: "Likes", icon: Heart },
+  ];
+
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Fixed Header - Figma Style */}
+    <PageShell user={currentUser} notificationCount={0} noPadding>
+      {/* Fixed Header - creator profile has its own custom header */}
       <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-border-base">
-        <div className="flex items-center justify-between px-4 h-14">
+        <div className="flex items-center justify-between px-4 h-14 max-w-6xl mx-auto">
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={() => router.back()}
             aria-label="Go back"
-            className="text-text-primary"
+            className="text-text-primary active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
           >
             <ChevronLeft className="w-6 h-6" aria-hidden="true" />
           </Button>
@@ -268,405 +314,311 @@ export default function CreatorProfilePage() {
             size="icon-sm"
             onClick={handleShare}
             aria-label="Share profile"
-            className="text-text-primary"
+            className="text-text-primary active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
           >
             <Share2 className="w-5 h-5" aria-hidden="true" />
           </Button>
         </div>
       </header>
 
-      {/* Banner - Figma Style */}
-      <div className="relative mt-14 h-56 sm:h-80">
-        <div className="w-full h-full bg-gradient-primary opacity-80"></div>
+      {/* Banner */}
+      <div className="relative mt-14 h-48 md:h-64 duotone-overlay overflow-hidden">
+        <div className="w-full h-full bg-gradient-primary opacity-80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/60" />
       </div>
 
-      {/* Avatar Section - Figma Style */}
-      <div className="relative -mt-16 sm:-mt-20 mb-6 px-4">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div className="flex items-end gap-4">
-            <Avatar className="w-24 h-24 sm:w-32 sm:h-32 border-4 border-background ring-2 ring-brand-primary/30 shadow-glow">
-              <AvatarImage
-                src={creatorProfile.avatar_url || "/placeholder.svg"}
-                alt={creatorProfile.display_name || "Creator"}
-              />
-              <AvatarFallback className="text-2xl sm:text-3xl bg-brand-primary-alpha-10 text-brand-primary font-bold">
-                {creatorProfile.display_name?.[0]?.toUpperCase() || "C"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="pb-2">
-              <h1 className="text-xl sm:text-2xl font-bold text-text-primary mb-1">
-                {creatorProfile.display_name || "Creator"}
-              </h1>
-              {creatorProfile.bio && (
-                <p className="text-text-tertiary text-sm max-w-md line-clamp-2">
-                  {creatorProfile.bio}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Subscribe Button - Desktop */}
-          {currentUserId && currentUserId !== creatorId && (
-            <div className="hidden sm:flex flex-col gap-2">
-              {isSubscribed ? (
-                <Button
-                  variant="outline"
-                  onClick={handleCancelSubscription}
-                  disabled={isSubscribing}
-                  className="rounded-xl min-w-[140px]"
-                >
-                  {isSubscribing ? "..." : "Subscribed"}
-                </Button>
-              ) : (
-                <Button
-                  variant="subscribe-gradient"
-                  onClick={handleSubscribe}
-                  disabled={isSubscribing}
-                  className="rounded-xl min-w-[140px]"
-                >
-                  {isSubscribing ? "..." : "Subscribe"}
-                </Button>
-              )}
-              <ReportButton
-                targetType="user"
-                targetId={creatorId}
-                variant="ghost"
-                size="sm"
-                className="text-text-tertiary"
-              />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      <main className="max-w-2xl mx-auto">
-        {/* Tabs - Figma Style */}
-        <div className="px-4 mb-4">
-          <div className="flex border-b border-border-base">
-            <button
-              onClick={() => setActiveTab("posts")}
-              className={cn(
-                "flex-1 pb-3 text-sm font-medium transition-colors relative",
-                activeTab === "posts"
-                  ? "text-brand-primary"
-                  : "text-text-tertiary hover:text-text-primary"
-              )}
-            >
-              <div className="flex items-center justify-center gap-2">
-                <FileText className="w-4 h-4" aria-hidden="true" />
-                <span>Posts</span>
-              </div>
-              {activeTab === "posts" && (
-                <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-brand-primary rounded-full"></span>
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab("media")}
-              className={cn(
-                "flex-1 pb-3 text-sm font-medium transition-colors relative",
-                activeTab === "media"
-                  ? "text-brand-primary"
-                  : "text-text-tertiary hover:text-text-primary"
-              )}
-            >
-              <div className="flex items-center justify-center gap-2">
-                <ImageIcon className="w-4 h-4" aria-hidden="true" />
-                <span>Media</span>
-              </div>
-              {activeTab === "media" && (
-                <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-brand-primary rounded-full"></span>
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab("likes")}
-              className={cn(
-                "flex-1 pb-3 text-sm font-medium transition-colors relative",
-                activeTab === "likes"
-                  ? "text-brand-primary"
-                  : "text-text-tertiary hover:text-text-primary"
-              )}
-            >
-              <div className="flex items-center justify-center gap-2">
-                <Heart className="w-4 h-4" aria-hidden="true" />
-                <span>Likes</span>
-              </div>
-              {activeTab === "likes" && (
-                <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-brand-primary rounded-full"></span>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Tab Content - Grid Layout for Media */}
-        <div className="px-4 pb-24">
-          {activeTab === "posts" && (
-            <div className="space-y-4">
-              {posts.length === 0 ? (
-                <div className="py-12 text-center">
-                  <FileText className="w-12 h-12 mx-auto mb-3 text-text-quaternary" />
-                  <p className="text-text-tertiary">No posts yet</p>
-                </div>
-              ) : (
-                posts.map((post) => {
-                  const canView =
-                    postViewStates.get(post.id) === true || post.creator_id === currentUserId;
-
-                  return (
-                    <div
-                      key={post.id}
-                      className="bg-surface-base border border-border-base rounded-2xl overflow-hidden"
-                    >
-                      <div className="p-4">
-                        {post.title && (
-                          <Link href={`/posts/${post.id}`}>
-                            <h3 className="text-xl font-bold text-foreground mb-3 hover:text-primary transition-colors cursor-pointer line-clamp-2">
-                              {post.title}
-                            </h3>
-                          </Link>
-                        )}
-                        {canView ? (
-                          <p className="text-foreground whitespace-pre-wrap mb-6 line-clamp-4 text-sm leading-relaxed">
-                            {post.content}
-                          </p>
-                        ) : (
-                          <div className="bg-muted/50 border border-border rounded-xl p-6 text-center mb-6">
-                            <Lock
-                              className="w-10 h-10 mx-auto mb-3 text-muted-foreground"
-                              aria-hidden="true"
-                            />
-                            <p className="text-muted-foreground mb-4 text-sm">
-                              {post.price_cents === 0
-                                ? "This exclusive content is for subscribers only"
-                                : `Unlock this hot content for $${((post.price_cents || 0) / 100).toFixed(2)}`}
-                            </p>
-                            {post.price_cents === 0 ? (
-                              <Button
-                                size="sm"
-                                variant="subscribe-gradient"
-                                onClick={handleSubscribe}
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter" || e.key === " ") {
-                                    e.preventDefault();
-                                    handleSubscribe();
-                                  }
-                                }}
-                                disabled={isSubscribing}
-                                className="rounded-xl min-h-[44px] font-semibold shadow-lg"
-                                aria-label={
-                                  isSubscribing
-                                    ? "Processing subscription…"
-                                    : "Subscribe to unlock this content"
-                                }
-                              >
-                                {isSubscribing ? "Processing…" : "Subscribe to Unlock"}
-                              </Button>
-                            ) : (
-                              <Button
-                                size="sm"
-                                variant="unlock-gradient"
-                                onClick={async () => {
-                                  try {
-                                    const response = await fetch("/api/unlock", {
-                                      method: "POST",
-                                      headers: { "Content-Type": "application/json" },
-                                      body: JSON.stringify({
-                                        postId: post.id,
-                                        priceCents: post.price_cents || 0,
-                                      }),
-                                    });
-                                    const result = await response.json();
-                                    if (result.success && currentUserId) {
-                                      // 重新加载 posts（通过 API）
-                                      const postsResponse = await fetch(
-                                        `/api/creator/${creatorId}/posts`
-                                      );
-                                      if (postsResponse.ok) {
-                                        const postsData = await postsResponse.json();
-                                        setPosts(postsData.posts || []);
-
-                                        // 使用 API 返回的解锁状态，并标记当前解锁的 post
-                                        const states = new Map<string, boolean>();
-                                        for (const p of postsData.posts || []) {
-                                          if (p.creator_id === currentUserId) {
-                                            states.set(p.id, true);
-                                          } else {
-                                            // 已解锁的 post 设为可见
-                                            states.set(
-                                              p.id,
-                                              p.id === post.id
-                                                ? true
-                                                : postsData.unlockedStates?.[p.id] || false
-                                            );
-                                          }
-                                        }
-                                        setPostViewStates(states);
-                                      }
-                                    }
-                                  } catch (err) {
-                                    console.error("[creator] unlock error", err);
-                                  }
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter" || e.key === " ") {
-                                    e.preventDefault();
-                                    // Trigger unlock
-                                  }
-                                }}
-                                className="rounded-xl min-h-[44px] font-semibold shadow-lg"
-                                aria-label={`Unlock this content for $${((post.price_cents || 0) / 100).toFixed(2)}`}
-                              >
-                                Unlock for ${((post.price_cents || 0) / 100).toFixed(2)}
-                              </Button>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Media Display */}
-                        {((post.media && post.media.length > 0) || post.media_url) && (
-                          <div className="mb-4">
-                            <MediaDisplay
-                              post={post}
-                              canView={canView}
-                              isCreator={post.creator_id === currentUserId}
-                              onSubscribe={handleSubscribe}
-                              onUnlock={async () => {
-                                try {
-                                  const response = await fetch("/api/unlock", {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({
-                                      postId: post.id,
-                                      priceCents: post.price_cents || 0,
-                                    }),
-                                  });
-                                  const result = await response.json();
-                                  if (result.success && currentUserId) {
-                                    // 重新加载 posts（通过 API）
-                                    const postsResponse = await fetch(
-                                      `/api/creator/${creatorId}/posts`
-                                    );
-                                    if (postsResponse.ok) {
-                                      const postsData = await postsResponse.json();
-                                      setPosts(postsData.posts || []);
-
-                                      // 使用 API 返回的解锁状态，并标记当前解锁的 post
-                                      const states = new Map<string, boolean>();
-                                      for (const p of postsData.posts || []) {
-                                        if (p.creator_id === currentUserId) {
-                                          states.set(p.id, true);
-                                        } else {
-                                          // 已解锁的 post 设为可见
-                                          states.set(
-                                            p.id,
-                                            p.id === post.id
-                                              ? true
-                                              : postsData.unlockedStates?.[p.id] || false
-                                          );
-                                        }
-                                      }
-                                      setPostViewStates(states);
-                                    }
-                                  }
-                                } catch (err) {
-                                  console.error("[creator] unlock error", err);
-                                }
-                              }}
-                              creatorDisplayName={creatorProfile.display_name}
-                            />
-                          </div>
-                        )}
-
-                        <div className="pt-4 border-t border-border-base flex items-center justify-between">
-                          <span className="text-sm text-text-tertiary">
-                            {post.created_at ? formatDate(post.created_at) : "Unknown date"}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            asChild
-                            className="rounded-lg text-brand-primary"
-                          >
-                            <Link href={`/posts/${post.id}`}>View Details</Link>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          )}
-
-          {activeTab === "media" && (
-            <Card className="rounded-xl border shadow-sm">
-              <CardContent className="py-16 text-center">
-                <ImageIcon
-                  className="w-16 h-16 mx-auto mb-4 text-muted-foreground"
-                  aria-hidden="true"
+      {/* Two-Column Layout: Avatar Section + (Desktop) Sidebar */}
+      <div className="max-w-6xl mx-auto px-4 md:px-6">
+        {/* Avatar + Name Row */}
+        <div className="relative -mt-14 md:-mt-16 mb-6">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div className="flex items-end gap-4">
+              <Avatar className="w-24 h-24 md:w-28 md:h-28 border-4 border-background ring-2 ring-brand-primary/30 shadow-glow rounded-2xl flex-shrink-0">
+                <AvatarImage
+                  src={creatorProfile.avatar_url || DEFAULT_AVATAR_CREATOR}
+                  alt={creatorProfile.display_name || "Creator"}
+                  className="object-cover"
                 />
-                <h3 className="text-lg font-semibold mb-2">Media Gallery</h3>
-                <p className="text-muted-foreground text-sm">Coming soon...</p>
-              </CardContent>
-            </Card>
-          )}
+                <AvatarFallback className="text-2xl md:text-3xl bg-brand-primary-alpha-10 text-brand-primary font-bold rounded-2xl">
+                  {creatorProfile.display_name?.[0]?.toUpperCase() || "C"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="pb-2">
+                <h1 className="text-xl md:text-2xl font-bold text-text-primary mb-1">
+                  {creatorProfile.display_name || "Creator"}
+                </h1>
+                {creatorProfile.bio && (
+                  <p className="text-text-tertiary text-sm max-w-md line-clamp-2">
+                    {creatorProfile.bio}
+                  </p>
+                )}
+              </div>
+            </div>
 
-          {activeTab === "likes" && (
-            <Card className="rounded-xl border shadow-sm">
-              <CardContent className="py-16 text-center">
-                <Heart
-                  className="w-16 h-16 mx-auto mb-4 text-muted-foreground"
-                  aria-hidden="true"
+            {/* Desktop CTA */}
+            {!isOwnProfile && (
+              <div className="hidden md:flex flex-col items-end gap-2">
+                {isSubscribed ? (
+                  <Button
+                    variant="outline"
+                    onClick={handleCancelSubscription}
+                    disabled={isSubscribing}
+                    className="rounded-xl min-w-[160px] active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                  >
+                    {isSubscribing ? "..." : "Subscribed"}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="subscribe-gradient"
+                    onClick={handleSubscribe}
+                    disabled={isSubscribing}
+                    className="rounded-xl min-w-[160px] hover-bold shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                    data-testid="subscribe-button"
+                    aria-label="Subscribe to this creator"
+                  >
+                    {isSubscribing ? "..." : "Subscribe"}
+                  </Button>
+                )}
+                <ReportButton
+                  targetType="user"
+                  targetId={creatorId}
+                  variant="ghost"
+                  size="sm"
+                  className="text-text-tertiary"
                 />
-                <h3 className="text-lg font-semibold mb-2">Liked Posts</h3>
-                <p className="text-muted-foreground text-sm">Liked posts feature is coming soon</p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* 移动端: 底部浮动订阅按钮 */}
-        {currentUserId && currentUserId !== creatorId && (
-          <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border z-50 shadow-lg">
-            {isSubscribed ? (
-              <Button
-                variant="outline"
-                onClick={handleCancelSubscription}
-                disabled={isSubscribing}
-                className="w-full rounded-lg h-12 min-h-[48px]"
-              >
-                {isSubscribing ? "Processing…" : "Unsubscribe"}
-              </Button>
-            ) : (
-              <Button
-                onClick={handleSubscribe}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleSubscribe();
-                  }
-                }}
-                disabled={isSubscribing}
-                variant="subscribe-gradient"
-                className="w-full rounded-xl h-12 min-h-[48px] font-bold shadow-lg"
-                aria-label={
-                  isSubscribing ? "Processing subscription…" : "Subscribe to this creator"
-                }
-              >
-                {isSubscribing ? "Processing…" : "Subscribe Now"}
-              </Button>
+              </div>
             )}
           </div>
-        )}
-      </main>
+        </div>
 
-      <BottomNavigation notificationCount={0} />
-    </div>
+        {/* PC: Two-column — stats left, content right */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* LEFT / TOP: Stats + About Sidebar */}
+          <aside className="w-full lg:w-72 shrink-0 space-y-4">
+            {/* Bento Stats */}
+            <div className="grid grid-cols-3 lg:grid-cols-1 gap-3">
+              <div className="card-block p-4 flex lg:flex-row lg:items-center lg:justify-between flex-col text-center lg:text-left">
+                <div>
+                  <p className="text-xs text-text-tertiary mb-0.5">Posts</p>
+                  <p className="text-2xl font-bold text-text-primary">{totalPosts}</p>
+                </div>
+                <FileText
+                  className="w-5 h-5 text-brand-primary/50 hidden lg:block"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="card-block p-4 flex lg:flex-row lg:items-center lg:justify-between flex-col text-center lg:text-left">
+                <div>
+                  <p className="text-xs text-text-tertiary mb-0.5">Media</p>
+                  <p className="text-2xl font-bold text-text-primary">{mediaPosts}</p>
+                </div>
+                <ImageIcon
+                  className="w-5 h-5 text-brand-primary/50 hidden lg:block"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="card-block p-4 flex lg:flex-row lg:items-center lg:justify-between flex-col text-center lg:text-left">
+                <div>
+                  <p className="text-xs text-text-tertiary mb-0.5">Likes</p>
+                  <p className="text-2xl font-bold text-text-primary">{animatedLikes.toFixed(0)}</p>
+                </div>
+                <Heart className="w-5 h-5 text-error/50 hidden lg:block" aria-hidden="true" />
+              </div>
+            </div>
+
+            {/* About (Desktop only) */}
+            {creatorProfile.bio && (
+              <div className="card-block p-4 hidden lg:block">
+                <h3 className="text-sm font-semibold text-text-primary mb-2 flex items-center gap-2">
+                  <Star className="w-4 h-4 text-brand-primary" />
+                  About
+                </h3>
+                <p className="text-sm text-text-secondary leading-relaxed">{creatorProfile.bio}</p>
+              </div>
+            )}
+
+            {/* Social Proof (Desktop) */}
+            <div className="card-block p-4 bg-gradient-subtle hidden lg:block">
+              <p className="text-sm text-text-secondary">
+                <span className="font-bold text-brand-primary">
+                  <Users className="w-4 h-4 inline mr-1" />
+                  Join thousands
+                </span>{" "}
+                of fans supporting this creator.
+              </p>
+            </div>
+          </aside>
+
+          {/* RIGHT / MAIN: Tabs + Content */}
+          <section className="flex-1 min-w-0">
+            {/* Tabs */}
+            <div className="flex border-b border-border-base mb-4" role="tablist">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    role="tab"
+                    aria-selected={activeTab === tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={cn(
+                      "flex-1 pb-3 text-sm font-medium transition-colors relative flex items-center justify-center gap-1.5",
+                      "active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-brand-primary",
+                      activeTab === tab.id
+                        ? "text-brand-primary"
+                        : "text-text-tertiary hover:text-text-primary"
+                    )}
+                  >
+                    <Icon className="w-4 h-4" aria-hidden="true" />
+                    <span>{tab.label}</span>
+                    {tab.count !== undefined && (
+                      <span className="text-xs text-text-tertiary">({tab.count})</span>
+                    )}
+                    {activeTab === tab.id && (
+                      <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-brand-primary rounded-full" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Posts Tab */}
+            {activeTab === "posts" && (
+              <div className="space-y-4 pb-24 lg:pb-8">
+                {posts.length === 0 ? (
+                  <div className="card-block p-12 text-center">
+                    <FileText className="w-12 h-12 mx-auto mb-3 text-text-quaternary" />
+                    <p className="text-text-tertiary">No posts yet</p>
+                  </div>
+                ) : (
+                  posts.map((post, index) => {
+                    const isUnlocked =
+                      postViewStates.get(post.id) === true || post.creator_id === currentUserId;
+
+                    return (
+                      <PostCard
+                        key={post.id}
+                        variant="feed"
+                        post={post}
+                        currentUserId={currentUserId}
+                        isUnlocked={isUnlocked}
+                        isSubscribing={isSubscribing}
+                        onSubscribe={handleSubscribe}
+                        onUnlock={async () => {
+                          const res = await fetch("/api/unlock", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              postId: post.id,
+                              priceCents: post.price_cents || 0,
+                            }),
+                          });
+                          const result = await res.json();
+                          if (result.success) await reloadPosts();
+                        }}
+                        animationDelay={index < 10 ? index * 60 : undefined}
+                      />
+                    );
+                  })
+                )}
+              </div>
+            )}
+
+            {/* Media Tab */}
+            {activeTab === "media" && (
+              <div className="pb-24 lg:pb-8">
+                {mediaPosts === 0 ? (
+                  <div className="card-block p-12 text-center">
+                    <ImageIcon
+                      className="w-12 h-12 mx-auto mb-3 text-text-quaternary"
+                      aria-hidden="true"
+                    />
+                    <p className="text-text-tertiary">No media posts yet</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {posts
+                      .filter((p) => (p.media && p.media.length > 0) || p.media_url)
+                      .map((post) => (
+                        <Link
+                          key={post.id}
+                          href={`/posts/${post.id}`}
+                          className="aspect-square bg-surface-raised rounded-xl overflow-hidden relative group hover:ring-2 hover:ring-brand-primary/30 transition-all focus-visible:ring-2 focus-visible:ring-brand-primary"
+                        >
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Grid3X3 className="w-8 h-8 text-text-tertiary group-hover:text-brand-primary transition-colors" />
+                          </div>
+                          {post.visibility !== "free" && (
+                            <div className="absolute top-1 right-1 bg-black/60 rounded-full p-1">
+                              <Lock className="w-3 h-3 text-white" />
+                            </div>
+                          )}
+                        </Link>
+                      ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Likes Tab */}
+            {activeTab === "likes" && (
+              <div className="card-block p-12 text-center pb-24 lg:pb-8">
+                <Heart className="w-12 h-12 mx-auto mb-3 text-text-quaternary" aria-hidden="true" />
+                <p className="text-text-tertiary">Liked posts coming soon</p>
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
+
+      {/* Mobile: Floating Subscribe Button */}
+      {!isOwnProfile && (
+        <div className="md:hidden fixed bottom-14 left-0 right-0 p-3 bg-bg-base/95 backdrop-blur-sm border-t border-border-base z-[45] shadow-lg">
+          {isSubscribed ? (
+            <Button
+              variant="outline"
+              onClick={handleCancelSubscription}
+              disabled={isSubscribing}
+              className="w-full rounded-xl min-h-[52px] active:scale-[0.98]"
+            >
+              {isSubscribing ? "Processing…" : "Unsubscribe"}
+            </Button>
+          ) : (
+            <Button
+              onClick={handleSubscribe}
+              disabled={isSubscribing}
+              variant="subscribe-gradient"
+              className="w-full rounded-xl min-h-[52px] font-bold shadow-glow hover-bold active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-brand-primary"
+              data-testid="subscribe-button"
+              aria-label="Subscribe to this creator"
+            >
+              {isSubscribing ? "Processing…" : "Subscribe Now"}
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* Subscribe PaywallModal */}
+      {!isOwnProfile && creatorProfile && (
+        <PaywallModal
+          open={showSubscribeModal}
+          onOpenChange={setShowSubscribeModal}
+          type="subscribe"
+          creatorName={creatorProfile.display_name || "Creator"}
+          creatorAvatar={creatorProfile.avatar_url}
+          price={subscriptionPrice}
+          billingPeriod="month"
+          benefits={[
+            "Full access to all exclusive posts",
+            "Direct messaging with creator",
+            "Early access to new content",
+            "Member-only live streams",
+            "Cancel anytime",
+          ]}
+          creatorId={creatorId}
+          onSuccess={confirmSubscribe}
+        />
+      )}
+    </PageShell>
   );
-}
-
-function formatDate(dateString: string) {
-  const date = new Date(dateString);
-  // 使用 date-fns 统一格式化时间
-  return formatDistanceToNow(date, { addSuffix: true });
 }

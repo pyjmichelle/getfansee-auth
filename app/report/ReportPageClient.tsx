@@ -1,291 +1,286 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { NavHeader } from "@/components/nav-header";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { ensureProfile } from "@/lib/auth";
-import { getProfile } from "@/lib/profile";
-import { submitReport, type ReportType } from "@/lib/reports";
-import { toast } from "sonner";
-import {
-  AlertTriangle,
-  ArrowLeft,
-  Shield,
-  Ban,
-  AlertCircle,
-  MoreHorizontal,
-  CheckCircle,
-  Loader2,
-} from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Shield, CheckCircle, AlertCircle, Lock, FileText } from "@/lib/icons";
+import { cn } from "@/lib/utils";
+import { PageShell } from "@/components/page-shell";
 
-const supabase = getSupabaseBrowserClient();
+type ReportType = "post" | "comment" | "user";
 
-type ReportPageClientProps = {
+interface ReportPageClientProps {
   initialType: ReportType;
   initialId: string;
-};
+  postId?: string;
+  creatorId?: string;
+}
 
 const REPORT_REASONS = [
-  { id: "inappropriate", label: "Inappropriate content", icon: AlertCircle },
-  { id: "harassment", label: "Harassment or bullying", icon: AlertTriangle },
-  { id: "spam", label: "Spam or misleading", icon: Ban },
-  { id: "copyright", label: "Copyright violation", icon: Shield },
-  { id: "underage", label: "Underage content", icon: AlertTriangle },
-  { id: "violence", label: "Violence or dangerous content", icon: AlertCircle },
-  { id: "other", label: "Other", icon: MoreHorizontal },
+  { id: "spam", label: "Spam or Scam", description: "Misleading or repetitive content" },
+  {
+    id: "explicit",
+    label: "Undisclosed Explicit Content",
+    description: "Adult content not properly labeled",
+  },
+  {
+    id: "minors",
+    label: "Content Involving Minors",
+    description: "Sexualization or harm to minors",
+  },
+  {
+    id: "harassment",
+    label: "Harassment or Bullying",
+    description: "Targeted harassment or abuse",
+  },
+  {
+    id: "intellectual",
+    label: "Intellectual Property Violation",
+    description: "Unauthorized use of copyrighted material",
+  },
+  { id: "violence", label: "Violence or Threats", description: "Threatening or violent content" },
+  { id: "other", label: "Other", description: "Something else not listed above" },
 ];
 
-export default function ReportPageClient({ initialType, initialId }: ReportPageClientProps) {
+export default function ReportPageClient({
+  initialType,
+  initialId,
+  postId,
+  creatorId,
+}: ReportPageClientProps) {
   const router = useRouter();
-  const type = initialType;
-  const id = initialId;
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{
-    username: string;
-    role: "fan" | "creator";
-    avatar?: string;
-  } | null>(null);
-  const [selectedReason, setSelectedReason] = useState("");
+  const [selectedReason, setSelectedReason] = useState<string>("");
   const [details, setDetails] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true);
-
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
-          router.push("/auth");
-          return;
-        }
-
-        await ensureProfile();
-        const profile = await getProfile(session.user.id);
-        if (profile) {
-          setCurrentUser({
-            username: profile.display_name || "user",
-            role: (profile.role || "fan") as "fan" | "creator",
-            avatar: profile.avatar_url || undefined,
-          });
-        }
-      } catch (err) {
-        console.error("[report] loadData error:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, [router]);
-
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!selectedReason) {
-      toast.error("Please select a report reason");
-      return;
-    }
-
-    if (!id) {
-      toast.error("Invalid report target");
+      setError("Please select a reason for your report.");
       return;
     }
 
     setIsSubmitting(true);
+    setError(null);
+
     try {
-      const reasonLabel =
-        REPORT_REASONS.find((r) => r.id === selectedReason)?.label || selectedReason;
-      const success = await submitReport({
-        reported_type: type,
-        reported_id: id,
-        reason: reasonLabel,
-        description: details.trim() || undefined,
+      const response = await fetch("/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: initialType,
+          id: initialId,
+          postId: postId || initialId,
+          creatorId,
+          reason: selectedReason,
+          details: details.trim(),
+        }),
       });
 
-      if (success) {
-        setSubmitted(true);
-      } else {
-        toast.error("Submission failed. Please try again");
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Failed to submit report");
       }
+
+      setSuccess(true);
     } catch (err) {
-      console.error("[report] submit error:", err);
-      toast.error("Submission failed. Please try again");
+      console.error("[ReportPageClient] submit error:", err);
+      setError(err instanceof Error ? err.message : "Failed to submit report. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (isLoading) {
+  if (success) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
-      </div>
-    );
-  }
-
-  // Success State
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-background">
-        {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-
-        <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4">
-          <div className="max-w-md w-full text-center animate-in fade-in zoom-in duration-300">
-            <div className="w-24 h-24 bg-semantic-success/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-12 h-12 text-semantic-success" />
+      <PageShell user={null} maxWidth="md">
+        <div className="flex items-center justify-center py-16">
+          <div className="card-block p-10 text-center w-full">
+            <div className="w-16 h-16 mx-auto rounded-full bg-success/10 flex items-center justify-center mb-4">
+              <CheckCircle className="w-8 h-8 text-success" aria-hidden="true" />
             </div>
-
-            <h1 className="text-3xl font-bold mb-3">Report submitted</h1>
-            <p className="text-text-secondary text-lg mb-8">
-              Thank you for helping keep GetFanSee safe. We&apos;ll review your report and take
-              appropriate action.
+            <h2 className="text-xl font-bold mb-2 text-text-primary">Report Submitted</h2>
+            <p className="text-text-secondary text-sm mb-6">
+              Thank you for helping keep GetFanSee safe. Our moderation team will review your report
+              within 24–48 hours.
             </p>
-
-            <div className="bg-surface-base border border-border-base rounded-2xl p-6 text-left mb-8">
-              <h3 className="font-semibold mb-3">What happens next?</h3>
-              <ul className="space-y-2 text-sm text-text-secondary">
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="w-[18px] h-[18px] text-semantic-success flex-shrink-0 mt-0.5" />
-                  <span>Our moderation team will review the report</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="w-[18px] h-[18px] text-semantic-success flex-shrink-0 mt-0.5" />
-                  <span>We&apos;ll take action if the content violates our policies</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="w-[18px] h-[18px] text-semantic-success flex-shrink-0 mt-0.5" />
-                  <span>You&apos;ll be notified of the outcome via email</span>
-                </li>
-              </ul>
-            </div>
-
             <Button
-              onClick={() => router.push("/home")}
-              className="w-full py-4 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-primary/90 transition-all shadow-lg shadow-brand-primary/20"
+              variant="subscribe-gradient"
+              className="w-full min-h-[44px] shadow-glow active:scale-95"
+              onClick={() => router.back()}
+              aria-label="Return to previous page"
             >
-              Back to Feed
+              Go Back
             </Button>
           </div>
         </div>
-      </div>
+      </PageShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-
-      <main className="max-w-2xl mx-auto py-12 px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-text-tertiary hover:text-brand-primary transition-colors mb-6"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span>Back</span>
-          </button>
-
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Report {type}</h1>
-          <p className="text-text-secondary text-lg">Help us understand what&apos;s wrong</p>
-        </div>
-
-        {/* Report Form */}
-        <div className="bg-surface-base border border-border-base rounded-2xl p-6 mb-6">
-          <h3 className="font-semibold text-lg mb-4">Why are you reporting this?</h3>
-
-          <div className="space-y-3">
-            {REPORT_REASONS.map((reason) => {
-              const Icon = reason.icon;
-              return (
-                <label
-                  key={reason.id}
-                  className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                    selectedReason === reason.id
-                      ? "border-brand-primary bg-brand-primary/5"
-                      : "border-border-base hover:border-brand-primary/30 hover:bg-surface-raised"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="reason"
-                    value={reason.id}
-                    checked={selectedReason === reason.id}
-                    onChange={(e) => setSelectedReason(e.target.value)}
-                    className="sr-only"
-                  />
-                  <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      selectedReason === reason.id ? "bg-brand-primary/10" : "bg-surface-raised"
-                    }`}
-                  >
-                    <Icon
-                      className={`w-[22px] h-[22px] ${
-                        selectedReason === reason.id ? "text-brand-primary" : "text-text-tertiary"
-                      }`}
-                    />
-                  </div>
-                  <span className="font-semibold">{reason.label}</span>
-                  {selectedReason === reason.id && (
-                    <CheckCircle className="w-5 h-5 text-brand-primary ml-auto" />
-                  )}
-                </label>
-              );
-            })}
+    <PageShell user={null} maxWidth="4xl">
+      <div className="py-4">
+        {/* Page Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-error/10 flex items-center justify-center">
+            <Shield className="w-5 h-5 text-error" aria-hidden="true" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-text-primary">Report Content</h1>
+            <p className="text-sm text-text-tertiary">Help us maintain a safe community</p>
           </div>
         </div>
 
-        {/* Additional Details */}
-        <div className="bg-surface-base border border-border-base rounded-2xl p-6 mb-6">
-          <label className="block mb-3 font-semibold text-lg">Additional details (optional)</label>
-          <Textarea
-            value={details}
-            onChange={(e) => setDetails(e.target.value)}
-            placeholder="Provide any additional information that might help us review this report..."
-            rows={5}
-            maxLength={500}
-            className="w-full px-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all resize-none"
-          />
-          <div className="flex justify-between mt-2 text-sm text-text-tertiary">
-            <span>Help us understand the issue better</span>
-            <span>{details.length}/500</span>
-          </div>
-        </div>
+        {error && (
+          <Alert variant="destructive" className="mb-6" role="alert">
+            <AlertCircle className="h-4 w-4" aria-hidden="true" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-        {/* Info Box */}
-        <div className="bg-brand-primary/5 border border-brand-primary/20 rounded-xl p-4 mb-6 flex items-start gap-3">
-          <Shield className="w-5 h-5 text-brand-primary flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-text-secondary">
-            <p className="font-medium text-text-primary mb-1">Your report is anonymous</p>
-            <p>The person you&apos;re reporting won&apos;t know you submitted this report.</p>
-          </div>
-        </div>
+        {/* Two-column layout on Desktop */}
+        <div className="md:grid md:grid-cols-[1fr_280px] md:gap-8 md:items-start">
+          {/* Form */}
+          <form onSubmit={handleSubmit} aria-label="Report content form">
+            {/* Reason Selection */}
+            <div className="card-block p-5 mb-4">
+              <Label className="text-sm font-semibold text-text-primary mb-3 block">
+                Reason for Report <span className="text-error">*</span>
+              </Label>
+              <fieldset>
+                <legend className="sr-only">Select a reason for your report</legend>
+                <div className="space-y-2">
+                  {REPORT_REASONS.map((reason) => {
+                    const isSelected = selectedReason === reason.id;
+                    return (
+                      <label
+                        key={reason.id}
+                        className={cn(
+                          "flex items-start gap-3 p-3 rounded-xl cursor-pointer hover-bold transition-all min-h-[44px]",
+                          "border border-transparent focus-within:border-brand-primary/50",
+                          isSelected
+                            ? "bg-brand-primary/10 border-brand-primary/30"
+                            : "hover:bg-surface-raised"
+                        )}
+                        aria-label={`${reason.label}: ${reason.description}`}
+                      >
+                        <input
+                          type="radio"
+                          name="reason"
+                          value={reason.id}
+                          checked={isSelected}
+                          onChange={() => setSelectedReason(reason.id)}
+                          className="mt-0.5 accent-brand-primary"
+                        />
+                        <div>
+                          <p
+                            className={cn(
+                              "text-sm font-medium",
+                              isSelected ? "text-brand-primary" : "text-text-primary"
+                            )}
+                          >
+                            {reason.label}
+                          </p>
+                          <p className="text-xs text-text-tertiary">{reason.description}</p>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            </div>
 
-        {/* Actions */}
-        <div className="flex gap-3">
-          <Button
-            onClick={() => router.back()}
-            variant="outline"
-            className="flex-1 py-4 bg-surface-base border border-border-base rounded-xl font-semibold hover:bg-surface-raised transition-all"
+            {/* Additional Details */}
+            <div className="card-block p-5 mb-4">
+              <Label
+                htmlFor="report-details"
+                className="text-sm font-semibold text-text-primary mb-2 block"
+              >
+                Additional Details{" "}
+                <span className="text-text-tertiary font-normal">(optional)</span>
+              </Label>
+              <Textarea
+                id="report-details"
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                placeholder="Provide any additional context that might help our moderation team..."
+                className="min-h-[100px] resize-none bg-surface-raised border-border-base text-text-primary placeholder:text-text-tertiary focus:border-brand-primary/50 transition-colors"
+                maxLength={1000}
+              />
+              <p className="text-xs text-text-tertiary mt-1.5 text-right">{details.length}/1000</p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="sm:flex-1 min-h-[44px] active:scale-95 hover:bg-surface-raised focus-visible:ring-2 focus-visible:ring-brand-primary"
+                onClick={() => router.back()}
+                aria-label="Cancel and go back"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="subscribe-gradient"
+                disabled={!selectedReason || isSubmitting}
+                className="sm:flex-1 min-h-[44px] shadow-glow active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                aria-label={isSubmitting ? "Submitting report…" : "Submit report"}
+              >
+                {isSubmitting ? "Submitting…" : "Submit Report"}
+              </Button>
+            </div>
+          </form>
+
+          {/* Info Panel — Mobile: after form, Desktop: sticky sidebar */}
+          <aside
+            className="mt-6 md:mt-0 space-y-4 md:sticky md:top-20"
+            aria-label="Report information"
           >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!selectedReason || isSubmitting}
-            className="flex-1 py-4 bg-semantic-error text-white rounded-xl font-semibold hover:bg-semantic-error/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg"
-          >
-            {isSubmitting ? "Submitting..." : "Submit Report"}
-          </Button>
+            {/* Anonymous */}
+            <div className="card-block p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Lock className="w-4 h-4 text-brand-primary" aria-hidden="true" />
+                <h2 className="text-sm font-semibold text-text-primary">Anonymous Report</h2>
+              </div>
+              <p className="text-xs text-text-tertiary">
+                Your identity is kept confidential. The reported user will not know who submitted
+                this report.
+              </p>
+            </div>
+
+            {/* Process */}
+            <div className="card-block p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="w-4 h-4 text-brand-accent" aria-hidden="true" />
+                <h2 className="text-sm font-semibold text-text-primary">Review Process</h2>
+              </div>
+              <ol className="space-y-2">
+                {[
+                  "You submit a report with a reason",
+                  "Our team reviews within 24–48 hours",
+                  "Content is actioned if it violates our guidelines",
+                  "You may receive a follow-up if needed",
+                ].map((step, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-text-tertiary">
+                    <span className="flex-shrink-0 w-4 h-4 rounded-full bg-brand-primary/10 text-brand-primary text-[10px] font-bold flex items-center justify-center mt-0.5">
+                      {i + 1}
+                    </span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </aside>
         </div>
-      </main>
-    </div>
+      </div>
+    </PageShell>
   );
 }

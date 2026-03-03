@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { type Comment } from "@/lib/comments";
+import { Analytics } from "@/lib/analytics";
 
 interface CommentFormProps {
   postId: string;
@@ -47,6 +48,7 @@ export function CommentForm({ postId, onCommentCreated, className }: CommentForm
       }
 
       // 成功
+      Analytics.contentCommented(postId, "");
       setContent("");
       toast.success("Comment posted!");
 
@@ -84,7 +86,7 @@ export function CommentForm({ postId, onCommentCreated, className }: CommentForm
           id="comment-char-count"
           className={cn(
             "absolute bottom-2 right-2 text-xs",
-            isOverLimit ? "text-destructive" : "text-muted-foreground"
+            isOverLimit ? "text-error" : "text-text-tertiary"
           )}
           aria-live="polite"
         >

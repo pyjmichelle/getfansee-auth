@@ -1,9 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Heart } from "lucide-react";
+import { Heart } from "@/lib/icons";
 import { usePostLike } from "@/hooks/use-post-like";
 import { cn } from "@/lib/utils";
+import { Analytics } from "@/lib/analytics";
 
 interface PostLikeButtonProps {
   postId: string;
@@ -24,10 +25,17 @@ export function PostLikeButton({
     userId
   );
 
+  const handleLike = () => {
+    if (!isLiked) {
+      Analytics.contentLiked(postId, "");
+    }
+    toggleLike();
+  };
+
   return (
     <Button
       variant="ghost"
-      onClick={toggleLike}
+      onClick={handleLike}
       disabled={isLoading || !userId}
       className={cn("gap-2 hover:bg-white/5 rounded-xl min-h-[44px] min-w-[44px]", className)}
     >

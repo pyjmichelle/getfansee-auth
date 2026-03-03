@@ -1,22 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Mail, Camera, Save, LogOut, Sparkles, Loader2 } from "lucide-react";
-import { NavHeader } from "@/components/nav-header";
+import { Camera, LogOut, Loader2 } from "@/lib/icons";
+import { PageShell } from "@/components/page-shell";
 // Card components no longer needed - using Figma div-based layout
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { LoadingState } from "@/components/loading-state";
+import { TabsContent } from "@/components/ui/tabs";
 // CenteredContainer no longer needed - using Figma max-w layout
-import { BottomNavigation } from "@/components/bottom-navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 // 所有服务器端函数都通过 API 调用，不直接导入
 import { uploadAvatar } from "@/lib/storage";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useCountUp } from "@/hooks/use-count-up";
+import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
+import { ProfileBanner } from "@/components/profile-banner";
+import { SettingsTabs } from "@/components/settings-tabs";
+import { GlassCard } from "@/components/glass-card";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -41,23 +47,24 @@ export default function ProfilePage() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [activeTab, setActiveTab] = useState("profile");
+  useSkeletonMetric("me_page", isLoading);
+  const creatorSocialCount = useCountUp(currentUser?.role === "creator" ? 1284 : 1283, {
+    duration: 900,
+    decimals: 0,
+  });
 
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           router.push("/auth");
           return;
         }
 
-        // 确保 profile 存在（通过 API）
-        await fetch("/api/auth/ensure-profile", { method: "POST" });
-        setCurrentUserId(session.user.id);
-        setEmail(session.user.email || "");
+        setCurrentUserId(bootstrap.user.id);
+        setEmail(bootstrap.user.email || "");
 
         // 加载 profile（通过 API）
         const profileResponse = await fetch("/api/profile");
@@ -252,13 +259,33 @@ export default function ProfilePage() {
 
   if (isLoading || !currentUser) {
     return (
-      <div className="min-h-screen bg-background pb-20">
-        <NavHeader user={currentUser!} notificationCount={0} />
-        <div className="pt-20 md:pt-24 pb-12 max-w-3xl mx-auto px-4 md:px-6">
-          <LoadingState type="spinner" text="Loading profile…" />
+      <PageShell user={currentUser} notificationCount={0} maxWidth="3xl">
+        <div className="pb-12 space-y-6">
+          {/* Hero skeleton */}
+          <div className="card-block bg-gradient-subtle p-6 md:p-8 animate-pulse">
+            <div className="flex flex-col md:flex-row md:items-center gap-6">
+              <div className="flex items-center gap-5">
+                <div className="w-24 h-24 rounded-full bg-white/8" />
+                <div className="space-y-2">
+                  <div className="h-8 w-36 bg-white/8 rounded" />
+                  <div className="h-4 w-48 bg-white/8 rounded" />
+                  <div className="h-6 w-20 bg-white/8 rounded-full" />
+                </div>
+              </div>
+              <div className="h-10 w-32 bg-white/8 rounded-xl md:ml-auto hidden md:block" />
+            </div>
+          </div>
+          {/* Cards skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="card-block p-6 md:p-8 h-48 animate-pulse bg-white/5" />
+            <div className="card-block p-6 md:p-8 h-48 animate-pulse bg-white/5" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="card-block p-6 md:p-8 h-40 animate-pulse bg-white/5" />
+            <div className="card-block p-6 md:p-8 h-40 animate-pulse bg-white/5" />
+          </div>
         </div>
-        <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
-      </div>
+      </PageShell>
     );
   }
 
@@ -315,328 +342,273 @@ export default function ProfilePage() {
     }
   };
 
+  const settingsTabs = [
+    { value: "profile", label: "Profile" },
+    { value: "account", label: "Account" },
+    { value: "security", label: "Security" },
+  ];
+
   return (
-    <div className="min-h-screen bg-background pb-24 md:pb-0">
-      <NavHeader user={currentUser!} notificationCount={0} />
+    <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
+      <div className="pb-12" data-testid="me-page-ready">
+        {/* Profile Banner */}
+        <ProfileBanner
+          name={username || "Profile"}
+          email={email}
+          role={currentUser.role}
+          avatarUrl={avatar || DEFAULT_AVATAR_FAN}
+          action={
+            isEditing ? (
+              <Button onClick={handleSave} disabled={isSaving} className="shadow-glow">
+                {isSaving ? "Saving..." : "Save Changes"}
+              </Button>
+            ) : (
+              <Button onClick={() => setIsEditing(true)} className="shadow-glow">
+                Edit Profile
+              </Button>
+            )
+          }
+        />
 
-      <div className="pt-20 md:pt-24 pb-12">
-        <div className="max-w-3xl mx-auto px-4 md:px-6">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2 text-text-primary">Profile Settings</h1>
-            <p className="text-text-secondary">
-              Manage your profile information and account settings
-            </p>
-          </div>
+        {/* PC Two-column | Mobile Single-column */}
+        <div className="mt-6 flex flex-col md:flex-row gap-6">
+          {/* Left sidebar navigation — desktop only */}
+          <aside className="hidden md:flex flex-col gap-1 w-52 shrink-0">
+            {settingsTabs.map((tab) => (
+              <button
+                key={tab.value}
+                onClick={() => setActiveTab(tab.value)}
+                className={`w-full text-left px-4 py-2.5 rounded-[var(--radius-sm)] text-[13px] font-medium transition-all ${
+                  activeTab === tab.value
+                    ? "bg-violet-500/15 text-violet-400 border border-violet-500/20"
+                    : "text-text-muted hover:text-white hover:bg-white/6"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+            {/* Logout shortcut */}
+            <div className="mt-4 pt-4 border-t border-white/6">
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2.5 rounded-[var(--radius-sm)] text-[13px] font-medium text-red-400 hover:bg-red-500/8 transition-all"
+              >
+                Log Out
+              </button>
+            </div>
+          </aside>
 
-          {/* Avatar Section - Figma Style */}
-          <div className="bg-surface-base border border-border-base rounded-2xl p-6 md:p-8 mb-6">
-            <h2 className="font-semibold text-lg mb-6 text-text-primary">Profile Picture</h2>
-            <div className="flex items-center gap-6">
-              <div className="relative group">
-                <Avatar className="w-24 h-24">
-                  <AvatarImage src={avatar || "/placeholder.svg"} alt="Profile picture" />
-                  <AvatarFallback className="text-2xl bg-brand-primary-alpha-10 text-brand-primary">
-                    {username[0]?.toUpperCase() || email[0]?.toUpperCase() || "U"}
-                  </AvatarFallback>
-                </Avatar>
-                {isEditing && (
-                  <label className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer">
-                    <Camera className="w-6 h-6 text-white" aria-hidden="true" />
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/jpg,image/png,image/webp"
-                      onChange={handleAvatarUpload}
-                      className="hidden"
-                      disabled={isUploadingAvatar}
-                      aria-label="Choose avatar file"
-                    />
-                  </label>
-                )}
-                {isUploadingAvatar && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
-                    <Loader2 className="w-6 h-6 text-white animate-spin" aria-hidden="true" />
+          {/* Right content area */}
+          <div className="flex-1 min-w-0">
+            <SettingsTabs value={activeTab} onValueChange={setActiveTab} items={settingsTabs}>
+              <TabsContent value="profile" className="mt-4">
+                <GlassCard className="p-6">
+                  <div className="mb-6 flex items-center gap-5">
+                    <div className="relative group">
+                      <Avatar className="w-24 h-24">
+                        <AvatarImage src={avatar || DEFAULT_AVATAR_FAN} alt="Profile picture" />
+                        <AvatarFallback className="text-2xl bg-brand-primary-alpha-10 text-brand-primary">
+                          {username[0]?.toUpperCase() || email[0]?.toUpperCase() || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      {isEditing ? (
+                        <label className="absolute inset-0 cursor-pointer rounded-full bg-black/60 opacity-0 transition-all group-hover:opacity-100 flex items-center justify-center">
+                          <Camera className="w-6 h-6 text-white" aria-hidden="true" />
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/jpg,image/png,image/webp"
+                            onChange={handleAvatarUpload}
+                            className="hidden"
+                            disabled={isUploadingAvatar}
+                            aria-label="Choose avatar file"
+                          />
+                        </label>
+                      ) : null}
+                      {isUploadingAvatar ? (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                          <Loader2 className="w-6 h-6 text-white animate-spin" aria-hidden="true" />
+                        </div>
+                      ) : null}
+                    </div>
+                    <div>
+                      <p className="text-sm text-text-secondary">
+                        Upload a new profile picture (recommended 400x400).
+                      </p>
+                    </div>
                   </div>
-                )}
-              </div>
-              <div className="flex-1">
-                <p className="text-text-secondary text-sm mb-3">
-                  Upload a new profile picture. Recommended size: 400x400px
-                </p>
-                {isEditing && (
-                  <div className="flex gap-3">
-                    <label className="px-4 py-2 bg-brand-primary text-white rounded-xl font-medium hover:bg-brand-primary-subtle transition-all cursor-pointer text-sm">
-                      Upload new
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/jpg,image/png,image/webp"
-                        onChange={handleAvatarUpload}
-                        className="hidden"
-                        disabled={isUploadingAvatar}
+
+                  <div className="space-y-4">
+                    <div>
+                      <Label
+                        htmlFor="username"
+                        className="mb-2 block text-sm font-medium text-text-secondary"
+                      >
+                        Display Name
+                      </Label>
+                      <Input
+                        id="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        disabled={!isEditing}
+                        className="h-10 rounded-xl bg-white/8"
+                        placeholder="Enter your display name"
                       />
-                    </label>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setAvatar("")}
-                      className="px-4 py-2 bg-surface-raised border border-border-base rounded-xl font-medium hover:bg-surface-overlay transition-all text-text-secondary"
-                    >
-                      Remove
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="bio"
+                        className="mb-2 block text-sm font-medium text-text-secondary"
+                      >
+                        Bio
+                      </Label>
+                      <Textarea
+                        id="bio"
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
+                        disabled={!isEditing}
+                        placeholder="Tell people a bit about yourself"
+                        className="min-h-[96px] rounded-xl bg-white/8"
+                        maxLength={200}
+                      />
+                      <p className="mt-1 text-xs text-text-tertiary">{bio.length}/200</p>
+                    </div>
+                  </div>
+                </GlassCard>
+              </TabsContent>
+
+              <TabsContent value="account" className="mt-4">
+                <GlassCard className="p-6 space-y-5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-text-primary">Email Address</p>
+                      <p className="text-sm text-text-tertiary">{email}</p>
+                    </div>
+                    <Button variant="outline" size="sm" disabled>
+                      Change
                     </Button>
                   </div>
-                )}
-              </div>
-            </div>
-          </div>
+                  <div className="flex items-center justify-between border-t border-border-subtle pt-4">
+                    <div>
+                      <p className="font-medium text-text-primary">Account Type</p>
+                      <p className="text-sm text-text-tertiary capitalize">{currentUser.role}</p>
+                    </div>
+                    {currentUser.role === "fan" ? (
+                      <Button
+                        onClick={handleCreateCreator}
+                        disabled={isCreatingCreator}
+                        data-testid="become-creator-button"
+                        size="sm"
+                      >
+                        {isCreatingCreator ? "Creating..." : "Become Creator"}
+                      </Button>
+                    ) : null}
+                  </div>
+                  <div className="rounded-xl border border-border-base bg-gradient-subtle p-4">
+                    <p className="text-sm text-text-secondary">
+                      Join{" "}
+                      <span className="font-bold text-brand-primary">
+                        {creatorSocialCount.toFixed(0)}
+                      </span>{" "}
+                      creators already earning on GetFanSee.
+                    </p>
+                    {currentUser.role === "creator" ? (
+                      <Button
+                        onClick={handleSeedPosts}
+                        disabled={isSeeding}
+                        variant="outline"
+                        className="mt-3 w-full"
+                      >
+                        {isSeeding ? "Seeding…" : "Seed demo posts"}
+                      </Button>
+                    ) : null}
+                  </div>
+                </GlassCard>
+              </TabsContent>
 
-          {/* Basic Info - Figma Style */}
-          <div className="bg-surface-base border border-border-base rounded-2xl p-6 md:p-8 mb-6">
-            <h2 className="font-semibold text-lg mb-6 text-text-primary">Basic Information</h2>
-            <div className="space-y-5">
-              <div>
-                <Label
-                  htmlFor="username"
-                  className="block mb-2.5 text-sm font-medium text-text-secondary"
-                >
-                  Display Name
-                </Label>
-                <Input
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  disabled={!isEditing}
-                  className="w-full px-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all"
-                  placeholder="Enter your display name"
-                />
-              </div>
-
-              <div>
-                <Label
-                  htmlFor="bio"
-                  className="block mb-2.5 text-sm font-medium text-text-secondary"
-                >
-                  Bio
-                </Label>
-                <Textarea
-                  id="bio"
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  disabled={!isEditing}
-                  placeholder="Tell people a bit about yourself"
-                  className="w-full px-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all resize-none min-h-[100px]"
-                  maxLength={200}
-                />
-                <div className="flex justify-between mt-2">
-                  <p className="text-sm text-text-tertiary">Tell people a bit about yourself</p>
-                  <p className="text-sm text-text-tertiary">{bio.length}/200</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Account Info - Figma Style */}
-          <div className="bg-surface-base border border-border-base rounded-2xl p-6 md:p-8 mb-6">
-            <h2 className="font-semibold text-lg mb-6 text-text-primary">Account</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between py-3">
-                <div>
-                  <div className="font-medium mb-1 text-text-primary">Email Address</div>
-                  <div className="text-text-tertiary text-sm">{email}</div>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled
-                  className="px-4 py-2 bg-surface-raised border border-border-base rounded-xl font-medium hover:bg-surface-overlay transition-all text-sm"
-                >
-                  Change
-                </Button>
-              </div>
-
-              <div className="flex items-center justify-between py-3 border-t border-border-subtle">
-                <div>
-                  <div className="font-medium mb-1 text-text-primary">Account Type</div>
-                  <div className="text-text-tertiary text-sm capitalize">{currentUser.role}</div>
-                </div>
-                {currentUser.role === "fan" && (
+              <TabsContent value="security" className="mt-4">
+                <GlassCard className="p-6 space-y-4">
+                  <div>
+                    <Label
+                      htmlFor="oldPassword"
+                      className="mb-2 block text-sm font-medium text-text-secondary"
+                    >
+                      Current Password
+                    </Label>
+                    <Input
+                      id="oldPassword"
+                      type="password"
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
+                      className="h-10 rounded-xl bg-white/8"
+                      placeholder="Enter current password"
+                      autoComplete="current-password"
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="newPassword"
+                      className="mb-2 block text-sm font-medium text-text-secondary"
+                    >
+                      New Password
+                    </Label>
+                    <Input
+                      id="newPassword"
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="h-10 rounded-xl bg-white/8"
+                      placeholder="Enter new password (min 8 characters)"
+                      autoComplete="new-password"
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="confirmPassword"
+                      className="mb-2 block text-sm font-medium text-text-secondary"
+                    >
+                      Confirm New Password
+                    </Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="h-10 rounded-xl bg-white/8"
+                      placeholder="Confirm new password"
+                      autoComplete="new-password"
+                    />
+                  </div>
                   <Button
-                    onClick={handleCreateCreator}
-                    disabled={isCreatingCreator}
-                    data-testid="become-creator-button"
-                    className="px-4 py-2 bg-brand-primary text-white rounded-xl font-medium hover:bg-brand-primary-subtle transition-all text-sm flex items-center gap-2"
+                    onClick={handlePasswordChange}
+                    disabled={isSaving || !oldPassword || !newPassword || !confirmPassword}
+                    className="w-full"
                   >
-                    {isCreatingCreator ? (
-                      <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-                    ) : (
-                      <Sparkles className="w-4 h-4" aria-hidden="true" />
-                    )}
-                    {isCreatingCreator ? "Creating..." : "Become Creator"}
+                    {isSaving ? "Updating..." : "Update Password"}
                   </Button>
-                )}
-              </div>
-            </div>
-          </div>
+                </GlassCard>
+              </TabsContent>
+            </SettingsTabs>
 
-          {/* Password Section - Figma Style */}
-          <div className="bg-surface-base border border-border-base rounded-2xl p-6 md:p-8 mb-6">
-            <h2 className="font-semibold text-lg mb-6 text-text-primary">Security</h2>
-            <div className="space-y-4">
-              <div>
-                <Label
-                  htmlFor="oldPassword"
-                  className="block mb-2.5 text-sm font-medium text-text-secondary"
-                >
-                  Current Password
-                </Label>
-                <Input
-                  id="oldPassword"
-                  type="password"
-                  value={oldPassword}
-                  onChange={(e) => setOldPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all"
-                  placeholder="Enter current password"
-                  autoComplete="current-password"
-                />
-              </div>
-              <div>
-                <Label
-                  htmlFor="newPassword"
-                  className="block mb-2.5 text-sm font-medium text-text-secondary"
-                >
-                  New Password
-                </Label>
-                <Input
-                  id="newPassword"
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all"
-                  placeholder="Enter new password (min 8 characters)"
-                  autoComplete="new-password"
-                />
-              </div>
-              <div>
-                <Label
-                  htmlFor="confirmPassword"
-                  className="block mb-2.5 text-sm font-medium text-text-secondary"
-                >
-                  Confirm New Password
-                </Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all"
-                  placeholder="Confirm new password"
-                  autoComplete="new-password"
-                />
-              </div>
-              <Button
-                onClick={handlePasswordChange}
-                disabled={isSaving || !oldPassword || !newPassword || !confirmPassword}
-                className="w-full px-4 py-3 bg-brand-primary text-white rounded-xl font-medium hover:bg-brand-primary-subtle transition-all disabled:opacity-50"
-                aria-label="Change password"
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
-                    Updating...
-                  </>
-                ) : (
-                  "Update Password"
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Creator Tools - Figma Style */}
-          {currentUser.role === "creator" && (
-            <div className="bg-surface-base border border-border-base rounded-2xl p-6 md:p-8 mb-6">
-              <h2 className="font-semibold text-lg mb-6 text-text-primary">Creator Tools</h2>
-              <Button
-                onClick={handleSeedPosts}
-                disabled={isSeeding}
-                variant="outline"
-                className="w-full px-4 py-3 bg-surface-raised border border-border-base rounded-xl font-medium hover:bg-surface-overlay transition-all"
-                aria-label="Seed demo posts"
-              >
-                {isSeeding ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
-                ) : (
-                  <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
-                )}
-                {isSeeding ? "Seeding…" : "Seed demo posts"}
-              </Button>
-              <p className="text-sm text-text-tertiary mt-2">
-                Creates 3 demo posts: subscriber-only, PPV $4.99, PPV $9.99
-              </p>
-            </div>
-          )}
-
-          {/* Danger Zone - Figma Style */}
-          <div className="bg-surface-base border border-error/20 rounded-2xl p-6 md:p-8 mb-8">
-            <h2 className="font-semibold text-lg mb-6 text-error">Danger Zone</h2>
-            <div className="space-y-4">
+            {/* Mobile logout — desktop uses sidebar */}
+            <GlassCard className="border-error/30 p-6 mt-4 md:hidden">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-medium mb-1 text-text-primary">Log Out</div>
-                  <div className="text-text-tertiary text-sm">Sign out of your account</div>
+                  <p className="font-medium text-text-primary">Log Out</p>
+                  <p className="text-sm text-text-tertiary">Sign out of your account</p>
                 </div>
                 <Button
                   variant="outline"
                   onClick={handleLogout}
-                  className="px-4 py-2 bg-surface-raised border border-border-base rounded-xl font-medium hover:bg-error/10 hover:border-error/30 hover:text-error transition-all text-sm"
                   aria-label="Log out of your account"
                 >
                   <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
                   Log Out
                 </Button>
               </div>
-            </div>
-          </div>
-
-          {/* Save Button - Figma Style */}
-          <div className="flex items-center justify-between">
-            <Button
-              variant="outline"
-              onClick={() => setIsEditing(false)}
-              disabled={!isEditing}
-              className="px-6 py-3 bg-surface-base border border-border-base rounded-xl font-medium hover:bg-surface-raised transition-all"
-            >
-              Cancel
-            </Button>
-            {isEditing ? (
-              <Button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="px-8 py-3 bg-brand-primary text-white rounded-xl font-medium hover:bg-brand-primary-subtle transition-all disabled:opacity-50 shadow-md"
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" aria-hidden="true" />
-                    Save Changes
-                  </>
-                )}
-              </Button>
-            ) : (
-              <Button
-                onClick={() => setIsEditing(true)}
-                className="px-8 py-3 bg-brand-primary text-white rounded-xl font-medium hover:bg-brand-primary-subtle transition-all shadow-md"
-              >
-                Edit Profile
-              </Button>
-            )}
+            </GlassCard>
           </div>
         </div>
       </div>
-
-      <BottomNavigation notificationCount={0} userRole={currentUser?.role} />
-    </div>
+    </PageShell>
   );
 }

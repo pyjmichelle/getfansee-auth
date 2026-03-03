@@ -303,12 +303,20 @@ export async function isActiveSubscriber(
 export async function unlockPost(
   postId: string,
   priceCents?: number,
-  idempotencyKey?: string
+  idempotencyKey?: string,
+  explicitUserId?: string
 ): Promise<{ success: boolean; error?: string; balance_after_cents?: number }> {
   try {
-    const user = await getCurrentUserUniversal();
-    if (!user) {
-      return { success: false, error: "User not authenticated" };
+    // 优先使用路由层已验证的 userId，回退到通用获取（兼容直接调用场景）
+    let userId: string;
+    if (explicitUserId) {
+      userId = explicitUserId;
+    } else {
+      const user = await getCurrentUserUniversal();
+      if (!user) {
+        return { success: false, error: "User not authenticated" };
+      }
+      userId = user.id;
     }
 
     const supabase = await getSupabaseUniversalClient();
@@ -331,7 +339,7 @@ export async function unlockPost(
     // 调用原子扣费函数（在数据库内部完成：检查余额 -> 扣费 -> 记录交易 -> 创建购买）
     const { data, error } = await supabase.rpc("unlock_ppv", {
       p_post_id: postId,
-      p_user_id: user.id,
+      p_user_id: userId,
       p_idempotency_key: idempotencyKey ?? null,
     });
 

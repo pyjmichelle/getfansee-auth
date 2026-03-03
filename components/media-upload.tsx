@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2 } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { uploadFile, type UploadProgress } from "@/lib/storage";
 
@@ -129,10 +129,10 @@ export function MediaUpload({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={`
-            border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
-            transition-colors
-            ${isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25"}
-            ${isUploading ? "opacity-50 cursor-not-allowed" : "hover:border-primary/50"}
+            border-2 border-dashed rounded-xl p-8 md:p-12 text-center cursor-pointer
+            transition-all focus-visible:outline-2 focus-visible:outline-brand-primary
+            ${isDragging ? "border-brand-primary bg-brand-primary/5" : "border-border-base"}
+            ${isUploading ? "opacity-50 cursor-not-allowed" : "@media(hover:hover){hover:border-brand-primary/50} active:border-brand-primary"}
           `}
           onClick={() => !isUploading && fileInputRef.current?.click()}
         >
@@ -147,17 +147,24 @@ export function MediaUpload({
 
           {isUploading ? (
             <>
-              <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground mb-2">Uploading…</p>
+              <Loader2
+                className="w-12 h-12 mx-auto mb-4 animate-spin text-brand-primary"
+                aria-hidden="true"
+              />
+              <p className="text-sm text-text-tertiary mb-2">Uploading…</p>
               {uploadProgress && (
                 <div className="w-full max-w-xs mx-auto">
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-2 bg-surface-raised rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-primary transition-[width] duration-300 motion-safe:transition-[width] motion-reduce:transition-none"
+                      className="h-full bg-brand-primary transition-[width] duration-300"
                       style={{ width: `${uploadProgress.percentage}%` }}
+                      role="progressbar"
+                      aria-valuenow={Math.round(uploadProgress.percentage)}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-text-tertiary mt-1">
                     {uploadProgress.percentage.toFixed(0)}%
                   </p>
                 </div>
@@ -165,9 +172,11 @@ export function MediaUpload({
             </>
           ) : (
             <>
-              <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-sm font-medium mb-1">Click or drag files here to upload</p>
-              <p className="text-xs text-muted-foreground">
+              <Upload className="w-12 h-12 mx-auto mb-4 text-text-tertiary" aria-hidden="true" />
+              <p className="text-sm font-medium mb-1 text-text-primary">
+                Click or drag files here to upload
+              </p>
+              <p className="text-xs text-text-tertiary">
                 Supports images and videos (images max 10MB, videos max 200MB)
               </p>
             </>
@@ -176,7 +185,7 @@ export function MediaUpload({
       ) : (
         <div className="relative">
           {uploadedUrl ? (
-            <div className="relative rounded-lg overflow-hidden border border-border">
+            <div className="relative rounded-xl overflow-hidden border border-border-base">
               {uploadedUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                 <img
                   src={uploadedUrl}
@@ -189,14 +198,15 @@ export function MediaUpload({
               <Button
                 variant="destructive"
                 size="icon"
-                className="absolute top-2 right-2"
+                className="absolute top-2 right-2 min-h-[44px] min-w-[44px] active:scale-95"
                 onClick={handleRemove}
+                aria-label="Remove uploaded file"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4" aria-hidden="true" />
               </Button>
             </div>
           ) : (
-            <div className="relative rounded-lg overflow-hidden border border-border">
+            <div className="relative rounded-xl overflow-hidden border border-border-base">
               {isImage ? (
                 <img
                   src={previewUrl}
@@ -209,7 +219,7 @@ export function MediaUpload({
               {isUploading && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                   <div className="text-center text-white">
-                    <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin" />
+                    <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin" aria-hidden="true" />
                     <p className="text-sm">Uploading…</p>
                     {uploadProgress && (
                       <p className="text-xs mt-1">{uploadProgress.percentage.toFixed(0)}%</p>
@@ -220,11 +230,12 @@ export function MediaUpload({
               <Button
                 variant="destructive"
                 size="icon"
-                className="absolute top-2 right-2"
+                className="absolute top-2 right-2 min-h-[44px] min-w-[44px] active:scale-95"
                 onClick={handleRemove}
                 disabled={isUploading}
+                aria-label="Remove file"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4" aria-hidden="true" />
               </Button>
             </div>
           )}

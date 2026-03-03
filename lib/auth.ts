@@ -3,6 +3,8 @@
 import { getSupabaseBrowserClient } from "./supabase-browser";
 
 const supabase = getSupabaseBrowserClient();
+let ensureProfilePromise: Promise<void> | null = null;
+let profileEnsured = false;
 
 export type AppUser = {
   id: string;
@@ -69,79 +71,94 @@ export async function getCurrentUser(): Promise<AppUser | null> {
  * 确保 profiles 中存在记录，默认 role = 'fan'
  */
 export async function ensureProfile() {
-  try {
-    const user = await getCurrentUser();
-    if (!user) {
-      console.warn("[auth] ensureProfile: No user found");
-      return;
-    }
+  if (profileEnsured) return;
+  if (ensureProfilePromise) {
+    await ensureProfilePromise;
+    return;
+  }
 
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, role, age_verified, referrer_id")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error("[auth] ensureProfile select error", error);
-      // 不抛出错误，允许登录继续
-      return;
-    }
-
-    if (!data) {
-      // 归因逻辑：在用户注册时绑定推荐关系
-      let referrerId: string | null = null;
-      if (typeof window !== "undefined") {
-        try {
-          // 动态导入推荐模块（仅在客户端）
-          const referral = await import("./referral");
-          referrerId = referral.getReferralFromCookie();
-        } catch (err) {
-          // 如果导入失败，忽略推荐逻辑
-          console.warn("[auth] Failed to load referral module:", err);
-        }
+  ensureProfilePromise = (async () => {
+    try {
+      const user = await getCurrentUser();
+      if (!user) {
+        console.warn("[auth] ensureProfile: No user found");
+        return;
       }
 
-      // 生成默认头像 URL（使用 UI Avatars 服务）
-      const defaultAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split("@")[0])}&background=random&color=fff&size=128`;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, role, age_verified, referrer_id")
+        .eq("id", user.id)
+        .maybeSingle();
 
-      // 生成 username（从 email 或 ID 生成唯一标识）
-      const baseUsername = user.email
-        .split("@")[0]
-        .toLowerCase()
-        .replace(/[^a-z0-9_]/g, "_");
-      const username = `${baseUsername}_${user.id.substring(0, 8)}`;
+      if (error) {
+        console.error("[auth] ensureProfile select error", error);
+        // 不抛出错误，允许登录继续
+        return;
+      }
 
-      const { error: insertError } = await supabase.from("profiles").insert({
-        id: user.id,
-        email: user.email,
-        username: username,
-        display_name: user.email.split("@")[0],
-        role: "fan",
-        age_verified: false,
-        avatar_url: defaultAvatarUrl,
-        referrer_id: referrerId, // 财务系统预留：绑定推荐人
-      });
-
-      if (insertError) {
-        console.error("[auth] ensureProfile insert error", insertError);
-        // 不抛出错误，允许登录继续（profile 可以在后续创建）
-      } else {
-        if (referrerId && typeof window !== "undefined") {
-          // 绑定成功后清除 Cookie（在客户端执行）
+      if (!data) {
+        // 归因逻辑：在用户注册时绑定推荐关系
+        let referrerId: string | null = null;
+        if (typeof window !== "undefined") {
           try {
+            // 动态导入推荐模块（仅在客户端）
             const referral = await import("./referral");
-            referral.clearReferralCookie();
+            referrerId = referral.getReferralFromCookie();
           } catch (err) {
-            // 如果导入失败，忽略清除操作
-            console.warn("[auth] Failed to clear referral cookie:", err);
+            // 如果导入失败，忽略推荐逻辑
+            console.warn("[auth] Failed to load referral module:", err);
+          }
+        }
+
+        // 生成默认头像 URL（使用 UI Avatars 服务）
+        const defaultAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split("@")[0])}&background=random&color=fff&size=128`;
+
+        // 生成 username（从 email 或 ID 生成唯一标识）
+        const baseUsername = user.email
+          .split("@")[0]
+          .toLowerCase()
+          .replace(/[^a-z0-9_]/g, "_");
+        const username = `${baseUsername}_${user.id.substring(0, 8)}`;
+
+        const { error: insertError } = await supabase.from("profiles").insert({
+          id: user.id,
+          email: user.email,
+          username: username,
+          display_name: user.email.split("@")[0],
+          role: "fan",
+          age_verified: false,
+          avatar_url: defaultAvatarUrl,
+          referrer_id: referrerId, // 财务系统预留：绑定推荐人
+        });
+
+        if (insertError) {
+          console.error("[auth] ensureProfile insert error", insertError);
+          // 不抛出错误，允许登录继续（profile 可以在后续创建）
+        } else {
+          if (referrerId && typeof window !== "undefined") {
+            // 绑定成功后清除 Cookie（在客户端执行）
+            try {
+              const referral = await import("./referral");
+              referral.clearReferralCookie();
+            } catch (err) {
+              // 如果导入失败，忽略清除操作
+              console.warn("[auth] Failed to clear referral cookie:", err);
+            }
           }
         }
       }
+      profileEnsured = true;
+    } catch (err) {
+      console.error("[auth] ensureProfile unexpected error:", err);
+      // 不抛出错误，允许登录继续
     }
-  } catch (err) {
-    console.error("[auth] ensureProfile unexpected error:", err);
-    // 不抛出错误，允许登录继续
+  })();
+
+  try {
+    await ensureProfilePromise;
+  } finally {
+    ensureProfilePromise = null;
   }
 }
 
@@ -243,5 +260,7 @@ export async function signInWithGoogle(): Promise<{ success: boolean; error?: st
 
 export async function signOut() {
   const { error } = await supabase.auth.signOut();
+  profileEnsured = false;
+  ensureProfilePromise = null;
   if (error) throw error;
 }

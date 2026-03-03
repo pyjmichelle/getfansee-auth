@@ -5,41 +5,80 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-[transform,opacity,box-shadow,background-color,border-color] duration-200 motion-safe:transition-[transform,opacity,box-shadow,background-color,border-color] motion-reduce:transition-none hover:scale-[1.02] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-[3px] focus-visible:ring-primary/50 focus-visible:outline-none aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive select-none",
+  [
+    "inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium select-none",
+    "rounded-[var(--radius-sm)] border border-transparent",
+    "transition-[transform,opacity,background-color,box-shadow,border-color,filter]",
+    "duration-150 ease-out",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+    "disabled:pointer-events-none disabled:opacity-40 disabled:cursor-not-allowed",
+    "active:scale-[0.97]",
+    "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-[14px]",
+    "shrink-0",
+  ].join(" "),
   {
     variants: {
       variant: {
-        default:
-          "bg-primary-gradient text-white font-semibold shadow-md hover:shadow-subscribe-glow hover-glow",
+        /* Default — subtle glass */
+        default: "bg-white/10 text-white border-white/8 hover:bg-white/15 hover:border-white/12",
+
+        /* Violet gradient — primary CTA (replaces rose) */
+        rose: "bg-gradient-rose text-white shadow-glow-violet hover:brightness-110 hover:saturate-110 hover:shadow-glow-violet-lg",
+        violet:
+          "bg-gradient-rose text-white shadow-glow-violet hover:brightness-110 hover:saturate-110 hover:shadow-glow-violet-lg",
+
+        /* Gold gradient — purchase/unlock/tip */
+        gold: "bg-gradient-gold text-white font-semibold shadow-glow-gold hover:brightness-110 hover:shadow-glow-gold-lg",
+
+        /* Indigo — secondary accent */
+        purple: "bg-gradient-purple text-white hover:brightness-110 hover:shadow-glow-purple",
+
+        /* Premium — violet→indigo */
+        premium: "bg-gradient-premium text-white shadow-glow-violet hover:brightness-110",
+
+        /* Ghost — minimal */
+        ghost:
+          "bg-transparent text-text-secondary border-transparent hover:bg-white/5 hover:text-white",
+
+        /* Outline — bordered */
+        outline: "bg-transparent text-white border-white/12 hover:border-white/20 hover:bg-white/5",
+
+        /* Destructive */
         destructive:
-          "bg-destructive text-white hover:bg-destructive/90 hover:shadow-md focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
-        outline:
-          "border border-border bg-transparent hover:bg-secondary/50 hover:border-border-strong active:bg-secondary/70",
+          "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20 hover:text-red-300",
+
+        /* Link */
+        link: "bg-transparent text-violet-400 underline-offset-4 hover:underline border-transparent p-0 h-auto",
+
+        /* Success */
+        success: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20",
+
+        /* Secondary */
         secondary:
-          "bg-secondary text-foreground border border-border/50 hover:bg-secondary/80 hover:border-border-strong active:bg-secondary/90",
-        ghost: "bg-transparent hover:bg-secondary/60 hover:text-foreground active:bg-secondary/80",
-        link: "text-primary underline-offset-4 hover:underline font-medium hover:text-brand-primary-subtle",
-        gradient:
-          "bg-primary-gradient text-white font-bold shadow-md hover:shadow-subscribe-glow hover-glow",
-        "accent-gradient":
-          "bg-accent-gradient text-white font-bold shadow-md hover:shadow-accent-glow hover-glow",
-        "subscribe-gradient":
-          "bg-subscribe-gradient text-white font-bold shadow-md hover:shadow-glow hover-glow",
+          "bg-white/6 text-text-secondary border-white/8 hover:bg-white/10 hover:text-white",
+
+        /* ── Legacy compat aliases (kept for gradual migration) ── */
+        gradient: "bg-gradient-rose text-white shadow-glow-violet hover:brightness-110",
+        "accent-gradient": "bg-gradient-gold text-white font-semibold hover:brightness-110",
+        "subscribe-gradient": "bg-gradient-rose text-white shadow-glow-violet hover:brightness-110",
         "unlock-gradient":
-          "bg-unlock-gradient text-white font-bold shadow-md hover:shadow-unlock-glow hover-glow",
-        "success-gradient":
-          "bg-success-gradient text-white font-bold shadow-md hover:shadow-success-glow hover-glow",
-        "tip-gradient":
-          "bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold shadow-md hover-glow-gold hover:from-amber-600 hover:to-amber-700 hover-glow",
+          "bg-gradient-gold text-white font-semibold shadow-glow-gold hover:brightness-110",
+        "success-gradient": "bg-emerald-500 text-white hover:brightness-110",
+        "tip-gradient": "bg-gradient-gold text-white font-semibold hover:brightness-110",
+        "purple-gradient": "bg-gradient-purple text-white hover:brightness-110",
+        "premium-gradient":
+          "bg-gradient-premium text-white shadow-glow-violet hover:brightness-110",
       },
       size: {
-        default: "h-10 min-h-[44px] px-5 py-2.5 has-[>svg]:px-4 text-base",
-        sm: "h-8 min-h-[36px] gap-1.5 px-3.5 has-[>svg]:px-3 text-sm",
-        lg: "h-12 min-h-[48px] px-7 has-[>svg]:px-5 text-base",
-        xl: "h-14 min-h-[56px] px-8 has-[>svg]:px-6 text-lg",
-        icon: "size-10 min-h-[44px] min-w-[44px]",
-        "icon-sm": "size-8 min-h-[36px] min-w-[36px]",
-        "icon-lg": "size-12 min-h-[48px] min-w-[48px]",
+        xs: "h-6 px-2 text-[11px] rounded-[var(--radius-xs)]",
+        sm: "h-7 px-2.5 text-[12px]",
+        default: "h-8 px-3 text-[13px]",
+        lg: "h-9 px-4 text-[13px]",
+        xl: "h-10 px-5 text-[14px]",
+        icon: "size-8 p-0",
+        "icon-sm": "size-7 p-0",
+        "icon-lg": "size-9 p-0",
+        "icon-xs": "size-6 p-0",
       },
     },
     defaultVariants: {

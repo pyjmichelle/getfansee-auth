@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { NavHeader } from "@/components/nav-header";
+import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,12 +11,11 @@ import { Badge } from "@/components/ui/badge";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { ensureProfile } from "@/lib/auth";
 import { getProfile } from "@/lib/profile";
-// getPost 和 updatePost 通过 API 调用，不直接导入
 import { type Post } from "@/lib/types";
 import { toast } from "sonner";
 import { MultiMediaUpload } from "@/components/multi-media-upload";
 import { type MediaFile } from "@/lib/storage";
-import { Lock } from "lucide-react";
+import { Lock } from "@/lib/icons";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -74,7 +73,6 @@ export default function EditPostPage() {
           }
         }
 
-        // 加载 post 数据（通过 API）
         const response = await fetch(`/api/posts/${postId}`);
         if (!response.ok) {
           if (response.status === 404) {
@@ -100,10 +98,8 @@ export default function EditPostPage() {
           content: postData.content,
         });
 
-        // 转换现有媒体为 MediaFile 格式（用于显示）
         if (postData.media && postData.media.length > 0) {
-          // 注意：编辑时，现有媒体会保留，新上传的会追加
-          // 这里只设置新上传的文件，现有媒体在保存时会保留
+          // Existing media preserved on save; new uploads appended
         }
       } catch (err) {
         console.error("[edit-post] loadData error:", err);
@@ -165,30 +161,29 @@ export default function EditPostPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse space-y-4 w-full max-w-2xl px-4">
-          <div className="h-8 w-48 bg-muted rounded"></div>
-          <div className="h-64 bg-muted rounded-3xl"></div>
-          <div className="h-12 w-full bg-muted rounded-xl"></div>
+      <PageShell user={currentUser} notificationCount={0} maxWidth="2xl">
+        <div className="animate-pulse space-y-4 py-8">
+          <div className="h-8 w-48 bg-surface-raised rounded"></div>
+          <div className="h-64 bg-surface-raised rounded-2xl"></div>
+          <div className="h-12 w-full bg-surface-raised rounded-xl"></div>
         </div>
-      </div>
+      </PageShell>
     );
   }
 
   if (error && !post) {
     return (
-      <div className="min-h-screen bg-background">
-        {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-        <main className="container max-w-2xl mx-auto px-4 py-6">
-          <div className="bg-card border border-border rounded-3xl p-6">
+      <PageShell user={currentUser} notificationCount={0} maxWidth="2xl">
+        <div className="section-block py-6">
+          <div className="card-block p-6">
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-foreground mb-4">Error</h1>
-              <p className="text-muted-foreground mb-6">{error}</p>
+              <h1 className="text-2xl font-bold text-text-primary mb-4">Error</h1>
+              <p className="text-text-secondary mb-6">{error}</p>
               <Button onClick={() => router.push("/creator/studio/post/list")}>Back to List</Button>
             </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </PageShell>
     );
   }
 
@@ -197,29 +192,25 @@ export default function EditPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {currentUser && <NavHeader user={currentUser} notificationCount={0} />}
-
-      <main className="container max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+    <PageShell user={currentUser} notificationCount={0} maxWidth="2xl">
+      <div className="section-block py-8 md:py-12">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Edit Post</h1>
-          <p className="text-muted-foreground">
-            Edit your content (price and visibility are locked)
-          </p>
+          <h1 className="text-3xl font-bold text-text-primary mb-2">Edit Post</h1>
+          <p className="text-text-secondary">Edit your content (price and visibility are locked)</p>
         </div>
 
         {error && (
-          <div className="bg-destructive/10 border border-destructive/20 rounded-3xl p-6 mb-8">
-            <p className="text-destructive font-medium">Error</p>
-            <p className="text-sm text-muted-foreground mt-1">{error}</p>
+          <div className="bg-error/10 border border-error/20 rounded-2xl p-6 mb-8">
+            <p className="text-error font-medium">Error</p>
+            <p className="text-sm text-text-secondary mt-1">{error}</p>
           </div>
         )}
 
-        <div className="bg-card border border-border rounded-3xl p-6 md:p-8">
+        <div className="card-block p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Locked Visibility & Price Info */}
-            <div className="bg-muted border border-border rounded-xl p-4 space-y-3">
-              <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="bg-surface-raised border border-border-base rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2 text-text-tertiary">
                 <Lock className="w-4 h-4" />
                 <span className="text-sm font-medium">
                   Price and visibility are locked (cannot be modified)
@@ -231,7 +222,7 @@ export default function EditPostPage() {
                     post.visibility === "free"
                       ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 rounded-lg"
                       : post.visibility === "subscribers"
-                        ? "bg-primary/10 text-primary border-primary/20 rounded-lg"
+                        ? "bg-brand-primary/10 text-brand-primary border-brand-primary/20 rounded-lg"
                         : "glass bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)] border-[var(--border-purple-500-20)] rounded-lg"
                   }
                 >
@@ -242,7 +233,7 @@ export default function EditPostPage() {
                       : `Premium $${((post.price_cents || 0) / 100).toFixed(2)}`}
                 </Badge>
                 {post.visibility === "ppv" && (
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-sm text-text-tertiary">
                     Price: ${((post.price_cents || 0) / 100).toFixed(2)}
                   </span>
                 )}
@@ -265,7 +256,7 @@ export default function EditPostPage() {
             {/* Content */}
             <div className="space-y-2">
               <Label htmlFor="content">
-                Content <span className="text-destructive">*</span>
+                Content <span className="text-error">*</span>
               </Label>
               <Textarea
                 id="content"
@@ -285,13 +276,13 @@ export default function EditPostPage() {
                 media)
               </Label>
               {post.media && post.media.length > 0 && (
-                <div className="mb-3 p-3 bg-muted rounded-lg">
-                  <p className="text-xs text-muted-foreground mb-2">
+                <div className="mb-3 p-3 bg-surface-raised rounded-lg">
+                  <p className="text-xs text-text-tertiary mb-2">
                     Existing media ({post.media.length} file{post.media.length > 1 ? "s" : ""})
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {post.media.map((media) => (
-                      <div key={media.id} className="text-xs text-muted-foreground">
+                      <div key={media.id} className="text-xs text-text-tertiary">
                         {media.media_type === "image" ? "🖼️" : "🎥"} {media.file_name || "media"}
                       </div>
                     ))}
@@ -303,14 +294,14 @@ export default function EditPostPage() {
                   setMediaFiles(files);
                   toast.success(`${files.length} new file${files.length > 1 ? "s" : ""} uploaded`);
                 }}
-                onUploadError={(error) => {
-                  setError(error);
-                  toast.error(error);
+                onUploadError={(uploadError) => {
+                  setError(uploadError);
+                  toast.error(uploadError);
                 }}
                 maxFiles={10}
               />
               {mediaFiles.length > 0 && (
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="text-xs text-text-tertiary mt-2">
                   {mediaFiles.length} new file{mediaFiles.length > 1 ? "s" : ""} uploaded (will be
                   appended to existing media)
                 </p>
@@ -324,7 +315,7 @@ export default function EditPostPage() {
                 variant="outline"
                 onClick={() => router.push("/creator/studio/post/list")}
                 disabled={isSaving}
-                className="flex-1 border-border bg-card hover:bg-card rounded-xl"
+                className="flex-1 border-border-base bg-surface-base hover:bg-surface-raised rounded-xl"
               >
                 Cancel
               </Button>
@@ -332,14 +323,14 @@ export default function EditPostPage() {
                 type="submit"
                 variant="gradient"
                 disabled={isSaving}
-                className="flex-1 rounded-xl"
+                className="flex-1 rounded-xl shadow-glow hover-bold"
               >
                 {isSaving ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </form>
         </div>
-      </main>
-    </div>
+      </div>
+    </PageShell>
   );
 }

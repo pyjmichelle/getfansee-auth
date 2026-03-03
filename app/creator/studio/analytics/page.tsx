@@ -1,38 +1,81 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ArrowLeft,
-  TrendingUp,
-  TrendingDown,
   Eye,
   Heart,
   DollarSign,
   ChevronRight,
-} from "lucide-react";
-import { NavHeader } from "@/components/nav-header";
+  BarChart3,
+  Users,
+  TrendingUp,
+  FileText,
+  Plus,
+} from "@/lib/icons";
+import { PageShell } from "@/components/page-shell";
+import Image from "next/image";
 import Link from "next/link";
-import { BottomNavigation } from "@/components/bottom-navigation";
+import { useCountUp } from "@/hooks/use-count-up";
+import { StatCard } from "@/components/stat-card";
+import { EmptyState } from "@/components/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { DEFAULT_AVATAR_CREATOR } from "@/lib/image-fallbacks";
 
 type TimeRange = "7d" | "30d" | "90d" | "all";
 
+function AnalyticsSkeleton() {
+  return (
+    <div className="pb-12 space-y-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-10 w-10 rounded-xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-48 rounded" />
+            <Skeleton className="h-4 w-64 rounded" />
+          </div>
+        </div>
+        <Skeleton className="h-10 w-64 rounded-xl" />
+      </div>
+      <div className="bento-grid">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <Skeleton key={i} className="h-28 rounded-2xl" />
+        ))}
+      </div>
+      <div className="grid md:grid-cols-2 gap-6">
+        <Skeleton className="h-80 rounded-2xl" />
+        <Skeleton className="h-80 rounded-2xl" />
+      </div>
+      <Skeleton className="h-64 rounded-2xl" />
+      <div className="card-block p-6">
+        <Skeleton className="h-6 w-48 mb-6 rounded" />
+        <div className="flex gap-4 overflow-hidden">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-24 min-w-[280px] rounded-xl" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<TimeRange>("30d");
+  const [isLoading, setIsLoading] = useState(true);
 
   const currentUser = {
     username: "sophia_creative",
     role: "creator" as const,
-    avatar: "/placeholder.svg?height=100&width=100",
+    avatar: DEFAULT_AVATAR_CREATOR,
   };
 
-  const stats = {
-    views: { value: "12,543", change: "+12.5%", trend: "up" as const },
-    uniqueViewers: { value: "8,234", change: "+8.2%", trend: "up" as const },
-    engagementRate: { value: "4.2%", change: "-0.3%", trend: "down" as const },
-    newSubscribers: { value: "234", change: "+18.7%", trend: "up" as const },
-    churnRate: { value: "2.1%", change: "+0.5%", trend: "down" as const },
-    earnings: { value: "$2,847", change: "+22.1%", trend: "up" as const },
-  };
+  const animatedViews = useCountUp(12543, { duration: 900, decimals: 0 });
+  const animatedViewers = useCountUp(8234, { duration: 900, decimals: 0 });
+  const animatedEngagement = useCountUp(4.2, { duration: 900, decimals: 1 });
+  const animatedNewSubs = useCountUp(234, { duration: 900, decimals: 0 });
+  const animatedChurn = useCountUp(2.1, { duration: 900, decimals: 1 });
+  const animatedEarnings = useCountUp(2847, { duration: 900, decimals: 0 });
 
   const topPosts = [
     {
@@ -61,6 +104,11 @@ export default function AnalyticsPage() {
     },
   ];
 
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 400);
+    return () => clearTimeout(t);
+  }, []);
+
   // Chart data for views
   const viewsData = [420, 380, 520, 480, 650, 590, 720, 680, 820, 760, 890, 950, 880, 1020];
   const maxViews = Math.max(...viewsData);
@@ -72,18 +120,33 @@ export default function AnalyticsPage() {
   ];
   const maxSubscribers = Math.max(...subscriberData);
 
-  return (
-    <div className="min-h-screen bg-background pb-24 md:pb-0">
-      <NavHeader user={currentUser} notificationCount={5} />
+  if (isLoading) {
+    return (
+      <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
+        <AnalyticsSkeleton />
+      </PageShell>
+    );
+  }
 
-      <div className="pt-20 md:pt-24 pb-12">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
+  const studioNav = [
+    { href: "/creator/new-post", icon: Plus, label: "Create Post" },
+    { href: "/creator/studio/earnings", icon: DollarSign, label: "Earnings" },
+    { href: "/creator/studio/subscribers", icon: Users, label: "Subscribers" },
+    { href: "/creator/studio/post/list", icon: FileText, label: "Post List" },
+    { href: "/creator/studio/analytics", icon: BarChart3, label: "Analytics" },
+  ];
+
+  return (
+    <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
+      <div className="pb-12 flex flex-col lg:flex-row gap-8">
+        <main className="flex-1 min-w-0" data-testid="analytics-ready">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-4">
               <Link
                 href="/creator/studio"
-                className="p-2.5 hover:bg-surface-raised rounded-xl transition-colors"
+                className="p-2.5 hover:bg-surface-raised rounded-xl transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                aria-label="Back to Studio"
               >
                 <ArrowLeft size={24} />
               </Link>
@@ -96,56 +159,77 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Time Range Selector */}
-            <div className="flex gap-2 bg-surface-base border border-border-base rounded-xl p-1">
+            <div className="snap-row bg-surface-base border border-border-base rounded-xl p-1">
               {[
                 { value: "7d" as const, label: "7 Days" },
                 { value: "30d" as const, label: "30 Days" },
                 { value: "90d" as const, label: "90 Days" },
                 { value: "all" as const, label: "All Time" },
               ].map((range) => (
-                <button
+                <Button
                   key={range.value}
                   onClick={() => setTimeRange(range.value)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95 ${
+                  variant={timeRange === range.value ? "default" : "ghost"}
+                  size="sm"
+                  className={`rounded-lg ${
                     timeRange === range.value
                       ? "bg-brand-primary text-white shadow-md"
                       : "text-text-secondary hover:bg-surface-raised"
                   }`}
                 >
                   {range.label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
+          <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+            Analytics data is coming soon — current figures are estimates for preview purposes.
+          </div>
 
-          {/* Key Metrics Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-            {Object.entries(stats).map(([key, data]) => (
-              <div
-                key={key}
-                className="bg-surface-base border border-border-base rounded-2xl p-5 hover:border-brand-primary/30 transition-all"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-text-tertiary capitalize">
-                    {key.replace(/([A-Z])/g, " $1").trim()}
-                  </span>
-                  <div
-                    className={`flex items-center gap-1 text-xs ${
-                      data.trend === "up" ? "text-success" : "text-error"
-                    }`}
-                  >
-                    {data.trend === "up" ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                    <span>{data.change}</span>
-                  </div>
-                </div>
-                <div className="text-2xl font-bold text-text-primary">{data.value}</div>
-              </div>
-            ))}
+          {/* Key Metrics - StatCard */}
+          <div className="bento-grid mb-8">
+            <StatCard
+              title="Views"
+              value={animatedViews.toFixed(0)}
+              change={{ value: 12.5, trend: "up" }}
+              icon={<Eye className="w-5 h-5" />}
+              className="bento-2x1"
+            />
+            <StatCard
+              title="Unique Viewers"
+              value={animatedViewers.toFixed(0)}
+              change={{ value: 8.2, trend: "up" }}
+              icon={<Users className="w-5 h-5" />}
+            />
+            <StatCard
+              title="Engagement Rate"
+              value={`${animatedEngagement.toFixed(1)}%`}
+              change={{ value: 0.3, trend: "down" }}
+              icon={<TrendingUp className="w-5 h-5" />}
+            />
+            <StatCard
+              title="New Subscribers"
+              value={animatedNewSubs.toFixed(0)}
+              change={{ value: 18.7, trend: "up" }}
+              icon={<Users className="w-5 h-5" />}
+            />
+            <StatCard
+              title="Churn Rate"
+              value={`${animatedChurn.toFixed(1)}%`}
+              change={{ value: 0.5, trend: "down" }}
+              icon={<TrendingUp className="w-5 h-5" />}
+            />
+            <StatCard
+              title="Earnings"
+              value={`$${animatedEarnings.toFixed(0)}`}
+              change={{ value: 22.1, trend: "up" }}
+              icon={<DollarSign className="w-5 h-5" />}
+              className="bento-2x1"
+            />
           </div>
 
           {/* Charts Row */}
           <div className="grid md:grid-cols-2 gap-6 mb-8">
-            {/* Views Chart */}
             <div className="bg-surface-base border border-border-base rounded-2xl p-6">
               <h3 className="font-semibold text-lg mb-6 text-text-primary">Views Over Time</h3>
               <div className="h-64 flex items-end justify-between gap-2">
@@ -167,42 +251,38 @@ export default function AnalyticsPage() {
               </div>
             </div>
 
-            {/* Revenue Breakdown */}
             <div className="bg-surface-base border border-border-base rounded-2xl p-6">
               <h3 className="font-semibold text-lg mb-6 text-text-primary">Revenue Breakdown</h3>
               <div className="flex items-center justify-center h-64">
                 <div className="relative w-48 h-48">
                   <svg className="w-full h-full" viewBox="0 0 100 100">
-                    {/* Subscriptions - 65% */}
                     <circle
                       cx="50"
                       cy="50"
                       r="40"
                       fill="none"
-                      stroke="rgb(107, 114, 255)"
+                      stroke="var(--brand-primary)"
                       strokeWidth="20"
                       strokeDasharray="163 251"
                       transform="rotate(-90 50 50)"
                     />
-                    {/* PPV - 30% */}
                     <circle
                       cx="50"
                       cy="50"
                       r="40"
                       fill="none"
-                      stroke="rgb(255, 170, 69)"
+                      stroke="var(--brand-accent)"
                       strokeWidth="20"
                       strokeDasharray="75 251"
                       strokeDashoffset="-163"
                       transform="rotate(-90 50 50)"
                     />
-                    {/* Tips - 5% */}
                     <circle
                       cx="50"
                       cy="50"
                       r="40"
                       fill="none"
-                      stroke="rgb(16, 185, 129)"
+                      stroke="var(--success)"
                       strokeWidth="20"
                       strokeDasharray="13 251"
                       strokeDashoffset="-238"
@@ -273,48 +353,99 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Top Performing Content */}
-          <div className="bg-surface-base border border-border-base rounded-2xl p-6">
+          <div className="card-block p-6">
             <h3 className="font-semibold text-lg mb-6 text-text-primary">Top Performing Content</h3>
-            <div className="space-y-4">
-              {topPosts.map((post, index) => (
-                <div
-                  key={post.id}
-                  className="flex items-center gap-4 p-4 bg-surface-raised rounded-xl hover:bg-surface-overlay transition-all cursor-pointer"
-                >
-                  <div className="text-2xl font-bold text-text-quaternary w-8 text-center">
-                    #{index + 1}
-                  </div>
-                  <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-surface-base">
-                    <img src={post.thumbnail} alt="" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold mb-1 truncate text-text-primary">{post.title}</h4>
-                    <div className="flex items-center gap-4 text-sm text-text-tertiary">
-                      <span className="flex items-center gap-1">
-                        <Eye size={14} />
-                        {post.views.toLocaleString()}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Heart size={14} />
-                        {post.likes}
-                      </span>
-                      <span className="flex items-center gap-1 text-success font-medium">
-                        <DollarSign size={14} />
-                        {post.earnings}
-                      </span>
+            {topPosts.length === 0 ? (
+              <EmptyState
+                icon={<BarChart3 className="w-8 h-8 text-text-tertiary" />}
+                title="No content yet"
+                description="Publish posts to see performance and top content here."
+                action={{ label: "Create Post", href: "/creator/new-post" }}
+              />
+            ) : (
+              <div className="snap-row">
+                {topPosts.map((post, index) => (
+                  <div
+                    key={post.id}
+                    className="card-block min-w-[280px] flex items-center gap-4 p-4 hover:bg-surface-overlay transition-all cursor-pointer animate-profile-reveal"
+                    style={{ animationDelay: `${index * 80}ms` }}
+                  >
+                    <div className="text-2xl font-bold text-text-quaternary w-8 text-center">
+                      #{index + 1}
                     </div>
+                    <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-surface-base">
+                      <Image
+                        src={post.thumbnail}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="80px"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold mb-1 truncate text-text-primary">
+                        {post.title}
+                      </h4>
+                      <div className="flex items-center gap-4 text-sm text-text-tertiary">
+                        <span className="flex items-center gap-1">
+                          <Eye size={14} />
+                          {post.views.toLocaleString()}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Heart size={14} />
+                          {post.likes}
+                        </span>
+                        <span className="flex items-center gap-1 text-success font-medium">
+                          <DollarSign size={14} />
+                          {post.earnings}
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-lg hover:bg-surface-base"
+                      aria-label="View post"
+                    >
+                      <ChevronRight size={20} className="text-text-tertiary" />
+                    </Button>
                   </div>
-                  <button className="p-2 hover:bg-surface-base rounded-lg transition-colors active:scale-95">
-                    <ChevronRight size={20} className="text-text-tertiary" />
-                  </button>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* Sidebar: Studio nav (PC only) */}
+        <aside className="w-full lg:w-72 shrink-0">
+          <div className="sticky top-24 space-y-4">
+            <div className="card-block p-4">
+              <h2 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">
+                Studio
+              </h2>
+              <nav className="space-y-1" aria-label="Studio navigation">
+                {studioNav.map(({ href, icon: Icon, label }) => {
+                  const isActive = href === "/creator/studio/analytics";
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary ${
+                        isActive
+                          ? "bg-brand-primary/10 text-brand-primary"
+                          : "text-text-secondary hover:bg-surface-raised hover:text-text-primary"
+                      }`}
+                    >
+                      <Icon size={16} />
+                      {label}
+                    </Link>
+                  );
+                })}
+              </nav>
             </div>
           </div>
-        </div>
+        </aside>
       </div>
-
-      <BottomNavigation notificationCount={0} userRole={currentUser.role} />
-    </div>
+    </PageShell>
   );
 }

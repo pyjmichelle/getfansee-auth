@@ -8,6 +8,7 @@
 
 import { getSupabaseUniversalClient } from "./supabase-universal";
 import { getCurrentUserUniversal } from "./auth-universal";
+import { DEFAULT_POST_MEDIA } from "./image-fallbacks";
 
 export interface CreatorStats {
   revenue: {
@@ -341,7 +342,7 @@ export async function getRecentPosts(creatorId: string, limit: number = 3) {
         mediaUrl:
           post.post_media && post.post_media.length > 0
             ? post.post_media[0].media_url
-            : "/placeholder.svg?height=300&width=400",
+            : DEFAULT_POST_MEDIA,
         createdAt: post.created_at,
         likes,
         views,

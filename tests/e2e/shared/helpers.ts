@@ -512,8 +512,9 @@ export async function injectSupabaseSession(
   }
   await ensureTestMode(page);
 
-  // 必须先导航到同源页面，否则 fetch credentials 无法正确应用 Set-Cookie
-  await page.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded", timeout: 15_000 });
+  // 必须先导航到同源页面，否则 fetch credentials 无法正确应用 Set-Cookie。
+  // 使用 /auth 避免从 / 被重定向导致的导航竞态（fetch 在 evaluate 时被 abort）。
+  await page.goto(`${baseUrl}/auth`, { waitUntil: "domcontentloaded", timeout: 15_000 });
   const origin = new URL(page.url()).origin;
   if (!origin || origin === "null") {
     throw new Error(`injectSupabaseSession: invalid origin from page.url()=${page.url()}`);
@@ -567,8 +568,27 @@ export async function injectSupabaseSession(
     );
   }
 
-  // 导航到 /home 并验证 session 生效
-  await page.goto(`${origin}/home`, { waitUntil: "domcontentloaded", timeout: 15_000 });
+  // 导航到 /home 并验证 session 生效（部分环境首次跳转偶发超时，做一次温和重试）
+  let navigatedToHome = false;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      await page.goto(`${origin}/home`, {
+        waitUntil: "domcontentloaded",
+        timeout: 30_000,
+      });
+      navigatedToHome = true;
+      break;
+    } catch (error) {
+      if (attempt === 1) throw error;
+      await page.goto(`${origin}/auth?mode=login`, {
+        waitUntil: "domcontentloaded",
+        timeout: 15_000,
+      });
+    }
+  }
+  if (!navigatedToHome) {
+    throw new Error("E2E session: failed to navigate to /home after session injection");
+  }
   if (page.url().includes("/auth")) {
     throw new Error(
       `E2E session: redirected to /auth after goto(/home) — session not生效 (origin=${origin} sb-cookies present but server did not recognize)`

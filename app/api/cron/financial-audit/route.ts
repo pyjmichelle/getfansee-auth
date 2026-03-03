@@ -273,16 +273,20 @@ async function checkBalanceConsistency(
 }
 
 export async function GET(request: NextRequest) {
-  // 验证 cron secret
+  // 强制 CRON_SECRET 鉴权：无论环境，缺少或错误 secret 均拒绝
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
-  // 在生产环境强制验证 secret
-  if (process.env.NODE_ENV === "production" && cronSecret) {
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      logger.warn("Unauthorized cron request", { endpoint: "/api/cron/financial-audit" });
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  if (!cronSecret) {
+    logger.warn("CRON_SECRET not configured, refusing cron request", {
+      endpoint: "/api/cron/financial-audit",
+    });
+    return NextResponse.json({ error: "Service not configured" }, { status: 503 });
+  }
+
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    logger.warn("Unauthorized cron request", { endpoint: "/api/cron/financial-audit" });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   logger.info("Starting financial audit", { endpoint: "/api/cron/financial-audit" });
