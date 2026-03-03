@@ -16,7 +16,7 @@ const nextConfig = {
   // Remove X-Powered-By header to avoid leaking Next.js fingerprint
   poweredByHeader: false,
   experimental: {
-    optimizePackageImports: ['@phosphor-icons/react'],
+    optimizePackageImports: ['react-coolicons'],
   },
   async headers() {
     return [
