@@ -10,15 +10,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload } from "@/lib/icons";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-// 所有服务器端函数都通过 API 调用，不直接导入
 import { submitVerification } from "@/lib/kyc";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 import { toast } from "sonner";
 import { Analytics } from "@/lib/analytics";
 import { LoadingState } from "@/components/loading-state";
 import { DEFAULT_AVATAR_CREATOR, PLACEHOLDER_GENERIC } from "@/lib/image-fallbacks";
-
-const supabase = getSupabaseBrowserClient();
 
 export default function CreatorOnboardingPage() {
   const router = useRouter();
@@ -56,19 +53,13 @@ export default function CreatorOnboardingPage() {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const {
-          data: { session },
-          error: sessionError,
-        } = await supabase.auth.getSession();
-
-        if (sessionError || !session) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           router.push("/auth");
           return;
         }
 
-        // 确保 profile 存在（通过 API）
-        await fetch("/api/auth/ensure-profile", { method: "POST" });
-        setCurrentUserId(session.user.id);
+        setCurrentUserId(bootstrap.user.id);
 
         // 加载 profile（通过 API）
         const profileResponse = await fetch("/api/profile");

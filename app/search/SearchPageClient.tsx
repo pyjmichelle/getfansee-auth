@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   CheckCircle2,
@@ -16,7 +17,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_AVATAR_CREATOR, DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
 import { type Creator } from "@/lib/types";
-import { toast } from "sonner";
 import { PageShell } from "@/components/page-shell";
 import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
@@ -166,6 +166,7 @@ export default function SearchPageClient() {
   const [category, setCategory] = useState<Category>("all");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [isSearching, setIsSearching] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [creators, setCreators] = useState<ExploreCreator[]>([]);
   const [currentUser, setCurrentUser] = useState<{
@@ -233,14 +234,17 @@ export default function SearchPageClient() {
     }
   }, [initialQuery]);
 
+  const hasSearchQuery = query.trim().length >= 2;
+  const showEmptyState = hasSearchQuery && !isSearching && creators.length === 0;
+
   const displayedCreators = useMemo(() => {
-    const base = creators.length > 0 ? creators : SHOWCASE_CREATORS;
+    const base = hasSearchQuery ? creators : SHOWCASE_CREATORS;
     if (category === "all") return base;
     if (category === "trending")
       return [...base].sort((a, b) => b.subscriberCount - a.subscriberCount);
     if (category === "new") return [...base].reverse();
     return [...base].sort((a, b) => b.postCount - a.postCount);
-  }, [category, creators]);
+  }, [category, creators, hasSearchQuery]);
 
   const featured = displayedCreators.slice(0, 3);
 
@@ -271,8 +275,12 @@ export default function SearchPageClient() {
             <input
               value={query}
               onChange={(e) => {
-                setQuery(e.target.value);
-                performSearch(e.target.value);
+                const val = e.target.value;
+                setQuery(val);
+                if (debounceRef.current) clearTimeout(debounceRef.current);
+                debounceRef.current = setTimeout(() => {
+                  performSearch(val);
+                }, 300);
               }}
               placeholder="Search creators by name or username..."
               className="glass-input w-full h-10 pl-9 pr-4 text-[13px] text-white placeholder:text-text-muted"
@@ -291,10 +299,12 @@ export default function SearchPageClient() {
                 className="relative h-[280px] md:h-[340px] overflow-hidden rounded-[var(--radius-md)] cursor-pointer group"
                 onClick={() => router.push(`/creator/${c.id}`)}
               >
-                <img
+                <Image
                   src={c.coverImage}
                   alt={c.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  sizes="(max-width: 768px) 100vw, 33vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/80" />
                 {c.verified && (
@@ -320,7 +330,7 @@ export default function SearchPageClient() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        toast.success(`Subscribed to ${c.name}!`);
+                        router.push(`/creator/${c.id}`);
                       }}
                       className="h-7 px-3 rounded-full bg-violet-500/90 text-white text-[11px] font-bold hover:bg-violet-500 transition-colors shadow-glow-violet"
                     >
@@ -370,109 +380,121 @@ export default function SearchPageClient() {
           </div>
         </section>
 
+        {/* Empty state */}
+        {showEmptyState && (
+          <div
+            className="flex flex-col items-center justify-center py-16 text-center"
+            data-testid="search-empty"
+          >
+            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+              <Search className="size-7 text-text-muted" />
+            </div>
+            <p className="text-[15px] font-semibold text-white mb-1">No creators found</p>
+            <p className="text-[13px] text-text-muted max-w-xs">
+              Try a different name or username to find creators you love.
+            </p>
+          </div>
+        )}
+
         {/* Creator grid/list */}
-        <section
-          className={
-            viewMode === "grid"
-              ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
-              : "space-y-2.5"
-          }
-          data-testid="search-results"
-        >
-          {displayedCreators.map((c) =>
-            viewMode === "grid" ? (
-              <article
-                key={`${category}-${c.id}`}
-                className="glass-card rounded-[var(--radius-md)] overflow-hidden cursor-pointer hover:border-violet-500/30 transition-all group card-interactive"
-                onClick={() => router.push(`/creator/${c.id}`)}
-              >
-                <div className="relative h-28 overflow-hidden">
-                  <img
-                    src={c.coverImage}
-                    alt=""
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/40" />
-                  {c.verified && (
-                    <div className="absolute top-2 right-2 size-5 rounded-full bg-violet-500 flex items-center justify-center">
-                      <CheckCircle2 className="size-[10px] text-white" />
-                    </div>
-                  )}
-                </div>
-                <div className="p-3">
-                  <div className="flex items-center gap-2 -mt-5 mb-2">
-                    <Avatar className="size-8 ring-2 ring-bg-base">
-                      <AvatarImage src={c.avatar} />
-                      <AvatarFallback className="text-[10px]">{c.name[0]}</AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <p className="text-[12px] font-semibold text-white truncate">{c.name}</p>
-                  <p className="text-[10px] text-text-muted mb-1">@{c.username}</p>
-                  <p className="text-[10px] text-text-secondary line-clamp-2 mb-2.5">{c.bio}</p>
-                  <div className="flex items-center justify-between text-[10px] text-text-muted mb-2.5">
-                    <span>{formatCount(c.subscriberCount)} subs</span>
-                    <span>{c.postCount} posts</span>
-                  </div>
-                  <Button
-                    variant={c.isSubscribed ? "outline" : "violet"}
-                    size="xs"
-                    className="w-full"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toast.success(
-                        c.isSubscribed ? `Viewing ${c.name}` : `Subscribed to ${c.name}!`
-                      );
-                    }}
-                  >
-                    {c.isSubscribed ? "View Profile" : `$${c.price.toFixed(2)}/mo`}
-                  </Button>
-                </div>
-              </article>
-            ) : (
-              <article
-                key={`${category}-${c.id}`}
-                className="glass-card rounded-[var(--radius-md)] overflow-hidden flex gap-3 p-3 cursor-pointer hover:border-violet-500/30 transition-all"
-                onClick={() => router.push(`/creator/${c.id}`)}
-              >
-                <Avatar className="size-10 shrink-0 ring-1 ring-violet-500/20">
-                  <AvatarImage src={c.avatar} />
-                  <AvatarFallback>{c.name[0]}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <p className="text-[13px] font-semibold text-white truncate">{c.name}</p>
+        {!showEmptyState && (
+          <section
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+                : "space-y-2.5"
+            }
+            data-testid="search-results"
+          >
+            {displayedCreators.map((c) =>
+              viewMode === "grid" ? (
+                <article
+                  key={`${category}-${c.id}`}
+                  className="glass-card rounded-[var(--radius-md)] overflow-hidden cursor-pointer hover:border-violet-500/30 transition-all group card-interactive"
+                  onClick={() => router.push(`/creator/${c.id}`)}
+                >
+                  <div className="relative h-28 overflow-hidden">
+                    <Image
+                      src={c.coverImage}
+                      alt=""
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/40" />
                     {c.verified && (
-                      <CheckCircle2 className="size-[12px] text-violet-500 shrink-0" />
+                      <div className="absolute top-2 right-2 size-5 rounded-full bg-violet-500 flex items-center justify-center">
+                        <CheckCircle2 className="size-[10px] text-white" />
+                      </div>
                     )}
                   </div>
-                  <p className="text-[11px] text-text-muted mb-1">@{c.username}</p>
-                  <p className="text-[11px] text-text-secondary line-clamp-1">{c.bio}</p>
-                  <p className="text-[10px] text-text-muted mt-1">
-                    {formatCount(c.subscriberCount)} subscribers · {c.postCount} posts
-                  </p>
-                </div>
-                <div className="shrink-0 flex flex-col items-end gap-1.5">
-                  <Button
-                    variant={c.isSubscribed ? "outline" : "violet"}
-                    size="xs"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toast.success(`Subscribed to ${c.name}!`);
-                    }}
-                  >
-                    {c.isSubscribed ? "Subscribed" : `$${c.price.toFixed(2)}/mo`}
-                  </Button>
-                </div>
-              </article>
-            )
-          )}
-        </section>
-
-        <div className="mt-8 flex justify-center">
-          <Button variant="outline" size="sm">
-            Load More Creators
-          </Button>
-        </div>
+                  <div className="p-3">
+                    <div className="flex items-center gap-2 -mt-5 mb-2">
+                      <Avatar className="size-8 ring-2 ring-bg-base">
+                        <AvatarImage src={c.avatar} />
+                        <AvatarFallback className="text-[10px]">{c.name[0]}</AvatarFallback>
+                      </Avatar>
+                    </div>
+                    <p className="text-[12px] font-semibold text-white truncate">{c.name}</p>
+                    <p className="text-[10px] text-text-muted mb-1">@{c.username}</p>
+                    <p className="text-[10px] text-text-secondary line-clamp-2 mb-2.5">{c.bio}</p>
+                    <div className="flex items-center justify-between text-[10px] text-text-muted mb-2.5">
+                      <span>{formatCount(c.subscriberCount)} subs</span>
+                      <span>{c.postCount} posts</span>
+                    </div>
+                    <Button
+                      variant={c.isSubscribed ? "outline" : "violet"}
+                      size="xs"
+                      className="w-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/creator/${c.id}`);
+                      }}
+                    >
+                      {c.isSubscribed ? "View Profile" : `$${c.price.toFixed(2)}/mo`}
+                    </Button>
+                  </div>
+                </article>
+              ) : (
+                <article
+                  key={`${category}-${c.id}`}
+                  className="glass-card rounded-[var(--radius-md)] overflow-hidden flex gap-3 p-3 cursor-pointer hover:border-violet-500/30 transition-all"
+                  onClick={() => router.push(`/creator/${c.id}`)}
+                >
+                  <Avatar className="size-10 shrink-0 ring-1 ring-violet-500/20">
+                    <AvatarImage src={c.avatar} />
+                    <AvatarFallback>{c.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <p className="text-[13px] font-semibold text-white truncate">{c.name}</p>
+                      {c.verified && (
+                        <CheckCircle2 className="size-[12px] text-violet-500 shrink-0" />
+                      )}
+                    </div>
+                    <p className="text-[11px] text-text-muted mb-1">@{c.username}</p>
+                    <p className="text-[11px] text-text-secondary line-clamp-1">{c.bio}</p>
+                    <p className="text-[10px] text-text-muted mt-1">
+                      {formatCount(c.subscriberCount)} subscribers · {c.postCount} posts
+                    </p>
+                  </div>
+                  <div className="shrink-0 flex flex-col items-end gap-1.5">
+                    <Button
+                      variant={c.isSubscribed ? "outline" : "violet"}
+                      size="xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/creator/${c.id}`);
+                      }}
+                    >
+                      {c.isSubscribed ? "View Profile" : `$${c.price.toFixed(2)}/mo`}
+                    </Button>
+                  </div>
+                </article>
+              )
+            )}
+          </section>
+        )}
       </div>
     </PageShell>
   );

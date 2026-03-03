@@ -25,25 +25,22 @@ export interface VerificationData {
  */
 export async function submitVerification(userId: string, data: VerificationData): Promise<boolean> {
   try {
-    // 上传证件照片
+    // 上传证件照片到私有 verification bucket（非公开，保护用户隐私）
     const idDocUrls: string[] = [];
     for (const file of data.id_doc_files) {
       try {
-        // 使用 storage.ts 的 uploadFile，但需要指定 bucket
-        // 这里我们直接上传到 avatars bucket（临时方案，后续可以创建专门的 verification bucket）
+        const filePath = `${userId}/${Date.now()}-${file.name}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from("avatars")
-          .upload(`verifications/${userId}/${Date.now()}-${file.name}`, file);
+          .from("verification")
+          .upload(filePath, file);
 
         if (uploadError) {
           console.error("[kyc] upload id doc error:", uploadError);
           throw new Error(`上传证件失败: ${uploadError.message}`);
         }
 
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from("avatars").getPublicUrl(uploadData.path);
-        idDocUrls.push(publicUrl);
+        // Store the path (not public URL since this is a private bucket)
+        idDocUrls.push(uploadData.path);
       } catch (err: unknown) {
         console.error("[kyc] upload file exception:", err);
         throw err;

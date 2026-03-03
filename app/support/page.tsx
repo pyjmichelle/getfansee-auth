@@ -8,10 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { ensureProfile } from "@/lib/auth";
-import { getProfile } from "@/lib/profile";
 import { toast } from "sonner";
 import { HelpCircle, CreditCard, User, AlertTriangle, Send, Loader2 } from "@/lib/icons";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -33,27 +32,22 @@ export default function SupportPage() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
+      const bootstrap = await getAuthBootstrap();
+      if (!bootstrap.authenticated || !bootstrap.user) {
         router.push("/auth");
         return;
       }
 
-      await ensureProfile();
-      const profile = await getProfile(session.user.id);
-      if (profile) {
+      if (bootstrap.profile) {
         setCurrentUser({
-          username: profile.display_name || "user",
-          role: (profile.role || "fan") as "fan" | "creator",
-          avatar: profile.avatar_url || undefined,
-          email: session.user.email,
+          username: bootstrap.profile.display_name || "user",
+          role: (bootstrap.profile.role || "fan") as "fan" | "creator",
+          avatar: bootstrap.profile.avatar_url || undefined,
+          email: bootstrap.user.email,
         });
         setFormData((prev) => ({
           ...prev,
-          email: session.user.email || "",
+          email: bootstrap.user!.email || "",
         }));
       }
     };
@@ -72,17 +66,14 @@ export default function SupportPage() {
     setIsSubmitting(true);
 
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
+      const bootstrap = await getAuthBootstrap();
+      if (!bootstrap.authenticated || !bootstrap.user) {
         router.push("/auth");
         return;
       }
 
       const { error } = await supabase.from("support_tickets").insert({
-        user_id: session.user.id,
+        user_id: bootstrap.user.id,
         email: formData.email,
         subject: formData.subject,
         message: formData.message,
@@ -148,7 +139,7 @@ export default function SupportPage() {
 
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
-      <div className="pb-12">
+      <div className="pb-24">
         {/* Hero Banner */}
         <div className="card-block bg-gradient-subtle p-6 md:p-8 mb-6">
           <div className="flex items-center gap-3 mb-2">

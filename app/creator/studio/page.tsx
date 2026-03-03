@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DollarSign, Users, Eye, Heart, Plus, Coins } from "@/lib/icons";
+import { DollarSign, Users, Eye, Heart, Plus, Coins, BarChart3, FileText } from "@/lib/icons";
 import { PageShell } from "@/components/page-shell";
 // Card, Badge, Skeleton, StatCard, CenteredContainer no longer needed - using Figma inline styles
 // EmptyState no longer needed - using Figma inline styles
@@ -192,7 +192,7 @@ export default function CreatorStudioPage() {
   if (isLoading) {
     return (
       <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
-        <div className="pb-12 space-y-6 animate-pulse">
+        <div className="pb-24 space-y-6 animate-pulse">
           <div className="card-block bg-gradient-subtle p-6 md:p-8">
             <div className="h-8 w-56 bg-white/8 rounded mb-3" />
             <div className="h-4 w-80 bg-white/8 rounded mb-6" />
@@ -216,7 +216,7 @@ export default function CreatorStudioPage() {
 
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
-      <div data-testid="page-ready" className="pb-12">
+      <div data-testid="page-ready" className="pb-24">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
@@ -246,20 +246,21 @@ export default function CreatorStudioPage() {
           <div className="flex-1 min-w-0">
             {/* Quick Actions (mobile) */}
             <div className="grid grid-cols-2 gap-3 mb-6 lg:hidden" data-testid="creator-nav">
-              <Link
-                href="/creator/studio/earnings"
-                className="px-4 py-3.5 bg-surface-raised border border-border-base rounded-xl font-semibold hover:bg-surface-overlay transition-all flex items-center justify-center gap-2 active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary text-sm"
-              >
-                <DollarSign size={18} />
-                Earnings
-              </Link>
-              <Link
-                href="/creator/studio/subscribers"
-                className="px-4 py-3.5 bg-surface-raised border border-border-base rounded-xl font-semibold hover:bg-surface-overlay transition-all flex items-center justify-center gap-2 active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary text-sm"
-              >
-                <Users size={18} />
-                Subscribers
-              </Link>
+              {[
+                { href: "/creator/studio/earnings", icon: DollarSign, label: "Earnings" },
+                { href: "/creator/studio/subscribers", icon: Users, label: "Subscribers" },
+                { href: "/creator/studio/post/list", icon: FileText, label: "Post List" },
+                { href: "/creator/studio/analytics", icon: BarChart3, label: "Analytics" },
+              ].map(({ href, icon: Icon, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="px-4 py-3.5 bg-surface-raised border border-border-base rounded-xl font-semibold hover:bg-surface-overlay transition-all flex items-center justify-center gap-2 active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary text-sm"
+                >
+                  <Icon size={18} />
+                  {label}
+                </Link>
+              ))}
             </div>
 
             {/* Key Stats - Figma Style */}
@@ -473,7 +474,7 @@ export default function CreatorStudioPage() {
                     { href: "/creator/studio/earnings", icon: DollarSign, label: "Earnings" },
                     { href: "/creator/studio/subscribers", icon: Users, label: "Subscribers" },
                     { href: "/creator/studio/post/list", icon: Eye, label: "Post List" },
-                    { href: "/creator/studio/analytics", icon: Heart, label: "Analytics" },
+                    { href: "/creator/studio/analytics", icon: BarChart3, label: "Analytics" },
                   ].map(({ href, icon: Icon, label }) => (
                     <Link
                       key={href}

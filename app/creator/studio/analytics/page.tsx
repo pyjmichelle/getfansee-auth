@@ -27,7 +27,7 @@ type TimeRange = "7d" | "30d" | "90d" | "all";
 
 function AnalyticsSkeleton() {
   return (
-    <div className="pb-12 space-y-8">
+    <div className="pb-24 space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Skeleton className="h-10 w-10 rounded-xl" />
@@ -138,7 +138,7 @@ export default function AnalyticsPage() {
 
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
-      <div className="pb-12 flex flex-col lg:flex-row gap-8">
+      <div className="pb-24 flex flex-col lg:flex-row gap-8">
         <main className="flex-1 min-w-0" data-testid="analytics-ready">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">

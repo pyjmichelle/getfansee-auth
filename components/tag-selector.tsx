@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X } from "@/lib/icons";
+import { Input } from "@/components/ui/input";
+import { X, Plus } from "@/lib/icons";
 
 interface Tag {
   id: string;
@@ -22,6 +23,8 @@ interface TagSelectorProps {
 export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: TagSelectorProps) {
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [customInput, setCustomInput] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const loadTags = async () => {
@@ -55,7 +58,16 @@ export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: T
   };
 
   const getTagName = (tagId: string) => {
-    return availableTags.find((tag) => tag.id === tagId)?.name || "";
+    return availableTags.find((tag) => tag.id === tagId)?.name || tagId;
+  };
+
+  const addCustomTag = () => {
+    const trimmed = customInput.trim().toLowerCase().replace(/\s+/g, "-");
+    if (!trimmed || selectedTags.length >= maxTags) return;
+    if (selectedTags.includes(trimmed)) return;
+    onChange([...selectedTags, trimmed]);
+    setCustomInput("");
+    inputRef.current?.focus();
   };
 
   if (isLoading) {
@@ -117,6 +129,38 @@ export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: T
             </Button>
           ))}
       </div>
+
+      {/* Custom tag input */}
+      {selectedTags.length < maxTags && (
+        <div className="flex items-center gap-2">
+          <Input
+            ref={inputRef}
+            type="text"
+            value={customInput}
+            onChange={(e) => setCustomInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addCustomTag();
+              }
+            }}
+            placeholder="Add custom tag..."
+            className="h-8 text-[13px] flex-1"
+            maxLength={30}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addCustomTag}
+            disabled={!customInput.trim()}
+            className="h-8 px-2 shrink-0"
+            aria-label="Add custom tag"
+          >
+            <Plus className="w-3.5 h-3.5" />
+          </Button>
+        </div>
+      )}
 
       {selectedTags.length >= maxTags && (
         <p className="text-xs text-text-tertiary">Maximum {maxTags} tags selected</p>

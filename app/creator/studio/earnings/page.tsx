@@ -188,7 +188,7 @@ export default function EarningsPage() {
   if (isLoading) {
     return (
       <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
-        <div className="pb-12 animate-pulse space-y-6">
+        <div className="pb-24 animate-pulse space-y-6">
           <div className="h-10 w-48 bg-surface-raised rounded" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="h-48 bg-surface-raised rounded-2xl" />
@@ -202,11 +202,11 @@ export default function EarningsPage() {
 
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
-      <div className="pb-12 flex flex-col lg:flex-row gap-8">
+      <div className="pb-24 flex flex-col lg:flex-row gap-8">
         <main className="flex-1 min-w-0">
           {/* Header */}
-          <div className="mb-10">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="mb-4 md:mb-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <Link
                   href="/creator/studio"
@@ -215,10 +215,12 @@ export default function EarningsPage() {
                   <ArrowLeft size={24} />
                 </Link>
                 <div>
-                  <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3 text-text-primary">
+                  <h1 className="text-2xl md:text-4xl font-bold tracking-tight mb-1 md:mb-3 text-text-primary">
                     Earnings
                   </h1>
-                  <p className="text-text-tertiary text-lg">Track revenue and manage payouts</p>
+                  <p className="text-text-tertiary text-sm md:text-lg">
+                    Track revenue and manage payouts
+                  </p>
                 </div>
               </div>
               <div className="flex gap-3">
@@ -238,7 +240,7 @@ export default function EarningsPage() {
           </div>
 
           {/* Primary Balance Cards */}
-          <div className="bento-grid mb-10">
+          <div className="bento-grid mb-4 md:mb-10">
             {/* Available Balance */}
             <div
               className="bento-2x2 card-block bg-gradient-subtle p-8 relative overflow-hidden"

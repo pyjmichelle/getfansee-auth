@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PageShell } from "@/components/page-shell";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { ensureProfile } from "@/lib/auth";
-import { getProfile } from "@/lib/profile";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 import { type Post } from "@/lib/types";
 import {
   Edit,
@@ -40,8 +38,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
-const supabase = getSupabaseBrowserClient();
-
 export default function CreatorPostListPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -63,26 +59,20 @@ export default function CreatorPostListPage() {
         setIsLoading(true);
         setError(null);
 
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           router.push("/auth");
           return;
         }
 
-        await ensureProfile();
-
-        const profile = await getProfile(session.user.id);
-        if (profile) {
+        if (bootstrap.profile) {
           setCurrentUser({
-            username: profile.display_name || "user",
-            role: (profile.role || "fan") as "fan" | "creator",
-            avatar: profile.avatar_url || undefined,
+            username: bootstrap.profile.display_name || "user",
+            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
+            avatar: bootstrap.profile.avatar_url || undefined,
           });
 
-          if (profile.role !== "creator") {
+          if (bootstrap.profile.role !== "creator") {
             router.push("/home");
             return;
           }
@@ -155,7 +145,7 @@ export default function CreatorPostListPage() {
   if (isLoading) {
     return (
       <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
-        <div className="pb-12 animate-pulse space-y-6">
+        <div className="pb-24 animate-pulse space-y-6">
           <div className="h-10 w-64 bg-surface-raised rounded" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
@@ -174,16 +164,16 @@ export default function CreatorPostListPage() {
 
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
-      <div className="pb-12 flex flex-col lg:flex-row gap-8">
+      <div className="pb-24 flex flex-col lg:flex-row gap-8">
         <main className="flex-1 min-w-0">
           {/* Header */}
-          <div className="mb-10">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="mb-4 md:mb-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3 text-text-primary">
+                <h1 className="text-2xl md:text-4xl font-bold tracking-tight mb-1 md:mb-3 text-text-primary">
                   Content Library
                 </h1>
-                <p className="text-text-tertiary text-lg">Manage your posts and media</p>
+                <p className="text-text-tertiary text-sm md:text-lg">Manage your posts and media</p>
               </div>
               <div className="flex gap-3">
                 <Button
@@ -193,7 +183,7 @@ export default function CreatorPostListPage() {
                   <Download size={18} />
                   Export
                 </Button>
-                <Button asChild>
+                <Button asChild className="px-5 py-3">
                   <Link href="/creator/new-post">
                     <Plus size={18} />
                     Create Post

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/empty-state";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { getProfile } from "@/lib/profile";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 // cancelSubscription 通过 API 调用，不直接导入
 import {
   AlertDialog,
@@ -34,11 +34,13 @@ type Subscription = {
   status: string;
   current_period_end: string;
   created_at: string;
-  cancelled_at?: string | null; // For canceled subscriptions, display the corresponding cancelled_at date
+  cancelled_at?: string | null;
+  price_cents?: number;
   creator?: {
     id: string;
     display_name: string;
     avatar_url?: string | null;
+    subscription_price_cents?: number;
   };
 };
 
@@ -99,11 +101,8 @@ export default function SubscriptionsPage() {
           return;
         }
 
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           if (isTestMode) {
             setCurrentUser({
               username: "test-user",
@@ -117,27 +116,25 @@ export default function SubscriptionsPage() {
           return;
         }
 
-        await fetch("/api/auth/ensure-profile", { method: "POST" });
-        const profile = await getProfile(session.user.id);
-        if (profile) {
+        if (bootstrap.profile) {
           setCurrentUser({
-            id: session.user.id,
-            username: profile.display_name || "user",
-            role: (profile.role || "fan") as "fan" | "creator",
-            avatar: profile.avatar_url || undefined,
+            id: bootstrap.user.id,
+            username: bootstrap.profile.display_name || "user",
+            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
+            avatar: bootstrap.profile.avatar_url || undefined,
           });
         } else if (isTestMode) {
           setCurrentUser({
-            username: session.user.email?.split("@")[0] || "test-user",
+            username: bootstrap.user.email?.split("@")[0] || "test-user",
             role: "fan",
           });
         }
 
-        // Load subscriptions（强制使用 getSession() 获取当前用户）
+        // Load subscriptions for current user
         const { data: subsData, error } = await supabase
           .from("subscriptions")
           .select("*")
-          .eq("subscriber_id", session.user.id)
+          .eq("subscriber_id", bootstrap.user.id)
           .order("created_at", { ascending: false });
 
         if (error) {
@@ -272,7 +269,12 @@ export default function SubscriptionsPage() {
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
     return days <= 7 && days >= 0;
   }).length;
-  const monthlyCost = subscriptions.filter((s) => s.status === "active").length * 9.99;
+  const monthlyCost = subscriptions
+    .filter((s) => s.status === "active")
+    .reduce((sum, s) => {
+      const priceCents = s.price_cents ?? s.creator?.subscription_price_cents ?? 0;
+      return sum + priceCents / 100;
+    }, 0);
   const animatedSupportCount = useCountUp(subscriptions.length, { duration: 900, decimals: 0 });
   const animatedMonthlyCost = useCountUp(monthlyCost, { duration: 900, decimals: 2 });
 

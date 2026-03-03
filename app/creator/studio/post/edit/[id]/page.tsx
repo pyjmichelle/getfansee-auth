@@ -8,16 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { ensureProfile } from "@/lib/auth";
-import { getProfile } from "@/lib/profile";
 import { type Post } from "@/lib/types";
 import { toast } from "sonner";
 import { MultiMediaUpload } from "@/components/multi-media-upload";
 import { type MediaFile } from "@/lib/storage";
 import { Lock } from "@/lib/icons";
-
-const supabase = getSupabaseBrowserClient();
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 
 export default function EditPostPage() {
   const router = useRouter();
@@ -47,27 +43,22 @@ export default function EditPostPage() {
         setIsLoading(true);
         setError(null);
 
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           router.push("/auth");
           return;
         }
 
-        await ensureProfile();
-        setCurrentUserId(session.user.id);
+        setCurrentUserId(bootstrap.user.id);
 
-        const profile = await getProfile(session.user.id);
-        if (profile) {
+        if (bootstrap.profile) {
           setCurrentUser({
-            username: profile.display_name || "user",
-            role: (profile.role || "fan") as "fan" | "creator",
-            avatar: profile.avatar_url || undefined,
+            username: bootstrap.profile.display_name || "user",
+            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
+            avatar: bootstrap.profile.avatar_url || undefined,
           });
 
-          if (profile.role !== "creator") {
+          if (bootstrap.profile.role !== "creator") {
             router.push("/home");
             return;
           }

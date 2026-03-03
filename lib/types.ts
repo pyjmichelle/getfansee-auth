@@ -65,4 +65,5 @@ export type Post = {
     is_locked?: boolean; // 单个媒体是否锁定
   }>;
   isLikedByCurrentUser?: boolean; // 当前用户是否已点赞（前端使用）
+  tags?: string[];
 };
