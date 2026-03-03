@@ -260,7 +260,7 @@ export default function ProfilePage() {
   if (isLoading || !currentUser) {
     return (
       <PageShell user={currentUser} notificationCount={0} maxWidth="3xl">
-        <div className="pb-12 space-y-6">
+        <div className="pb-24 space-y-6">
           {/* Hero skeleton */}
           <div className="card-block bg-gradient-subtle p-6 md:p-8 animate-pulse">
             <div className="flex flex-col md:flex-row md:items-center gap-6">
@@ -350,7 +350,7 @@ export default function ProfilePage() {
 
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
-      <div className="pb-12" data-testid="me-page-ready">
+      <div className="pb-24" data-testid="me-page-ready">
         {/* Profile Banner */}
         <ProfileBanner
           name={username || "Profile"}
@@ -399,7 +399,7 @@ export default function ProfilePage() {
           </aside>
 
           {/* Right content area */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 min-h-[480px]">
             <SettingsTabs value={activeTab} onValueChange={setActiveTab} items={settingsTabs}>
               <TabsContent value="profile" className="mt-4">
                 <GlassCard className="p-6">

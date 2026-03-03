@@ -8,8 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { type PostVisibility } from "@/lib/types";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 import { toast } from "sonner";
 import { MultiMediaUpload } from "@/components/multi-media-upload";
 import { TagSelector } from "@/components/tag-selector";
@@ -42,8 +42,6 @@ import {
 } from "@/lib/icons";
 import Link from "next/link";
 
-const supabase = getSupabaseBrowserClient();
-
 export default function NewPostPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -71,28 +69,15 @@ export default function NewPostPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const {
-          data: { session },
-          error: sessionError,
-        } = await supabase.auth.getSession();
-
-        if (sessionError || !session) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           router.push("/auth");
           return;
         }
 
-        // 确保 profile 存在（通过 API）
-        await fetch("/api/auth/ensure-profile", { method: "POST" });
-        setCurrentUserId(session.user.id);
+        setCurrentUserId(bootstrap.user.id);
 
-        // 加载 profile（通过 API）
-        const profileResponse = await fetch("/api/profile");
-        if (!profileResponse.ok) {
-          setError("Unable to load profile");
-          return;
-        }
-        const profileData = await profileResponse.json();
-        const profile = profileData.profile;
+        const profile = bootstrap.profile;
         if (!profile) {
           setError("Unable to load profile");
           return;
@@ -200,7 +185,7 @@ export default function NewPostPage() {
   if (isLoading) {
     return (
       <PageShell user={currentUser} notificationCount={0} maxWidth="5xl" hideBottomNav>
-        <div className="pb-12 space-y-6 animate-pulse">
+        <div className="pb-24 space-y-6 animate-pulse">
           <div className="h-10 w-64 bg-surface-raised rounded" />
           <div className="grid md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-6">
@@ -217,7 +202,7 @@ export default function NewPostPage() {
   if (error && currentUser?.role !== "creator") {
     return (
       <PageShell user={currentUser} notificationCount={0} maxWidth="5xl" hideBottomNav>
-        <div className="pb-12">
+        <div className="pb-24">
           <div className="bg-surface-raised border border-border-base rounded-2xl p-8 text-center">
             <div className="w-16 h-16 bg-brand-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Lock size={32} className="text-brand-primary" />
@@ -269,7 +254,7 @@ export default function NewPostPage() {
 
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="5xl" hideBottomNav>
-      <div data-testid="page-ready" className="pb-12">
+      <div data-testid="page-ready" className="pb-24">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">

@@ -1,36 +1,40 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { PageShell } from "@/components/page-shell";
-import { PostCard } from "@/components/post-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { type Post } from "@/lib/types";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
-  Image as ImageIcon,
-  Heart,
   FileText,
-  Lock,
   Share2,
   ChevronLeft,
   Users,
-  Grid3X3,
   Star,
+  CheckCircle2,
+  MoreVertical,
+  Plus,
 } from "@/lib/icons";
-import { ReportButton } from "@/components/report-button";
 import { PaywallModal } from "@/components/paywall-modal";
+import { PostGridItem } from "@/components/post-grid-item";
 import { toast } from "sonner";
 import { Analytics } from "@/lib/analytics";
 import { ErrorState } from "@/components/error-state";
 import { DEFAULT_AVATAR_CREATOR } from "@/lib/image-fallbacks";
 import { useCountUp } from "@/hooks/use-count-up";
+import { MOCK_CREATORS, MOCK_POSTS } from "@/lib/mock-data";
 
-const supabase = getSupabaseBrowserClient();
+/* -------------------------------------------------------------------------- */
+/* Constants (outside component to avoid re-creation on every render)          */
+/* -------------------------------------------------------------------------- */
+const CONTENT_FILTERS = ["All", "Photos", "Videos", "Behind the Scenes", "Exclusive", "Tutorials"];
+
+const formatCount = (n: number) =>
+  n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1) + "K" : String(n);
 
 /* -------------------------------------------------------------------------- */
 /* Skeleton                                                                     */
@@ -96,14 +100,25 @@ export default function CreatorProfilePage() {
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [subscriptionPrice, setSubscriptionPrice] = useState(9.99);
   const [postViewStates, setPostViewStates] = useState<Map<string, boolean>>(new Map());
-  const [activeTab, setActiveTab] = useState<"posts" | "media" | "likes">("posts");
+  const [activeTab, setActiveTab] = useState<"posts" | "about">("posts");
+  const [selectedFilter, setSelectedFilter] = useState("All");
+  const [subscribersCount, setSubscribersCount] = useState(0);
 
   const totalPosts = posts.length;
-  const mediaPosts = posts.filter(
-    (post) => (post.media && post.media.length > 0) || post.media_url
-  ).length;
   const totalLikes = posts.reduce((sum, post) => sum + (post.likes_count || 0), 0);
   const animatedLikes = useCountUp(totalLikes, { duration: 800, decimals: 0 });
+
+  const filteredPosts = useMemo(() => {
+    if (selectedFilter === "All") return posts;
+    if (selectedFilter === "Photos")
+      return posts.filter(
+        (p) => !p.media || p.media.length === 0 || p.media[0]?.media_type === "image"
+      );
+    if (selectedFilter === "Videos")
+      return posts.filter((p) => p.media && p.media[0]?.media_type === "video");
+    if (selectedFilter === "Exclusive") return posts.filter((p) => p.visibility === "subscribers");
+    return posts;
+  }, [posts, selectedFilter]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -111,47 +126,80 @@ export default function CreatorProfilePage() {
         setIsLoading(true);
         setError(null);
 
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           router.push("/auth");
           return;
         }
 
-        await fetch("/api/auth/ensure-profile", { method: "POST" });
-        setCurrentUserId(session.user.id);
+        setCurrentUserId(bootstrap.user.id);
 
-        const profileResponse = await fetch("/api/profile");
-        if (profileResponse.ok) {
-          const profileData = await profileResponse.json();
-          const userProfile = profileData.profile;
-          if (userProfile) {
-            setCurrentUser({
-              username: userProfile.display_name || "user",
-              role: (userProfile.role || "fan") as "fan" | "creator",
-              avatar: userProfile.avatar_url || undefined,
-            });
-          }
+        if (bootstrap.profile) {
+          setCurrentUser({
+            username: bootstrap.profile.display_name || "user",
+            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
+            avatar: bootstrap.profile.avatar_url || undefined,
+          });
         }
 
-        if (session.user.id !== creatorId) {
-          const statusResponse = await fetch(`/api/subscription/status?creatorId=${creatorId}`);
+        // Fetch subscription status + creator profile in parallel
+        const [statusResponse, creatorResponse] = await Promise.all([
+          bootstrap.user.id !== creatorId
+            ? fetch(`/api/subscription/status?creatorId=${creatorId}`)
+            : Promise.resolve(null),
+          fetch(`/api/creator/${creatorId}`),
+        ]);
+
+        if (statusResponse) {
           const statusData = await statusResponse.json();
           setIsSubscribed(statusData.isSubscribed || false);
         }
 
-        const creatorResponse = await fetch(`/api/creator/${creatorId}`);
-        if (!creatorResponse.ok) {
-          setError("Creator not found");
-          return;
+        let creator = null;
+        if (creatorResponse.ok) {
+          const creatorData = await creatorResponse.json();
+          creator = creatorData.creator;
         }
-        const creatorData = await creatorResponse.json();
-        const creator = creatorData.creator;
+
+        // Fallback to mock data when creator not found in DB (demo mode)
         if (!creator) {
-          setError("Creator not found");
-          return;
+          const mockCreator = MOCK_CREATORS.find((c) => c.id === creatorId);
+          if (mockCreator) {
+            creator = {
+              id: mockCreator.id,
+              display_name: mockCreator.display_name,
+              bio: mockCreator.bio,
+              avatar_url: mockCreator.avatar_url,
+              subscription_price_cents: 999,
+            };
+            const mockPostsForCreator = MOCK_POSTS.filter((p) => p.creator_id === creatorId).map(
+              (p) => ({
+                ...p,
+                creator: mockCreator,
+              })
+            );
+            setPosts(mockPostsForCreator);
+            setSubscribersCount(mockCreator.subscriber_count || 0);
+            const states = new Map<string, boolean>();
+            for (const post of mockPostsForCreator) {
+              states.set(post.id, post.visibility === "free");
+            }
+            setPostViewStates(states);
+          } else {
+            setError("Creator not found");
+            return;
+          }
+        } else {
+          const postsResponse = await fetch(`/api/creator/${creatorId}/posts`);
+          if (postsResponse.ok) {
+            const postsData = await postsResponse.json();
+            setPosts(postsData.posts || []);
+            const states = new Map<string, boolean>();
+            for (const post of postsData.posts || []) {
+              states.set(post.id, postsData.unlockedStates?.[post.id] || false);
+            }
+            setPostViewStates(states);
+          }
         }
 
         Analytics.creatorProfileViewed(creatorId);
@@ -165,17 +213,7 @@ export default function CreatorProfilePage() {
         if (creator.subscription_price_cents && creator.subscription_price_cents > 0) {
           setSubscriptionPrice(creator.subscription_price_cents / 100);
         }
-
-        const postsResponse = await fetch(`/api/creator/${creatorId}/posts`);
-        if (postsResponse.ok) {
-          const postsData = await postsResponse.json();
-          setPosts(postsData.posts || []);
-          const states = new Map<string, boolean>();
-          for (const post of postsData.posts || []) {
-            states.set(post.id, postsData.unlockedStates?.[post.id] || false);
-          }
-          setPostViewStates(states);
-        }
+        setSubscribersCount(creator.subscribers_count || creator.subscriber_count || 0);
       } catch (err) {
         console.error("[creator] loadData error", err);
         setError("Failed to load, please try again");
@@ -278,7 +316,10 @@ export default function CreatorProfilePage() {
           <ErrorState
             title="Creator Not Found"
             message={error || "This creator does not exist"}
-            retry={() => router.push("/home")}
+            retry={() => {
+              setError(null);
+              setIsLoading(true);
+            }}
             variant="centered"
           />
         </div>
@@ -286,294 +327,283 @@ export default function CreatorProfilePage() {
     );
   }
 
-  const tabs = [
-    { id: "posts" as const, label: "Posts", icon: FileText, count: totalPosts },
-    { id: "media" as const, label: "Media", icon: ImageIcon, count: mediaPosts },
-    { id: "likes" as const, label: "Likes", icon: Heart },
-  ];
-
   return (
     <PageShell user={currentUser} notificationCount={0} noPadding>
-      {/* Fixed Header - creator profile has its own custom header */}
-      <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-border-base">
-        <div className="flex items-center justify-between px-4 h-14 max-w-6xl mx-auto">
+      {/* Fixed Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-white/6">
+        <div className="flex items-center justify-between px-4 h-14 max-w-3xl mx-auto">
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={() => router.back()}
             aria-label="Go back"
-            className="text-text-primary active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="text-white active:scale-95"
           >
             <ChevronLeft className="w-6 h-6" aria-hidden="true" />
           </Button>
-          <h1 className="font-semibold text-text-primary truncate max-w-[200px]">
+          <span className="font-semibold text-white truncate max-w-[220px] flex items-center gap-1.5 text-[15px]">
             {creatorProfile.display_name || "Creator"}
-          </h1>
+            <CheckCircle2 className="size-[15px] text-violet-400 shrink-0" aria-hidden="true" />
+          </span>
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={handleShare}
             aria-label="Share profile"
-            className="text-text-primary active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="text-white active:scale-95"
           >
-            <Share2 className="w-5 h-5" aria-hidden="true" />
+            <MoreVertical className="w-5 h-5" aria-hidden="true" />
           </Button>
         </div>
       </header>
 
       {/* Banner */}
-      <div className="relative mt-14 h-48 md:h-64 duotone-overlay overflow-hidden">
-        <div className="w-full h-full bg-gradient-primary opacity-80" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/60" />
+      <div className="relative mt-14 h-40 md:h-52 overflow-hidden">
+        <div className="w-full h-full bg-gradient-to-br from-[#0a1a3a] via-[#061830] to-[#04111f]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-900/40 via-indigo-900/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-bg-base/70" />
       </div>
 
-      {/* Two-Column Layout: Avatar Section + (Desktop) Sidebar */}
-      <div className="max-w-6xl mx-auto px-4 md:px-6">
-        {/* Avatar + Name Row */}
-        <div className="relative -mt-14 md:-mt-16 mb-6">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-            <div className="flex items-end gap-4">
-              <Avatar className="w-24 h-24 md:w-28 md:h-28 border-4 border-background ring-2 ring-brand-primary/30 shadow-glow rounded-2xl flex-shrink-0">
-                <AvatarImage
-                  src={creatorProfile.avatar_url || DEFAULT_AVATAR_CREATOR}
-                  alt={creatorProfile.display_name || "Creator"}
-                  className="object-cover"
-                />
-                <AvatarFallback className="text-2xl md:text-3xl bg-brand-primary-alpha-10 text-brand-primary font-bold rounded-2xl">
-                  {creatorProfile.display_name?.[0]?.toUpperCase() || "C"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="pb-2">
-                <h1 className="text-xl md:text-2xl font-bold text-text-primary mb-1">
-                  {creatorProfile.display_name || "Creator"}
-                </h1>
-                {creatorProfile.bio && (
-                  <p className="text-text-tertiary text-sm max-w-md line-clamp-2">
-                    {creatorProfile.bio}
-                  </p>
-                )}
-              </div>
+      {/* Profile Section */}
+      <div className="max-w-3xl mx-auto px-4 md:px-6 pb-28">
+        {/* Avatar + Subscribe Row */}
+        <div className="flex items-end justify-between -mt-14 mb-4">
+          <Avatar className="w-24 h-24 md:w-28 md:h-28 border-4 border-bg-base rounded-full ring-2 ring-white/10 shadow-xl flex-shrink-0">
+            <AvatarImage
+              src={creatorProfile.avatar_url || DEFAULT_AVATAR_CREATOR}
+              alt={creatorProfile.display_name || "Creator"}
+              className="object-cover"
+            />
+            <AvatarFallback className="text-2xl font-bold bg-violet-500/20 text-violet-300 rounded-full">
+              {creatorProfile.display_name?.[0]?.toUpperCase() || "C"}
+            </AvatarFallback>
+          </Avatar>
+          {/* PC Subscribe button */}
+          {!isOwnProfile && (
+            <div className="hidden md:block pb-1">
+              {isSubscribed ? (
+                <Button
+                  variant="outline"
+                  onClick={handleCancelSubscription}
+                  disabled={isSubscribing}
+                  className="rounded-full px-5 active:scale-95"
+                >
+                  {isSubscribing ? (
+                    "…"
+                  ) : (
+                    <>
+                      <CheckCircle2 size={14} className="mr-1.5" aria-hidden="true" />
+                      Subscribed
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  variant="violet"
+                  onClick={handleSubscribe}
+                  disabled={isSubscribing}
+                  className="rounded-full px-5 gap-1.5 shadow-glow-violet active:scale-95"
+                  data-testid="subscribe-button"
+                  aria-label="Subscribe to this creator"
+                >
+                  <Plus size={14} />
+                  Subscribe for ${subscriptionPrice}/month
+                </Button>
+              )}
             </div>
+          )}
+          {isOwnProfile && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="hidden md:flex rounded-full px-5"
+              onClick={() => router.push("/me")}
+            >
+              Edit Profile
+            </Button>
+          )}
+        </div>
 
-            {/* Desktop CTA */}
-            {!isOwnProfile && (
-              <div className="hidden md:flex flex-col items-end gap-2">
-                {isSubscribed ? (
-                  <Button
-                    variant="outline"
-                    onClick={handleCancelSubscription}
-                    disabled={isSubscribing}
-                    className="rounded-xl min-w-[160px] active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
-                  >
-                    {isSubscribing ? "..." : "Subscribed"}
-                  </Button>
-                ) : (
-                  <Button
-                    variant="subscribe-gradient"
-                    onClick={handleSubscribe}
-                    disabled={isSubscribing}
-                    className="rounded-xl min-w-[160px] hover-bold shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
-                    data-testid="subscribe-button"
-                    aria-label="Subscribe to this creator"
-                  >
-                    {isSubscribing ? "..." : "Subscribe"}
-                  </Button>
-                )}
-                <ReportButton
-                  targetType="user"
-                  targetId={creatorId}
-                  variant="ghost"
-                  size="sm"
-                  className="text-text-tertiary"
-                />
-              </div>
-            )}
+        {/* Creator Info */}
+        <div className="mb-5">
+          <div className="flex items-center gap-2 mb-0.5">
+            <h1 className="text-xl md:text-2xl font-bold text-white leading-tight">
+              {creatorProfile.display_name || "Creator"}
+            </h1>
+            <CheckCircle2 className="size-[18px] text-violet-400 shrink-0" aria-hidden="true" />
           </div>
+          <p className="text-[13px] text-text-muted mb-3">
+            @{(creatorProfile.display_name || "creator").replace(/\s+/g, "").toLowerCase()}
+          </p>
+
+          {/* Inline Stats */}
+          <div className="flex items-center gap-4 text-[13px] mb-3 flex-wrap">
+            <span>
+              <strong className="text-white font-bold">{totalPosts}</strong>{" "}
+              <span className="text-text-muted">posts</span>
+            </span>
+            <span>
+              <strong className="text-white font-bold">{formatCount(subscribersCount)}</strong>{" "}
+              <span className="text-text-muted">subscribers</span>
+            </span>
+            <span>
+              <strong className="text-white font-bold">
+                {formatCount(Math.round(animatedLikes))}
+              </strong>{" "}
+              <span className="text-text-muted">likes</span>
+            </span>
+          </div>
+
+          {/* Bio */}
+          {creatorProfile.bio && (
+            <p className="text-[13px] text-text-secondary leading-relaxed mb-4">
+              {creatorProfile.bio}
+            </p>
+          )}
+
+          {/* Mobile: Subscribe + Share */}
+          {!isOwnProfile && (
+            <div className="flex md:hidden gap-3 mt-1">
+              {isSubscribed ? (
+                <Button
+                  variant="outline"
+                  onClick={handleCancelSubscription}
+                  disabled={isSubscribing}
+                  className="flex-1 rounded-full active:scale-[0.98]"
+                >
+                  {isSubscribing ? "…" : "Subscribed"}
+                </Button>
+              ) : (
+                <Button
+                  variant="violet"
+                  onClick={handleSubscribe}
+                  disabled={isSubscribing}
+                  className="flex-1 rounded-full gap-1.5 shadow-glow-violet active:scale-[0.98]"
+                  data-testid="subscribe-button"
+                  aria-label="Subscribe to this creator"
+                >
+                  <Plus size={14} />
+                  Subscribe ${subscriptionPrice}/mo
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleShare}
+                className="rounded-full"
+                aria-label="Share profile"
+              >
+                <Share2 size={18} />
+              </Button>
+            </div>
+          )}
+          {isOwnProfile && (
+            <Button
+              variant="outline"
+              className="md:hidden w-full rounded-full"
+              onClick={() => router.push("/me")}
+            >
+              Edit Profile
+            </Button>
+          )}
         </div>
 
-        {/* PC: Two-column — stats left, content right */}
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* LEFT / TOP: Stats + About Sidebar */}
-          <aside className="w-full lg:w-72 shrink-0 space-y-4">
-            {/* Bento Stats */}
-            <div className="grid grid-cols-3 lg:grid-cols-1 gap-3">
-              <div className="card-block p-4 flex lg:flex-row lg:items-center lg:justify-between flex-col text-center lg:text-left">
-                <div>
-                  <p className="text-xs text-text-tertiary mb-0.5">Posts</p>
-                  <p className="text-2xl font-bold text-text-primary">{totalPosts}</p>
-                </div>
-                <FileText
-                  className="w-5 h-5 text-brand-primary/50 hidden lg:block"
-                  aria-hidden="true"
-                />
-              </div>
-              <div className="card-block p-4 flex lg:flex-row lg:items-center lg:justify-between flex-col text-center lg:text-left">
-                <div>
-                  <p className="text-xs text-text-tertiary mb-0.5">Media</p>
-                  <p className="text-2xl font-bold text-text-primary">{mediaPosts}</p>
-                </div>
-                <ImageIcon
-                  className="w-5 h-5 text-brand-primary/50 hidden lg:block"
-                  aria-hidden="true"
-                />
-              </div>
-              <div className="card-block p-4 flex lg:flex-row lg:items-center lg:justify-between flex-col text-center lg:text-left">
-                <div>
-                  <p className="text-xs text-text-tertiary mb-0.5">Likes</p>
-                  <p className="text-2xl font-bold text-text-primary">{animatedLikes.toFixed(0)}</p>
-                </div>
-                <Heart className="w-5 h-5 text-error/50 hidden lg:block" aria-hidden="true" />
-              </div>
-            </div>
-
-            {/* About (Desktop only) */}
-            {creatorProfile.bio && (
-              <div className="card-block p-4 hidden lg:block">
-                <h3 className="text-sm font-semibold text-text-primary mb-2 flex items-center gap-2">
-                  <Star className="w-4 h-4 text-brand-primary" />
-                  About
-                </h3>
-                <p className="text-sm text-text-secondary leading-relaxed">{creatorProfile.bio}</p>
-              </div>
-            )}
-
-            {/* Social Proof (Desktop) */}
-            <div className="card-block p-4 bg-gradient-subtle hidden lg:block">
-              <p className="text-sm text-text-secondary">
-                <span className="font-bold text-brand-primary">
-                  <Users className="w-4 h-4 inline mr-1" />
-                  Join thousands
-                </span>{" "}
-                of fans supporting this creator.
-              </p>
-            </div>
-          </aside>
-
-          {/* RIGHT / MAIN: Tabs + Content */}
-          <section className="flex-1 min-w-0">
-            {/* Tabs */}
-            <div className="flex border-b border-border-base mb-4" role="tablist">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    role="tab"
-                    aria-selected={activeTab === tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={cn(
-                      "flex-1 pb-3 text-sm font-medium transition-colors relative flex items-center justify-center gap-1.5",
-                      "active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-brand-primary",
-                      activeTab === tab.id
-                        ? "text-brand-primary"
-                        : "text-text-tertiary hover:text-text-primary"
-                    )}
-                  >
-                    <Icon className="w-4 h-4" aria-hidden="true" />
-                    <span>{tab.label}</span>
-                    {tab.count !== undefined && (
-                      <span className="text-xs text-text-tertiary">({tab.count})</span>
-                    )}
-                    {activeTab === tab.id && (
-                      <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-brand-primary rounded-full" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Posts Tab */}
-            {activeTab === "posts" && (
-              <div className="space-y-4 pb-24 lg:pb-8">
-                {posts.length === 0 ? (
-                  <div className="card-block p-12 text-center">
-                    <FileText className="w-12 h-12 mx-auto mb-3 text-text-quaternary" />
-                    <p className="text-text-tertiary">No posts yet</p>
-                  </div>
-                ) : (
-                  posts.map((post, index) => {
-                    const isUnlocked =
-                      postViewStates.get(post.id) === true || post.creator_id === currentUserId;
-
-                    return (
-                      <PostCard
-                        key={post.id}
-                        variant="feed"
-                        post={post}
-                        currentUserId={currentUserId}
-                        isUnlocked={isUnlocked}
-                        isSubscribing={isSubscribing}
-                        onSubscribe={handleSubscribe}
-                        onUnlock={async () => {
-                          const res = await fetch("/api/unlock", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                              postId: post.id,
-                              priceCents: post.price_cents || 0,
-                            }),
-                          });
-                          const result = await res.json();
-                          if (result.success) await reloadPosts();
-                        }}
-                        animationDelay={index < 10 ? index * 60 : undefined}
-                      />
-                    );
-                  })
-                )}
-              </div>
-            )}
-
-            {/* Media Tab */}
-            {activeTab === "media" && (
-              <div className="pb-24 lg:pb-8">
-                {mediaPosts === 0 ? (
-                  <div className="card-block p-12 text-center">
-                    <ImageIcon
-                      className="w-12 h-12 mx-auto mb-3 text-text-quaternary"
-                      aria-hidden="true"
-                    />
-                    <p className="text-text-tertiary">No media posts yet</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {posts
-                      .filter((p) => (p.media && p.media.length > 0) || p.media_url)
-                      .map((post) => (
-                        <Link
-                          key={post.id}
-                          href={`/posts/${post.id}`}
-                          className="aspect-square bg-surface-raised rounded-xl overflow-hidden relative group hover:ring-2 hover:ring-brand-primary/30 transition-all focus-visible:ring-2 focus-visible:ring-brand-primary"
-                        >
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Grid3X3 className="w-8 h-8 text-text-tertiary group-hover:text-brand-primary transition-colors" />
-                          </div>
-                          {post.visibility !== "free" && (
-                            <div className="absolute top-1 right-1 bg-black/60 rounded-full p-1">
-                              <Lock className="w-3 h-3 text-white" />
-                            </div>
-                          )}
-                        </Link>
-                      ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Likes Tab */}
-            {activeTab === "likes" && (
-              <div className="card-block p-12 text-center pb-24 lg:pb-8">
-                <Heart className="w-12 h-12 mx-auto mb-3 text-text-quaternary" aria-hidden="true" />
-                <p className="text-text-tertiary">Liked posts coming soon</p>
-              </div>
-            )}
-          </section>
+        {/* Tabs: Posts | About */}
+        <div className="flex border-b border-white/8 mb-0" role="tablist">
+          {(["posts", "about"] as const).map((tab) => (
+            <button
+              key={tab}
+              role="tab"
+              aria-selected={activeTab === tab}
+              onClick={() => setActiveTab(tab)}
+              className={cn(
+                "pb-3 px-4 text-[13px] font-semibold relative transition-colors capitalize",
+                "focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:outline-offset-1",
+                activeTab === tab
+                  ? "text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-violet-500 after:rounded-full"
+                  : "text-text-muted hover:text-white"
+              )}
+            >
+              {tab === "posts" ? "Posts" : "About"}
+            </button>
+          ))}
         </div>
+
+        {/* Posts Tab */}
+        {activeTab === "posts" && (
+          <>
+            {/* Content Filter Pills */}
+            <div className="flex items-center gap-2 overflow-x-auto py-3 mb-3 scrollbar-none -mx-4 px-4">
+              {CONTENT_FILTERS.map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setSelectedFilter(f)}
+                  className={cn(
+                    "shrink-0 h-8 px-3.5 rounded-full text-[12px] font-medium transition-all",
+                    "focus-visible:outline-2 focus-visible:outline-violet-500",
+                    selectedFilter === f
+                      ? "bg-violet-500 text-white shadow-glow-violet"
+                      : "bg-white/5 border border-white/8 text-text-muted hover:border-violet-500/30 hover:text-white"
+                  )}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+
+            {/* 3-Col Post Grid */}
+            {filteredPosts.length === 0 ? (
+              <div className="py-16 text-center">
+                <FileText className="w-10 h-10 mx-auto mb-3 text-text-quaternary" />
+                <p className="text-[13px] text-text-muted">No posts yet</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-0.5 md:gap-1">
+                {filteredPosts.map((post) => (
+                  <PostGridItem
+                    key={post.id}
+                    post={post}
+                    isUnlocked={postViewStates.get(post.id) === true}
+                    currentUserId={currentUserId}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* About Tab */}
+        {activeTab === "about" && (
+          <div className="pt-4 pb-8 space-y-4">
+            <div className="glass-card rounded-[var(--radius-md)] p-5">
+              <h3 className="text-[14px] font-semibold text-white mb-3 flex items-center gap-2">
+                <Star size={14} className="text-violet-400" />
+                About
+              </h3>
+              {creatorProfile.bio ? (
+                <p className="text-[13px] text-text-secondary leading-relaxed">
+                  {creatorProfile.bio}
+                </p>
+              ) : (
+                <p className="text-[13px] text-text-muted">No bio yet.</p>
+              )}
+            </div>
+            <div className="glass-card rounded-[var(--radius-md)] p-5">
+              <div className="flex items-center gap-3">
+                <Users size={16} className="text-violet-400" />
+                <p className="text-[13px] text-text-secondary">
+                  <strong className="text-white">{formatCount(subscribersCount)}</strong>{" "}
+                  subscribers supporting this creator
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Mobile: Floating Subscribe Button */}
+      {/* Mobile Floating Subscribe */}
       {!isOwnProfile && (
-        <div className="md:hidden fixed bottom-14 left-0 right-0 p-3 bg-bg-base/95 backdrop-blur-sm border-t border-border-base z-[45] shadow-lg">
+        <div className="md:hidden fixed bottom-14 left-0 right-0 p-3 bg-bg-base/95 backdrop-blur-sm border-t border-white/6 z-[45]">
           {isSubscribed ? (
             <Button
               variant="outline"
@@ -588,11 +618,11 @@ export default function CreatorProfilePage() {
               onClick={handleSubscribe}
               disabled={isSubscribing}
               variant="subscribe-gradient"
-              className="w-full rounded-xl min-h-[52px] font-bold shadow-glow hover-bold active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-brand-primary"
+              className="w-full rounded-xl min-h-[52px] font-bold shadow-glow hover-bold active:scale-[0.98]"
               data-testid="subscribe-button"
               aria-label="Subscribe to this creator"
             >
-              {isSubscribing ? "Processing…" : "Subscribe Now"}
+              {isSubscribing ? "Processing…" : `Subscribe for $${subscriptionPrice}/mo`}
             </Button>
           )}
         </div>

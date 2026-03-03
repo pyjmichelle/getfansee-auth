@@ -5,10 +5,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { ensureProfile } from "@/lib/auth";
-import { getProfile } from "@/lib/profile";
 import { Check, X, Calendar, Globe, FileText } from "@/lib/icons";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Analytics } from "@/lib/analytics";
@@ -25,8 +23,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
-
-const supabase = getSupabaseBrowserClient();
 
 interface Verification {
   id: string;
@@ -47,7 +43,7 @@ export default function CreatorVerificationsPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [verifications, setVerifications] = useState<Verification[]>([]);
-  const [currentUser, setCurrentUser] = useState<{
+  const [_currentUser, setCurrentUser] = useState<{
     username: string;
     role: "fan" | "creator";
     avatar?: string;
@@ -61,26 +57,21 @@ export default function CreatorVerificationsPage() {
       try {
         setIsLoading(true);
 
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           router.push("/auth");
           return;
         }
 
-        await ensureProfile();
-        const profile = await getProfile(session.user.id);
-        if (profile) {
-          if (profile.role !== "admin") {
+        if (bootstrap.profile) {
+          if (bootstrap.profile.role !== "admin") {
             router.push("/home");
             return;
           }
           setCurrentUser({
-            username: profile.display_name || "user",
-            role: (profile.role || "fan") as "fan" | "creator",
-            avatar: profile.avatar_url || undefined,
+            username: bootstrap.profile.display_name || "user",
+            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
+            avatar: bootstrap.profile.avatar_url || undefined,
           });
         }
 

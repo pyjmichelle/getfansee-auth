@@ -149,8 +149,22 @@ function PostCard({
 
       {/* Text content */}
       {post.content && (
-        <div className="px-3.5 pb-2.5">
+        <div className="px-3.5 pb-2">
           <p className="text-[13px] text-text-secondary leading-relaxed">{post.content}</p>
+        </div>
+      )}
+
+      {/* Tags */}
+      {post.tags && post.tags.length > 0 && (
+        <div className="px-3.5 pb-2.5 flex flex-wrap gap-1">
+          {post.tags.map((tag) => (
+            <span
+              key={tag}
+              className="px-2 py-0.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-[10px] text-violet-400"
+            >
+              #{tag}
+            </span>
+          ))}
         </div>
       )}
 
@@ -237,9 +251,8 @@ function PostCard({
         <div className="flex-1" />
 
         <button
-          disabled
-          className="flex items-center gap-1 h-7 px-3 rounded-full bg-amber-500/10 border border-amber-500/15 text-amber-400/40 cursor-not-allowed"
-          title="Tipping coming soon"
+          onClick={() => toast("Tipping coming soon! ✨")}
+          className="flex items-center gap-1 h-7 px-3 rounded-full bg-amber-500/10 border border-amber-500/15 text-amber-400 hover:bg-amber-500/20 transition-colors"
         >
           <DollarSign className="size-[12px]" />
           <span className="text-[11px] font-bold">Tip</span>
@@ -254,17 +267,24 @@ export function HomeFeedClient({
   initialUnlockedStates,
   currentUser,
 }: HomeFeedClientProps) {
-  const router = useRouter();
   const { addUnlockedPost, isUnlocked: isUnlockedGlobal } = useUnlock();
   const [activeFeedTab, setActiveFeedTab] = useState<"for-you" | "following">("for-you");
   const [posts] = useState<Post[]>(initialPosts);
   const [paywallPost, setPaywallPost] = useState<Post | null>(null);
   const [postViewStates] = useState<Map<string, boolean>>(initialUnlockedStates);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
   const trendingTags = ["Art", "Photography", "Fitness", "Design", "Music", "Travel"];
 
-  const displayedPosts =
+  const basePosts =
     activeFeedTab === "for-you" ? posts : posts.filter((p) => p.visibility === "subscribers");
+  const displayedPosts = selectedTag
+    ? basePosts.filter((p) => p.tags?.includes(selectedTag))
+    : basePosts;
+
+  const handleTagClick = (tag: string) => {
+    setSelectedTag((prev) => (prev === tag ? null : tag));
+  };
 
   const handleUnlock = (post: Post) => setPaywallPost(post);
 
@@ -304,8 +324,12 @@ export function HomeFeedClient({
                 {trendingTags.map((tag) => (
                   <button
                     key={tag}
-                    onClick={() => router.push(`/tags/${tag.toLowerCase()}`)}
-                    className="px-2.5 py-1 rounded-full bg-white/5 border border-white/8 text-[11px] text-text-muted hover:text-white hover:border-violet-500/40 hover:bg-violet-500/8 transition-all"
+                    onClick={() => handleTagClick(tag)}
+                    className={`px-2.5 py-1 rounded-full border text-[11px] transition-all ${
+                      selectedTag === tag
+                        ? "bg-violet-500 border-violet-500 text-white shadow-glow-violet"
+                        : "bg-white/5 border-white/8 text-text-muted hover:text-white hover:border-violet-500/40 hover:bg-violet-500/8"
+                    }`}
                   >
                     #{tag}
                   </button>
@@ -343,8 +367,12 @@ export function HomeFeedClient({
               {trendingTags.map((tag) => (
                 <button
                   key={tag}
-                  onClick={() => router.push(`/tags/${tag.toLowerCase()}`)}
-                  className="shrink-0 px-2.5 py-1 rounded-full bg-white/5 border border-white/8 text-[11px] text-text-muted hover:text-white hover:border-violet-500/40 transition-all"
+                  onClick={() => handleTagClick(tag)}
+                  className={`shrink-0 px-2.5 py-1 rounded-full border text-[11px] transition-all ${
+                    selectedTag === tag
+                      ? "bg-violet-500 border-violet-500 text-white"
+                      : "bg-white/5 border-white/8 text-text-muted hover:text-white hover:border-violet-500/40"
+                  }`}
                 >
                   #{tag}
                 </button>
@@ -367,6 +395,22 @@ export function HomeFeedClient({
               ))}
             </div>
           </div>
+
+          {/* Active tag filter indicator */}
+          {selectedTag && (
+            <div className="flex items-center gap-2 px-1 mb-3">
+              <span className="text-[12px] text-text-muted">Filtering by</span>
+              <span className="px-2 py-0.5 rounded-full bg-violet-500/20 border border-violet-500/30 text-[11px] text-violet-400">
+                #{selectedTag}
+              </span>
+              <button
+                onClick={() => setSelectedTag(null)}
+                className="text-[11px] text-text-muted hover:text-white underline"
+              >
+                Clear
+              </button>
+            </div>
+          )}
 
           {/* Posts */}
           {displayedPosts.length > 0 ? (

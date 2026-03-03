@@ -6,17 +6,13 @@ import { PageShell } from "@/components/page-shell";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { ensureProfile } from "@/lib/auth";
-import { getProfile } from "@/lib/profile";
 import { type Post } from "@/lib/types";
 import Link from "next/link";
 import { ArrowLeft, Tag, FileText } from "@/lib/icons";
 import { formatDistanceToNow } from "date-fns";
 import { useCountUp } from "@/hooks/use-count-up";
 import { DEFAULT_AVATAR_CREATOR } from "@/lib/image-fallbacks";
-
-const supabase = getSupabaseBrowserClient();
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 
 export default function TagPage() {
   const params = useParams();
@@ -37,22 +33,17 @@ export default function TagPage() {
       try {
         setIsLoading(true);
 
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session) {
+        const bootstrap = await getAuthBootstrap();
+        if (!bootstrap.authenticated || !bootstrap.user) {
           router.push("/auth");
           return;
         }
 
-        await ensureProfile();
-        const profile = await getProfile(session.user.id);
-        if (profile) {
+        if (bootstrap.profile) {
           setCurrentUser({
-            username: profile.display_name || "user",
-            role: (profile.role || "fan") as "fan" | "creator",
-            avatar: profile.avatar_url || undefined,
+            username: bootstrap.profile.display_name || "user",
+            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
+            avatar: bootstrap.profile.avatar_url || undefined,
           });
         }
 
