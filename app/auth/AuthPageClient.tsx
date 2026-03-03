@@ -333,6 +333,13 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
     >
       {/* ── PC Hero Side (left 45%) ─────────────────────── */}
       <aside className="auth-hero relative overflow-hidden bg-gradient-to-br from-violet-900 via-purple-800 to-indigo-900">
+        {/* Hero background photo (required by design spec) */}
+        <img
+          src="/images/auth/hero-pc.jpg"
+          alt="Creator showcasing content on GetFanSee"
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
+          aria-hidden="true"
+        />
         {/* Abstract SVG pattern overlay */}
         <svg
           className="absolute inset-0 w-full h-full opacity-10"
