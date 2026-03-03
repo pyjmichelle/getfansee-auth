@@ -19,6 +19,8 @@ interface PageShellProps {
   mainClassName?: string;
   noPadding?: boolean;
   meshBg?: boolean;
+  /** When the page has its own fixed bottom action bar, suppress the shared BottomNavigation on mobile */
+  hideBottomNav?: boolean;
 }
 
 const maxWidthMap: Record<MaxWidth, string> = {
@@ -43,21 +45,25 @@ export function PageShell({
   mainClassName,
   noPadding = false,
   meshBg = false,
+  hideBottomNav = false,
 }: PageShellProps) {
   return (
     <div className={cn("min-h-dvh bg-bg-base flex flex-col", meshBg && "mesh-bg", className)}>
       <NavHeader user={user ?? undefined} notificationCount={notificationCount} />
       <main
         className={cn(
-          /* top offset: 48px mobile nav + 8px buffer */
-          "flex-1 pt-4 pb-24 md:pt-6 md:pb-8",
+          "flex-1 pt-4 md:pt-6 md:pb-8",
+          /* When page has its own fixed action bar, don't add bottom padding for BottomNavigation */
+          hideBottomNav ? "pb-6" : "pb-24",
           !noPadding && [maxWidthMap[maxWidth], "mx-auto px-4 md:px-6"],
           mainClassName
         )}
       >
         {children}
       </main>
-      <BottomNavigation notificationCount={notificationCount} userRole={user?.role} />
+      {!hideBottomNav && (
+        <BottomNavigation notificationCount={notificationCount} userRole={user?.role} />
+      )}
     </div>
   );
 }

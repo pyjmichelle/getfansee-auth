@@ -199,7 +199,7 @@ export default function NewPostPage() {
   // Show minimal loading state during auth check
   if (isLoading) {
     return (
-      <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
+      <PageShell user={currentUser} notificationCount={0} maxWidth="5xl" hideBottomNav>
         <div className="pb-12 space-y-6 animate-pulse">
           <div className="h-10 w-64 bg-surface-raised rounded" />
           <div className="grid md:grid-cols-3 gap-6">
@@ -216,7 +216,7 @@ export default function NewPostPage() {
 
   if (error && currentUser?.role !== "creator") {
     return (
-      <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
+      <PageShell user={currentUser} notificationCount={0} maxWidth="5xl" hideBottomNav>
         <div className="pb-12">
           <div className="bg-surface-raised border border-border-base rounded-2xl p-8 text-center">
             <div className="w-16 h-16 bg-brand-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -268,7 +268,7 @@ export default function NewPostPage() {
   const handleDiscardAndExit = () => router.push("/creator/studio");
 
   return (
-    <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
+    <PageShell user={currentUser} notificationCount={0} maxWidth="5xl" hideBottomNav>
       <div data-testid="page-ready" className="pb-12">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -498,7 +498,7 @@ export default function NewPostPage() {
                         value={formData.price}
                         onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                         placeholder="0.00"
-                        min="0.99"
+                        min="1.00"
                         step="0.01"
                         disabled={isSaving}
                         className="w-full pl-9 pr-4 py-3 bg-surface-base border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-all"
@@ -507,7 +507,7 @@ export default function NewPostPage() {
                     </div>
                     <p className="text-xs text-text-tertiary mt-2 flex items-center gap-1">
                       <Info size={12} />
-                      Minimum: $0.99 • Platform fee: 20%
+                      Minimum: $1.00 • Platform fee: 20%
                     </p>
 
                     {/* Price Suggestions */}
@@ -525,7 +525,7 @@ export default function NewPostPage() {
                     </div>
 
                     {/* Earnings Preview */}
-                    {formData.price && parseFloat(formData.price) >= 0.99 && (
+                    {formData.price && parseFloat(formData.price) >= 1.0 && (
                       <div className="mt-4 p-3 bg-success/10 border border-success/20 rounded-xl">
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-text-tertiary">You&apos;ll earn:</span>

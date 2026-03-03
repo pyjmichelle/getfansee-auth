@@ -274,8 +274,11 @@ export default function CreatorStudioPage() {
                   ${stats.revenue.value.toFixed(0)}
                 </div>
                 <div className="text-sm text-text-tertiary">This month</div>
-                <div className="text-xs text-success mt-2">
-                  +{stats.revenue.change}% from last month
+                <div
+                  className={`text-xs mt-2 ${stats.revenue.trend === "down" ? "text-error" : "text-success"}`}
+                >
+                  {stats.revenue.trend === "down" ? "-" : "+"}
+                  {Math.abs(stats.revenue.change)}% from last month
                 </div>
               </div>
 
@@ -289,8 +292,11 @@ export default function CreatorStudioPage() {
                   {stats.subscribers.value.toLocaleString()}
                 </div>
                 <div className="text-sm text-text-tertiary">Subscribers</div>
-                <div className="text-xs text-success mt-2">
-                  +{stats.subscribers.change} this month
+                <div
+                  className={`text-xs mt-2 ${stats.subscribers.trend === "down" ? "text-error" : "text-success"}`}
+                >
+                  {stats.subscribers.trend === "down" ? "-" : "+"}
+                  {Math.abs(stats.subscribers.change)} this month
                 </div>
               </div>
 
@@ -304,8 +310,11 @@ export default function CreatorStudioPage() {
                   {stats.visitors.value.toLocaleString()}
                 </div>
                 <div className="text-sm text-text-tertiary">Total views</div>
-                <div className="text-xs text-success mt-2">
-                  +{stats.visitors.change}% from last month
+                <div
+                  className={`text-xs mt-2 ${stats.visitors.trend === "down" ? "text-error" : "text-success"}`}
+                >
+                  {stats.visitors.trend === "down" ? "-" : "+"}
+                  {Math.abs(stats.visitors.change)}% from last month
                 </div>
               </div>
 
@@ -319,8 +328,11 @@ export default function CreatorStudioPage() {
                   {stats.ppvSales.value}
                 </div>
                 <div className="text-sm text-text-tertiary">PPV Sales</div>
-                <div className="text-xs text-success mt-2">
-                  +{stats.ppvSales.change}% from last month
+                <div
+                  className={`text-xs mt-2 ${stats.ppvSales.trend === "down" ? "text-error" : "text-success"}`}
+                >
+                  {stats.ppvSales.trend === "down" ? "-" : "+"}
+                  {Math.abs(stats.ppvSales.change)}% from last month
                 </div>
               </div>
             </div>
