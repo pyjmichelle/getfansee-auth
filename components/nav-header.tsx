@@ -188,7 +188,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
         {/* Desktop search bar — inline expandable */}
         <div ref={searchContainerRef} className="hidden md:flex flex-1 max-w-[420px] mx-6 relative">
           {searchActive ? (
-            <>
+            <div data-testid="search-modal" className="w-full">
               <div className="w-full relative">
                 <Search
                   className="absolute left-3 top-1/2 -translate-y-1/2 size-[14px] text-text-muted pointer-events-none"
@@ -219,6 +219,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                   <X className="size-[13px]" />
                 </button>
               </div>
+              {/* data-testid matches QA gate selector for search modal */}
               {searchInput.length >= 2 && (
                 <div className="absolute top-full left-0 right-0 mt-1.5 rounded-xl border border-white/8 bg-[#14141e]/96 backdrop-blur-xl shadow-2xl z-[100] overflow-hidden">
                   {isSearching && (
@@ -257,7 +258,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                   </Link>
                 </div>
               )}
-            </>
+            </div>
           ) : (
             <button
               onClick={() => setSearchActive(true)}
