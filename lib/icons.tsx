@@ -1,15 +1,14 @@
 /**
- * GetFanSee Icon System — Phosphor Duotone
- * Drop-in replacement for lucide-react imports.
+ * GetFanSee Icon System — Coolicons
+ * Drop-in replacement for lucide-react / phosphor imports.
+ * Uses react-coolicons (https://github.com/krystonschwarze/coolicons).
  * Change import path from "lucide-react" to "@/lib/icons" to migrate.
- *
- * Default weight: "duotone" — rich two-tone depth matching Liquid Glass design.
  */
 "use client";
 
 import type React from "react";
-import type { ComponentPropsWithoutRef } from "react";
-import type { Icon, IconWeight } from "@phosphor-icons/react";
+import type { SVGProps } from "react";
+import * as Ci from "react-coolicons";
 
 /** Compat type alias for components that expected Lucide's icon component type */
 export type LucideIcon = React.FC<{
@@ -17,212 +16,145 @@ export type LucideIcon = React.FC<{
   size?: number | string;
   "aria-hidden"?: boolean | "true" | "false";
 }>;
-import {
-  House as PhHouse,
-  MagnifyingGlass as PhMagnifyingGlass,
-  Heart as PhHeart,
-  Bell as PhBell,
-  User as PhUser,
-  Users as PhUsers,
-  UserCheck as PhUserCheck,
-  UserPlus as PhUserPlus,
-  Lock as PhLock,
-  LockOpen as PhLockOpen,
-  Eye as PhEye,
-  EyeSlash as PhEyeSlash,
-  Gear as PhGear,
-  SignOut as PhSignOut,
-  Envelope as PhEnvelope,
-  WarningCircle as PhWarningCircle,
-  Warning as PhWarning,
-  CircleNotch as PhCircleNotch,
-  CheckCircle as PhCheckCircle,
-  ShareNetwork as PhShareNetwork,
-  ChatCircle as PhChatCircle,
-  CurrencyDollar as PhCurrencyDollar,
-  Fire as PhFire,
-  Sparkle as PhSparkle,
-  PencilSimple as PhPencilSimple,
-  Trash as PhTrash,
-  FileText as PhFileText,
-  Camera as PhCamera,
-  PaperPlaneTilt as PhPaperPlaneTilt,
-  SquaresFour as PhSquaresFour,
-  DotsThree as PhDotsThree,
-  DotsThreeVertical as PhDotsThreeVertical,
-  ArrowsClockwise as PhArrowsClockwise,
-  TrendUp as PhTrendUp,
-  TrendDown as PhTrendDown,
-  ChartBar as PhChartBar,
-  GridFour as PhGridFour,
-  Rows as PhRows,
-  Question as PhQuestion,
-  Compass as PhCompass,
-  CaretLeft as PhCaretLeft,
-  CaretRight as PhCaretRight,
-  CaretDown as PhCaretDown,
-  CaretUp as PhCaretUp,
-  SidebarSimple as PhSidebarSimple,
-  DotsSixVertical as PhDotsSixVertical,
-  FloppyDisk as PhFloppyDisk,
-  VideoCamera as PhVideoCamera,
-  Plus as PhPlus,
-  Minus as PhMinus,
-  X as PhX,
-  Check as PhCheck,
-  Star as PhStar,
-  Flag as PhFlag,
-  Globe as PhGlobe,
-  Tag as PhTag,
-  Hash as PhHash,
-  Calendar as PhCalendar,
-  Clock as PhClock,
-  Shield as PhShield,
-  ShieldWarning as PhShieldWarning,
-  Upload as PhUpload,
-  Download as PhDownload,
-  Copy as PhCopy,
-  Image as PhImage,
-  Info as PhInfo,
-  CreditCard as PhCreditCard,
-  Wallet as PhWallet,
-  Gift as PhGift,
-  Coins as PhCoins,
-  ShoppingBag as PhShoppingBag,
-  ArrowLeft as PhArrowLeft,
-  ArrowRight as PhArrowRight,
-  ArrowUp as PhArrowUp,
-  ArrowDown as PhArrowDown,
-  ArrowUpRight as PhArrowUpRight,
-  ChatText as PhChatText,
-  XCircle as PhXCircle,
-  CheckSquare as PhCheckSquare,
-  List as PhList,
-} from "@phosphor-icons/react";
 
-type IconProps = ComponentPropsWithoutRef<Icon> & { weight?: IconWeight };
+type IconProps = SVGProps<SVGSVGElement> & {
+  size?: number | string;
+};
 
-/** Returns a component that defaults to duotone weight */
-function d(PhIcon: Icon) {
-  const C = ({ weight = "duotone", ...rest }: IconProps) => <PhIcon weight={weight} {...rest} />;
-  C.displayName = PhIcon.displayName;
+const DEFAULT_SIZE = 24;
+
+function wrap(Icon: React.FC<SVGProps<SVGSVGElement>>, opts?: { spin?: boolean }) {
+  const C = ({ size, className, ...rest }: IconProps) => {
+    const w = size ?? DEFAULT_SIZE;
+    const h = size ?? DEFAULT_SIZE;
+    const cn = [className, opts?.spin ? "animate-spin" : null].filter(Boolean).join(" ");
+    return (
+      <Icon
+        width={typeof w === "number" ? w : undefined}
+        height={typeof h === "number" ? h : undefined}
+        className={cn || undefined}
+        {...rest}
+      />
+    );
+  };
+  C.displayName = Icon.displayName ?? "Icon";
   return C;
 }
 
 // ── Navigation ──────────────────────────────────────────────────
-export const Home = d(PhHouse);
-export const Search = d(PhMagnifyingGlass);
-export const SearchIcon = d(PhMagnifyingGlass);
-export const Compass = d(PhCompass);
+export const Home = wrap(Ci.House01);
+export const Search = wrap(Ci.SearchMagnifyingGlass);
+export const SearchIcon = wrap(Ci.SearchMagnifyingGlass);
+export const Compass = wrap(Ci.Compass);
 
 // ── Chevrons / Carets ───────────────────────────────────────────
-export const ChevronLeft = d(PhCaretLeft);
-export const ChevronLeftIcon = d(PhCaretLeft);
-export const ChevronRight = d(PhCaretRight);
-export const ChevronRightIcon = d(PhCaretRight);
-export const ChevronDown = d(PhCaretDown);
-export const ChevronDownIcon = d(PhCaretDown);
-export const ChevronUp = d(PhCaretUp);
-export const ChevronUpIcon = d(PhCaretUp);
+export const ChevronLeft = wrap(Ci.ChevronLeft);
+export const ChevronLeftIcon = wrap(Ci.ChevronLeft);
+export const ChevronRight = wrap(Ci.ChevronRight);
+export const ChevronRightIcon = wrap(Ci.ChevronRight);
+export const ChevronDown = wrap(Ci.ChevronDown);
+export const ChevronDownIcon = wrap(Ci.ChevronDown);
+export const ChevronUp = wrap(Ci.ChevronUp);
+export const ChevronUpIcon = wrap(Ci.ChevronUp);
 
 // ── Arrows ──────────────────────────────────────────────────────
-export const ArrowLeft = d(PhArrowLeft);
-export const ArrowRight = d(PhArrowRight);
-export const ArrowUp = d(PhArrowUp);
-export const ArrowDown = d(PhArrowDown);
-export const ArrowUpRight = d(PhArrowUpRight);
+export const ArrowLeft = wrap(Ci.ArrowLeftSm);
+export const ArrowRight = wrap(Ci.ArrowRightSm);
+export const ArrowUp = wrap(Ci.ArrowUpSm);
+export const ArrowDown = wrap(Ci.ArrowDownSm);
+export const ArrowUpRight = wrap(Ci.ArrowUpRightSm);
 
 // ── Social / Interaction ─────────────────────────────────────────
-export const Heart = d(PhHeart);
-export const Bell = d(PhBell);
-export const Star = d(PhStar);
-export const Share2 = d(PhShareNetwork);
-export const MessageCircle = d(PhChatCircle);
-export const MessageSquare = d(PhChatText);
-export const Flame = d(PhFire);
-export const Sparkles = d(PhSparkle);
+export const Heart = wrap(Ci.Heart01);
+export const Bell = wrap(Ci.Bell);
+export const Star = wrap(Ci.Star);
+export const Share2 = wrap(Ci.ShareAndroid);
+export const MessageCircle = wrap(Ci.ChatCircle);
+export const MessageSquare = wrap(Ci.Chat);
+export const Flame = wrap(Ci.Sun);
+export const Sparkles = wrap(Ci.Bulb);
 
 // ── User / Auth ──────────────────────────────────────────────────
-export const User = d(PhUser);
-export const Users = d(PhUsers);
-export const UserCheck = d(PhUserCheck);
-export const UserPlus = d(PhUserPlus);
-export const LogOut = d(PhSignOut);
-export const Eye = d(PhEye);
-export const EyeOff = d(PhEyeSlash);
-export const Camera = d(PhCamera);
+export const User = wrap(Ci.User01);
+export const Users = wrap(Ci.Users);
+export const UserCheck = wrap(Ci.UserCheck);
+export const UserPlus = wrap(Ci.UserAdd);
+export const LogOut = wrap(Ci.LogOut);
+export const Eye = wrap(Ci.Show);
+export const EyeOff = wrap(Ci.Hide);
+export const Camera = wrap(Ci.Camera);
 
 // ── Lock / Security ──────────────────────────────────────────────
-export const Lock = d(PhLock);
-export const Unlock = d(PhLockOpen);
-export const Shield = d(PhShield);
-export const ShieldAlert = d(PhShieldWarning);
+export const Lock = wrap(Ci.Lock);
+export const Unlock = wrap(Ci.LockOpen);
+export const Shield = wrap(Ci.Shield);
+export const ShieldAlert = wrap(Ci.ShieldWarning);
 
 // ── Status / Feedback ────────────────────────────────────────────
-export const AlertCircle = d(PhWarningCircle);
-export const AlertTriangle = d(PhWarning);
-export const CheckCircle = d(PhCheckCircle);
-export const CheckCircle2 = d(PhCheckCircle);
-export const CheckCheck = d(PhCheckSquare);
-export const Check = d(PhCheck);
-export const CheckIcon = d(PhCheck);
-export const X = d(PhX);
-export const XIcon = d(PhX);
-export const XCircle = d(PhXCircle);
-export const CircleIcon = d(PhCircleNotch);
-export const Loader2 = d(PhCircleNotch);
-export const Loader2Icon = d(PhCircleNotch);
-export const RefreshCw = d(PhArrowsClockwise);
-export const Info = d(PhInfo);
+export const AlertCircle = wrap(Ci.CircleWarning);
+export const AlertTriangle = wrap(Ci.TriangleWarning);
+export const CheckCircle = wrap(Ci.CircleCheck);
+export const CheckCircle2 = wrap(Ci.CircleCheck);
+export const CheckCheck = wrap(Ci.CheckAllBig);
+export const Check = wrap(Ci.Check);
+export const CheckIcon = wrap(Ci.Check);
+export const X = wrap(Ci.CloseMd);
+export const XIcon = wrap(Ci.CloseMd);
+export const XCircle = wrap(Ci.CloseCircle);
+export const CircleIcon = wrap(Ci.Loading, { spin: true });
+export const Loader2 = wrap(Ci.Loading, { spin: true });
+export const Loader2Icon = wrap(Ci.Loading, { spin: true });
+export const RefreshCw = wrap(Ci.ArrowsReload01);
+export const Info = wrap(Ci.Info);
 
-// ── Settings / Controls ──────────────────────────────────────────
-export const Settings = d(PhGear);
-export const Plus = d(PhPlus);
-export const Minus = d(PhMinus);
-export const MinusIcon = d(PhMinus);
-export const MoreHorizontal = d(PhDotsThree);
-export const MoreHorizontalIcon = d(PhDotsThree);
-export const MoreVertical = d(PhDotsThreeVertical);
-export const PanelLeftIcon = d(PhSidebarSimple);
-export const GripVerticalIcon = d(PhDotsSixVertical);
-export const Save = d(PhFloppyDisk);
-export const LayoutDashboard = d(PhSquaresFour);
-export const HelpCircle = d(PhQuestion);
+// ── Settings / Controls ─────────────────────────────────────────
+export const Settings = wrap(Ci.Settings);
+export const Plus = wrap(Ci.AddPlus);
+export const Minus = wrap(Ci.RemoveMinus);
+export const MinusIcon = wrap(Ci.RemoveMinus);
+export const MoreHorizontal = wrap(Ci.MoreHorizontal);
+export const MoreHorizontalIcon = wrap(Ci.MoreHorizontal);
+export const MoreVertical = wrap(Ci.MoreVertical);
+export const PanelLeftIcon = wrap(Ci.WindowSidebar);
+export const GripVerticalIcon = wrap(Ci.DragVertical);
+export const Save = wrap(Ci.Save);
+export const LayoutDashboard = wrap(Ci.MoreGridBig);
+export const HelpCircle = wrap(Ci.Help);
 
 // ── Content / Media ──────────────────────────────────────────────
-export const FileText = d(PhFileText);
-export const Image = d(PhImage);
-export const ImageIcon = d(PhImage);
-export const Video = d(PhVideoCamera);
-export const Upload = d(PhUpload);
-export const Download = d(PhDownload);
-export const Copy = d(PhCopy);
-export const Edit = d(PhPencilSimple);
-export const Edit3 = d(PhPencilSimple);
-export const Trash2 = d(PhTrash);
-export const Hash = d(PhHash);
-export const Tag = d(PhTag);
-export const Flag = d(PhFlag);
-export const Globe = d(PhGlobe);
-export const Send = d(PhPaperPlaneTilt);
-export const Mail = d(PhEnvelope);
+export const FileText = wrap(Ci.FileDocument);
+export const Image = wrap(Ci.Image01);
+export const ImageIcon = wrap(Ci.Image01);
+export const Video = wrap(Ci.Play);
+export const Upload = wrap(Ci.FileUpload);
+export const Download = wrap(Ci.Download);
+export const Copy = wrap(Ci.Copy);
+export const Edit = wrap(Ci.EditPencil01);
+export const Edit3 = wrap(Ci.EditPencil01);
+export const Trash2 = wrap(Ci.TrashFull);
+export const Hash = wrap(Ci.Tag);
+export const Tag = wrap(Ci.Tag);
+export const Flag = wrap(Ci.Flag);
+export const Globe = wrap(Ci.Globe);
+export const Send = wrap(Ci.PaperPlane);
+export const Mail = wrap(Ci.Mail);
 
-// ── Finance ───────────────────────────────────────────────────────
-export const DollarSign = d(PhCurrencyDollar);
-export const Wallet = d(PhWallet);
-export const CreditCard = d(PhCreditCard);
-export const Coins = d(PhCoins);
-export const ShoppingBag = d(PhShoppingBag);
-export const Gift = d(PhGift);
-export const TrendingUp = d(PhTrendUp);
-export const TrendingDown = d(PhTrendDown);
-export const BarChart3 = d(PhChartBar);
+// ── Finance (coolicons 无独立 DollarSign/Wallet/Coins，用相近图标) ──
+export const DollarSign = wrap(Ci.CreditCard01);
+export const Wallet = wrap(Ci.CreditCard01);
+export const CreditCard = wrap(Ci.CreditCard01);
+export const Coins = wrap(Ci.Gift);
+export const ShoppingBag = wrap(Ci.Handbag);
+export const Gift = wrap(Ci.Gift);
+export const TrendingUp = wrap(Ci.TrendingUp);
+export const TrendingDown = wrap(Ci.TrendingDown);
+export const BarChart3 = wrap(Ci.ChartBarVertical01);
 
 // ── Date / Time ───────────────────────────────────────────────────
-export const Calendar = d(PhCalendar);
-export const Clock = d(PhClock);
+export const Calendar = wrap(Ci.Calendar);
+export const Clock = wrap(Ci.Clock);
 
 // ── Layout / View ─────────────────────────────────────────────────
-export const Grid3X3 = d(PhGridFour);
-export const List = d(PhList);
-export const Rows3 = d(PhRows);
+export const Grid3X3 = wrap(Ci.MoreGridBig);
+export const List = wrap(Ci.ListUnordered);
+export const Rows3 = wrap(Ci.Rows);
