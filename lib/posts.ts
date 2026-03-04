@@ -160,12 +160,12 @@ export async function listCreatorPosts(
       visitorCountry = await getVisitorCountry();
     }
 
-    // 地理屏蔽检查：直接从 profiles 表查询 creator 的 blocked_countries
+    // 地理屏蔽检查：从 public_creator_profiles 视图查询 creator 的 blocked_countries
     // 先检查地理屏蔽，避免不必要的 posts 查询
     if (visitorCountry) {
       // 使用 .single() 而不是 .maybeSingle()，以便在查询失败时得到明确的错误
       const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
+        .from("public_creator_profiles")
         .select("blocked_countries, role")
         .eq("id", creatorId)
         .single();
@@ -359,7 +359,7 @@ export async function listFeed(
       visitorCountry = await getVisitorCountry();
     }
 
-    // 查询 posts 并 join profiles 获取 creator 信息（包括 blocked_countries）
+    // 查询 posts（creator 信息通过 public_creator_profiles 二次查询，避免直接依赖 profiles 表）
     const { data, error } = await supabase
       .from("posts")
       .select(
@@ -375,12 +375,7 @@ export async function listFeed(
         preview_enabled,
         watermark_enabled,
         likes_count,
-        created_at,
-        profiles:creator_id (
-          display_name,
-          avatar_url,
-          blocked_countries
-        )
+        created_at
       `
       )
       .order("created_at", { ascending: false })
@@ -405,19 +400,26 @@ export async function listFeed(
       watermark_enabled: boolean | null;
       likes_count?: number;
       created_at: string;
-      profiles?: {
-        display_name?: string;
-        avatar_url?: string;
-        blocked_countries?: string[] | null;
-      } | null;
     }
     const rawPosts = (data || []) as PostWithProfile[];
+    const creatorIds = Array.from(new Set(rawPosts.map((item) => item.creator_id)));
+    const { data: creatorProfiles } =
+      creatorIds.length > 0
+        ? await supabase
+            .from("public_creator_profiles")
+            .select("id, display_name, avatar_url, blocked_countries")
+            .in("id", creatorIds)
+        : { data: [] };
+    const creatorProfileMap = new Map(
+      (creatorProfiles || []).map((profile) => [profile.id, profile])
+    );
+
     let filteredData = rawPosts.filter((item: PostWithProfile) => {
       if (!visitorCountry) {
         return true; // 无法确定国家，不过滤
       }
 
-      const blockedCountries = item.profiles?.blocked_countries;
+      const blockedCountries = creatorProfileMap.get(item.creator_id)?.blocked_countries;
       if (!blockedCountries || blockedCountries.length === 0) {
         return true; // 没有屏蔽任何国家
       }
@@ -527,8 +529,8 @@ export async function listFeed(
         watermark_enabled: item.watermark_enabled !== undefined ? item.watermark_enabled : true,
         created_at: item.created_at,
         creator: {
-          display_name: item.profiles?.display_name,
-          avatar_url: item.profiles?.avatar_url,
+          display_name: creatorProfileMap.get(item.creator_id)?.display_name,
+          avatar_url: creatorProfileMap.get(item.creator_id)?.avatar_url,
         },
       };
 

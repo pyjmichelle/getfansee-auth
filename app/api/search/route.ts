@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
-import { getSupabaseAdminClient } from "@/lib/supabase-admin";
+import { requireUser } from "@/lib/authz";
+import { getSupabaseRouteHandlerClient } from "@/lib/supabase-route";
 import { searchMockCreators, getMockPostsWithCreators, shouldUseMockData } from "@/lib/mock-data";
 
 /**
@@ -9,10 +9,7 @@ import { searchMockCreators, getMockPostsWithCreators, shouldUseMockData } from 
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    await requireUser();
 
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q") || "";
@@ -26,7 +23,8 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const supabase = getSupabaseAdminClient();
+    // 使用 route handler client（携带用户会话 + RLS），避免业务搜索绕过 RLS
+    const supabase = await getSupabaseRouteHandlerClient();
     interface SearchResults {
       success: boolean;
       creators?: Array<{

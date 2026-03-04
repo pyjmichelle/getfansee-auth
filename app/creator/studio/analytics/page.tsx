@@ -367,7 +367,7 @@ export default function AnalyticsPage() {
                 {topPosts.map((post, index) => (
                   <div
                     key={post.id}
-                    className="card-block min-w-[280px] flex items-center gap-4 p-4 hover:bg-surface-overlay transition-all cursor-pointer animate-profile-reveal"
+                    className="card-block min-w-[280px] flex items-center gap-4 p-4 hover:bg-surface-overlay transition-all animate-profile-reveal"
                     style={{ animationDelay: `${index * 80}ms` }}
                   >
                     <div className="text-2xl font-bold text-text-quaternary w-8 text-center">
@@ -402,12 +402,14 @@ export default function AnalyticsPage() {
                       </div>
                     </div>
                     <Button
+                      asChild
                       variant="ghost"
                       size="icon"
                       className="rounded-lg hover:bg-surface-base"
-                      aria-label="View post"
                     >
-                      <ChevronRight size={20} className="text-text-tertiary" />
+                      <Link href="/creator/studio/post/list" aria-label="View post list">
+                        <ChevronRight size={20} className="text-text-tertiary" />
+                      </Link>
                     </Button>
                   </div>
                 ))}

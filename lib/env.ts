@@ -23,6 +23,7 @@ export const env = createEnv({
     E2E: z.string().optional(),
     PLAYWRIGHT_TEST_MODE: z.string().optional(),
     E2E_ALLOW_ANY_HOST: z.string().optional(),
+    TEST_ROUTE_SECRET: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_SUPABASE_URL: z.string().min(1, "NEXT_PUBLIC_SUPABASE_URL is required"),
@@ -49,6 +50,7 @@ export const env = createEnv({
     E2E: process.env.E2E,
     PLAYWRIGHT_TEST_MODE: process.env.PLAYWRIGHT_TEST_MODE,
     E2E_ALLOW_ANY_HOST: process.env.E2E_ALLOW_ANY_HOST,
+    TEST_ROUTE_SECRET: process.env.TEST_ROUTE_SECRET,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,

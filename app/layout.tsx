@@ -34,9 +34,16 @@ const playfair = Playfair_Display({
   fallback: ["Georgia", "Times New Roman", "serif"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://getfansee.com";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "GetFanSee - Where fans get closer",
   description: "Premium adult creator subscription platform",
+  alternates: {
+    canonical: "/",
+  },
   manifest: "/manifest.json",
   icons: {
     icon: "/icon.svg",
@@ -47,6 +54,7 @@ export const metadata: Metadata = {
     description: "Premium adult creator subscription platform",
     type: "website",
     siteName: "GetFanSee",
+    url: siteUrl,
   },
   robots: {
     index: true,

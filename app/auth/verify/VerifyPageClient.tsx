@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, XCircle, Loader2, Mail } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { ensureProfile } from "@/lib/auth";
+import { syncSessionCookies } from "@/lib/auth-session-client";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 const supabase = getSupabaseBrowserClient();
@@ -145,6 +146,7 @@ export default function VerifyPageClient({ query }: VerifyPageClientProps) {
 
           if (data?.session?.user) {
             devLog("Code exchange successful, user:", data.session.user.email);
+            await syncSessionCookies(data.session);
             // 获取 user 后立刻 ensureProfile 并重定向 (unconditionally)
             await ensureProfile();
             router.replace("/home");
@@ -213,6 +215,7 @@ export default function VerifyPageClient({ query }: VerifyPageClientProps) {
 
           // 有 session，创建 profile 并重定向 (unconditionally)
           devLog("Token verification successful, user:", session.user.email);
+          await syncSessionCookies(session);
           await ensureProfile();
           router.replace("/home");
           return;
@@ -226,6 +229,7 @@ export default function VerifyPageClient({ query }: VerifyPageClientProps) {
         if (session?.user) {
           devLog("Already has session, user:", session.user.email);
           // 已有 session，直接创建 profile 并跳转 (unconditionally)
+          await syncSessionCookies(session);
           await ensureProfile();
           router.replace("/home");
           return;

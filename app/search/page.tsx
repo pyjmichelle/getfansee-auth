@@ -1,6 +1,15 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import SearchPageClient from "./SearchPageClient";
 import { Loader2 } from "@/lib/icons";
+
+export const metadata: Metadata = {
+  title: "Search — GetFanSee",
+  description: "Search creators and posts on GetFanSee.",
+  alternates: {
+    canonical: "/search",
+  },
+};
 
 function SearchLoadingFallback() {
   return (
