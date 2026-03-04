@@ -133,6 +133,76 @@ const SHOWCASE_CREATORS: ExploreCreator[] = [
     price: 15.99,
     verified: true,
   },
+  {
+    id: "showcase-7",
+    name: "Jake Winters",
+    username: "jakewins",
+    bio: "Travel photographer documenting hidden gems across the globe. Exclusive photo packs & guides 🌍",
+    avatar: AVATAR_ALEX,
+    coverImage: COVER_ELENA,
+    subscriberCount: 7823,
+    postCount: 203,
+    price: 10.99,
+    verified: true,
+  },
+  {
+    id: "showcase-8",
+    name: "Aria Nakamura",
+    username: "arianaka",
+    bio: "Music producer & singer-songwriter. Unreleased tracks, live sessions, and studio vlogs 🎵",
+    avatar: AVATAR_SOPHIE,
+    coverImage: COVER_MAYA,
+    subscriberCount: 21340,
+    postCount: 478,
+    price: 17.99,
+    verified: true,
+  },
+  {
+    id: "showcase-9",
+    name: "Carlos Vega",
+    username: "carlosvega",
+    bio: "Entrepreneur & business coach. Exclusive workshops, case studies, and mentorship content 🚀",
+    avatar: AVATAR_DAVID,
+    coverImage: COVER_ALEX,
+    subscriberCount: 5612,
+    postCount: 134,
+    price: 24.99,
+  },
+  {
+    id: "showcase-10",
+    name: "Zoe Blackwood",
+    username: "zoeblack",
+    bio: "Yoga instructor & mindfulness coach. Daily practice videos and exclusive wellness programs 🧘",
+    avatar: AVATAR_LUNA,
+    coverImage: COVER_SOPHIE,
+    subscriberCount: 14230,
+    postCount: 356,
+    price: 13.49,
+    verified: true,
+  },
+  {
+    id: "showcase-11",
+    name: "Priya Sharma",
+    username: "priyacreates",
+    bio: "Fashion designer & stylist sharing behind-the-scenes of the industry and exclusive lookbooks 👗",
+    avatar: AVATAR_MAYA,
+    coverImage: COVER_DAVID,
+    subscriberCount: 9870,
+    postCount: 289,
+    price: 16.99,
+  },
+  {
+    id: "showcase-12",
+    name: "Ethan Brooks",
+    username: "ethanbrooks",
+    bio: "Tech reviewer & developer. Deep-dive tutorials, exclusive project builds, and dev insights 💻",
+    avatar: AVATAR_ELENA,
+    coverImage: COVER_LUNA,
+    subscriberCount: 11456,
+    postCount: 412,
+    price: 18.99,
+    verified: true,
+  },
 ];
 
 function formatCount(count: number): string {
@@ -254,7 +324,7 @@ export default function SearchPageClient() {
 
   return (
     <PageShell user={currentUser}>
-      <div className="max-w-5xl mx-auto px-3 md:px-5 pb-16" data-testid="search-page">
+      <div className="max-w-7xl mx-auto px-3 md:px-5 pb-16" data-testid="search-page">
         {/* Hero search section */}
         <section className="py-8 md:py-12 text-center">
           <h1 className="font-serif text-h1 md:text-[32px] text-white mb-2">Discover Creators</h1>
@@ -413,7 +483,7 @@ export default function SearchPageClient() {
                   className="glass-card rounded-[var(--radius-md)] overflow-hidden cursor-pointer hover:border-violet-500/30 transition-all group card-interactive"
                   onClick={() => router.push(`/creator/${c.id}`)}
                 >
-                  <div className="relative h-28 overflow-hidden">
+                  <div className="relative h-36 overflow-hidden">
                     <Image
                       src={c.coverImage}
                       alt=""
