@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireUser } from "@/lib/authz";
+import { jsonError } from "@/lib/http-errors";
 import { createPost, type PostVisibility } from "@/lib/posts";
 
 type CreatePostPayload = {
@@ -18,6 +20,9 @@ type CreatePostPayload = {
 
 export async function POST(request: NextRequest) {
   try {
+    // 路由层显式鉴权，避免仅依赖下层隐式校验
+    await requireUser();
+
     const body = (await request.json()) as CreatePostPayload;
     const { title, content, mediaFiles, visibility, priceCents, previewEnabled, watermarkEnabled } =
       body;
@@ -49,8 +54,6 @@ export async function POST(request: NextRequest) {
       );
     }
   } catch (err: unknown) {
-    console.error("[api/posts] Exception in POST:", err);
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return jsonError(err);
   }
 }

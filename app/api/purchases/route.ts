@@ -77,7 +77,7 @@ export async function GET() {
     const { data: creators } =
       creatorIds.length > 0
         ? await supabase
-            .from("profiles")
+            .from("public_creator_profiles")
             .select("id, display_name, avatar_url")
             .in("id", creatorIds)
         : { data: [] };

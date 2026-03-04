@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireUser } from "@/lib/authz";
+import { jsonError } from "@/lib/http-errors";
 import { cancelSubscription } from "@/lib/paywall";
 
 type CancelSubscriptionPayload = {
@@ -7,6 +9,9 @@ type CancelSubscriptionPayload = {
 
 export async function POST(request: NextRequest) {
   try {
+    // 路由层显式鉴权，统一 401/403 语义
+    await requireUser();
+
     const { creatorId } = (await request.json()) as CancelSubscriptionPayload;
 
     if (!creatorId) {
@@ -24,8 +29,6 @@ export async function POST(request: NextRequest) {
       );
     }
   } catch (err: unknown) {
-    console.error("[api] cancel subscription error:", err);
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return jsonError(err);
   }
 }

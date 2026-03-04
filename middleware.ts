@@ -12,12 +12,14 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
   const isAdminPath = pathname.startsWith("/admin");
+  const userProtectedPaths = ["/me", "/subscriptions", "/purchases", "/notifications"];
+  const isUserProtectedPath = userProtectedPaths.some((path) => pathname.startsWith(path));
 
   // 保护 Creator 路由（除了公开的 /creator/[id] 查看页面）
   const creatorProtectedPaths = ["/creator/new-post", "/creator/studio"];
   const isCreatorProtectedPath = creatorProtectedPaths.some((path) => pathname.startsWith(path));
 
-  if (!isCreatorProtectedPath && !isAdminPath) {
+  if (!isCreatorProtectedPath && !isAdminPath && !isUserProtectedPath) {
     return response;
   }
 
@@ -87,6 +89,10 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/me/:path*",
+    "/subscriptions/:path*",
+    "/purchases/:path*",
+    "/notifications/:path*",
     "/creator/new-post/:path*",
     "/creator/onboarding/:path*",
     "/creator/studio/:path*",

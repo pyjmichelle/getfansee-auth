@@ -37,11 +37,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Recharge failed" }, { status: 500 });
     }
 
-    const result = data as { success: boolean; balance_cents: number; idempotent: boolean };
+    const result = data as {
+      success: boolean;
+      balance_cents?: number;
+      idempotent?: boolean;
+      error?: string;
+    };
+
+    if (!result?.success) {
+      const message = result?.error || "Recharge failed";
+      const status = message.toLowerCase().includes("unauthorized") ? 403 : 400;
+      return NextResponse.json({ success: false, error: message }, { status });
+    }
 
     return NextResponse.json({
       success: true,
-      balance: result.balance_cents / 100,
+      balance: (result.balance_cents ?? 0) / 100,
     });
   } catch (err: unknown) {
     return jsonError(err);

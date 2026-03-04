@@ -7,10 +7,12 @@ const nextConfig = {
   },
   images: {
     // Allow remote images from Supabase storage and other CDN sources
-    unoptimized: true,
+    unoptimized: process.env.NEXT_PUBLIC_TEST_MODE === "true",
     remotePatterns: [
       { protocol: "https", hostname: "**.supabase.co" },
       { protocol: "https", hostname: "**.supabase.in" },
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "ui-avatars.com" },
     ],
   },
   // Remove X-Powered-By header to avoid leaking Next.js fingerprint

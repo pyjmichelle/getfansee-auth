@@ -4,6 +4,7 @@ import type React from "react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ensureProfile, signInWithGoogle, signUpWithEmail } from "@/lib/auth";
+import { syncSessionCookies } from "@/lib/auth-session-client";
 import { captureReferralFromUrl } from "@/lib/referral";
 import { Analytics } from "@/lib/analytics";
 import { invalidateAuthBootstrap, prefetchAuthBootstrap } from "@/lib/auth-bootstrap-client";
@@ -138,17 +140,8 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
         return;
       }
 
-      const sessionSync = await fetch("/api/auth/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          access_token: data.session.access_token,
-          refresh_token: data.session.refresh_token,
-          expires_in: data.session.expires_in,
-        }),
-      });
-
-      if (!sessionSync.ok) {
+      const sessionSyncOk = await syncSessionCookies(data.session);
+      if (!sessionSyncOk) {
         setError("Login failed: session sync error");
         setIsLoading(false);
         return;
@@ -211,17 +204,8 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
       if (sessionData?.session) {
         devLog("[auth] Signup successful with session, redirecting...");
 
-        const sessionSync = await fetch("/api/auth/session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            access_token: sessionData.session.access_token,
-            refresh_token: sessionData.session.refresh_token,
-            expires_in: sessionData.session.expires_in,
-          }),
-        });
-
-        if (!sessionSync.ok) {
+        const sessionSyncOk = await syncSessionCookies(sessionData.session);
+        if (!sessionSyncOk) {
           console.warn("[auth] Session sync failed but continuing...");
         }
 
@@ -251,17 +235,8 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
       devLog("[auth] Auto-login successful, redirecting...");
       Analytics.identify(loginData.session.user.id);
       Analytics.userRegistered("email");
-      const sessionSync = await fetch("/api/auth/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          access_token: loginData.session.access_token,
-          refresh_token: loginData.session.refresh_token,
-          expires_in: loginData.session.expires_in,
-        }),
-      });
-
-      if (!sessionSync.ok) {
+      const sessionSyncOk = await syncSessionCookies(loginData.session);
+      if (!sessionSyncOk) {
         console.warn("[auth] Session sync failed but continuing...");
       }
 
@@ -304,11 +279,15 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
       {/* ── PC Hero Side (left 45%) ─────────────────────── */}
       <aside className="auth-hero relative overflow-hidden bg-gradient-to-br from-[#0d0720] via-[#150a2e] to-[#0a0d2e]">
         {/* Hero background photo (required by design spec) */}
-        <img
+        <Image
           src="/images/auth/hero-pc.jpg"
           alt="Creator showcasing content on GetFanSee"
+          width={1600}
+          height={1200}
+          sizes="(min-width: 1024px) 45vw, 100vw"
           className="absolute inset-0 w-full h-full object-cover opacity-[0.12]"
           aria-hidden="true"
+          priority
         />
 
         {/* Geometric pattern overlay */}

@@ -204,7 +204,9 @@ export async function getCreatorEarnings(creatorId: string): Promise<
     const { data, error } = await supabase
       .from("transactions")
       .select("*")
-      .or(`metadata->>'creator_id'.eq.${creatorId},type.eq.subscription,type.eq.ppv_purchase`)
+      .or(
+        `metadata->>'creator_id'.eq.${creatorId},type.eq.subscription,type.eq.ppv_purchase,type.eq.ppv_revenue`
+      )
       .order("created_at", { ascending: false });
 
     if (error) {
