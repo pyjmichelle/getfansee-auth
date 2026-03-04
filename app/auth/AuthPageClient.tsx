@@ -14,8 +14,7 @@ import { ensureProfile, signInWithGoogle, signUpWithEmail } from "@/lib/auth";
 import { captureReferralFromUrl } from "@/lib/referral";
 import { Analytics } from "@/lib/analytics";
 import { invalidateAuthBootstrap, prefetchAuthBootstrap } from "@/lib/auth-bootstrap-client";
-import { AlertCircle, Loader2, Eye, EyeOff, Users, DollarSign, Star } from "@/lib/icons";
-import { useCountUp } from "@/hooks/use-count-up";
+import { AlertCircle, Loader2, Eye, EyeOff, DollarSign, Lock, Globe, Sparkles } from "@/lib/icons";
 import { TrustStrip } from "@/components/trust-strip";
 
 type AuthPageClientProps = {
@@ -47,11 +46,6 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
   const [activeTab, setActiveTab] = useState<"login" | "signup">(initialMode);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
-
-  // Social proof counters
-  const creatorCount = useCountUp(12480, { duration: 1200, decimals: 0 });
-  const fanCount = useCountUp(89340, { duration: 1400, decimals: 0 });
-  const earningsCount = useCountUp(2400000, { duration: 1600, decimals: 0 });
 
   const resetAuthState = useCallback(() => {
     setError(null);
@@ -301,30 +295,6 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
     }
   };
 
-  const socialProofItems = [
-    {
-      icon: Users,
-      label: "Active Creators",
-      value: creatorCount.toLocaleString(),
-      color: "text-brand-primary",
-      bg: "bg-brand-primary/10",
-    },
-    {
-      icon: Star,
-      label: "Happy Fans",
-      value: fanCount.toLocaleString(),
-      color: "text-brand-accent",
-      bg: "bg-brand-accent/10",
-    },
-    {
-      icon: DollarSign,
-      label: "Paid to Creators",
-      value: `$${(earningsCount / 1_000_000).toFixed(1)}M+`,
-      color: "text-success",
-      bg: "bg-success/10",
-    },
-  ];
-
   return (
     <div
       data-testid="page-ready"
@@ -332,86 +302,96 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
       style={{ touchAction: "manipulation", overscrollBehaviorY: "contain" }}
     >
       {/* ── PC Hero Side (left 45%) ─────────────────────── */}
-      <aside className="auth-hero relative overflow-hidden bg-gradient-to-br from-violet-900 via-purple-800 to-indigo-900">
+      <aside className="auth-hero relative overflow-hidden bg-gradient-to-br from-[#0d0720] via-[#150a2e] to-[#0a0d2e]">
         {/* Hero background photo (required by design spec) */}
         <img
           src="/images/auth/hero-pc.jpg"
           alt="Creator showcasing content on GetFanSee"
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.12]"
           aria-hidden="true"
         />
-        {/* Abstract SVG pattern overlay */}
+
+        {/* Geometric pattern overlay */}
         <svg
-          className="absolute inset-0 w-full h-full opacity-10"
+          className="absolute inset-0 w-full h-full opacity-[0.06]"
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden="true"
         >
           <defs>
-            <pattern id="auth-grid" width="60" height="60" patternUnits="userSpaceOnUse">
-              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" strokeWidth="0.5" />
+            <pattern id="auth-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+              <path d="M 48 0 L 0 0 0 48" fill="none" stroke="white" strokeWidth="0.5" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#auth-grid)" />
         </svg>
+        {/* Decorative arcs */}
+        <svg
+          className="absolute inset-0 w-full h-full opacity-[0.08]"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          preserveAspectRatio="xMidYMid slice"
+        >
+          <circle cx="100%" cy="0" r="520" fill="none" stroke="white" strokeWidth="1" />
+          <circle cx="100%" cy="0" r="360" fill="none" stroke="white" strokeWidth="0.5" />
+          <circle cx="0" cy="100%" r="400" fill="none" stroke="white" strokeWidth="0.8" />
+          <line x1="0" y1="0" x2="100%" y2="100%" stroke="white" strokeWidth="0.4" />
+          <line x1="100%" y1="0" x2="0" y2="100%" stroke="white" strokeWidth="0.4" />
+        </svg>
+
         {/* Glowing orbs */}
-        <div className="absolute top-1/4 left-1/3 w-64 h-64 rounded-full bg-violet-500/20 blur-3xl" />
-        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full bg-indigo-400/15 blur-3xl" />
-        <div className="absolute top-2/3 left-1/4 w-48 h-48 rounded-full bg-purple-400/15 blur-2xl" />
+        <div className="absolute top-1/4 left-1/3 w-72 h-72 rounded-full bg-violet-600/25 blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-indigo-500/20 blur-3xl" />
+        <div className="absolute top-2/3 left-1/5 w-56 h-56 rounded-full bg-purple-400/15 blur-2xl" />
 
         {/* Content */}
-        <div className="absolute inset-0 flex flex-col justify-between p-8">
+        <div className="absolute inset-0 flex flex-col justify-between p-10">
           {/* Top branding */}
           <div className="flex items-center gap-3">
             <div className="size-12 rounded-[var(--radius-sm)] bg-white/10 border border-white/20 flex items-center justify-center shadow-glow-violet backdrop-blur-sm">
-              <span className="text-white font-bold text-[18px]">G</span>
+              <Sparkles className="w-6 h-6 text-violet-300" aria-hidden="true" />
             </div>
             <span className="font-bold text-[22px] text-white tracking-tight">GetFanSee</span>
           </div>
 
           {/* Center feature callouts */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[
-              { emoji: "💰", text: "Earn from your passion" },
-              { emoji: "🔒", text: "Exclusive content for subscribers" },
-              { emoji: "🌍", text: "Reach fans worldwide" },
+              {
+                Icon: DollarSign,
+                text: "Monetize your passion & earn more",
+                color: "text-emerald-400",
+              },
+              {
+                Icon: Lock,
+                text: "Exclusive content for your subscribers",
+                color: "text-violet-400",
+              },
+              { Icon: Globe, text: "Reach fans all around the world", color: "text-sky-400" },
             ].map((f) => (
               <div
                 key={f.text}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/8 border border-white/12 backdrop-blur-sm"
+                className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl bg-white/6 border border-white/10 backdrop-blur-sm"
               >
-                <span className="text-xl">{f.emoji}</span>
-                <p className="text-[14px] text-white/90 font-medium">{f.text}</p>
+                <div className="w-9 h-9 rounded-xl bg-white/8 flex items-center justify-center shrink-0">
+                  <f.Icon className={`w-5 h-5 ${f.color}`} aria-hidden="true" />
+                </div>
+                <p className="text-[15px] text-white/90 font-medium leading-snug">{f.text}</p>
               </div>
             ))}
           </div>
 
-          {/* Bottom title + social proof */}
+          {/* Bottom title */}
           <div>
-            <p className="text-4xl font-serif font-bold text-white leading-tight mb-2">
+            <p className="text-5xl font-serif font-bold text-white leading-tight mb-3">
               Where Creators
               <br />
               <span className="text-gradient-primary">Get Paid.</span>
             </p>
-            <p className="text-base text-white/60 mb-5">
-              The premium content platform for independent creators
+            <p className="text-lg text-white/50 leading-relaxed">
+              The premium content platform
+              <br />
+              built for independent creators.
             </p>
-
-            {/* Social proof stats */}
-            <div className="flex items-center gap-5">
-              {socialProofItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.label} className="text-center">
-                    <Icon
-                      className="size-[16px] text-violet-400 mx-auto mb-0.5"
-                      aria-hidden="true"
-                    />
-                    <p className="text-base font-bold text-white">{item.value}</p>
-                    <p className="text-[11px] text-white/50">{item.label}</p>
-                  </div>
-                );
-              })}
-            </div>
           </div>
         </div>
       </aside>
@@ -736,34 +716,6 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
             className="mt-6"
             items={["Secure & Encrypted", "24/7 Support", "Private & Discreet"]}
           />
-
-          {/* Mobile social proof — hidden on desktop (hero already shows it) */}
-          <div className="mt-5 pt-5 border-t border-white/6 lg:hidden">
-            <p className="text-center text-[11px] text-text-muted mb-3 uppercase tracking-wider font-medium">
-              Trusted by
-            </p>
-            <div className="grid grid-cols-3 gap-2">
-              {socialProofItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div
-                    key={item.label}
-                    className="flex flex-col items-center gap-1 p-2.5 rounded-[var(--radius-sm)] bg-white/4 border border-white/6"
-                  >
-                    <div
-                      className={`size-7 rounded-full ${item.bg} flex items-center justify-center`}
-                    >
-                      <Icon className={`size-[13px] ${item.color}`} aria-hidden="true" />
-                    </div>
-                    <p className={`text-[13px] font-bold ${item.color}`}>{item.value}</p>
-                    <p className="text-[10px] text-text-muted text-center leading-tight">
-                      {item.label}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
 
           <p className="mt-4 text-center text-[11px] text-text-disabled">
             © 2026 GetFanSee. All rights reserved.

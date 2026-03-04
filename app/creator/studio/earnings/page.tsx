@@ -243,7 +243,7 @@ export default function EarningsPage() {
           <div className="bento-grid mb-4 md:mb-10">
             {/* Available Balance */}
             <div
-              className="bento-2x2 card-block bg-gradient-subtle p-8 relative overflow-hidden"
+              className="bento-2x2 card-block bg-gradient-subtle p-4 md:p-8 relative overflow-hidden"
               data-testid="earnings-balance"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-success/10 to-transparent" />
@@ -274,7 +274,7 @@ export default function EarningsPage() {
             </div>
 
             {/* Pending Payout */}
-            <div className="bento-2x1 card-block p-8">
+            <div className="bento-2x1 card-block p-4 md:p-8">
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <div className="text-sm text-text-tertiary font-semibold mb-2 uppercase tracking-wide">
@@ -305,7 +305,7 @@ export default function EarningsPage() {
           </div>
 
           {/* Revenue Breakdown */}
-          <div className="card-block p-8 mb-10">
+          <div className="card-block p-4 md:p-8 mb-10">
             <div className="mb-6">
               <h3 className="text-lg font-bold mb-1 text-text-primary">Revenue Breakdown</h3>
               <p className="text-sm text-text-tertiary">Earnings by source</p>

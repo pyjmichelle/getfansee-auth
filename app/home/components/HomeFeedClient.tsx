@@ -21,6 +21,7 @@ import {
   CheckCircle2,
 } from "@/lib/icons";
 import { PaywallModal } from "@/components/paywall-modal";
+import { ShareModal } from "@/components/share-modal";
 import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
 import { toast } from "sonner";
 import { PageShell } from "@/components/page-shell";
@@ -49,15 +50,16 @@ function PostCard({
   post,
   isUnlocked,
   onUnlock,
+  onShare,
 }: {
   post: Post;
   isUnlocked: boolean;
   onUnlock: () => void;
+  onShare: () => void;
 }) {
   const router = useRouter();
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes_count ?? 0);
-  const [copied, setCopied] = useState(false);
 
   const handle = post.creator?.display_name?.toLowerCase().replace(/\s+/g, "") || "user";
   const hasMedia = post.media && post.media.length > 0;
@@ -76,16 +78,8 @@ function PostCard({
     setLikeCount((c) => (liked ? c - 1 : c + 1));
   };
 
-  const handleShare = async () => {
-    const url = `${window.location.origin}/posts/${post.id}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      toast.success("Link copied!");
-    } catch {
-      toast.error("Failed to copy link");
-    }
+  const handleShare = () => {
+    onShare();
   };
 
   return (
@@ -241,11 +235,11 @@ function PostCard({
 
         <button
           onClick={handleShare}
-          className={`flex items-center gap-1.5 h-8 px-2.5 rounded-full transition-all ${copied ? "text-emerald-400 bg-emerald-500/10" : "text-text-muted hover:text-white hover:bg-white/8"}`}
+          className="flex items-center gap-1.5 h-8 px-2.5 rounded-full transition-all text-text-muted hover:text-white hover:bg-white/8"
           aria-label="Share"
         >
           <Share2 className="size-[15px]" />
-          <span className="text-[12px] font-medium">{copied ? "Copied!" : "Share"}</span>
+          <span className="text-[12px] font-medium">Share</span>
         </button>
 
         <div className="flex-1" />
@@ -271,6 +265,7 @@ export function HomeFeedClient({
   const [activeFeedTab, setActiveFeedTab] = useState<"for-you" | "following">("for-you");
   const [posts] = useState<Post[]>(initialPosts);
   const [paywallPost, setPaywallPost] = useState<Post | null>(null);
+  const [sharePost, setSharePost] = useState<Post | null>(null);
   const [postViewStates] = useState<Map<string, boolean>>(initialUnlockedStates);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
@@ -287,6 +282,7 @@ export function HomeFeedClient({
   };
 
   const handleUnlock = (post: Post) => setPaywallPost(post);
+  const handleShare = (post: Post) => setSharePost(post);
 
   const handlePaywallSuccess = (postId: string) => {
     addUnlockedPost(postId);
@@ -360,7 +356,7 @@ export function HomeFeedClient({
         {/* ── Main feed ──────────────────────────────────── */}
         <main className="home-feed min-w-0">
           {/* Feed tabs */}
-          <div className="sticky top-[52px] z-30 bg-bg-base/95 backdrop-blur-md border-b border-white/6 mb-4">
+          <div className="sticky top-12 md:top-[52px] z-30 bg-bg-base/95 backdrop-blur-md border-b border-white/6 mb-4">
             {/* Trending tags scroll (mobile) */}
             <div className="flex items-center gap-2 px-3 py-2 overflow-x-auto no-scrollbar lg:hidden">
               <TrendingUp className="size-[13px] text-violet-500 shrink-0" />
@@ -421,6 +417,7 @@ export function HomeFeedClient({
                   post={post}
                   isUnlocked={postViewStates.get(post.id) || isUnlockedGlobal(post.id)}
                   onUnlock={() => handleUnlock(post)}
+                  onShare={() => handleShare(post)}
                 />
               ))}
               <div className="py-8 text-center">
@@ -453,17 +450,31 @@ export function HomeFeedClient({
                 Suggested Creators
               </h3>
               <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-2.5">
+                {[
+                  { name: "Elena Rivers", handle: "elenarivs", avatar: "/creator-avatar.png" },
+                  {
+                    name: "Maya Chen",
+                    handle: "mayacreates",
+                    avatar: "/artist-creator-avatar.jpg",
+                  },
+                  { name: "Alex Martinez", handle: "alexfitlife", avatar: "/fan-user-avatar.jpg" },
+                ].map((creator) => (
+                  <div key={creator.handle} className="flex items-center gap-2.5">
                     <Avatar className="size-8 ring-1 ring-violet-500/20">
-                      <AvatarFallback className="text-[10px]">C{i}</AvatarFallback>
+                      <AvatarImage src={creator.avatar} />
+                      <AvatarFallback className="text-[10px]">{creator.name[0]}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[12px] font-medium text-white truncate">Creator {i}</p>
-                      <p className="text-[10px] text-text-muted">@creator{i}</p>
+                      <p className="text-[12px] font-medium text-white truncate">{creator.name}</p>
+                      <p className="text-[10px] text-text-muted">@{creator.handle}</p>
                     </div>
-                    <Button variant="outline" size="xs" disabled title="Coming soon">
-                      Coming soon
+                    <Button
+                      variant="violet"
+                      size="xs"
+                      className="shrink-0 text-[11px] h-6 px-2.5"
+                      onClick={() => toast.info("Subscribe feature coming soon!")}
+                    >
+                      Follow
                     </Button>
                   </div>
                 ))}
@@ -472,6 +483,17 @@ export function HomeFeedClient({
           </div>
         </aside>
       </div>
+
+      <ShareModal
+        open={!!sharePost}
+        onClose={() => setSharePost(null)}
+        url={
+          sharePost
+            ? `${typeof window !== "undefined" ? window.location.origin : ""}/posts/${sharePost.id}`
+            : ""
+        }
+        title={sharePost?.content?.slice(0, 80) || "Check out this post on GetFanSee"}
+      />
 
       {paywallPost && (
         <PaywallModal

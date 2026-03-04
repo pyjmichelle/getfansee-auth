@@ -57,8 +57,7 @@ export function CommentForm({ postId, onCommentCreated, className }: CommentForm
       }
     } catch (err) {
       const error = err as Error;
-      console.error("[CommentForm] Error:", error);
-      toast.error(error.message || "Failed to post comment");
+      toast.error(error.message || "Failed to post comment", { duration: 5000 });
     } finally {
       setIsSubmitting(false);
     }

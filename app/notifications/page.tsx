@@ -499,9 +499,9 @@ export default function NotificationsPage() {
                               if (notification.actionUrl) router.push(notification.actionUrl);
                             }}
                           >
-                            <div className="p-3 md:p-4 flex gap-3">
+                            <div className="p-2.5 md:p-3 flex gap-3">
                               <div
-                                className={`w-10 h-10 ${getNotificationBgColor(notification.type)} rounded-xl flex items-center justify-center border border-border-base flex-shrink-0`}
+                                className={`w-8 h-8 ${getNotificationBgColor(notification.type)} rounded-lg flex items-center justify-center border border-border-base flex-shrink-0`}
                               >
                                 {getNotificationIcon(notification.type)}
                               </div>

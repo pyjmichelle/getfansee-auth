@@ -10,17 +10,33 @@ interface PostGridItemProps {
   post: Post;
   isUnlocked?: boolean;
   currentUserId?: string | null;
+  onUnlock?: (post: Post) => void;
   className?: string;
 }
 
-export function PostGridItem({ post, isUnlocked, currentUserId, className }: PostGridItemProps) {
+export function PostGridItem({
+  post,
+  isUnlocked,
+  currentUserId,
+  onUnlock,
+  className,
+}: PostGridItemProps) {
   const unlockedForUser = isUnlocked || post.creator_id === currentUserId;
   const thumb = post.media_url || (post.media && post.media[0]?.media_url) || null;
   const isVideo = post.media && post.media[0]?.media_type === "video";
+  const isLocked = post.visibility !== "free" && !unlockedForUser;
+
+  const handleUnlockClick = (e: React.MouseEvent) => {
+    if (onUnlock && isLocked) {
+      e.preventDefault();
+      onUnlock(post);
+    }
+  };
 
   return (
     <Link
       href={`/posts/${post.id}`}
+      onClick={handleUnlockClick}
       className={cn(
         "relative aspect-square overflow-hidden group cursor-pointer block",
         "focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:outline-offset-1",
@@ -32,7 +48,10 @@ export function PostGridItem({ post, isUnlocked, currentUserId, className }: Pos
           src={thumb}
           alt=""
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          className={cn(
+            "object-cover group-hover:scale-105 transition-transform duration-300",
+            isLocked && "blur-sm scale-105"
+          )}
           sizes="(max-width: 768px) 33vw, 200px"
         />
       ) : (
@@ -42,19 +61,32 @@ export function PostGridItem({ post, isUnlocked, currentUserId, className }: Pos
       )}
 
       {/* Lock overlay for paid/subscriber posts */}
-      {post.visibility !== "free" && !unlockedForUser && (
-        <div className="absolute inset-0 bg-black/65 flex flex-col items-center justify-center gap-1">
-          <Lock size={20} className="text-white" aria-hidden="true" />
-          {post.visibility === "ppv" && post.price_cents && (
-            <span className="text-white text-[13px] font-bold">
-              ${(post.price_cents / 100).toFixed(2)}
-            </span>
+      {isLocked && (
+        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2 p-2">
+          <Lock size={16} className="text-white/80" aria-hidden="true" />
+          {post.visibility === "ppv" && post.price_cents ? (
+            <>
+              <span className="text-white text-[11px] font-bold">
+                ${(post.price_cents / 100).toFixed(2)}
+              </span>
+              {onUnlock && (
+                <span className="px-2.5 py-1 rounded-full bg-amber-500 text-black text-[10px] font-bold tracking-wide">
+                  Unlock
+                </span>
+              )}
+            </>
+          ) : (
+            onUnlock && (
+              <span className="px-2.5 py-1 rounded-full bg-violet-600 text-white text-[10px] font-bold tracking-wide">
+                Subscribe
+              </span>
+            )
           )}
         </div>
       )}
 
       {/* Video indicator */}
-      {isVideo && (
+      {isVideo && !isLocked && (
         <div className="absolute top-1.5 right-1.5 bg-black/60 rounded p-1 flex items-center justify-center">
           <Video size={10} className="text-white" aria-hidden="true" />
         </div>

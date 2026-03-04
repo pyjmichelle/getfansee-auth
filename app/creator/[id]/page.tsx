@@ -329,8 +329,8 @@ export default function CreatorProfilePage() {
 
   return (
     <PageShell user={currentUser} notificationCount={0} noPadding>
-      {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-white/6">
+      {/* Mobile-only Fixed Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-white/6 md:hidden">
         <div className="flex items-center justify-between px-4 h-14 max-w-3xl mx-auto">
           <Button
             variant="ghost"
@@ -358,16 +358,31 @@ export default function CreatorProfilePage() {
       </header>
 
       {/* Banner */}
-      <div className="relative mt-14 h-40 md:h-52 overflow-hidden">
+      <div className="relative mt-14 md:mt-0 h-40 md:h-52 overflow-hidden">
         <div className="w-full h-full bg-gradient-to-br from-[#0a1a3a] via-[#061830] to-[#04111f]" />
         <div className="absolute inset-0 bg-gradient-to-br from-teal-900/40 via-indigo-900/20 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-bg-base/70" />
+        {/* Stronger bottom fade to eliminate harsh transition with background */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-bg-base to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-bg-base/20 to-bg-base" />
       </div>
 
       {/* Profile Section */}
       <div className="max-w-3xl mx-auto px-4 md:px-6 pb-28">
+        {/* Desktop inline back row */}
+        <div className="hidden md:flex items-center gap-3 pt-4 mb-2">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => router.back()}
+            aria-label="Go back"
+            className="text-white/70 hover:text-white active:scale-95"
+          >
+            <ChevronLeft className="w-5 h-5" aria-hidden="true" />
+          </Button>
+          <span className="text-[14px] text-text-muted">Back</span>
+        </div>
         {/* Avatar + Subscribe Row */}
-        <div className="flex items-end justify-between -mt-14 mb-4">
+        <div className="flex items-end justify-between -mt-14 md:-mt-10 mb-4">
           <Avatar className="w-24 h-24 md:w-28 md:h-28 border-4 border-bg-base rounded-full ring-2 ring-white/10 shadow-xl flex-shrink-0">
             <AvatarImage
               src={creatorProfile.avatar_url || DEFAULT_AVATAR_CREATOR}
@@ -565,6 +580,7 @@ export default function CreatorProfilePage() {
                     post={post}
                     isUnlocked={postViewStates.get(post.id) === true}
                     currentUserId={currentUserId}
+                    onUnlock={() => setShowSubscribeModal(true)}
                   />
                 ))}
               </div>

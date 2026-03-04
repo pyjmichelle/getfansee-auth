@@ -15,6 +15,7 @@ import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 import { type Post } from "@/lib/types";
 import Link from "next/link";
 import { ArrowLeft, Share2, Lock, MessageCircle, MoreVertical, CheckCircle2 } from "@/lib/icons";
+import { ShareModal } from "@/components/share-modal";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { Analytics } from "@/lib/analytics";
@@ -137,6 +138,8 @@ export default function PostDetailPage() {
   } | null>(null);
   const [canView, setCanView] = useState(false);
   const [showPaywallModal, setShowPaywallModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
   const socialUnlockCount = useCountUp(0, { duration: 900, decimals: 0 });
 
@@ -239,17 +242,20 @@ export default function PostDetailPage() {
         const isFree = data.post.visibility === "free";
         setCanView(isCreator || isFree || data.canView || false);
 
-        // Fetch related posts from same creator
+        // Fetch related posts + subscription status in parallel
         if (data.post.creator_id) {
-          try {
-            const relRes = await fetch(`/api/creator/${data.post.creator_id}/posts`);
-            if (relRes.ok) {
-              const relData = await relRes.json();
-              const others = (relData.posts || []).filter((p: Post) => p.id !== postId).slice(0, 6);
-              setRelatedPosts(others);
-            }
-          } catch {
-            // silently ignore
+          const [relRes, subRes] = await Promise.allSettled([
+            fetch(`/api/creator/${data.post.creator_id}/posts`),
+            fetch(`/api/subscriptions/status?creatorId=${data.post.creator_id}`),
+          ]);
+          if (relRes.status === "fulfilled" && relRes.value.ok) {
+            const relData = await relRes.value.json();
+            const others = (relData.posts || []).filter((p: Post) => p.id !== postId).slice(0, 6);
+            setRelatedPosts(others);
+          }
+          if (subRes.status === "fulfilled" && subRes.value.ok) {
+            const subData = await subRes.value.json();
+            setIsSubscribed(subData.isSubscribed === true);
           }
         }
 
@@ -271,13 +277,7 @@ export default function PostDetailPage() {
   }, [postId, router]);
 
   const handleShare = () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      navigator.share({ title: post?.title || "Check out this post", url });
-    } else {
-      navigator.clipboard.writeText(url);
-      toast.success("Link copied to clipboard");
-    }
+    setShowShareModal(true);
   };
 
   const refetchCanView = async () => {
@@ -295,7 +295,7 @@ export default function PostDetailPage() {
     return (
       <PageShell user={currentUser} notificationCount={0} noPadding>
         <div data-testid="post-detail-page">
-          <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-border-base">
+          <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-border-base md:hidden">
             <div className="flex items-center justify-center px-4 h-14">
               <h1 className="font-semibold text-text-primary">Post</h1>
             </div>
@@ -310,7 +310,7 @@ export default function PostDetailPage() {
     return (
       <PageShell user={currentUser} notificationCount={0} noPadding>
         <div data-testid="post-page-error">
-          <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-border-base">
+          <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-border-base md:hidden">
             <div className="flex items-center px-4 h-14">
               <Button
                 variant="ghost"
@@ -341,8 +341,8 @@ export default function PostDetailPage() {
   return (
     <PageShell user={currentUser} notificationCount={0} noPadding>
       <div data-testid="page-ready">
-        {/* Fixed Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-white/6">
+        {/* Mobile-only Fixed Header */}
+        <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-white/6 md:hidden">
           <div className="flex items-center justify-between px-4 h-14 max-w-3xl mx-auto">
             <Button
               variant="ghost"
@@ -367,7 +367,31 @@ export default function PostDetailPage() {
         </header>
 
         {/* Single-column content */}
-        <div className="pt-14 max-w-3xl mx-auto px-4 md:px-6 pb-28">
+        <div className="pt-14 md:pt-4 max-w-3xl mx-auto px-4 md:px-6 pb-28">
+          {/* Desktop inline back row */}
+          <div className="hidden md:flex items-center gap-3 mb-3">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => router.back()}
+              aria-label="Go back"
+              className="text-white/70 hover:text-white active:scale-95"
+            >
+              <ArrowLeft className="w-5 h-5" aria-hidden="true" />
+            </Button>
+            <span className="text-[14px] text-text-muted">Back</span>
+            <div className="ml-auto">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={handleShare}
+                aria-label="Share"
+                className="text-white/70 hover:text-white active:scale-95"
+              >
+                <MoreVertical className="w-5 h-5" aria-hidden="true" />
+              </Button>
+            </div>
+          </div>
           <article className="py-4">
             {/* Creator Info Row */}
             <div className="flex items-center gap-3 mb-4">
@@ -401,16 +425,26 @@ export default function PostDetailPage() {
                   )}
                 </p>
               </div>
-              {!isCreator && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rounded-full h-7 px-3.5 text-[12px] shrink-0"
-                  onClick={() => router.push(`/creator/${post.creator_id}`)}
-                >
-                  Follow
-                </Button>
-              )}
+              {!isCreator &&
+                (isSubscribed ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full h-7 px-3.5 text-[12px] shrink-0 border-violet-500/40 text-violet-300"
+                    disabled
+                  >
+                    ✓ Subscribed
+                  </Button>
+                ) : (
+                  <Button
+                    variant="violet"
+                    size="sm"
+                    className="rounded-full h-7 px-3.5 text-[12px] shrink-0"
+                    onClick={() => setShowPaywallModal(true)}
+                  >
+                    Subscribe
+                  </Button>
+                ))}
             </div>
 
             {/* Text Content */}
@@ -541,6 +575,13 @@ export default function PostDetailPage() {
           </article>
         </div>
 
+        <ShareModal
+          open={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          url={typeof window !== "undefined" ? window.location.href : ""}
+          title={post?.title || post?.content?.slice(0, 80) || "Check out this post on GetFanSee"}
+        />
+
         {post && (
           <PaywallModal
             open={showPaywallModal}
@@ -558,6 +599,7 @@ export default function PostDetailPage() {
             contentPreview={post.title || undefined}
             onSuccess={async () => {
               setShowPaywallModal(false);
+              if (post.visibility === "subscribers") setIsSubscribed(true);
               await refetchCanView();
             }}
           />
