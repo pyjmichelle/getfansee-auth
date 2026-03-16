@@ -179,7 +179,10 @@ function PostCard({
 
           {/* Lock overlay */}
           {shouldBlur && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50">
+            <div
+              className="absolute inset-0 flex flex-col items-center justify-center bg-black/50"
+              data-testid="post-locked-preview"
+            >
               <div className="flex items-center gap-1.5 mb-4 px-2.5 py-1 rounded-full bg-violet-500/15 border border-violet-500/30">
                 <Sparkles className="size-[11px] text-violet-400" />
                 <span className="text-[10px] font-bold text-violet-400 tracking-widest uppercase">
