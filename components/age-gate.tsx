@@ -13,10 +13,13 @@ const EXEMPT_ROUTES = [
   "/terms",
   "/privacy",
   "/dmca",
-  "/auth",
+  // /auth (login/register) is intentionally NOT exempt — age gate must fire on first visit.
+  // Only deep sub-routes that arrive via external links (email, OAuth) are exempt.
   "/auth/verify",
   "/auth/error",
   "/auth/resend-verification",
+  "/auth/forgot-password",
+  "/auth/reset-password",
 ];
 
 interface AgeGateProps {
