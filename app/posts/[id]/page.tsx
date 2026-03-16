@@ -167,14 +167,8 @@ export default function PostDetailPage() {
 
         const bootstrap = await getAuthBootstrap();
         if (!bootstrap.authenticated || !bootstrap.user) {
-          if (isTestMode) {
-            // Fallback: show mock unlocked post
-            const fallback = PAGE_MOCK_POSTS["mock-post-1"];
-            setCurrentUser({ id: "mock-fan-user", username: "test-user", role: "fan" });
-            setPost(fallback.post);
-            setCanView(true);
-            return;
-          }
+          // Redirect to auth — even in test mode, unauthenticated users must log in.
+          // Setting canView(true) here was masking real auth failures in E2E tests.
           router.push("/auth");
           return;
         }
@@ -205,12 +199,6 @@ export default function PostDetailPage() {
             setRelatedPosts(others.map((p) => ({ ...p, creator: mockCreator }) as Post));
             return;
           }
-          if (isTestMode) {
-            const fallback = PAGE_MOCK_POSTS["mock-post-1"];
-            setPost(fallback.post);
-            setCanView(true);
-            return;
-          }
           throw new Error("Failed to load post");
         }
 
@@ -225,12 +213,6 @@ export default function PostDetailPage() {
               creator: mockCreator,
             } as Post);
             setCanView(mockPost.visibility === "free");
-            return;
-          }
-          if (isTestMode) {
-            const fallback = PAGE_MOCK_POSTS["mock-post-1"];
-            setPost(fallback.post);
-            setCanView(true);
             return;
           }
           throw new Error(data.error || "Failed to load post");

@@ -49,7 +49,7 @@ export default function WalletPage() {
   const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === "true";
   const [isLoading, setIsLoading] = useState(true);
   // 测试模式下预填 mock 数据，避免异步加载延迟导致截图为空
-  const [availableBalance, setAvailableBalance] = useState<number>(isTestMode ? 28.5 : 0);
+  const [availableBalance, setAvailableBalance] = useState<number>(0);
   const [transactions, setTransactions] = useState<Transaction[]>(
     isTestMode
       ? [
@@ -144,9 +144,10 @@ export default function WalletPage() {
             if (balanceData !== null && balanceData.available !== undefined) {
               setAvailableBalance(balanceData.available);
             } else if (isTestMode) {
-              // 测试模式：使用 Mock 余额和交易记录（让页面有内容可展示）
+              // Test mode: no real wallet record found → show $0 balance.
+              // E2E tests rely on this to verify zero-balance scenarios.
               if (!mounted) return;
-              setAvailableBalance(28.5);
+              setAvailableBalance(0);
               setTransactions([
                 {
                   id: "mock-tx-1",
