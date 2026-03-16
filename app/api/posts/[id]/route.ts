@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
+import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getCurrentUser } from "@/lib/auth-server";
 import { resolveSubscriptionUserColumn } from "@/lib/subscriptions";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const supabase = await createClient();
+    // Use admin client to fetch the post so that RLS does not block reading PPV/subscriber
+    // post metadata before the user has purchased/subscribed. Access control (canView) is
+    // applied explicitly below; sensitive content fields are stripped when !canView.
+    const adminSupabase = getSupabaseAdminClient();
+    const supabase = await createClient(); // kept for RLS-scoped access checks (purchases, subscriptions)
     const resolvedParams = await params;
     const postId = resolvedParams.id;
 
@@ -16,8 +21,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    // 获取帖子详情（包含创作者信息）
-    const { data: post, error: postError } = await supabase
+    // 获取帖子详情（包含创作者信息）— admin client bypasses RLS so fans can
+    // see PPV post metadata (title, preview) even before purchasing.
+    const { data: post, error: postError } = await adminSupabase
       .from("posts")
       .select(
         `
