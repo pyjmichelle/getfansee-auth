@@ -9,6 +9,7 @@ import "server-only";
  */
 
 import { getSupabaseServerClient } from "./supabase-server";
+import { getSupabaseAdminClient } from "./supabase-admin";
 import { getCurrentUser } from "./auth-server";
 import { getProfile } from "./profile-server";
 import { getVisitorCountry, isCountryBlocked } from "./geo-utils";
@@ -154,7 +155,9 @@ export async function listCreatorPosts(
   visitorCountry?: string | null
 ): Promise<Post[]> {
   try {
-    const supabase = await getSupabaseServerClient();
+    // Use admin client to bypass RLS — creator profile pages must show all
+    // posts (with lock overlays) even to fans who haven't subscribed/purchased.
+    const supabase = getSupabaseAdminClient();
     // 如果没有提供访客国家，尝试从 headers 获取
     if (visitorCountry === undefined) {
       visitorCountry = await getVisitorCountry();
@@ -350,7 +353,12 @@ export async function listFeed(
   visitorCountry?: string | null
 ): Promise<Post[]> {
   try {
-    const supabase = await getSupabaseServerClient();
+    // Use admin client to bypass RLS — the feed must surface all posts (with
+    // lock overlays for gated content). The strict `posts_select_visible` RLS
+    // policy (migration 013/033) would otherwise hide any subscribers/PPV post
+    // from fans who haven't yet subscribed or purchased, making the feed empty.
+    // Application-level access control (canViewPost) is applied separately.
+    const adminSupabase = getSupabaseAdminClient();
     const user = await getCurrentUser();
     const userId = user?.id || null;
 
@@ -360,7 +368,7 @@ export async function listFeed(
     }
 
     // 查询 posts（creator 信息通过 public_creator_profiles 二次查询，避免直接依赖 profiles 表）
-    const { data, error } = await supabase
+    const { data, error } = await adminSupabase
       .from("posts")
       .select(
         `
@@ -403,15 +411,21 @@ export async function listFeed(
     }
     const rawPosts = (data || []) as PostWithProfile[];
     const creatorIds = Array.from(new Set(rawPosts.map((item) => item.creator_id)));
+    interface CreatorProfileRow {
+      id: string;
+      display_name: string | null;
+      avatar_url: string | null;
+      blocked_countries: string[] | null;
+    }
     const { data: creatorProfiles } =
       creatorIds.length > 0
-        ? await supabase
+        ? await adminSupabase
             .from("public_creator_profiles")
             .select("id, display_name, avatar_url, blocked_countries")
             .in("id", creatorIds)
-        : { data: [] };
+        : { data: [] as CreatorProfileRow[] };
     const creatorProfileMap = new Map(
-      (creatorProfiles || []).map((profile) => [profile.id, profile])
+      ((creatorProfiles || []) as CreatorProfileRow[]).map((profile) => [profile.id, profile])
     );
 
     let filteredData = rawPosts.filter((item: PostWithProfile) => {
@@ -529,8 +543,8 @@ export async function listFeed(
         watermark_enabled: item.watermark_enabled !== undefined ? item.watermark_enabled : true,
         created_at: item.created_at,
         creator: {
-          display_name: creatorProfileMap.get(item.creator_id)?.display_name,
-          avatar_url: creatorProfileMap.get(item.creator_id)?.avatar_url,
+          display_name: creatorProfileMap.get(item.creator_id)?.display_name ?? undefined,
+          avatar_url: creatorProfileMap.get(item.creator_id)?.avatar_url ?? undefined,
         },
       };
 

@@ -88,21 +88,12 @@ export function PaywallModal({
         const wallet = await getWalletBalance(user.id);
         if (!mounted) return;
         const available = wallet?.available ?? 0;
-        // E2E/test 环境下钱包常为 0，若不做回退则 insufficientBalance 为 true，解锁按钮一直 disabled
-        const displayBalance = isTestMode && available === 0 ? Math.max(price, 50) : available;
-        setBalance(displayBalance);
-        if (isTestMode && available === 0) {
-          setBalanceError(null);
-        }
+        setBalance(available);
       } catch (err) {
         console.error("[PaywallModal] Failed to load wallet balance:", err);
         if (mounted) {
           setBalance(null);
           setBalanceError("Unable to load balance");
-          if (isTestMode) {
-            setBalance(Math.max(price, 50));
-            setBalanceError(null);
-          }
         }
       } finally {
         if (mounted) {

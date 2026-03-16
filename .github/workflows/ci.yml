@@ -283,6 +283,26 @@ jobs:
           fi
           echo "✅ Test-mode sanity check passed (ping=200)"
 
+      - name: Verify / apply migration 036 (unlock_ppv price_cents fix)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          echo "Checking unlock_ppv function deployment status..."
+          pnpm tsx scripts/apply-migration-036.ts || {
+            echo ""
+            echo "❌ CRITICAL: unlock_ppv DB function needs migration 036 applied."
+            echo "   PPV purchase tests WILL fail until this is resolved."
+            echo ""
+            echo "   Option A (recommended): Add SUPABASE_ACCESS_TOKEN secret to GitHub repo"
+            echo "     and re-run CI — the script will apply the fix automatically."
+            echo ""
+            echo "   Option B (manual): Open the Supabase dashboard SQL editor and run:"
+            echo "     migrations/036_fix_unlock_ppv_price_cents.sql"
+            echo ""
+            echo "   Continuing with E2E tests (they will fail on unlock_ppv-dependent tests)."
+          }
+          true  # Do not block CI here; let the E2E step show the actual failures
+
       - name: Run E2E (chromium)
         env:
           PLAYWRIGHT_SKIP_SERVER: "true"

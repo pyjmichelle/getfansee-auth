@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/authz";
 import { jsonError } from "@/lib/http-errors";
-import { getSupabaseAdminClient } from "@/lib/supabase-admin";
+import { createClient } from "@/lib/supabase-server";
 
 type RechargePayload = {
   amount: number; // 美元金额
@@ -20,7 +20,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Invalid amount" }, { status: 400 });
     }
 
-    const supabase = getSupabaseAdminClient();
+    // Use the user's server client (NOT admin) so that auth.uid() is set correctly.
+    // recharge_wallet checks auth.uid() == p_user_id; the admin client has no auth.uid().
+    const supabase = await createClient();
     const amountCents = Math.round(amount * 100);
     // 幂等键：优先取请求头，否则生成新 UUID
     const idempotencyKey = request.headers.get("Idempotency-Key") ?? randomUUID();
