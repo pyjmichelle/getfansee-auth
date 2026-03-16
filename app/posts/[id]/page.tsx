@@ -340,270 +340,272 @@ export default function PostDetailPage() {
 
   return (
     <PageShell user={currentUser} notificationCount={0} noPadding>
-      <div data-testid="page-ready">
-        {/* Mobile-only Fixed Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-white/6 md:hidden">
-          <div className="flex items-center justify-between px-4 h-14 max-w-3xl mx-auto">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => router.back()}
-              aria-label="Go back"
-              className="text-white active:scale-95"
-            >
-              <ArrowLeft className="w-5 h-5" aria-hidden="true" />
-            </Button>
-            <h1 className="font-semibold text-white">Post</h1>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={handleShare}
-              aria-label="More options"
-              className="text-white active:scale-95"
-            >
-              <MoreVertical className="w-5 h-5" aria-hidden="true" />
-            </Button>
-          </div>
-        </header>
-
-        {/* Single-column content */}
-        <div className="pt-14 md:pt-4 max-w-3xl mx-auto px-4 md:px-6 pb-28">
-          {/* Desktop inline back row */}
-          <div className="hidden md:flex items-center gap-3 mb-3">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => router.back()}
-              aria-label="Go back"
-              className="text-white/70 hover:text-white active:scale-95"
-            >
-              <ArrowLeft className="w-5 h-5" aria-hidden="true" />
-            </Button>
-            <span className="text-[14px] text-text-muted">Back</span>
-            <div className="ml-auto">
+      <div data-testid="post-page">
+        <div data-testid="page-ready">
+          {/* Mobile-only Fixed Header */}
+          <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-white/6 md:hidden">
+            <div className="flex items-center justify-between px-4 h-14 max-w-3xl mx-auto">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => router.back()}
+                aria-label="Go back"
+                className="text-white active:scale-95"
+              >
+                <ArrowLeft className="w-5 h-5" aria-hidden="true" />
+              </Button>
+              <h1 className="font-semibold text-white">Post</h1>
               <Button
                 variant="ghost"
                 size="icon-sm"
                 onClick={handleShare}
-                aria-label="Share"
-                className="text-white/70 hover:text-white active:scale-95"
+                aria-label="More options"
+                className="text-white active:scale-95"
               >
                 <MoreVertical className="w-5 h-5" aria-hidden="true" />
               </Button>
             </div>
-          </div>
-          <article className="py-4">
-            {/* Creator Info Row */}
-            <div className="flex items-center gap-3 mb-4">
-              <Link href={`/creator/${post.creator_id}`} className="shrink-0">
-                <Avatar className="w-10 h-10 cursor-pointer ring-2 ring-transparent hover:ring-violet-500/30 transition-all">
-                  <AvatarImage
-                    src={post.creator?.avatar_url || DEFAULT_AVATAR_CREATOR}
-                    alt={post.creator?.display_name || "Creator"}
-                  />
-                  <AvatarFallback className="bg-violet-500/20 text-violet-300 text-sm font-semibold">
-                    {post.creator?.display_name?.[0]?.toUpperCase() || "C"}
-                  </AvatarFallback>
-                </Avatar>
-              </Link>
-              <div className="flex-1 min-w-0">
-                <Link href={`/creator/${post.creator_id}`}>
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="font-semibold text-white text-[14px] hover:text-violet-300 transition-colors">
-                      {post.creator?.display_name || "Creator"}
-                    </span>
-                    <CheckCircle2 size={13} className="text-violet-400" aria-hidden="true" />
-                  </span>
-                </Link>
-                <p className="text-[12px] text-text-muted">
-                  {creatorUsername}
-                  {post.created_at && (
-                    <>
-                      {" · "}
-                      {formatDistanceToNow(new Date(post.created_at), { addSuffix: false })} ago
-                    </>
-                  )}
-                </p>
-              </div>
-              {!isCreator &&
-                (isSubscribed ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="rounded-full h-7 px-3.5 text-[12px] shrink-0 border-violet-500/40 text-violet-300"
-                    disabled
-                  >
-                    ✓ Subscribed
-                  </Button>
-                ) : (
-                  <Button
-                    variant="violet"
-                    size="sm"
-                    className="rounded-full h-7 px-3.5 text-[12px] shrink-0"
-                    onClick={() => setShowPaywallModal(true)}
-                  >
-                    Subscribe
-                  </Button>
-                ))}
-            </div>
+          </header>
 
-            {/* Text Content */}
-            {post.content && canView && (
-              <p
-                className="text-[14px] text-text-secondary leading-relaxed whitespace-pre-wrap mb-4"
-                data-testid="post-content"
+          {/* Single-column content */}
+          <div className="pt-14 md:pt-4 max-w-3xl mx-auto px-4 md:px-6 pb-28">
+            {/* Desktop inline back row */}
+            <div className="hidden md:flex items-center gap-3 mb-3">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => router.back()}
+                aria-label="Go back"
+                className="text-white/70 hover:text-white active:scale-95"
               >
-                {post.content}
-              </p>
-            )}
-
-            {/* Media */}
-            <div className="rounded-2xl overflow-hidden mb-3 bg-black" data-testid="post-media">
-              <MediaDisplay
-                post={post}
-                canView={canView || isCreator}
-                isCreator={isCreator}
-                onSubscribe={() => setShowPaywallModal(true)}
-                onUnlock={() => setShowPaywallModal(true)}
-                creatorDisplayName={post.creator?.display_name}
-              />
-            </div>
-
-            {/* Locked State */}
-            {!canView && !isCreator && (
-              <div
-                className="glass-card rounded-[var(--radius-md)] px-6 py-10 text-center mb-4"
-                data-testid="post-locked-overlay"
-              >
-                <div className="size-16 mx-auto mb-4 bg-violet-500/10 rounded-full flex items-center justify-center border border-violet-500/20 shadow-glow-violet">
-                  <Lock size={28} className="text-violet-400" aria-hidden="true" />
-                </div>
-                <h3 className="text-[16px] font-semibold mb-2 text-white">Premium Content</h3>
-                <p className="text-[13px] text-text-muted mb-2 max-w-sm mx-auto">
-                  {post.visibility === "subscribers"
-                    ? "This exclusive content is available for subscribers only"
-                    : `Unlock this content for $${((post.price_cents || 0) / 100).toFixed(2)}`}
-                </p>
-                <p className="text-[12px] text-text-secondary mb-6">
-                  <span className="font-bold text-amber-400">{socialUnlockCount.toFixed(0)}</span>{" "}
-                  people already unlocked this content.
-                </p>
+                <ArrowLeft className="w-5 h-5" aria-hidden="true" />
+              </Button>
+              <span className="text-[14px] text-text-muted">Back</span>
+              <div className="ml-auto">
                 <Button
-                  variant={post.visibility === "subscribers" ? "violet" : "gold"}
-                  size="lg"
-                  className="px-8 shadow-glow-violet active:scale-95"
-                  data-testid={
-                    post.visibility === "subscribers"
-                      ? "post-subscribe-button"
-                      : "post-unlock-button"
-                  }
-                  onClick={() => setShowPaywallModal(true)}
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={handleShare}
+                  aria-label="Share"
+                  className="text-white/70 hover:text-white active:scale-95"
                 >
-                  <Lock size={16} className="mr-1.5" />
-                  {post.visibility === "subscribers" ? "Subscribe to Unlock" : "Unlock Now"}
+                  <MoreVertical className="w-5 h-5" aria-hidden="true" />
                 </Button>
               </div>
-            )}
-
-            {/* Actions Bar */}
-            <div className="flex items-center gap-3 py-2 border-t border-white/6 mb-1">
-              {currentUser && (
-                <PostLikeButton
-                  postId={post.id}
-                  initialLikesCount={post.likes_count || 0}
-                  userId={currentUser.id}
-                />
-              )}
-              <button
-                className="flex items-center gap-1.5 text-text-muted hover:text-white transition-colors text-[13px] cursor-pointer focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:rounded"
-                onClick={() => {
-                  document
-                    .getElementById("comment-section")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-                aria-label="View comments"
-              >
-                <MessageCircle size={18} aria-hidden="true" />
-                <span>{post.likes_count || 0}</span>
-              </button>
-              <button
-                className="flex items-center gap-1.5 text-text-muted hover:text-white transition-colors text-[13px] cursor-pointer focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:rounded"
-                onClick={handleShare}
-                aria-label="Share"
-              >
-                <Share2 size={18} aria-hidden="true" />
-              </button>
-              <Button
-                variant="tip-gradient"
-                size="sm"
-                className="ml-auto rounded-full px-4 h-8 gap-1.5 active:scale-95 font-semibold"
-                onClick={() => toast.info("Tip feature coming soon!")}
-              >
-                <span className="text-[13px]">Tip</span>
-              </Button>
             </div>
-
-            {/* Like count */}
-            <p className="text-[13px] font-semibold text-white mb-3">
-              {post.likes_count || 0} likes
-            </p>
-
-            {/* Comments Section */}
-            <div id="comment-section" className="border-t border-white/6 pt-3">
-              {currentUser && (
-                <CommentList
-                  postId={postId}
-                  currentUserId={currentUser.id}
-                  canComment={canView || isCreator}
-                />
-              )}
-            </div>
-
-            {/* More from creator */}
-            {relatedPosts.length > 0 && (
-              <div className="mt-8 border-t border-white/6 pt-6">
-                <h3 className="text-[14px] font-semibold text-white mb-3">
-                  More from {creatorUsername}
-                </h3>
-                <div className="grid grid-cols-3 gap-0.5">
-                  {relatedPosts.map((rp) => (
-                    <PostGridItem key={rp.id} post={rp} currentUserId={currentUser?.id} />
-                  ))}
+            <article className="py-4">
+              {/* Creator Info Row */}
+              <div className="flex items-center gap-3 mb-4">
+                <Link href={`/creator/${post.creator_id}`} className="shrink-0">
+                  <Avatar className="w-10 h-10 cursor-pointer ring-2 ring-transparent hover:ring-violet-500/30 transition-all">
+                    <AvatarImage
+                      src={post.creator?.avatar_url || DEFAULT_AVATAR_CREATOR}
+                      alt={post.creator?.display_name || "Creator"}
+                    />
+                    <AvatarFallback className="bg-violet-500/20 text-violet-300 text-sm font-semibold">
+                      {post.creator?.display_name?.[0]?.toUpperCase() || "C"}
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
+                <div className="flex-1 min-w-0">
+                  <Link href={`/creator/${post.creator_id}`}>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="font-semibold text-white text-[14px] hover:text-violet-300 transition-colors">
+                        {post.creator?.display_name || "Creator"}
+                      </span>
+                      <CheckCircle2 size={13} className="text-violet-400" aria-hidden="true" />
+                    </span>
+                  </Link>
+                  <p className="text-[12px] text-text-muted">
+                    {creatorUsername}
+                    {post.created_at && (
+                      <>
+                        {" · "}
+                        {formatDistanceToNow(new Date(post.created_at), { addSuffix: false })} ago
+                      </>
+                    )}
+                  </p>
                 </div>
+                {!isCreator &&
+                  (isSubscribed ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full h-7 px-3.5 text-[12px] shrink-0 border-violet-500/40 text-violet-300"
+                      disabled
+                    >
+                      ✓ Subscribed
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="violet"
+                      size="sm"
+                      className="rounded-full h-7 px-3.5 text-[12px] shrink-0"
+                      onClick={() => setShowPaywallModal(true)}
+                    >
+                      Subscribe
+                    </Button>
+                  ))}
               </div>
-            )}
-          </article>
-        </div>
 
-        <ShareModal
-          open={showShareModal}
-          onClose={() => setShowShareModal(false)}
-          url={typeof window !== "undefined" ? window.location.href : ""}
-          title={post?.title || post?.content?.slice(0, 80) || "Check out this post on GetFanSee"}
-        />
+              {/* Text Content */}
+              {post.content && canView && (
+                <p
+                  className="text-[14px] text-text-secondary leading-relaxed whitespace-pre-wrap mb-4"
+                  data-testid="post-content"
+                >
+                  {post.content}
+                </p>
+              )}
 
-        {post && (
-          <PaywallModal
-            open={showPaywallModal}
-            onOpenChange={setShowPaywallModal}
-            type={post.visibility === "subscribers" ? "subscribe" : "ppv"}
-            creatorName={post.creator?.display_name || "Creator"}
-            price={post.visibility === "ppv" ? (post.price_cents ?? 0) / 100 : 9.99}
-            benefits={
-              post.visibility === "subscribers"
-                ? ["Exclusive content", "Direct support", "Early access"]
-                : ["Instant access to this post", "Unlock all media"]
-            }
-            postId={post.visibility === "ppv" ? post.id : undefined}
-            creatorId={post.creator_id}
-            contentPreview={post.title || undefined}
-            onSuccess={async () => {
-              setShowPaywallModal(false);
-              if (post.visibility === "subscribers") setIsSubscribed(true);
-              await refetchCanView();
-            }}
+              {/* Media */}
+              <div className="rounded-2xl overflow-hidden mb-3 bg-black" data-testid="post-media">
+                <MediaDisplay
+                  post={post}
+                  canView={canView || isCreator}
+                  isCreator={isCreator}
+                  onSubscribe={() => setShowPaywallModal(true)}
+                  onUnlock={() => setShowPaywallModal(true)}
+                  creatorDisplayName={post.creator?.display_name}
+                />
+              </div>
+
+              {/* Locked State */}
+              {!canView && !isCreator && (
+                <div
+                  className="glass-card rounded-[var(--radius-md)] px-6 py-10 text-center mb-4"
+                  data-testid="post-locked-overlay"
+                >
+                  <div className="size-16 mx-auto mb-4 bg-violet-500/10 rounded-full flex items-center justify-center border border-violet-500/20 shadow-glow-violet">
+                    <Lock size={28} className="text-violet-400" aria-hidden="true" />
+                  </div>
+                  <h3 className="text-[16px] font-semibold mb-2 text-white">Premium Content</h3>
+                  <p className="text-[13px] text-text-muted mb-2 max-w-sm mx-auto">
+                    {post.visibility === "subscribers"
+                      ? "This exclusive content is available for subscribers only"
+                      : `Unlock this content for $${((post.price_cents || 0) / 100).toFixed(2)}`}
+                  </p>
+                  <p className="text-[12px] text-text-secondary mb-6">
+                    <span className="font-bold text-amber-400">{socialUnlockCount.toFixed(0)}</span>{" "}
+                    people already unlocked this content.
+                  </p>
+                  <Button
+                    variant={post.visibility === "subscribers" ? "violet" : "gold"}
+                    size="lg"
+                    className="px-8 shadow-glow-violet active:scale-95"
+                    data-testid={
+                      post.visibility === "subscribers"
+                        ? "post-subscribe-button"
+                        : "post-unlock-button"
+                    }
+                    onClick={() => setShowPaywallModal(true)}
+                  >
+                    <Lock size={16} className="mr-1.5" />
+                    {post.visibility === "subscribers" ? "Subscribe to Unlock" : "Unlock Now"}
+                  </Button>
+                </div>
+              )}
+
+              {/* Actions Bar */}
+              <div className="flex items-center gap-3 py-2 border-t border-white/6 mb-1">
+                {currentUser && (
+                  <PostLikeButton
+                    postId={post.id}
+                    initialLikesCount={post.likes_count || 0}
+                    userId={currentUser.id}
+                  />
+                )}
+                <button
+                  className="flex items-center gap-1.5 text-text-muted hover:text-white transition-colors text-[13px] cursor-pointer focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:rounded"
+                  onClick={() => {
+                    document
+                      .getElementById("comment-section")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  aria-label="View comments"
+                >
+                  <MessageCircle size={18} aria-hidden="true" />
+                  <span>{post.likes_count || 0}</span>
+                </button>
+                <button
+                  className="flex items-center gap-1.5 text-text-muted hover:text-white transition-colors text-[13px] cursor-pointer focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:rounded"
+                  onClick={handleShare}
+                  aria-label="Share"
+                >
+                  <Share2 size={18} aria-hidden="true" />
+                </button>
+                <Button
+                  variant="tip-gradient"
+                  size="sm"
+                  className="ml-auto rounded-full px-4 h-8 gap-1.5 active:scale-95 font-semibold"
+                  onClick={() => toast.info("Tip feature coming soon!")}
+                >
+                  <span className="text-[13px]">Tip</span>
+                </Button>
+              </div>
+
+              {/* Like count */}
+              <p className="text-[13px] font-semibold text-white mb-3">
+                {post.likes_count || 0} likes
+              </p>
+
+              {/* Comments Section */}
+              <div id="comment-section" className="border-t border-white/6 pt-3">
+                {currentUser && (
+                  <CommentList
+                    postId={postId}
+                    currentUserId={currentUser.id}
+                    canComment={canView || isCreator}
+                  />
+                )}
+              </div>
+
+              {/* More from creator */}
+              {relatedPosts.length > 0 && (
+                <div className="mt-8 border-t border-white/6 pt-6">
+                  <h3 className="text-[14px] font-semibold text-white mb-3">
+                    More from {creatorUsername}
+                  </h3>
+                  <div className="grid grid-cols-3 gap-0.5">
+                    {relatedPosts.map((rp) => (
+                      <PostGridItem key={rp.id} post={rp} currentUserId={currentUser?.id} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </article>
+          </div>
+
+          <ShareModal
+            open={showShareModal}
+            onClose={() => setShowShareModal(false)}
+            url={typeof window !== "undefined" ? window.location.href : ""}
+            title={post?.title || post?.content?.slice(0, 80) || "Check out this post on GetFanSee"}
           />
-        )}
+
+          {post && (
+            <PaywallModal
+              open={showPaywallModal}
+              onOpenChange={setShowPaywallModal}
+              type={post.visibility === "subscribers" ? "subscribe" : "ppv"}
+              creatorName={post.creator?.display_name || "Creator"}
+              price={post.visibility === "ppv" ? (post.price_cents ?? 0) / 100 : 9.99}
+              benefits={
+                post.visibility === "subscribers"
+                  ? ["Exclusive content", "Direct support", "Early access"]
+                  : ["Instant access to this post", "Unlock all media"]
+              }
+              postId={post.visibility === "ppv" ? post.id : undefined}
+              creatorId={post.creator_id}
+              contentPreview={post.title || undefined}
+              onSuccess={async () => {
+                setShowPaywallModal(false);
+                if (post.visibility === "subscribers") setIsSubscribed(true);
+                await refetchCanView();
+              }}
+            />
+          )}
+        </div>
       </div>
     </PageShell>
   );
