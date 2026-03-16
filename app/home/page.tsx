@@ -22,7 +22,6 @@ const getCachedFeed = cache(listFeed);
 
 export default async function HomePage() {
   const user = await getCachedUser();
-  const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === "true";
 
   if (!user) {
     redirect("/auth");
@@ -38,17 +37,24 @@ export default async function HomePage() {
   }
 
   // 4. 获取 feed 数据（使用缓存版本）
+  // Always call listFeed in E2E mode so test-created posts appear in the feed.
+  // The old guard (skip listFeed when isTestMode) caused E2E tests to see mock posts
+  // instead of real posts they just created.
   let posts: Post[] = [];
-  if (!isTestMode) {
-    try {
-      posts = await getCachedFeed(20);
-    } catch (err) {
-      console.error("[home] listFeed error", err);
-    }
+  const isE2EMode =
+    process.env.E2E === "1" ||
+    process.env.PLAYWRIGHT_TEST_MODE === "true" ||
+    process.env.NEXT_PUBLIC_TEST_MODE === "true";
+  try {
+    posts = await getCachedFeed(20);
+  } catch (err) {
+    console.error("[home] listFeed error", err);
   }
 
-  // 当 DB 为空时，在测试/开发模式下显示 Mock 数据（让首页有内容可展示）
-  const usingMockPosts = isTestMode || posts.length === 0;
+  // Use mock posts as fallback only when:
+  // 1. The database returned no posts, AND
+  // 2. We are NOT in an E2E test run (to avoid hiding freshly created test posts)
+  const usingMockPosts = !isE2EMode && posts.length === 0;
   if (usingMockPosts) {
     const creatorMap = new Map(MOCK_CREATORS.map((c) => [c.id, c]));
     posts = MOCK_POSTS.map((mp) => ({
