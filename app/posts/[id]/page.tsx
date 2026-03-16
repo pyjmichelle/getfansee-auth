@@ -246,7 +246,7 @@ export default function PostDetailPage() {
         if (data.post.creator_id) {
           const [relRes, subRes] = await Promise.allSettled([
             fetch(`/api/creator/${data.post.creator_id}/posts`),
-            fetch(`/api/subscriptions/status?creatorId=${data.post.creator_id}`),
+            fetch(`/api/subscription/status?creatorId=${data.post.creator_id}`),
           ]);
           if (relRes.status === "fulfilled" && relRes.value.ok) {
             const relData = await relRes.value.json();

@@ -1,11 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Home, Search, Plus, Bell, User } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { startRouteTransition } from "@/lib/perf-client";
+
+const NAV_ROUTES = [
+  { href: "/home", label: "Home", icon: Home, testId: "bottom-nav-home" },
+  { href: "/search", label: "Search", icon: Search, testId: "bottom-nav-search" },
+  {
+    href: "/creator/new-post",
+    label: "Create",
+    icon: Plus,
+    testId: "bottom-nav-new-post",
+    requireCreator: true,
+  },
+  { href: "/notifications", label: "Alerts", icon: Bell, testId: "bottom-nav-notifications" },
+  { href: "/me", label: "Profile", icon: User, testId: "bottom-nav-profile" },
+];
 
 interface BottomNavigationProps {
   notificationCount?: number;
@@ -16,27 +30,10 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
   const pathname = usePathname();
   const router = useRouter();
 
-  const navItems = [
-    { href: "/home", label: "Home", icon: Home, testId: "bottom-nav-home" },
-    { href: "/search", label: "Search", icon: Search, testId: "bottom-nav-search" },
-    {
-      href: "/creator/new-post",
-      label: "Create",
-      icon: Plus,
-      testId: "bottom-nav-new-post",
-      requireCreator: true,
-    },
-    {
-      href: "/notifications",
-      label: "Alerts",
-      icon: Bell,
-      testId: "bottom-nav-notifications",
-      badge: notificationCount > 0 ? notificationCount : undefined,
-    },
-    { href: "/me", label: "Profile", icon: User, testId: "bottom-nav-profile" },
-  ];
-
-  const visibleItems = navItems.filter((item) => !item.requireCreator || userRole === "creator");
+  const visibleItems = useMemo(
+    () => NAV_ROUTES.filter((item) => !item.requireCreator || userRole === "creator"),
+    [userRole]
+  );
 
   useEffect(() => {
     visibleItems.forEach((item) => router.prefetch(item.href));
@@ -91,12 +88,12 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
                   )}
                   aria-hidden="true"
                 />
-                {item.badge && (
+                {item.href === "/notifications" && notificationCount > 0 && (
                   <span
                     className="absolute -top-1.5 -right-2 h-[16px] min-w-[16px] flex items-center justify-center rounded-full bg-violet-500 text-white text-[9px] font-bold px-0.5"
-                    aria-label={`${item.badge} unread`}
+                    aria-label={`${notificationCount} unread`}
                   >
-                    {item.badge > 9 ? "9+" : item.badge}
+                    {notificationCount > 9 ? "9+" : notificationCount}
                   </span>
                 )}
               </div>

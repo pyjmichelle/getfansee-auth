@@ -196,27 +196,26 @@ export async function signInWithEmail(email: string, password: string) {
 
     if (error) {
       console.error("[auth] signInWithPassword error:", error);
-      // 确保错误信息被正确传递
-      const authError: AuthError = new Error(error.message || "登录失败");
+      const authError: AuthError = new Error(error.message || "Sign in failed");
       authError.code = error.status ? String(error.status) : error.name;
       authError.error_description = error.message;
       throw authError;
     }
 
-    // 登录后一定有 session，返回完整数据
     if (!data?.session) {
       console.warn("[auth] signInWithPassword: No session returned");
-      throw new Error("登录成功但未返回会话，请重试");
+      throw new Error("Sign in succeeded but no session was returned. Please try again.");
     }
 
     return data;
   } catch (err: unknown) {
-    // 如果是网络错误，包装成更友好的错误
     if (
       err instanceof Error &&
       (err.message.includes("Failed to fetch") || err.name === "NetworkError")
     ) {
-      const networkError: AuthError = new Error("网络连接失败，请检查网络连接或稍后重试");
+      const networkError: AuthError = new Error(
+        "Network error. Please check your connection and try again."
+      );
       networkError.code = "network_error";
       throw networkError;
     }

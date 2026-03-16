@@ -73,6 +73,9 @@ export default function VerifyPageClient({ query }: VerifyPageClientProps) {
         const hashError = hashParams.error;
         const hashErrorCode = hashParams.error_code;
         const hashErrorDescription = hashParams.error_description;
+        // Legacy implicit flow: Supabase puts access_token directly in hash
+        const hashAccessToken = hashParams.access_token;
+        const hashRefreshToken = hashParams.refresh_token;
 
         // 3. 合并参数（query string 优先）
         const code = queryCode || hashCode;
@@ -122,7 +125,38 @@ export default function VerifyPageClient({ query }: VerifyPageClientProps) {
           return;
         }
 
-        // 5. 优先处理 code（邮箱验证的新格式，Supabase 推荐）
+        // 5a. Legacy implicit flow: hash contains access_token + refresh_token
+        // generateLink() and some older Supabase configurations redirect with #access_token=...
+        if (hashAccessToken && hashRefreshToken) {
+          devLog("Processing legacy implicit flow (hash access_token)");
+          const { data: sessionData, error: setSessionError } = await supabase.auth.setSession({
+            access_token: hashAccessToken,
+            refresh_token: hashRefreshToken,
+          });
+
+          if (setSessionError) {
+            console.error("[verify] setSession error:", setSessionError);
+            setStatus("error");
+            setMessage("Verification failed. The link may have expired. Please request a new one.");
+            setCanResend(true);
+            return;
+          }
+
+          if (sessionData?.session?.user) {
+            devLog("Implicit flow session set, user:", sessionData.session.user.email);
+            await syncSessionCookies(sessionData.session);
+            await ensureProfile();
+            router.replace("/home");
+            return;
+          }
+
+          setStatus("error");
+          setMessage("Verification completed, but session not found. Please try logging in.");
+          setCanResend(true);
+          return;
+        }
+
+        // 5b. 处理 code（邮箱验证的新格式，Supabase PKCE 推荐）
         if (code) {
           devLog("Processing code exchange");
           const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);

@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { TabsContent } from "@/components/ui/tabs";
 // CenteredContainer no longer needed - using Figma max-w layout
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-// 所有服务器端函数都通过 API 调用，不直接导入
+import { signOut } from "@/lib/auth";
 import { uploadAvatar } from "@/lib/storage";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -100,7 +100,15 @@ export default function ProfilePage() {
     try {
       const avatarUrl = await uploadAvatar(file, currentUserId);
       setAvatar(avatarUrl);
-      toast.success("Avatar uploaded successfully");
+
+      // Auto-save immediately so the change persists without requiring "Save Changes"
+      await fetch("/api/profile/general", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatar_url: avatarUrl }),
+      });
+
+      toast.success("Avatar updated successfully");
     } catch (err: unknown) {
       console.error("[me] avatar upload error:", err);
       const message = err instanceof Error ? err.message : "Failed to upload avatar";
@@ -253,7 +261,8 @@ export default function ProfilePage() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await fetch("/api/auth/session", { method: "DELETE" });
+    await signOut();
     router.push("/auth");
   };
 
@@ -412,7 +421,7 @@ export default function ProfilePage() {
                         </AvatarFallback>
                       </Avatar>
                       {isEditing ? (
-                        <label className="absolute inset-0 cursor-pointer rounded-full bg-black/60 opacity-0 transition-all group-hover:opacity-100 flex items-center justify-center">
+                        <label className="absolute inset-0 cursor-pointer rounded-full bg-black/60 opacity-70 hover:opacity-90 transition-opacity flex items-center justify-center">
                           <Camera className="w-6 h-6 text-white" aria-hidden="true" />
                           <input
                             type="file"

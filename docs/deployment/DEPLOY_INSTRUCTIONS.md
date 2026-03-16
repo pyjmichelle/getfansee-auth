@@ -1,5 +1,12 @@
 # 部署前必做清单
 
+## 📌 部署方式
+
+- **Vercel + 自定义域名（推荐）**：见 [DEPLOY_VERCEL.md](./DEPLOY_VERCEL.md) — 从 GitHub 导入、绑定 getfansee.com、配置 DNS。
+- **FTP 静态导出**：见 [DEPLOY_FTP.md](./DEPLOY_FTP.md)。
+
+---
+
 ## 🚫 Staging 安全：禁止 test-mode
 
 **Staging 与生产环境不得开启 test-mode**，否则会暴露 `/api/test/*`（含 service_role 能力）。

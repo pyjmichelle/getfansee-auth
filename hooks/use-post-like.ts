@@ -12,6 +12,7 @@ export function usePostLike(postId: string, initialLikesCount: number = 0, userI
   // 检查当前用户是否已点赞
   useEffect(() => {
     if (!userId) return;
+    let cancelled = false;
 
     const checkLikeStatus = async () => {
       const supabase = getSupabaseBrowserClient();
@@ -22,10 +23,15 @@ export function usePostLike(postId: string, initialLikesCount: number = 0, userI
         .eq("user_id", userId)
         .maybeSingle();
 
-      setIsLiked(!!data);
+      if (!cancelled) {
+        setIsLiked(!!data);
+      }
     };
 
     checkLikeStatus();
+    return () => {
+      cancelled = true;
+    };
   }, [postId, userId]);
 
   const toggleLike = async () => {

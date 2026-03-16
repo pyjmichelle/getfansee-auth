@@ -17,25 +17,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_AVATAR_CREATOR, DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
 import { type Creator } from "@/lib/types";
+import { MOCK_CREATORS } from "@/lib/mock-data";
 import { PageShell } from "@/components/page-shell";
 import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
-
-// Creator cover images — local assets (no external dependency)
-const COVER_ELENA = "/images/placeholders/post-media-1-pc.jpg";
-const COVER_MAYA = "/images/auth/hero-pc.jpg";
-const COVER_ALEX = "/behind-the-scenes-studio.jpg";
-const COVER_SOPHIE = "/artistic-creative-work.jpg";
-const COVER_DAVID = "/premium-exclusive-content.jpg";
-const COVER_LUNA = "/creative-artwork-preview.jpg";
-
-// Creator avatars — local assets
-const AVATAR_ELENA = "/professional-woman-creator-avatar.jpg";
-const AVATAR_MAYA = "/female-creator-avatar.jpg";
-const AVATAR_ALEX = "/male-creator-avatar.jpg";
-const AVATAR_SOPHIE = "/artist-creator-avatar.jpg";
-const AVATAR_DAVID = "/placeholder-user.jpg";
-const AVATAR_LUNA = "/creator-avatar.jpg";
 
 type Category = "all" | "trending" | "new" | "top";
 type ViewMode = "grid" | "list";
@@ -61,149 +46,27 @@ const DISCOVER_CATEGORIES: Array<{ id: Category; label: string; icon: React.Reac
   { id: "top", label: "Top Rated", icon: <Compass className="h-4 w-4" /> },
 ];
 
-const SHOWCASE_CREATORS: ExploreCreator[] = [
-  {
-    id: "showcase-1",
-    name: "Elena Rivers",
-    username: "elenarivs",
-    bio: "Lifestyle & fashion creator sharing exclusive content and behind-the-scenes moments ✨",
-    avatar: AVATAR_ELENA,
-    coverImage: COVER_ELENA,
-    subscriberCount: 12847,
-    postCount: 342,
-    price: 14.99,
-    verified: true,
-  },
-  {
-    id: "showcase-2",
-    name: "Maya Chen",
-    username: "mayacres",
-    bio: "Digital artist and content creator. Join me for exclusive art tutorials and creative inspiration 🎨",
-    avatar: AVATAR_MAYA,
-    coverImage: COVER_MAYA,
-    subscriberCount: 8234,
-    postCount: 186,
-    price: 12.99,
-    verified: true,
-  },
-  {
-    id: "showcase-3",
-    name: "Alex Martinez",
-    username: "alexfit",
-    bio: "Fitness coach & wellness creator. Premium workout plans and nutrition guides available 💪",
-    avatar: AVATAR_ALEX,
-    coverImage: COVER_ALEX,
-    subscriberCount: 15623,
-    postCount: 428,
-    price: 19.99,
-    verified: true,
-  },
-  {
-    id: "showcase-4",
-    name: "Sophie Laurent",
-    username: "sophieur",
-    bio: "Professional photographer and visual storyteller. Exclusive photo sets and editing tutorials 📷",
-    avatar: AVATAR_SOPHIE,
-    coverImage: COVER_SOPHIE,
-    subscriberCount: 9456,
-    postCount: 267,
-    price: 11.99,
-    isSubscribed: true,
-  },
-  {
-    id: "showcase-5",
-    name: "David Kim",
-    username: "davidco",
-    bio: "Chef & culinary creator. Premium recipes, cooking masterclasses, and kitchen secrets 🍳",
-    avatar: AVATAR_DAVID,
-    coverImage: COVER_DAVID,
-    subscriberCount: 11234,
-    postCount: 392,
-    price: 13.99,
-  },
-  {
-    id: "showcase-6",
-    name: "Luna Rose",
-    username: "lunarose",
-    bio: "Beauty & wellness expert. Skincare routines, makeup tutorials, and self-care content 💄",
-    avatar: AVATAR_LUNA,
-    coverImage: COVER_LUNA,
-    subscriberCount: 18945,
-    postCount: 521,
-    price: 15.99,
-    verified: true,
-  },
-  {
-    id: "showcase-7",
-    name: "Jake Winters",
-    username: "jakewins",
-    bio: "Travel photographer documenting hidden gems across the globe. Exclusive photo packs & guides 🌍",
-    avatar: AVATAR_ALEX,
-    coverImage: COVER_ELENA,
-    subscriberCount: 7823,
-    postCount: 203,
-    price: 10.99,
-    verified: true,
-  },
-  {
-    id: "showcase-8",
-    name: "Aria Nakamura",
-    username: "arianaka",
-    bio: "Music producer & singer-songwriter. Unreleased tracks, live sessions, and studio vlogs 🎵",
-    avatar: AVATAR_SOPHIE,
-    coverImage: COVER_MAYA,
-    subscriberCount: 21340,
-    postCount: 478,
-    price: 17.99,
-    verified: true,
-  },
-  {
-    id: "showcase-9",
-    name: "Carlos Vega",
-    username: "carlosvega",
-    bio: "Entrepreneur & business coach. Exclusive workshops, case studies, and mentorship content 🚀",
-    avatar: AVATAR_DAVID,
-    coverImage: COVER_ALEX,
-    subscriberCount: 5612,
-    postCount: 134,
-    price: 24.99,
-  },
-  {
-    id: "showcase-10",
-    name: "Zoe Blackwood",
-    username: "zoeblack",
-    bio: "Yoga instructor & mindfulness coach. Daily practice videos and exclusive wellness programs 🧘",
-    avatar: AVATAR_LUNA,
-    coverImage: COVER_SOPHIE,
-    subscriberCount: 14230,
-    postCount: 356,
-    price: 13.49,
-    verified: true,
-  },
-  {
-    id: "showcase-11",
-    name: "Priya Sharma",
-    username: "priyacreates",
-    bio: "Fashion designer & stylist sharing behind-the-scenes of the industry and exclusive lookbooks 👗",
-    avatar: AVATAR_MAYA,
-    coverImage: COVER_DAVID,
-    subscriberCount: 9870,
-    postCount: 289,
-    price: 16.99,
-  },
-  {
-    id: "showcase-12",
-    name: "Ethan Brooks",
-    username: "ethanbrooks",
-    bio: "Tech reviewer & developer. Deep-dive tutorials, exclusive project builds, and dev insights 💻",
-    avatar: AVATAR_ELENA,
-    coverImage: COVER_LUNA,
-    subscriberCount: 11456,
-    postCount: 412,
-    price: 18.99,
-    verified: true,
-  },
+// Cover images for showcase — local assets (no external dependency)
+const SHOWCASE_COVERS = [
+  "/images/placeholders/post-media-1-pc.jpg",
+  "/images/auth/hero-pc.jpg",
+  "/behind-the-scenes-studio.jpg",
+  "/artistic-creative-work.jpg",
+  "/premium-exclusive-content.jpg",
 ];
+
+const SHOWCASE_CREATORS: ExploreCreator[] = MOCK_CREATORS.map((creator, index) => ({
+  id: creator.id,
+  name: creator.display_name,
+  username: creator.username || creator.display_name.toLowerCase().replace(/\s+/g, "_"),
+  bio: creator.bio,
+  avatar: creator.avatar_url || DEFAULT_AVATAR_CREATOR,
+  coverImage: SHOWCASE_COVERS[index % SHOWCASE_COVERS.length],
+  subscriberCount: creator.subscriber_count ?? 0,
+  postCount: creator.post_count ?? 0,
+  price: 9.99 + index * 2,
+  verified: index % 2 === 0,
+}));
 
 function formatCount(count: number): string {
   return count.toLocaleString();
@@ -235,6 +98,7 @@ export default function SearchPageClient() {
   const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState<Category>("all");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
@@ -277,22 +141,41 @@ export default function SearchPageClient() {
     initUser();
   }, []);
 
+  const localSearchCreators = (value: string): ExploreCreator[] => {
+    const normalized = value.trim().toLowerCase();
+    if (!normalized || normalized.length < 2) return [];
+    return SHOWCASE_CREATORS.filter((creator) => {
+      return (
+        creator.name.toLowerCase().includes(normalized) ||
+        creator.username.toLowerCase().includes(normalized) ||
+        creator.bio.toLowerCase().includes(normalized)
+      );
+    });
+  };
+
   const performSearch = async (value: string) => {
-    if (!value.trim() || value.trim().length < 2) {
+    const normalized = value.trim();
+    if (!normalized || normalized.length < 2) {
       setCreators([]);
       return;
     }
+    const localMatches = localSearchCreators(normalized);
     setIsSearching(true);
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(value)}&type=creators`);
+      const res = await fetch(`/api/search?q=${encodeURIComponent(normalized)}&type=creators`);
       const data = await res.json();
       if (data?.success && Array.isArray(data.creators)) {
-        setCreators(data.creators.map(mapApiCreator));
+        const apiCreators = data.creators.map(mapApiCreator);
+        const merged = [...apiCreators, ...localMatches];
+        const deduped = Array.from(
+          new Map(merged.map((creator) => [creator.id, creator])).values()
+        );
+        setCreators(deduped);
       } else {
-        setCreators([]);
+        setCreators(localMatches);
       }
     } catch {
-      setCreators([]);
+      setCreators(localMatches);
     } finally {
       setIsSearching(false);
     }
@@ -343,6 +226,7 @@ export default function SearchPageClient() {
           >
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-[14px] text-text-muted pointer-events-none" />
             <input
+              data-testid="search-input"
               value={query}
               onChange={(e) => {
                 const val = e.target.value;
@@ -352,7 +236,9 @@ export default function SearchPageClient() {
                   performSearch(val);
                 }, 300);
               }}
-              placeholder="Search creators by name or username..."
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
+              placeholder={isSearchFocused ? "" : "Search creators by nickname..."}
               className="glass-input w-full h-10 pl-9 pr-4 text-[13px] text-white placeholder:text-text-muted"
             />
           </form>
@@ -461,7 +347,7 @@ export default function SearchPageClient() {
             </div>
             <p className="text-[15px] font-semibold text-white mb-1">No creators found</p>
             <p className="text-[13px] text-text-muted max-w-xs">
-              Try a different name or username to find creators you love.
+              Try a different nickname to find creators you love.
             </p>
           </div>
         )}

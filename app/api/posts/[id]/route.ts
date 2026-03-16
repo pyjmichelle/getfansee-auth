@@ -36,7 +36,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       console.error("[GET /api/posts/[id]] Post fetch error:", postError);
       return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
     }
-
     // 检查查看权限
     let canView = false;
 
@@ -73,9 +72,19 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       canView = !!purchase;
     }
 
+    // Strip sensitive fields when the viewer does not have access.
+    // Prevents content leaking via API even if RLS is misconfigured.
+    const safePost = canView
+      ? post
+      : {
+          ...post,
+          content: null,
+          media_url: null,
+        };
+
     return NextResponse.json({
       success: true,
-      post: post,
+      post: safePost,
       canView: canView,
     });
   } catch (error: unknown) {

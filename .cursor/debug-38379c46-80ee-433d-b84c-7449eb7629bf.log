@@ -1,0 +1,1 @@
+{"sessionId":"38379c46-80ee-433d-b84c-7449eb7629bf","runId":"post-fix-h2","hypothesisId":"H2","location":"app/api/creator/[id]/posts/route.ts:return","message":"Returning creator posts with locked content stripped","data":{"creatorId":"77deaaa3-0c60-417d-ac8d-152ec291f674","totalPosts":1,"lockedCount":0,"lockedWithContentStripped":0},"timestamp":1773151383113}

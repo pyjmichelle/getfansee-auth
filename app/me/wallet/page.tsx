@@ -105,6 +105,7 @@ export default function WalletPage() {
   ];
 
   useEffect(() => {
+    let mounted = true;
     const loadData = async () => {
       try {
         setIsLoading(true);
@@ -139,10 +140,12 @@ export default function WalletPage() {
           try {
             const userId = bootstrapUser.id;
             const balanceData = await getWalletBalance(userId);
+            if (!mounted) return;
             if (balanceData !== null && balanceData.available !== undefined) {
               setAvailableBalance(balanceData.available);
             } else if (isTestMode) {
               // 测试模式：使用 Mock 余额和交易记录（让页面有内容可展示）
+              if (!mounted) return;
               setAvailableBalance(28.5);
               setTransactions([
                 {
@@ -174,6 +177,7 @@ export default function WalletPage() {
             }
 
             const transactionsData = await getTransactions(userId);
+            if (!mounted) return;
             setTransactions(transactionsData);
           } catch (loadErr) {
             console.error("[wallet] background load error:", loadErr);
@@ -186,6 +190,9 @@ export default function WalletPage() {
     };
 
     loadData();
+    return () => {
+      mounted = false;
+    };
   }, [router, isTestMode]);
 
   useEffect(() => {

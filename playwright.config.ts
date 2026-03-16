@@ -30,6 +30,8 @@ const defaultBaseUrl = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000
 const parsedUrl = new URL(defaultBaseUrl);
 const serverPort = parsedUrl.port || (parsedUrl.protocol === "https:" ? "443" : "80");
 const cookieExpires = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30;
+const authRealPattern = "**/auth-real/**/*.spec.ts";
+const authMockPattern = "**/auth-mock/**/*.spec.ts";
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -85,14 +87,27 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+      testIgnore: [authRealPattern, authMockPattern],
     },
     {
       name: "firefox",
       use: { ...devices["Desktop Firefox"] },
+      testIgnore: [authRealPattern, authMockPattern],
     },
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"] },
+      testIgnore: [authRealPattern, authMockPattern],
+    },
+    {
+      name: "auth-mock-chromium",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: [authMockPattern],
+    },
+    {
+      name: "auth-real-chromium",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: [authRealPattern],
     },
   ],
 

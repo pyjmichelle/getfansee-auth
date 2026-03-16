@@ -8,6 +8,7 @@ import { uploadFiles, validateFile, type MediaFile } from "@/lib/storage";
 export type MultiMediaUploadProps = {
   onUploadComplete: (files: MediaFile[]) => void;
   onUploadError?: (error: string) => void;
+  onUploadStateChange?: (isUploading: boolean) => void;
   maxFiles?: number;
   className?: string;
 };
@@ -15,6 +16,7 @@ export type MultiMediaUploadProps = {
 export function MultiMediaUpload({
   onUploadComplete,
   onUploadError,
+  onUploadStateChange,
   maxFiles = 10,
   className = "",
 }: MultiMediaUploadProps) {
@@ -47,6 +49,7 @@ export function MultiMediaUpload({
 
       try {
         setIsUploading(true);
+        onUploadStateChange?.(true);
 
         // 初始化进度
         const progressMap = new Map<
@@ -102,9 +105,10 @@ export function MultiMediaUpload({
         setUploadProgress(new Map());
       } finally {
         setIsUploading(false);
+        onUploadStateChange?.(false);
       }
     },
-    [uploadedFiles, maxFiles, onUploadComplete, onUploadError]
+    [uploadedFiles, maxFiles, onUploadComplete, onUploadError, onUploadStateChange]
   );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {

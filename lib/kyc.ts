@@ -36,7 +36,7 @@ export async function submitVerification(userId: string, data: VerificationData)
 
         if (uploadError) {
           console.error("[kyc] upload id doc error:", uploadError);
-          throw new Error(`上传证件失败: ${uploadError.message}`);
+          throw new Error(`Failed to upload ID document: ${uploadError.message}`);
         }
 
         // Store the path (not public URL since this is a private bucket)

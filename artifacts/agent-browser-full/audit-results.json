@@ -6,16 +6,8 @@
     "finalUrl": "http://localhost:3000/",
     "consoleErrors": [],
     "networkErrors": [
-      "POST http://localhost:3000/__nextjs_original-stack-frames - net::ERR_ABORTED",
-      "GET http://localhost:3000/__nextjs_font/geist-latin.woff2 - net::ERR_ABORTED",
-      "GET http://localhost:3000/_next/static/chunks/node_modules__pnpm_beb4ac62._.js - net::ERR_ABORTED",
-      "GET http://localhost:3000/_next/static/chunks/node_modules__pnpm_c257444f._.js - net::ERR_ABORTED",
-      "GET http://localhost:3000/_next/static/chunks/app_error_tsx_b707f966._.js - net::ERR_ABORTED",
-      "GET http://localhost:3000/_next/static/chunks/_192f4942._.js - net::ERR_ABORTED",
-      "GET http://localhost:3000/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js - net::ERR_ABORTED",
-      "GET http://localhost:3000/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_eb307a30._.js - net::ERR_ABORTED",
-      "GET http://localhost:3000/_next/static/chunks/lib_referral_ts_e2fa5556._.js - net::ERR_ABORTED",
-      "GET http://localhost:3000/_next/static/chunks/app_home_page_tsx_b707f966._.js - net::ERR_ABORTED"
+      "GET http://localhost:3000/_next/static/chunks/_da57dda4._.js - net::ERR_ABORTED",
+      "GET http://localhost:3000/_next/static/chunks/node_modules__pnpm_e4567808._.js - net::ERR_ABORTED"
     ],
     "clickableElements": [
       {
@@ -50,7 +42,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/root.png",
-    "timestamp": "2026-03-02T16:03:19.524Z"
+    "timestamp": "2026-03-04T16:48:32.126Z"
   },
   {
     "route": "/auth",
@@ -92,7 +84,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/auth.png",
-    "timestamp": "2026-03-02T16:03:21.809Z"
+    "timestamp": "2026-03-04T16:48:34.387Z"
   },
   {
     "route": "/home",
@@ -100,10 +92,7 @@
     "httpStatus": 200,
     "finalUrl": "http://localhost:3000/home",
     "consoleErrors": [],
-    "networkErrors": [
-      "POST http://localhost:3000/__nextjs_original-stack-frames - net::ERR_ABORTED",
-      "GET http://localhost:3000/__nextjs_font/geist-latin.woff2 - net::ERR_ABORTED"
-    ],
+    "networkErrors": [],
     "clickableElements": [
       {
         "type": "button",
@@ -137,17 +126,16 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/home.png",
-    "timestamp": "2026-03-02T16:03:24.084Z"
+    "timestamp": "2026-03-04T16:48:36.622Z"
   },
   {
     "route": "/me",
     "authState": "anonymous",
     "httpStatus": 200,
-    "finalUrl": "http://localhost:3000/me",
+    "redirectTo": "http://localhost:3000/auth?redirect=%2Fme",
+    "finalUrl": "http://localhost:3000/auth?redirect=%2Fme",
     "consoleErrors": [],
-    "networkErrors": [
-      "GET http://localhost:3000/auth?_rsc=1dxpt - net::ERR_ABORTED"
-    ],
+    "networkErrors": [],
     "clickableElements": [
       {
         "type": "button",
@@ -181,25 +169,26 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/me.png",
-    "timestamp": "2026-03-02T16:03:26.444Z"
+    "timestamp": "2026-03-04T16:48:38.885Z"
   },
   {
     "route": "/me/wallet",
     "authState": "anonymous",
     "httpStatus": 200,
-    "finalUrl": "http://localhost:3000/me/wallet",
+    "redirectTo": "http://localhost:3000/auth?redirect=%2Fme%2Fwallet",
+    "finalUrl": "http://localhost:3000/auth?redirect=%2Fme%2Fwallet",
     "consoleErrors": [],
     "networkErrors": [],
     "clickableElements": [
       {
         "type": "button",
-        "text": "Search creators, tags...",
+        "text": "Sign In",
         "selector": "button:nth-of-type(1)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "test-user",
+        "text": "Create Account",
         "selector": "button:nth-of-type(2)",
         "status": "untested"
       },
@@ -211,145 +200,38 @@
       },
       {
         "type": "button",
-        "text": "Add Funds",
+        "text": "Sign In",
         "selector": "button:nth-of-type(4)",
         "status": "untested"
       },
       {
-        "type": "button",
-        "text": "Statement",
-        "selector": "button:nth-of-type(5)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Top Up",
-        "selector": "button:nth-of-type(6)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "All",
-        "selector": "button:nth-of-type(7)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Added",
-        "selector": "button:nth-of-type(8)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Spent",
-        "selector": "button:nth-of-type(9)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Add Funds",
-        "selector": "button:nth-of-type(10)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Enter Site — I am 18+",
-        "selector": "button:nth-of-type(11)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Exit",
-        "selector": "button:nth-of-type(12)",
-        "status": "untested"
-      },
-      {
         "type": "link",
-        "text": "GGetFanSee",
+        "text": "Forgot password?",
         "selector": "a[href]:nth-of-type(1)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "/search",
-        "selector": "a[href]:nth-of-type(2)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Start Creating",
-        "selector": "a[href]:nth-of-type(3)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "/notifications",
-        "selector": "a[href]:nth-of-type(4)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Terms of Service",
-        "selector": "a[href]:nth-of-type(5)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Privacy Policy",
-        "selector": "a[href]:nth-of-type(6)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Home",
-        "selector": "a[href]:nth-of-type(7)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Search",
-        "selector": "a[href]:nth-of-type(8)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Alerts",
-        "selector": "a[href]:nth-of-type(9)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Profile",
-        "selector": "a[href]:nth-of-type(10)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Terms of Service",
-        "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/me_wallet.png",
-    "timestamp": "2026-03-02T16:03:28.623Z"
+    "timestamp": "2026-03-04T16:48:41.133Z"
   },
   {
     "route": "/purchases",
     "authState": "anonymous",
     "httpStatus": 200,
-    "finalUrl": "http://localhost:3000/purchases",
+    "redirectTo": "http://localhost:3000/auth?redirect=%2Fpurchases",
+    "finalUrl": "http://localhost:3000/auth?redirect=%2Fpurchases",
     "consoleErrors": [],
     "networkErrors": [],
     "clickableElements": [
       {
         "type": "button",
-        "text": "Search creators, tags...",
+        "text": "Sign In",
         "selector": "button:nth-of-type(1)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "test-user",
+        "text": "Create Account",
         "selector": "button:nth-of-type(2)",
         "status": "untested"
       },
@@ -361,97 +243,38 @@
       },
       {
         "type": "button",
-        "text": "Enter Site — I am 18+",
+        "text": "Sign In",
         "selector": "button:nth-of-type(4)",
         "status": "untested"
       },
       {
-        "type": "button",
-        "text": "Exit",
-        "selector": "button:nth-of-type(5)",
-        "status": "untested"
-      },
-      {
         "type": "link",
-        "text": "GGetFanSee",
+        "text": "Forgot password?",
         "selector": "a[href]:nth-of-type(1)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "/search",
-        "selector": "a[href]:nth-of-type(2)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Start Creating",
-        "selector": "a[href]:nth-of-type(3)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "/notifications",
-        "selector": "a[href]:nth-of-type(4)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Browse Content",
-        "selector": "a[href]:nth-of-type(5)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Home",
-        "selector": "a[href]:nth-of-type(6)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Search",
-        "selector": "a[href]:nth-of-type(7)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Alerts",
-        "selector": "a[href]:nth-of-type(8)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Profile",
-        "selector": "a[href]:nth-of-type(9)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Terms of Service",
-        "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/purchases.png",
-    "timestamp": "2026-03-02T16:03:30.769Z"
+    "timestamp": "2026-03-04T16:48:43.493Z"
   },
   {
     "route": "/subscriptions",
     "authState": "anonymous",
     "httpStatus": 200,
-    "finalUrl": "http://localhost:3000/subscriptions",
+    "redirectTo": "http://localhost:3000/auth?redirect=%2Fsubscriptions",
+    "finalUrl": "http://localhost:3000/auth?redirect=%2Fsubscriptions",
     "consoleErrors": [],
     "networkErrors": [],
     "clickableElements": [
       {
         "type": "button",
-        "text": "Search creators, tags...",
+        "text": "Sign In",
         "selector": "button:nth-of-type(1)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "test-user",
+        "text": "Create Account",
         "selector": "button:nth-of-type(2)",
         "status": "untested"
       },
@@ -463,109 +286,19 @@
       },
       {
         "type": "button",
-        "text": "Discover More Creators",
+        "text": "Sign In",
         "selector": "button:nth-of-type(4)",
         "status": "untested"
       },
       {
-        "type": "button",
-        "text": "Cancel",
-        "selector": "button:nth-of-type(5)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Cancel",
-        "selector": "button:nth-of-type(6)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Enter Site — I am 18+",
-        "selector": "button:nth-of-type(7)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Exit",
-        "selector": "button:nth-of-type(8)",
-        "status": "untested"
-      },
-      {
         "type": "link",
-        "text": "GGetFanSee",
+        "text": "Forgot password?",
         "selector": "a[href]:nth-of-type(1)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "/search",
-        "selector": "a[href]:nth-of-type(2)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Start Creating",
-        "selector": "a[href]:nth-of-type(3)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "/notifications",
-        "selector": "a[href]:nth-of-type(4)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Discover More Creators",
-        "selector": "a[href]:nth-of-type(5)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Elena RoseRenews in 22 days",
-        "selector": "a[href]:nth-of-type(6)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Maya StylesRenews in 3 days",
-        "selector": "a[href]:nth-of-type(7)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Home",
-        "selector": "a[href]:nth-of-type(8)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Search",
-        "selector": "a[href]:nth-of-type(9)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Alerts",
-        "selector": "a[href]:nth-of-type(10)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Profile",
-        "selector": "a[href]:nth-of-type(11)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Terms of Service",
-        "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/subscriptions.png",
-    "timestamp": "2026-03-02T16:03:33.005Z"
+    "timestamp": "2026-03-04T16:48:45.908Z"
   },
   {
     "route": "/search",
@@ -685,20 +418,50 @@
       },
       {
         "type": "button",
-        "text": "Load More Creators",
+        "text": "$10.99/mo",
         "selector": "button:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Enter Site — I am 18+",
+        "text": "$17.99/mo",
         "selector": "button:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Exit",
+        "text": "$24.99/mo",
         "selector": "button:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$13.49/mo",
+        "selector": "button:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$16.99/mo",
+        "selector": "button:nth-of-type(23)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$18.99/mo",
+        "selector": "button:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Enter Site — I am 18+",
+        "selector": "button:nth-of-type(25)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Exit",
+        "selector": "button:nth-of-type(26)",
         "status": "untested"
       },
       {
@@ -757,7 +520,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/search.png",
-    "timestamp": "2026-03-02T16:03:35.265Z"
+    "timestamp": "2026-03-04T16:48:48.212Z"
   },
   {
     "route": "/support",
@@ -799,7 +562,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/support.png",
-    "timestamp": "2026-03-02T16:03:37.542Z"
+    "timestamp": "2026-03-04T16:48:50.467Z"
   },
   {
     "route": "/creator/new-post",
@@ -842,7 +605,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_new-post.png",
-    "timestamp": "2026-03-02T16:03:39.848Z"
+    "timestamp": "2026-03-04T16:48:52.743Z"
   },
   {
     "route": "/creator/upgrade",
@@ -950,7 +713,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_upgrade.png",
-    "timestamp": "2026-03-02T16:03:42.181Z"
+    "timestamp": "2026-03-04T16:48:55.050Z"
   },
   {
     "route": "/creator/onboarding",
@@ -992,7 +755,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_onboarding.png",
-    "timestamp": "2026-03-02T16:03:44.477Z"
+    "timestamp": "2026-03-04T16:48:57.284Z"
   },
   {
     "route": "/creator/studio",
@@ -1035,7 +798,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio.png",
-    "timestamp": "2026-03-02T16:03:46.784Z"
+    "timestamp": "2026-03-04T16:48:59.539Z"
   },
   {
     "route": "/creator/studio/analytics",
@@ -1078,7 +841,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio_analytics.png",
-    "timestamp": "2026-03-02T16:03:49.122Z"
+    "timestamp": "2026-03-04T16:49:01.785Z"
   },
   {
     "route": "/creator/studio/earnings",
@@ -1121,7 +884,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio_earnings.png",
-    "timestamp": "2026-03-02T16:03:51.484Z"
+    "timestamp": "2026-03-04T16:49:04.085Z"
   },
   {
     "route": "/creator/studio/subscribers",
@@ -1164,7 +927,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio_subscribers.png",
-    "timestamp": "2026-03-02T16:03:53.798Z"
+    "timestamp": "2026-03-04T16:49:06.337Z"
   },
   {
     "route": "/creator/studio/post/list",
@@ -1207,7 +970,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/creator_studio_post_list.png",
-    "timestamp": "2026-03-02T16:03:56.059Z"
+    "timestamp": "2026-03-04T16:49:08.596Z"
   },
   {
     "route": "/admin/reports",
@@ -1250,7 +1013,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/admin_reports.png",
-    "timestamp": "2026-03-02T16:03:58.336Z"
+    "timestamp": "2026-03-04T16:49:10.892Z"
   },
   {
     "route": "/admin/content-review",
@@ -1293,7 +1056,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/admin_content-review.png",
-    "timestamp": "2026-03-02T16:04:00.850Z"
+    "timestamp": "2026-03-04T16:49:13.143Z"
   },
   {
     "route": "/admin/creator-verifications",
@@ -1336,7 +1099,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/anonymous/admin_creator-verifications.png",
-    "timestamp": "2026-03-02T16:04:03.259Z"
+    "timestamp": "2026-03-04T16:49:15.385Z"
   },
   {
     "route": "/",
@@ -1714,19 +1477,19 @@
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(62)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(63)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(64)",
         "status": "untested"
       },
@@ -1918,7 +1681,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/root.png",
-    "timestamp": "2026-03-02T16:04:06.225Z"
+    "timestamp": "2026-03-04T16:49:18.354Z"
   },
   {
     "route": "/auth",
@@ -1960,7 +1723,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/auth.png",
-    "timestamp": "2026-03-02T16:04:08.509Z"
+    "timestamp": "2026-03-04T16:49:20.596Z"
   },
   {
     "route": "/home",
@@ -2338,19 +2101,19 @@
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(62)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(63)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(64)",
         "status": "untested"
       },
@@ -2542,7 +2305,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/home.png",
-    "timestamp": "2026-03-02T16:04:12.398Z"
+    "timestamp": "2026-03-04T16:49:24.482Z"
   },
   {
     "route": "/me",
@@ -2626,7 +2389,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/me.png",
-    "timestamp": "2026-03-02T16:04:14.574Z"
+    "timestamp": "2026-03-04T16:49:26.904Z"
   },
   {
     "route": "/me/wallet",
@@ -2770,7 +2533,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/me_wallet.png",
-    "timestamp": "2026-03-02T16:04:16.809Z"
+    "timestamp": "2026-03-04T16:49:29.327Z"
   },
   {
     "route": "/purchases",
@@ -2890,7 +2653,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/purchases.png",
-    "timestamp": "2026-03-02T16:04:19.092Z"
+    "timestamp": "2026-03-04T16:49:31.767Z"
   },
   {
     "route": "/subscriptions",
@@ -3022,7 +2785,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/subscriptions.png",
-    "timestamp": "2026-03-02T16:04:21.332Z"
+    "timestamp": "2026-03-04T16:49:34.206Z"
   },
   {
     "route": "/search",
@@ -3142,20 +2905,50 @@
       },
       {
         "type": "button",
-        "text": "Load More Creators",
+        "text": "$10.99/mo",
         "selector": "button:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Enter Site — I am 18+",
+        "text": "$17.99/mo",
         "selector": "button:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Exit",
+        "text": "$24.99/mo",
         "selector": "button:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$13.49/mo",
+        "selector": "button:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$16.99/mo",
+        "selector": "button:nth-of-type(23)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$18.99/mo",
+        "selector": "button:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Enter Site — I am 18+",
+        "selector": "button:nth-of-type(25)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Exit",
+        "selector": "button:nth-of-type(26)",
         "status": "untested"
       },
       {
@@ -3214,7 +3007,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/search.png",
-    "timestamp": "2026-03-02T16:04:23.599Z"
+    "timestamp": "2026-03-04T16:49:36.522Z"
   },
   {
     "route": "/support",
@@ -3232,14 +3025,32 @@
       },
       {
         "type": "button",
-        "text": "Enter Site — I am 18+",
+        "text": "Test Fan",
         "selector": "button:nth-of-type(2)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Exit",
+        "text": "",
         "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Submit Ticket",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Enter Site — I am 18+",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Exit",
+        "selector": "button:nth-of-type(6)",
         "status": "untested"
       },
       {
@@ -3256,13 +3067,13 @@
       },
       {
         "type": "link",
-        "text": "Sign In",
+        "text": "Start Creating",
         "selector": "a[href]:nth-of-type(3)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Join",
+        "text": "/notifications",
         "selector": "a[href]:nth-of-type(4)",
         "status": "untested"
       },
@@ -3298,7 +3109,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/support.png",
-    "timestamp": "2026-03-02T16:04:25.757Z"
+    "timestamp": "2026-03-04T16:49:38.725Z"
   },
   {
     "route": "/creator/new-post",
@@ -3316,14 +3127,32 @@
       },
       {
         "type": "button",
-        "text": "Enter Site — I am 18+",
+        "text": "Test Fan",
         "selector": "button:nth-of-type(2)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Exit",
+        "text": "",
         "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Back to Home",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Enter Site — I am 18+",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Exit",
+        "selector": "button:nth-of-type(6)",
         "status": "untested"
       },
       {
@@ -3340,49 +3169,25 @@
       },
       {
         "type": "link",
-        "text": "Sign In",
+        "text": "Start Creating",
         "selector": "a[href]:nth-of-type(3)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Join",
+        "text": "/notifications",
         "selector": "a[href]:nth-of-type(4)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Home",
-        "selector": "a[href]:nth-of-type(5)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Search",
-        "selector": "a[href]:nth-of-type(6)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Alerts",
-        "selector": "a[href]:nth-of-type(7)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Profile",
-        "selector": "a[href]:nth-of-type(8)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
         "text": "Terms of Service",
-        "selector": "a[href]:nth-of-type(9)",
+        "selector": "a[href]:nth-of-type(5)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_new-post.png",
-    "timestamp": "2026-03-02T16:04:28.274Z"
+    "timestamp": "2026-03-04T16:49:41.181Z"
   },
   {
     "route": "/creator/upgrade",
@@ -3490,7 +3295,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_upgrade.png",
-    "timestamp": "2026-03-02T16:04:30.584Z"
+    "timestamp": "2026-03-04T16:49:43.516Z"
   },
   {
     "route": "/creator/onboarding",
@@ -3574,7 +3379,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_onboarding.png",
-    "timestamp": "2026-03-02T16:04:32.733Z"
+    "timestamp": "2026-03-04T16:49:45.679Z"
   },
   {
     "route": "/creator/studio",
@@ -3646,67 +3451,79 @@
       },
       {
         "type": "link",
-        "text": "Create Post",
+        "text": "Post List",
         "selector": "a[href]:nth-of-type(8)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Earnings",
+        "text": "Analytics",
         "selector": "a[href]:nth-of-type(9)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Subscribers",
+        "text": "Create Post",
         "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Post List",
+        "text": "Earnings",
         "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Analytics",
+        "text": "Subscribers",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Home",
+        "text": "Post List",
         "selector": "a[href]:nth-of-type(13)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Search",
+        "text": "Analytics",
         "selector": "a[href]:nth-of-type(14)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Alerts",
+        "text": "Home",
         "selector": "a[href]:nth-of-type(15)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Profile",
+        "text": "Search",
         "selector": "a[href]:nth-of-type(16)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Terms of Service",
+        "text": "Alerts",
         "selector": "a[href]:nth-of-type(17)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Profile",
+        "selector": "a[href]:nth-of-type(18)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Terms of Service",
+        "selector": "a[href]:nth-of-type(19)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio.png",
-    "timestamp": "2026-03-02T16:04:35.255Z"
+    "timestamp": "2026-03-04T16:49:48.156Z"
   },
   {
     "route": "/creator/studio/analytics",
@@ -3760,32 +3577,14 @@
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Enter Site — I am 18+",
         "selector": "button:nth-of-type(8)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
-        "selector": "button:nth-of-type(9)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "",
-        "selector": "button:nth-of-type(10)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Enter Site — I am 18+",
-        "selector": "button:nth-of-type(11)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
         "text": "Exit",
-        "selector": "button:nth-of-type(12)",
+        "selector": "button:nth-of-type(9)",
         "status": "untested"
       },
       {
@@ -3814,73 +3613,91 @@
       },
       {
         "type": "link",
-        "text": "Create Post",
+        "text": "/creator/studio/post/list",
         "selector": "a[href]:nth-of-type(5)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Earnings",
+        "text": "/creator/studio/post/list",
         "selector": "a[href]:nth-of-type(6)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Subscribers",
+        "text": "/creator/studio/post/list",
         "selector": "a[href]:nth-of-type(7)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Post List",
+        "text": "Create Post",
         "selector": "a[href]:nth-of-type(8)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Analytics",
+        "text": "Earnings",
         "selector": "a[href]:nth-of-type(9)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Home",
+        "text": "Subscribers",
         "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Search",
+        "text": "Post List",
         "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Create",
+        "text": "Analytics",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Alerts",
+        "text": "Home",
         "selector": "a[href]:nth-of-type(13)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Profile",
+        "text": "Search",
         "selector": "a[href]:nth-of-type(14)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Terms of Service",
+        "text": "Create",
         "selector": "a[href]:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Alerts",
+        "selector": "a[href]:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Profile",
+        "selector": "a[href]:nth-of-type(17)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Terms of Service",
+        "selector": "a[href]:nth-of-type(18)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio_analytics.png",
-    "timestamp": "2026-03-02T16:04:37.876Z"
+    "timestamp": "2026-03-04T16:49:50.673Z"
   },
   {
     "route": "/creator/studio/earnings",
@@ -4030,7 +3847,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio_earnings.png",
-    "timestamp": "2026-03-02T16:04:40.311Z"
+    "timestamp": "2026-03-04T16:49:53.154Z"
   },
   {
     "route": "/creator/studio/subscribers",
@@ -4180,7 +3997,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio_subscribers.png",
-    "timestamp": "2026-03-02T16:04:42.722Z"
+    "timestamp": "2026-03-04T16:49:55.676Z"
   },
   {
     "route": "/creator/studio/post/list",
@@ -4198,14 +4015,68 @@
       },
       {
         "type": "button",
-        "text": "Enter Site — I am 18+",
+        "text": "Test Fan",
         "selector": "button:nth-of-type(2)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Exit",
+        "text": "",
         "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Export",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "all",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "published",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "locked",
+        "selector": "button:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "draft",
+        "selector": "button:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Enter Site — I am 18+",
+        "selector": "button:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Exit",
+        "selector": "button:nth-of-type(12)",
         "status": "untested"
       },
       {
@@ -4222,49 +4093,97 @@
       },
       {
         "type": "link",
-        "text": "Sign In",
+        "text": "Start Creating",
         "selector": "a[href]:nth-of-type(3)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Join",
+        "text": "/notifications",
         "selector": "a[href]:nth-of-type(4)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Home",
+        "text": "Create Post",
         "selector": "a[href]:nth-of-type(5)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Search",
+        "text": "Create Post",
         "selector": "a[href]:nth-of-type(6)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Alerts",
+        "text": "Create Post",
         "selector": "a[href]:nth-of-type(7)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Profile",
+        "text": "Earnings",
         "selector": "a[href]:nth-of-type(8)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Terms of Service",
+        "text": "Subscribers",
         "selector": "a[href]:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Post List",
+        "selector": "a[href]:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Analytics",
+        "selector": "a[href]:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Create Post",
+        "selector": "a[href]:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Home",
+        "selector": "a[href]:nth-of-type(13)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search",
+        "selector": "a[href]:nth-of-type(14)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Alerts",
+        "selector": "a[href]:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Profile",
+        "selector": "a[href]:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Terms of Service",
+        "selector": "a[href]:nth-of-type(17)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/creator_studio_post_list.png",
-    "timestamp": "2026-03-02T16:04:45.249Z"
+    "timestamp": "2026-03-04T16:49:58.118Z"
   },
   {
     "route": "/admin/reports",
@@ -4643,19 +4562,19 @@
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(62)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(63)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(64)",
         "status": "untested"
       },
@@ -4847,7 +4766,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/admin_reports.png",
-    "timestamp": "2026-03-02T16:04:49.274Z"
+    "timestamp": "2026-03-04T16:50:02.318Z"
   },
   {
     "route": "/admin/content-review",
@@ -5226,19 +5145,19 @@
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(62)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(63)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(64)",
         "status": "untested"
       },
@@ -5430,7 +5349,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/admin_content-review.png",
-    "timestamp": "2026-03-02T16:04:53.246Z"
+    "timestamp": "2026-03-04T16:50:08.575Z"
   },
   {
     "route": "/admin/creator-verifications",
@@ -5809,19 +5728,19 @@
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(62)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(63)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(64)",
         "status": "untested"
       },
@@ -6013,7 +5932,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/fan/admin_creator-verifications.png",
-    "timestamp": "2026-03-02T16:04:57.280Z"
+    "timestamp": "2026-03-04T16:50:12.559Z"
   },
   {
     "route": "/",
@@ -6021,9 +5940,7 @@
     "httpStatus": 200,
     "finalUrl": "http://localhost:3000/",
     "consoleErrors": [],
-    "networkErrors": [
-      "POST http://localhost:3000/__nextjs_original-stack-frames - net::ERR_ABORTED"
-    ],
+    "networkErrors": [],
     "clickableElements": [
       {
         "type": "button",
@@ -6393,19 +6310,19 @@
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(62)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(63)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(64)",
         "status": "untested"
       },
@@ -6465,7 +6382,7 @@
       },
       {
         "type": "link",
-        "text": "S",
+        "text": "/creator/mock-creator-1",
         "selector": "a[href]:nth-of-type(8)",
         "status": "untested"
       },
@@ -6489,7 +6406,7 @@
       },
       {
         "type": "link",
-        "text": "E",
+        "text": "/creator/mock-creator-3",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
@@ -6513,7 +6430,7 @@
       },
       {
         "type": "link",
-        "text": "L",
+        "text": "/creator/mock-creator-5",
         "selector": "a[href]:nth-of-type(16)",
         "status": "untested"
       },
@@ -6525,7 +6442,7 @@
       },
       {
         "type": "link",
-        "text": "S",
+        "text": "/creator/mock-creator-1",
         "selector": "a[href]:nth-of-type(18)",
         "status": "untested"
       },
@@ -6549,7 +6466,7 @@
       },
       {
         "type": "link",
-        "text": "E",
+        "text": "/creator/mock-creator-3",
         "selector": "a[href]:nth-of-type(22)",
         "status": "untested"
       },
@@ -6597,7 +6514,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/root.png",
-    "timestamp": "2026-03-02T16:04:59.613Z"
+    "timestamp": "2026-03-04T16:50:14.966Z"
   },
   {
     "route": "/auth",
@@ -6639,7 +6556,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/auth.png",
-    "timestamp": "2026-03-02T16:05:01.892Z"
+    "timestamp": "2026-03-04T16:50:17.217Z"
   },
   {
     "route": "/home",
@@ -7017,19 +6934,19 @@
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(62)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(63)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(64)",
         "status": "untested"
       },
@@ -7221,7 +7138,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/home.png",
-    "timestamp": "2026-03-02T16:05:06.891Z"
+    "timestamp": "2026-03-04T16:50:22.933Z"
   },
   {
     "route": "/me",
@@ -7305,7 +7222,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/me.png",
-    "timestamp": "2026-03-02T16:05:09.067Z"
+    "timestamp": "2026-03-04T16:50:25.381Z"
   },
   {
     "route": "/me/wallet",
@@ -7449,7 +7366,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/me_wallet.png",
-    "timestamp": "2026-03-02T16:05:11.318Z"
+    "timestamp": "2026-03-04T16:50:27.817Z"
   },
   {
     "route": "/purchases",
@@ -7545,7 +7462,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/purchases.png",
-    "timestamp": "2026-03-02T16:05:13.472Z"
+    "timestamp": "2026-03-04T16:50:30.229Z"
   },
   {
     "route": "/subscriptions",
@@ -7677,7 +7594,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/subscriptions.png",
-    "timestamp": "2026-03-02T16:05:15.694Z"
+    "timestamp": "2026-03-04T16:50:32.659Z"
   },
   {
     "route": "/search",
@@ -7797,20 +7714,50 @@
       },
       {
         "type": "button",
-        "text": "Load More Creators",
+        "text": "$10.99/mo",
         "selector": "button:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Enter Site — I am 18+",
+        "text": "$17.99/mo",
         "selector": "button:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Exit",
+        "text": "$24.99/mo",
         "selector": "button:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$13.49/mo",
+        "selector": "button:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$16.99/mo",
+        "selector": "button:nth-of-type(23)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "$18.99/mo",
+        "selector": "button:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Enter Site — I am 18+",
+        "selector": "button:nth-of-type(25)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Exit",
+        "selector": "button:nth-of-type(26)",
         "status": "untested"
       },
       {
@@ -7869,7 +7816,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/search.png",
-    "timestamp": "2026-03-02T16:05:17.929Z"
+    "timestamp": "2026-03-04T16:50:35.031Z"
   },
   {
     "route": "/support",
@@ -7887,14 +7834,32 @@
       },
       {
         "type": "button",
-        "text": "Enter Site — I am 18+",
+        "text": "Test Creator",
         "selector": "button:nth-of-type(2)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Exit",
+        "text": "",
         "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Submit Ticket",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Enter Site — I am 18+",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Exit",
+        "selector": "button:nth-of-type(6)",
         "status": "untested"
       },
       {
@@ -7911,25 +7876,25 @@
       },
       {
         "type": "link",
-        "text": "Sign In",
+        "text": "/notifications",
         "selector": "a[href]:nth-of-type(3)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Join",
+        "text": "Home",
         "selector": "a[href]:nth-of-type(4)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Home",
+        "text": "Search",
         "selector": "a[href]:nth-of-type(5)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Search",
+        "text": "Create",
         "selector": "a[href]:nth-of-type(6)",
         "status": "untested"
       },
@@ -7953,7 +7918,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/support.png",
-    "timestamp": "2026-03-02T16:05:20.103Z"
+    "timestamp": "2026-03-04T16:50:37.201Z"
   },
   {
     "route": "/creator/new-post",
@@ -7971,14 +7936,50 @@
       },
       {
         "type": "button",
-        "text": "Enter Site — I am 18+",
+        "text": "Test Creator",
         "selector": "button:nth-of-type(2)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Exit",
+        "text": "",
         "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Discard & Exit",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Publish",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Discard & Exit",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Publish",
+        "selector": "button:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Enter Site — I am 18+",
+        "selector": "button:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Exit",
+        "selector": "button:nth-of-type(9)",
         "status": "untested"
       },
       {
@@ -7995,49 +7996,25 @@
       },
       {
         "type": "link",
-        "text": "Sign In",
+        "text": "/notifications",
         "selector": "a[href]:nth-of-type(3)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Join",
+        "text": "/creator/studio",
         "selector": "a[href]:nth-of-type(4)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Home",
-        "selector": "a[href]:nth-of-type(5)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Search",
-        "selector": "a[href]:nth-of-type(6)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Alerts",
-        "selector": "a[href]:nth-of-type(7)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Profile",
-        "selector": "a[href]:nth-of-type(8)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
         "text": "Terms of Service",
-        "selector": "a[href]:nth-of-type(9)",
+        "selector": "a[href]:nth-of-type(5)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_new-post.png",
-    "timestamp": "2026-03-02T16:05:22.903Z"
+    "timestamp": "2026-03-04T16:50:39.673Z"
   },
   {
     "route": "/creator/upgrade",
@@ -8145,7 +8122,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_upgrade.png",
-    "timestamp": "2026-03-02T16:05:25.194Z"
+    "timestamp": "2026-03-04T16:50:41.999Z"
   },
   {
     "route": "/creator/onboarding",
@@ -8229,13 +8206,271 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_onboarding.png",
-    "timestamp": "2026-03-02T16:05:27.360Z"
+    "timestamp": "2026-03-04T16:50:44.160Z"
   },
   {
     "route": "/creator/studio",
     "authState": "creator",
     "httpStatus": 200,
     "finalUrl": "http://localhost:3000/creator/studio",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators, tags...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Enter Site — I am 18+",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Exit",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Sign In",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Join",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Home",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Alerts",
+        "selector": "a[href]:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Profile",
+        "selector": "a[href]:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Terms of Service",
+        "selector": "a[href]:nth-of-type(9)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio.png",
+    "timestamp": "2026-03-04T16:50:46.614Z"
+  },
+  {
+    "route": "/creator/studio/analytics",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://localhost:3000/creator/studio/analytics",
+    "consoleErrors": [],
+    "networkErrors": [],
+    "clickableElements": [
+      {
+        "type": "button",
+        "text": "Search creators, tags...",
+        "selector": "button:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "sophia_creative",
+        "selector": "button:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "7 Days",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "30 Days",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "90 Days",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "All Time",
+        "selector": "button:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Enter Site — I am 18+",
+        "selector": "button:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Exit",
+        "selector": "button:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "GGetFanSee",
+        "selector": "a[href]:nth-of-type(1)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/search",
+        "selector": "a[href]:nth-of-type(2)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/notifications",
+        "selector": "a[href]:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/creator/studio",
+        "selector": "a[href]:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/creator/studio/post/list",
+        "selector": "a[href]:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/creator/studio/post/list",
+        "selector": "a[href]:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "/creator/studio/post/list",
+        "selector": "a[href]:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Create Post",
+        "selector": "a[href]:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Earnings",
+        "selector": "a[href]:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Subscribers",
+        "selector": "a[href]:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Post List",
+        "selector": "a[href]:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Analytics",
+        "selector": "a[href]:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Home",
+        "selector": "a[href]:nth-of-type(13)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search",
+        "selector": "a[href]:nth-of-type(14)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Create",
+        "selector": "a[href]:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Alerts",
+        "selector": "a[href]:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Profile",
+        "selector": "a[href]:nth-of-type(17)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Terms of Service",
+        "selector": "a[href]:nth-of-type(18)",
+        "status": "untested"
+      }
+    ],
+    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio_analytics.png",
+    "timestamp": "2026-03-04T16:50:49.115Z"
+  },
+  {
+    "route": "/creator/studio/earnings",
+    "authState": "creator",
+    "httpStatus": 200,
+    "finalUrl": "http://localhost:3000/creator/studio/earnings",
     "consoleErrors": [],
     "networkErrors": [],
     "clickableElements": [
@@ -8324,266 +8559,8 @@
         "status": "untested"
       }
     ],
-    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio.png",
-    "timestamp": "2026-03-02T16:05:29.796Z"
-  },
-  {
-    "route": "/creator/studio/analytics",
-    "authState": "creator",
-    "httpStatus": 200,
-    "finalUrl": "http://localhost:3000/creator/studio/analytics",
-    "consoleErrors": [],
-    "networkErrors": [],
-    "clickableElements": [
-      {
-        "type": "button",
-        "text": "Search creators, tags...",
-        "selector": "button:nth-of-type(1)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "sophia_creative",
-        "selector": "button:nth-of-type(2)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "",
-        "selector": "button:nth-of-type(3)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "7 Days",
-        "selector": "button:nth-of-type(4)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "30 Days",
-        "selector": "button:nth-of-type(5)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "90 Days",
-        "selector": "button:nth-of-type(6)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "All Time",
-        "selector": "button:nth-of-type(7)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "",
-        "selector": "button:nth-of-type(8)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "",
-        "selector": "button:nth-of-type(9)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "",
-        "selector": "button:nth-of-type(10)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Enter Site — I am 18+",
-        "selector": "button:nth-of-type(11)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Exit",
-        "selector": "button:nth-of-type(12)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "GGetFanSee",
-        "selector": "a[href]:nth-of-type(1)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "/search",
-        "selector": "a[href]:nth-of-type(2)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "/notifications",
-        "selector": "a[href]:nth-of-type(3)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "/creator/studio",
-        "selector": "a[href]:nth-of-type(4)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Create Post",
-        "selector": "a[href]:nth-of-type(5)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Earnings",
-        "selector": "a[href]:nth-of-type(6)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Subscribers",
-        "selector": "a[href]:nth-of-type(7)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Post List",
-        "selector": "a[href]:nth-of-type(8)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Analytics",
-        "selector": "a[href]:nth-of-type(9)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Home",
-        "selector": "a[href]:nth-of-type(10)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Search",
-        "selector": "a[href]:nth-of-type(11)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Create",
-        "selector": "a[href]:nth-of-type(12)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Alerts",
-        "selector": "a[href]:nth-of-type(13)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Profile",
-        "selector": "a[href]:nth-of-type(14)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Terms of Service",
-        "selector": "a[href]:nth-of-type(15)",
-        "status": "untested"
-      }
-    ],
-    "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio_analytics.png",
-    "timestamp": "2026-03-02T16:05:32.253Z"
-  },
-  {
-    "route": "/creator/studio/earnings",
-    "authState": "creator",
-    "httpStatus": 200,
-    "finalUrl": "http://localhost:3000/creator/studio/earnings",
-    "consoleErrors": [],
-    "networkErrors": [],
-    "clickableElements": [
-      {
-        "type": "button",
-        "text": "Search creators, tags...",
-        "selector": "button:nth-of-type(1)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Enter Site — I am 18+",
-        "selector": "button:nth-of-type(2)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Exit",
-        "selector": "button:nth-of-type(3)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "GGetFanSee",
-        "selector": "a[href]:nth-of-type(1)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "/search",
-        "selector": "a[href]:nth-of-type(2)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Sign In",
-        "selector": "a[href]:nth-of-type(3)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Join",
-        "selector": "a[href]:nth-of-type(4)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Home",
-        "selector": "a[href]:nth-of-type(5)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Search",
-        "selector": "a[href]:nth-of-type(6)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Alerts",
-        "selector": "a[href]:nth-of-type(7)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Profile",
-        "selector": "a[href]:nth-of-type(8)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Terms of Service",
-        "selector": "a[href]:nth-of-type(9)",
-        "status": "untested"
-      }
-    ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio_earnings.png",
-    "timestamp": "2026-03-02T16:05:34.695Z"
+    "timestamp": "2026-03-04T16:50:52.023Z"
   },
   {
     "route": "/creator/studio/subscribers",
@@ -8679,7 +8656,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio_subscribers.png",
-    "timestamp": "2026-03-02T16:05:37.484Z"
+    "timestamp": "2026-03-04T16:50:54.988Z"
   },
   {
     "route": "/creator/studio/post/list",
@@ -8697,14 +8674,68 @@
       },
       {
         "type": "button",
-        "text": "Enter Site — I am 18+",
+        "text": "Test Creator",
         "selector": "button:nth-of-type(2)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Exit",
+        "text": "",
         "selector": "button:nth-of-type(3)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Export",
+        "selector": "button:nth-of-type(4)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "all",
+        "selector": "button:nth-of-type(5)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "published",
+        "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "locked",
+        "selector": "button:nth-of-type(7)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "draft",
+        "selector": "button:nth-of-type(8)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Enter Site — I am 18+",
+        "selector": "button:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Exit",
+        "selector": "button:nth-of-type(12)",
         "status": "untested"
       },
       {
@@ -8721,49 +8752,97 @@
       },
       {
         "type": "link",
-        "text": "Sign In",
+        "text": "/notifications",
         "selector": "a[href]:nth-of-type(3)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Join",
+        "text": "Create Post",
         "selector": "a[href]:nth-of-type(4)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Home",
+        "text": "Create Post",
         "selector": "a[href]:nth-of-type(5)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Search",
+        "text": "Create Post",
         "selector": "a[href]:nth-of-type(6)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Alerts",
+        "text": "Earnings",
         "selector": "a[href]:nth-of-type(7)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Profile",
+        "text": "Subscribers",
         "selector": "a[href]:nth-of-type(8)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Terms of Service",
+        "text": "Post List",
         "selector": "a[href]:nth-of-type(9)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Analytics",
+        "selector": "a[href]:nth-of-type(10)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Create Post",
+        "selector": "a[href]:nth-of-type(11)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Home",
+        "selector": "a[href]:nth-of-type(12)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Search",
+        "selector": "a[href]:nth-of-type(13)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Create",
+        "selector": "a[href]:nth-of-type(14)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Alerts",
+        "selector": "a[href]:nth-of-type(15)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Profile",
+        "selector": "a[href]:nth-of-type(16)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Terms of Service",
+        "selector": "a[href]:nth-of-type(17)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/creator_studio_post_list.png",
-    "timestamp": "2026-03-02T16:05:39.919Z"
+    "timestamp": "2026-03-04T16:50:57.448Z"
   },
   {
     "route": "/admin/reports",
@@ -9142,19 +9221,19 @@
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(62)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(63)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(64)",
         "status": "untested"
       },
@@ -9346,7 +9425,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/admin_reports.png",
-    "timestamp": "2026-03-02T16:05:44.427Z"
+    "timestamp": "2026-03-04T16:51:01.716Z"
   },
   {
     "route": "/admin/content-review",
@@ -9725,19 +9804,19 @@
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(62)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(63)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(64)",
         "status": "untested"
       },
@@ -9929,7 +10008,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/admin_content-review.png",
-    "timestamp": "2026-03-02T16:05:48.439Z"
+    "timestamp": "2026-03-04T16:51:07.873Z"
   },
   {
     "route": "/admin/creator-verifications",
@@ -10308,19 +10387,19 @@
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(62)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(63)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Coming soon",
+        "text": "Follow",
         "selector": "button:nth-of-type(64)",
         "status": "untested"
       },
@@ -10512,6 +10591,6 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/agent-browser-full/creator/admin_creator-verifications.png",
-    "timestamp": "2026-03-02T16:05:52.455Z"
+    "timestamp": "2026-03-04T16:51:14.712Z"
   }
 ]

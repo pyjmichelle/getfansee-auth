@@ -140,11 +140,16 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
         return;
       }
 
-      const sessionSyncOk = await syncSessionCookies(data.session);
+      let sessionSyncOk = await syncSessionCookies(data.session);
       if (!sessionSyncOk) {
-        setError("Login failed: session sync error");
-        setIsLoading(false);
-        return;
+        // Retry once with latest session snapshot to avoid transient verification races
+        const { data: refreshed } = await supabase.auth.getSession();
+        if (refreshed.session) {
+          sessionSyncOk = await syncSessionCookies(refreshed.session);
+        }
+      }
+      if (!sessionSyncOk) {
+        console.warn("[auth] Session sync failed; continuing with client session.");
       }
       devLog("[auth] Session synced");
 
@@ -412,6 +417,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
             {/* Alerts */}
             {error && (
               <div
+                data-testid="auth-error"
                 className="flex items-start gap-2 mb-4 p-3 rounded-[var(--radius-sm)] bg-red-500/10 border border-red-500/20"
                 role="alert"
               >
@@ -421,6 +427,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
             )}
             {info && (
               <div
+                data-testid="auth-info"
                 className="mb-4 p-3 rounded-[var(--radius-sm)] bg-emerald-500/10 border border-emerald-500/20"
                 role="status"
               >
@@ -478,7 +485,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
 
                 <div className="flex justify-end">
                   <Link
-                    href="/auth/resend-verification"
+                    href="/auth/forgot-password"
                     className="text-[12px] text-violet-400 hover:text-violet-300 transition-colors"
                   >
                     Forgot password?
@@ -523,6 +530,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
                     className="w-full"
                     onClick={handleGoogleSignIn}
                     disabled={isLoading}
+                    data-testid="auth-google-button-login"
                   >
                     <svg className="size-[16px]" viewBox="0 0 24 24" aria-hidden="true">
                       <path
@@ -664,6 +672,7 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
                     className="w-full"
                     onClick={handleGoogleSignIn}
                     disabled={isLoading}
+                    data-testid="auth-google-button-signup"
                   >
                     <svg className="size-[16px]" viewBox="0 0 24 24" aria-hidden="true">
                       <path

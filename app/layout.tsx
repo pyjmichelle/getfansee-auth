@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { UnlockProvider } from "@/contexts/unlock-context";
 import { AgeGate } from "@/components/age-gate";
 import { PostHogProvider } from "@/components/providers/posthog-provider";
@@ -84,6 +85,7 @@ export default function RootLayout({
                 <AgeGate>{children}</AgeGate>
               </UnlockProvider>
               <Toaster />
+              <SonnerToaster richColors position="top-center" />
               {!isTestMode && <Analytics />}
             </AuthSyncProvider>
           </PostHogProvider>

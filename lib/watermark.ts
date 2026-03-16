@@ -32,7 +32,7 @@ export async function addWatermarkToImage(
         const ctx = canvas.getContext("2d");
 
         if (!ctx) {
-          reject(new Error("无法创建 Canvas context"));
+          reject(new Error("Failed to create Canvas context"));
           return;
         }
 
@@ -57,7 +57,7 @@ export async function addWatermarkToImage(
               const blobUrl = URL.createObjectURL(blob);
               resolve(blobUrl);
             } else {
-              reject(new Error("无法生成水印图片"));
+              reject(new Error("Failed to generate watermarked image"));
             }
           },
           "image/jpeg",
@@ -69,7 +69,7 @@ export async function addWatermarkToImage(
     };
 
     img.onerror = () => {
-      reject(new Error("图片加载失败"));
+      reject(new Error("Image failed to load"));
     };
 
     img.src = imageUrl;

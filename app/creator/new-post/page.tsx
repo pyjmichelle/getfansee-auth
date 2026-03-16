@@ -64,6 +64,7 @@ export default function NewPostPage() {
     watermark_enabled: true, // 默认开启
   });
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
+  const [isMediaUploading, setIsMediaUploading] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   useEffect(() => {
@@ -249,6 +250,7 @@ export default function NewPostPage() {
 
   const canPublish =
     formData.content.trim().length > 0 &&
+    !isMediaUploading &&
     (formData.visibility !== "ppv" || (formData.price && parseFloat(formData.price) > 0));
   const handleDiscardAndExit = () => router.push("/creator/studio");
 
@@ -393,6 +395,7 @@ export default function NewPostPage() {
                     setError(uploadError);
                     toast.error(uploadError);
                   }}
+                  onUploadStateChange={setIsMediaUploading}
                   maxFiles={10}
                 />
                 {mediaFiles.length > 0 && (

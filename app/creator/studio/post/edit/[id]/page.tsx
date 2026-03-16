@@ -140,11 +140,11 @@ export default function EditPostPage() {
           router.push("/creator/studio/post/list");
         }, 500);
       } else {
-        setError(result.error || "更新失败，请重试");
+        setError(result.error || "Update failed. Please try again.");
       }
     } catch (err) {
       console.error("[edit-post] handleSubmit error:", err);
-      setError("更新失败，请重试");
+      setError("Update failed. Please try again.");
     } finally {
       setIsSaving(false);
     }

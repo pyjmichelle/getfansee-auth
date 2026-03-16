@@ -53,6 +53,9 @@ function VideoPlayer({
 
     return () => {
       observer.disconnect();
+      if (!video.paused) {
+        video.pause();
+      }
     };
   }, [canView]);
 

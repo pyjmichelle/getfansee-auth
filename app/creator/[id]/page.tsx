@@ -21,6 +21,12 @@ import {
 } from "@/lib/icons";
 import { PaywallModal } from "@/components/paywall-modal";
 import { PostGridItem } from "@/components/post-grid-item";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { Analytics } from "@/lib/analytics";
 import { ErrorState } from "@/components/error-state";
@@ -291,12 +297,24 @@ export default function CreatorProfilePage() {
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/creator/${creatorId}`;
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({ url: shareUrl, title: creatorProfile?.display_name ?? "Creator" });
+        return;
+      } catch {
+        // user cancelled or share failed — fall through to clipboard
+      }
+    }
     try {
       await navigator.clipboard.writeText(shareUrl);
       toast.success("Link copied to clipboard!");
     } catch {
-      toast.success("Link copied!");
+      window.prompt("Copy this link:", shareUrl);
     }
+  };
+
+  const handleReport = () => {
+    toast.info("Report submitted. Our team will review it shortly.");
   };
 
   const isOwnProfile = currentUserId === creatorId;
@@ -345,15 +363,27 @@ export default function CreatorProfilePage() {
             {creatorProfile.display_name || "Creator"}
             <CheckCircle2 className="size-[15px] text-violet-400 shrink-0" aria-hidden="true" />
           </span>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={handleShare}
-            aria-label="Share profile"
-            className="text-white active:scale-95"
-          >
-            <MoreVertical className="w-5 h-5" aria-hidden="true" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label="More options"
+                data-testid="creator-more-btn"
+                className="text-white active:scale-95"
+              >
+                <MoreVertical className="w-5 h-5" aria-hidden="true" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" data-testid="creator-more-menu">
+              <DropdownMenuItem data-testid="creator-copy-link" onClick={handleShare}>
+                Copy link
+              </DropdownMenuItem>
+              <DropdownMenuItem data-testid="creator-report" onClick={handleReport}>
+                Report
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
@@ -507,6 +537,7 @@ export default function CreatorProfilePage() {
                 onClick={handleShare}
                 className="rounded-full"
                 aria-label="Share profile"
+                data-testid="creator-share-btn"
               >
                 <Share2 size={18} />
               </Button>

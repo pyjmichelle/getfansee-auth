@@ -121,6 +121,24 @@ export function PaywallModal({
   const insufficientBalance =
     type === "ppv" && !isBalanceLoading && balance !== null && balance < price;
 
+  const handleRetryBalance = async () => {
+    setBalanceError(null);
+    setIsBalanceLoading(true);
+    try {
+      const user = await getCurrentUser();
+      if (!user) {
+        setBalanceError("Please sign in to view balance");
+        return;
+      }
+      const wallet = await getWalletBalance(user.id);
+      setBalance(wallet?.available ?? 0);
+    } catch {
+      setBalanceError("Unable to load balance");
+    } finally {
+      setIsBalanceLoading(false);
+    }
+  };
+
   const handlePayment = async () => {
     setPaymentError(null);
     setPaymentState("processing");
@@ -407,8 +425,21 @@ export function PaywallModal({
                     )}
                   </>
                 ) : balanceError ? (
-                  <span className="text-red-400" data-testid="paywall-balance-error">
+                  <span
+                    className="flex items-center gap-2 text-red-400"
+                    data-testid="paywall-balance-error"
+                  >
                     {balanceError}
+                    {balanceError !== "Please sign in to view balance" && (
+                      <button
+                        type="button"
+                        className="text-xs underline transition-colors hover:text-red-300"
+                        onClick={handleRetryBalance}
+                        data-testid="paywall-balance-retry"
+                      >
+                        Retry
+                      </button>
+                    )}
                   </span>
                 ) : (
                   <span data-testid="paywall-balance-empty">Sign in to see balance</span>

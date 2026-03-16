@@ -17,5 +17,11 @@ export async function syncSessionCookies(session: SessionLike): Promise<boolean>
     }),
   });
 
-  return response.ok;
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    console.error("[syncSessionCookies] failed:", response.status, body);
+    return false;
+  }
+
+  return true;
 }

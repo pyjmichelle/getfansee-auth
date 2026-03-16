@@ -5,12 +5,12 @@ import { env } from "@/lib/env";
 // Session cookie sync endpoint: called by the client after Supabase JS login
 // to persist the session token in httpOnly cookies for SSR.
 //
-// WHY we avoid admin.auth.getUser() here:
-//   That call makes a Vercel → Supabase network roundtrip on EVERY login.
-//   It requires SUPABASE_SERVICE_ROLE_KEY in the serverless environment, and any
-//   network hiccup / cold-start timeout causes "session sync error".
-//   Because Supabase already validated the token when it issued it, we only need
-//   to verify the JWT claims locally (no network, no service key required).
+// WHY we validate JWT claims locally instead of calling admin.auth.getUser():
+//   A remote getUser() call creates a Vercel → Supabase network roundtrip on
+//   every login, which is fragile (cold-start timeouts → "session sync error").
+//   Because Supabase already validated the token at issuance, local claim
+//   verification (iss / aud / exp / sub) plus optional HMAC-SHA256 signature
+//   check is sufficient to safely set the httpOnly cookies.
 
 type SessionPayload = {
   access_token?: string;
