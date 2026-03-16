@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listCreatorPosts } from "@/lib/posts";
-import { canViewPost } from "@/lib/paywall";
+import { batchCheckSubscriptions, batchCheckPurchases } from "@/lib/paywall";
 import { getCurrentUser } from "@/lib/auth-server";
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -13,32 +13,51 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     const { id } = await params;
     const creatorId = id;
 
-    // 获取 creator posts
     const posts = await listCreatorPosts(creatorId);
 
-    // 在服务端检查每个 post 的可见性状态
     const unlockedStates: Record<string, boolean> = {};
-    for (const post of posts) {
-      // Creator 本人永远可见
-      if (post.creator_id === user.id) {
+
+    // Creator owns all their own posts
+    if (user.id === creatorId) {
+      posts.forEach((post) => {
         unlockedStates[post.id] = true;
-      } else if (post.visibility === "free") {
-        // 免费内容永远可见
-        unlockedStates[post.id] = true;
-      } else {
-        // 调用服务端函数检查解锁状态
-        try {
-          const canView = await canViewPost(post.id, post.creator_id);
-          unlockedStates[post.id] = canView;
-        } catch (err) {
-          console.error("[api] creator posts canViewPost error", err);
-          unlockedStates[post.id] = false;
+      });
+    } else {
+      // Separate free posts from gated posts to avoid unnecessary DB queries
+      const gatedPosts = posts.filter((p) => p.visibility !== "free");
+      const ppvPostIds = gatedPosts.filter((p) => p.visibility === "ppv").map((p) => p.id);
+      const subscriberPostCreatorIds = gatedPosts
+        .filter((p) => p.visibility === "subscribers" && p.creator_id !== undefined)
+        .map((p) => p.creator_id as string);
+      const uniqueCreatorIds = [...new Set(subscriberPostCreatorIds)];
+
+      // 2 queries regardless of post count (eliminates N+1)
+      const [subscriptionMap, purchaseMap] = await Promise.all([
+        batchCheckSubscriptions(user.id, uniqueCreatorIds),
+        batchCheckPurchases(user.id, ppvPostIds),
+      ]);
+
+      posts.forEach((post) => {
+        if (post.visibility === "free") {
+          unlockedStates[post.id] = true;
+        } else if (post.visibility === "ppv") {
+          unlockedStates[post.id] = purchaseMap.get(post.id) ?? false;
+        } else {
+          // subscribers-only: check subscription to the post's creator
+          unlockedStates[post.id] = post.creator_id
+            ? (subscriptionMap.get(post.creator_id) ?? false)
+            : false;
         }
-      }
+      });
     }
 
+    // Strip sensitive fields for locked posts to prevent content leaking
+    const safePosts = posts.map((post) =>
+      unlockedStates[post.id] ? post : { ...post, content: null, media_url: null }
+    );
+
     return NextResponse.json({
-      posts,
+      posts: safePosts,
       unlockedStates,
     });
   } catch (err: unknown) {

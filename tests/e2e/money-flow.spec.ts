@@ -55,10 +55,12 @@ test.describe("Money Flow - 护城河测试", () => {
     }
   });
 
-  // TODO: 修复 CI 中帖子页面加载问题后恢复此测试
-  test.skip("E2E-1: PPV 解锁完整流程 - Creator 发布 PPV → Fan 看到锁 → 解锁成功", async ({
-    page,
-  }) => {
+  test("E2E-1: PPV 解锁完整流程 - Creator 发布 PPV → Fan 看到锁 → 解锁成功", async ({ page }) => {
+    test.skip(
+      !process.env.SUPABASE_SERVICE_ROLE_KEY,
+      "Requires SUPABASE_SERVICE_ROLE_KEY for fixture setup"
+    );
+
     await signInUser(page, fixtures.fan.email, fixtures.fan.password);
     await waitForPageLoad(page);
 
@@ -73,7 +75,7 @@ test.describe("Money Flow - 护城河测试", () => {
         .isVisible()
         .catch(() => false)
     ) {
-      throw new Error(`Post page error: post ${postId} failed to load`);
+      throw new Error(`Post page error: post ${fixtures.posts.ppv.id} failed to load`);
     }
 
     await expect(page.getByTestId("post-locked-overlay")).toBeVisible({ timeout: 20_000 });
@@ -98,8 +100,11 @@ test.describe("Money Flow - 护城河测试", () => {
     });
   });
 
-  // TODO: 修复 CI 中帖子页面加载问题后恢复此测试
-  test.skip("E2E-2: 余额不足 → 提示充值 → 跳转钱包", async ({ page }) => {
+  test("E2E-2: 余额不足 → 提示充值 → 跳转钱包", async ({ page }) => {
+    test.skip(
+      !process.env.SUPABASE_SERVICE_ROLE_KEY,
+      "Requires SUPABASE_SERVICE_ROLE_KEY for fixture setup"
+    );
     // 1. 创建一个余额为 0 的新测试用户场景
     // 使用 fixtures.fan 但先确保余额不足
     const timestamp = Date.now();

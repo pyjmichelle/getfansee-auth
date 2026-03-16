@@ -38,10 +38,13 @@ test.describe("Paywall Flow E2E", () => {
     }
   });
 
-  // TODO: 修复 CI 中创建帖子 API 问题后恢复此测试
-  test.skip("完整流程：注册 → 成为 Creator → 上传图片 → 发布 locked post → 订阅 → 查看", async ({
+  test("完整流程：注册 → 成为 Creator → 上传图片 → 发布 locked post → 订阅 → 查看", async ({
     page,
   }) => {
+    test.skip(
+      !process.env.SUPABASE_SERVICE_ROLE_KEY,
+      "Requires SUPABASE_SERVICE_ROLE_KEY for fixture setup"
+    );
     test.setTimeout(180_000); // 长流程，CI 下避免超时
     let creatorPage: Awaited<ReturnType<typeof page.context>["newPage"]> | null = null;
     try {

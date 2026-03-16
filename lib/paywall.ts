@@ -198,15 +198,26 @@ export async function getCreatorEarnings(creatorId: string): Promise<
     created_at: string;
   }>
 > {
+  // Validate UUID format before using creatorId in any query to prevent
+  // string interpolation injection via the .or() PostgREST filter syntax.
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!UUID_RE.test(creatorId)) {
+    console.warn("[paywall] getCreatorEarnings: invalid creatorId format, returning empty");
+    return [];
+  }
+
   try {
     const supabase = await getSupabaseUniversalClient();
-    // 查询所有与创作者相关的交易（订阅、PPV购买等）
+
+    // Query the creator's own transaction rows directly using a safe parameterised
+    // eq() filter on user_id, then restrict to revenue-relevant types.
+    // This replaces the previous .or() string-interpolation approach which was
+    // vulnerable to PostgREST filter injection.
     const { data, error } = await supabase
       .from("transactions")
-      .select("*")
-      .or(
-        `metadata->>'creator_id'.eq.${creatorId},type.eq.subscription,type.eq.ppv_purchase,type.eq.ppv_revenue`
-      )
+      .select("id, type, amount_cents, status, available_on, metadata, created_at")
+      .eq("user_id", creatorId)
+      .in("type", ["subscription", "ppv_purchase", "ppv_revenue", "deposit", "withdrawal"])
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -214,7 +225,6 @@ export async function getCreatorEarnings(creatorId: string): Promise<
       return [];
     }
 
-    // 过滤出真正属于该创作者的交易
     type TransactionRow = {
       id: string;
       type: string;
@@ -225,23 +235,15 @@ export async function getCreatorEarnings(creatorId: string): Promise<
       metadata: Record<string, unknown> | null;
     };
 
-    return ((data as TransactionRow[] | null) || [])
-      .filter((t) => {
-        // 如果是订阅或PPV，检查 metadata 中的 creator_id
-        if (t.metadata && t.metadata.creator_id === creatorId) {
-          return true;
-        }
-        return false;
-      })
-      .map((t) => ({
-        id: t.id,
-        type: t.type,
-        amount_cents: t.amount_cents,
-        status: t.status,
-        available_on: t.available_on,
-        metadata: t.metadata,
-        created_at: t.created_at,
-      }));
+    return ((data as TransactionRow[] | null) || []).map((t) => ({
+      id: t.id,
+      type: t.type,
+      amount_cents: t.amount_cents,
+      status: t.status,
+      available_on: t.available_on,
+      metadata: t.metadata,
+      created_at: t.created_at,
+    }));
   } catch (err) {
     console.error("[paywall] getCreatorEarnings exception:", err);
     return [];

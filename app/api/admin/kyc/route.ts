@@ -96,7 +96,21 @@ export async function PATCH(request: NextRequest) {
 
     const supabase = getSupabaseAdminClient();
 
-    const { error } = await supabase
+    // Fetch user_id first so we can update both tables atomically in sequence.
+    // A separate SELECT before the UPDATE is safe here: the verification row
+    // is only modified by admin actions, so there is no meaningful TOCTOU risk.
+    const { data: verification, error: fetchError } = await supabase
+      .from("creator_verifications")
+      .select("user_id")
+      .eq("id", verificationId)
+      .single();
+
+    if (fetchError || !verification) {
+      console.error("[api/admin/kyc] PATCH fetch verification error:", fetchError);
+      return NextResponse.json({ error: "Verification not found" }, { status: 404 });
+    }
+
+    const { error: updateVerifError } = await supabase
       .from("creator_verifications")
       .update({
         status: approve ? "approved" : "rejected",
@@ -106,24 +120,25 @@ export async function PATCH(request: NextRequest) {
       })
       .eq("id", verificationId);
 
-    if (error) {
-      console.error("[api/admin/kyc] PATCH update error:", error);
+    if (updateVerifError) {
+      console.error("[api/admin/kyc] PATCH update verification error:", updateVerifError);
       return NextResponse.json({ error: "Failed to update verification" }, { status: 500 });
     }
 
-    // 通过时同步更新 profiles.age_verified
+    // Sync profiles.age_verified on approval — user_id already known, no extra SELECT
     if (approve) {
-      const { data: verification } = await supabase
-        .from("creator_verifications")
-        .select("user_id")
-        .eq("id", verificationId)
-        .single();
+      const { error: updateProfileError } = await supabase
+        .from("profiles")
+        .update({ age_verified: true })
+        .eq("id", verification.user_id);
 
-      if (verification) {
-        await supabase
-          .from("profiles")
-          .update({ age_verified: true })
-          .eq("id", verification.user_id);
+      if (updateProfileError) {
+        console.error(
+          "[api/admin/kyc] PATCH update profile age_verified error:",
+          updateProfileError
+        );
+        // Verification status was already updated; log the inconsistency but don't
+        // return 500 (the KYC status is the source of truth; age_verified is derived).
       }
     }
 

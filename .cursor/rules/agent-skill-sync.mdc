@@ -1,0 +1,45 @@
+---
+description: Keep agents and skills in sync with project evolution.
+globs: *
+alwaysApply: true
+---
+# Agent & Skill Sync Rule
+
+## Purpose
+
+Prevent agent/skill drift from real project behavior.
+
+## Mandatory Sync Triggers
+
+When any condition below is true, update corresponding agent/skill docs in the same task:
+
+1. New or renamed routes under `app/`.
+2. New migrations under `migrations/` affecting auth, RLS, payments, visibility, or performance.
+3. Changes to verification scripts in `package.json` (`check-*`, `test:*`, `qa:*`, `build`).
+4. New E2E folders or key scenarios under `tests/e2e/`.
+5. New security/compliance/payment requirements.
+
+## Minimum Update Set
+
+- Update relevant `.cursor/agents/*.md`.
+- Update matching `docs/agents/*.md` reference files.
+- Update `.cursor/skills/SKILLS_APPLICATION_GUIDE.md` when usage scope changes.
+- Add/update a planning entry in `docs/planning/sprint-current.md` if update is not completed in the same session.
+
+## Verification Requirement
+
+For agent/skill sync tasks, include at least:
+
+- `pnpm check-all`
+
+If command updates were made, include:
+
+- `pnpm build`
+
+## Definition of Complete
+
+Do not claim completion unless:
+
+- Updated docs name concrete routes/files/commands.
+- Agent output templates still match current release gate expectations.
+- The guide's "最后更新" date is refreshed.

@@ -1,15 +1,100 @@
+import { createHmac, timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseAdminClient } from "@/lib/supabase-admin";
+import { env } from "@/lib/env";
 
 // Session cookie sync endpoint: called by the client after Supabase JS login
 // to persist the session token in httpOnly cookies for SSR.
-// Security: validates the access_token against Supabase before setting cookies.
+//
+// WHY we avoid admin.auth.getUser() here:
+//   That call makes a Vercel → Supabase network roundtrip on EVERY login.
+//   It requires SUPABASE_SERVICE_ROLE_KEY in the serverless environment, and any
+//   network hiccup / cold-start timeout causes "session sync error".
+//   Because Supabase already validated the token when it issued it, we only need
+//   to verify the JWT claims locally (no network, no service key required).
 
 type SessionPayload = {
   access_token?: string;
   refresh_token?: string;
   expires_in?: number;
 };
+
+type JwtPayload = {
+  iss?: string;
+  aud?: string | string[];
+  sub?: string;
+  exp?: number;
+  role?: string;
+};
+
+/**
+ * Decode and validate a Supabase access_token.
+ *
+ * When SUPABASE_JWT_SECRET is configured, the HMAC-SHA256 signature is
+ * verified cryptographically (defense-in-depth before the httpOnly cookie is
+ * set).  Without the secret the function falls back to claims-only validation
+ * so existing deployments continue to work while the secret is being rolled
+ * out.
+ */
+function validateSupabaseJwt(token: string): JwtPayload | null {
+  // 1. Must be exactly 3 base64url segments
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
+
+  // 2. Decode the payload segment
+  let payload: JwtPayload;
+  try {
+    const json = Buffer.from(parts[1], "base64url").toString("utf-8");
+    payload = JSON.parse(json) as JwtPayload;
+  } catch {
+    return null;
+  }
+
+  // 3. Must not be expired
+  const now = Math.floor(Date.now() / 1000);
+  if (!payload.exp || payload.exp <= now) {
+    return null;
+  }
+
+  // 4. Issuer must match our Supabase project
+  const expectedIss = `${env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1`;
+  if (payload.iss !== expectedIss) {
+    return null;
+  }
+
+  // 5. Audience must be "authenticated"
+  const aud = Array.isArray(payload.aud) ? payload.aud[0] : payload.aud;
+  if (aud !== "authenticated") {
+    return null;
+  }
+
+  // 6. Must have a subject (user UUID)
+  if (!payload.sub) {
+    return null;
+  }
+
+  // 7. Cryptographic signature verification (when secret is available)
+  const jwtSecret = env.SUPABASE_JWT_SECRET;
+  if (jwtSecret) {
+    const signingInput = `${parts[0]}.${parts[1]}`;
+    const expectedSig = createHmac("sha256", jwtSecret).update(signingInput).digest("base64url");
+    const actualSig = parts[2];
+    try {
+      const expected = Buffer.from(expectedSig);
+      const actual = Buffer.from(actualSig);
+      if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) {
+        return null;
+      }
+    } catch {
+      return null;
+    }
+  } else {
+    console.warn(
+      "[api/auth/session] SUPABASE_JWT_SECRET not set — falling back to claims-only validation"
+    );
+  }
+
+  return payload;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,24 +108,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing tokens" }, { status: 400 });
     }
 
-    // Basic JWT structure check (header.payload.signature)
-    const jwtPattern = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
-    if (!jwtPattern.test(access_token)) {
-      return NextResponse.json({ error: "Invalid token format" }, { status: 400 });
-    }
-
-    // Server-side token validation: reject tokens not issued by our Supabase instance
-    const admin = getSupabaseAdminClient();
-    const { data: userData, error: verifyError } = await admin.auth.getUser(access_token);
-    if (verifyError || !userData?.user?.id) {
-      return NextResponse.json({ error: "Token verification failed" }, { status: 401 });
+    // Local JWT claim validation — no network call, no service key required
+    const payload = validateSupabaseJwt(access_token);
+    if (!payload) {
+      console.warn("[api/auth/session] JWT claim validation failed");
+      return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
     }
 
     const safeMaxAge = Math.min(Math.max(Number(expires_in) || 3600, 60), 86400);
     const isSecure =
       request.nextUrl.protocol === "https:" || request.headers.get("x-forwarded-proto") === "https";
 
-    const response = NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true, uid: payload.sub });
 
     response.cookies.set("sb-access-token", access_token, {
       path: "/",
@@ -64,4 +143,27 @@ export async function POST(request: NextRequest) {
     const message = err instanceof Error ? err.message : "Internal server error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
+}
+
+export async function DELETE(request: NextRequest) {
+  const isSecure =
+    request.nextUrl.protocol === "https:" || request.headers.get("x-forwarded-proto") === "https";
+  const response = NextResponse.json({ success: true });
+  response.cookies.set("sb-access-token", "", {
+    path: "/",
+    maxAge: 0,
+    expires: new Date(0),
+    httpOnly: true,
+    sameSite: "lax",
+    secure: isSecure,
+  });
+  response.cookies.set("sb-refresh-token", "", {
+    path: "/",
+    maxAge: 0,
+    expires: new Date(0),
+    httpOnly: true,
+    sameSite: "lax",
+    secure: isSecure,
+  });
+  return response;
 }

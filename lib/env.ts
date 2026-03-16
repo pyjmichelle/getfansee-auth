@@ -11,6 +11,8 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
     /** Service Role Key，仅用于 lib/server/supabase-admin，调用处会再校验 */
     SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+    /** JWT Secret，用于本地验证 Supabase access_token 签名（可选，缺失时降级为 claims-only 模式） */
+    SUPABASE_JWT_SECRET: z.string().optional(),
     DIDIT_WEBHOOK_SECRET: z.string().optional(),
     CRON_SECRET: z.string().optional(),
     ALERT_SLACK_WEBHOOK: z.string().optional(),
@@ -39,6 +41,7 @@ export const env = createEnv({
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    SUPABASE_JWT_SECRET: process.env.SUPABASE_JWT_SECRET,
     DIDIT_WEBHOOK_SECRET: process.env.DIDIT_WEBHOOK_SECRET,
     CRON_SECRET: process.env.CRON_SECRET,
     ALERT_SLACK_WEBHOOK: process.env.ALERT_SLACK_WEBHOOK,
