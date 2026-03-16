@@ -57,8 +57,11 @@ test.describe("Atomic PPV Unlock Tests", () => {
     }
   });
 
-  // TODO: 修复 CI 中帖子页面加载问题后恢复此测试
-  test.skip("E2E-1: PPV unlock success → purchase+transactions consistency", async ({ page }) => {
+  test("E2E-1: PPV unlock success → purchase+transactions consistency", async ({ page }) => {
+    test.skip(
+      !process.env.SUPABASE_SERVICE_ROLE_KEY,
+      "Requires SUPABASE_SERVICE_ROLE_KEY for fixture setup"
+    );
     await injectSupabaseSession(page, fixtures.fan.email, fixtures.fan.password, BASE_URL);
     await waitForPageLoad(page);
 
@@ -98,8 +101,11 @@ test.describe("Atomic PPV Unlock Tests", () => {
     await expect(contentElement).toBeVisible();
   });
 
-  // TODO: 修复 CI 中帖子页面加载问题后恢复此测试
-  test.skip("E2E-2: Double-click unlock → single charge (idempotency)", async ({ page }) => {
+  test("E2E-2: Double-click unlock → single charge (idempotency)", async ({ page }) => {
+    test.skip(
+      !process.env.SUPABASE_SERVICE_ROLE_KEY,
+      "Requires SUPABASE_SERVICE_ROLE_KEY for fixture setup"
+    );
     const fanAccount = await createConfirmedTestUser("fan");
     createdUserIds.push(fanAccount.userId);
     await topUpWallet(fanAccount.userId, Math.round(INITIAL_BALANCE * 100));
@@ -178,10 +184,13 @@ test.describe("Atomic PPV Unlock Tests", () => {
     });
   });
 
-  // TODO: 修复 CI 中帖子页面加载问题后恢复此测试
-  test.skip("E2E-3: Insufficient balance → no purchase, no transactions, UI prompts recharge", async ({
+  test("E2E-3: Insufficient balance → no purchase, no transactions, UI prompts recharge", async ({
     page,
   }) => {
+    test.skip(
+      !process.env.SUPABASE_SERVICE_ROLE_KEY,
+      "Requires SUPABASE_SERVICE_ROLE_KEY for fixture setup"
+    );
     const fanAccount = await createConfirmedTestUser("fan");
     createdUserIds.push(fanAccount.userId);
 

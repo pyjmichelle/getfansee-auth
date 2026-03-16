@@ -7,6 +7,19 @@
 
 ## Active Tasks
 
+### P2 – Agent/Skill 文档与项目迭代同步机制
+
+- Scope:
+  - 更新 `chief-quality-officer` 的职责、门禁命令与覆盖范围（含 admin/auth 新流程）
+  - 同步 `docs/agents/04-chief-quality.md` 与 `.cursor/skills/SKILLS_APPLICATION_GUIDE.md`
+  - 新增规则约束：后续项目结构变化时，必须同步更新 agent/skill 文档
+- Acceptance Criteria:
+  - `.cursor/agents/chief-quality.md` 与 `docs/agents/04-chief-quality.md` 明确当前项目命令与验证流程
+  - `.cursor/skills/SKILLS_APPLICATION_GUIDE.md` 更新为当前路由/测试结构并补充维护触发条件
+  - 新规则文件落地，覆盖“新增路由/迁移/脚本/测试时必须同步文档”
+- Required Gates:
+  - pnpm check-all
+
 ### P0 – 审查代码并修复以确保 CI 全绿
 
 - Scope:

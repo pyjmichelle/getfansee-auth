@@ -33,14 +33,17 @@ describe("wallet.ts", () => {
     await expect(getWalletBalance("user-1")).resolves.toEqual({ available: 50, pending: 25 });
   });
 
-  it("deposit 在更新成功时返回 true", async () => {
-    queryBuilder.single.mockResolvedValueOnce({
-      data: { available_balance_cents: 1000 },
-      error: null,
-    });
-    queryBuilder.update.mockReturnThis();
-    const { deposit } = await import("@/lib/wallet");
-    await expect(deposit("user-2", 10)).resolves.toBe(true);
+  it("getWalletBalance 在钱包不存在时创建并返回零余额", async () => {
+    queryBuilder.single
+      .mockResolvedValueOnce({ data: null, error: { code: "PGRST116", message: "not found" } })
+      .mockResolvedValueOnce({
+        data: { available_balance_cents: 0, pending_balance_cents: 0 },
+        error: null,
+      });
+    queryBuilder.insert.mockReturnThis();
+    const { getWalletBalance } = await import("@/lib/wallet");
+    const result = await getWalletBalance("user-new");
+    expect(result).toEqual({ available: 0, pending: 0 });
   });
 
   it("getTransactions 返回交易数组", async () => {

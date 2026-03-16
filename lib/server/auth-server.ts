@@ -112,7 +112,9 @@ export async function getCurrentUser(): Promise<AppUser | null> {
       .maybeSingle();
 
     if (profileError) {
-      console.warn("[auth-server] Failed to check ban status:", profileError.message);
+      // Fail-closed: if we cannot confirm the user is not banned, deny access.
+      console.error("[auth-server] Ban check query failed, denying access:", profileError.message);
+      return null;
     } else if (profile) {
       const now = new Date();
       const isBanned =

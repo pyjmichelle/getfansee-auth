@@ -44,14 +44,8 @@ export async function POST(request: NextRequest) {
       if (result.details) {
         console.error("[api/posts] Error details:", JSON.stringify(result.details, null, 2));
       }
-      return NextResponse.json(
-        {
-          success: false,
-          error: result.error,
-          details: result.details,
-        },
-        { status: 500 }
-      );
+      // Do not forward internal details (may contain DB role / schema info) to client
+      return NextResponse.json({ success: false, error: result.error }, { status: 500 });
     }
   } catch (err: unknown) {
     return jsonError(err);

@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireUser } from "@/lib/authz";
 import { hasActiveSubscription } from "@/lib/paywall";
+import { jsonError } from "@/lib/http-errors";
 
 export async function GET(request: NextRequest) {
   try {
+    await requireUser();
+
     const { searchParams } = new URL(request.url);
     const creatorId = searchParams.get("creatorId");
 
@@ -14,8 +18,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ isSubscribed });
   } catch (err: unknown) {
-    console.error("[api] subscription status error:", err);
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return jsonError(err);
   }
 }

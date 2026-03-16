@@ -1,83 +1,16 @@
 "use client";
 
 /**
- * Wallet 数据访问层
- * 钱包账户、充值、交易记录
+ * Wallet 客户端数据访问层（只读）
+ *
+ * 充值操作已移至服务端 API 路由 /api/wallet/recharge，
+ * 该路由通过 recharge_wallet RPC 以原子事务执行钱包更新 + 交易写入。
+ * 本文件仅保留读取函数供客户端组件使用。
  */
 
 import { getSupabaseBrowserClient } from "./supabase-browser";
 
 const supabase = getSupabaseBrowserClient();
-
-/**
- * 充值（Mock 支付处理）
- * @param userId 用户 ID
- * @param amount 充值金额（美元）
- * @returns true 成功，false 失败
- */
-export async function deposit(userId: string, amount: number): Promise<boolean> {
-  try {
-    const amountCents = Math.round(amount * 100);
-
-    // 1. 确保钱包账户存在
-    const { data: walletData, error: walletError } = await supabase
-      .from("wallet_accounts")
-      .select("available_balance_cents")
-      .eq("user_id", userId)
-      .single();
-
-    if (walletError && walletError.code === "PGRST116") {
-      // 创建钱包账户
-      const { error: insertError } = await supabase.from("wallet_accounts").insert({
-        user_id: userId,
-        available_balance_cents: amountCents,
-        pending_balance_cents: 0,
-      });
-
-      if (insertError) {
-        console.error("[wallet] deposit: create wallet error:", insertError);
-        return false;
-      }
-    } else if (walletData) {
-      // 更新余额
-      const newBalance = walletData.available_balance_cents + amountCents;
-      const { error: updateError } = await supabase
-        .from("wallet_accounts")
-        .update({ available_balance_cents: newBalance })
-        .eq("user_id", userId);
-
-      if (updateError) {
-        console.error("[wallet] deposit: update balance error:", updateError);
-        return false;
-      }
-    } else if (walletError) {
-      console.error("[wallet] deposit: get wallet error:", walletError);
-      return false;
-    }
-
-    // 2. 创建交易记录
-    const { error: transactionError } = await supabase.from("transactions").insert({
-      user_id: userId,
-      type: "deposit",
-      amount_cents: amountCents,
-      status: "completed",
-      metadata: {
-        payment_method: "mock",
-        amount_usd: amount,
-      },
-    });
-
-    if (transactionError) {
-      console.error("[wallet] deposit: create transaction error:", transactionError);
-      // 即使交易记录创建失败，余额已更新，返回成功
-    }
-
-    return true;
-  } catch (err) {
-    console.error("[wallet] deposit exception:", err);
-    return false;
-  }
-}
 
 /**
  * 获取钱包余额
