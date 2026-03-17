@@ -6,6 +6,7 @@
 import { getSupabaseUniversalClient } from "./supabase-universal";
 import { getCurrentUserUniversal } from "./auth-universal";
 import { getSubscriptionUserId, resolveSubscriptionUserColumn } from "./subscriptions";
+import { getSupabaseAdminClient } from "./supabase-admin";
 
 export type PaywallState = {
   hasActiveSubscription: boolean;
@@ -299,9 +300,13 @@ export async function isActiveSubscriber(
 }
 
 /**
- * 解锁单个 post（PPV unlock - 使用原子扣费函数）
+ * 解锁单个 post（PPV unlock）
+ * 使用 admin client 直接操作 DB，绕过 unlock_ppv RPC 函数的潜在 bug
+ * (migration 035 在 RPC 中引入了 v_post.price 字段名 bug)
  * @param postId Post ID
  * @param priceCents Price in cents (from post.price_cents, optional)
+ * @param idempotencyKey Idempotency key for deduplication
+ * @param explicitUserId Authenticated user ID (provided by route layer)
  * @returns { success: boolean, error?: string, balance_after_cents?: number }
  */
 export async function unlockPost(
@@ -323,46 +328,153 @@ export async function unlockPost(
       userId = user.id;
     }
 
-    const supabase = await getSupabaseUniversalClient();
-    // Get post price if not provided
-    if (!priceCents) {
-      const { data: post, error: postError } = await supabase
-        .from("posts")
-        .select("price_cents")
-        .eq("id", postId)
-        .single();
+    const admin = getSupabaseAdminClient();
 
-      if (postError || !post) {
-        console.error("[paywall] unlockPost: post not found", postError);
-        return { success: false, error: "Post not found" };
-      }
+    // 1. Fetch post info (price_cents + visibility + creator_id)
+    const { data: post, error: postError } = await admin
+      .from("posts")
+      .select("id, price_cents, visibility, creator_id")
+      .eq("id", postId)
+      .single();
 
-      priceCents = post.price_cents || 0;
+    if (postError || !post) {
+      console.error("[paywall] unlockPost: post not found", postError);
+      return { success: false, error: "Post not found" };
     }
 
-    // 调用原子扣费函数（在数据库内部完成：检查余额 -> 扣费 -> 记录交易 -> 创建购买）
-    const { data, error } = await supabase.rpc("unlock_ppv", {
-      p_post_id: postId,
-      p_user_id: userId,
-      p_idempotency_key: idempotencyKey ?? null,
-    });
-
-    if (error) {
-      console.error("[paywall] unlockPost rpc error:", error);
-      return { success: false, error: error.message };
+    if (post.visibility !== "ppv") {
+      return { success: false, error: "Post is not PPV" };
     }
 
-    if (!data || !data.success) {
+    const resolvedPrice = priceCents ?? post.price_cents ?? 0;
+    if (resolvedPrice <= 0) {
+      return { success: false, error: "Invalid post price" };
+    }
+
+    // 2. Idempotency key
+    const iKey = idempotencyKey ?? `ppv_${userId}_${postId}`;
+
+    // 3. Idempotency check — already have a purchase with this key?
+    const { data: existingPurchase } = await admin
+      .from("purchases")
+      .select("id")
+      .eq("fan_id", userId)
+      .eq("post_id", postId)
+      .maybeSingle();
+
+    if (existingPurchase) {
+      const { data: wallet } = await admin
+        .from("wallet_accounts")
+        .select("available_balance_cents")
+        .eq("user_id", userId)
+        .maybeSingle();
       return {
-        success: false,
-        error: data?.error || "Purchase failed",
-        balance_after_cents: data?.balance_after_cents,
+        success: true,
+        balance_after_cents: wallet?.available_balance_cents ?? 0,
       };
     }
 
+    // 4. Check fan wallet balance
+    const { data: fanWallet } = await admin
+      .from("wallet_accounts")
+      .select("available_balance_cents")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    const currentBalance = fanWallet?.available_balance_cents ?? 0;
+    if (currentBalance < resolvedPrice) {
+      return {
+        success: false,
+        error: "Insufficient balance",
+        balance_after_cents: currentBalance,
+      };
+    }
+
+    // 5. Deduct fan balance
+    const newFanBalance = currentBalance - resolvedPrice;
+    const { error: deductError } = await admin
+      .from("wallet_accounts")
+      .upsert(
+        { user_id: userId, available_balance_cents: newFanBalance, pending_balance_cents: 0 },
+        { onConflict: "user_id" }
+      );
+
+    if (deductError) {
+      console.error("[paywall] unlockPost: wallet deduct error", deductError);
+      return { success: false, error: "Balance deduction failed" };
+    }
+
+    // 6. Record purchase
+    const { data: newPurchase, error: purchaseError } = await admin
+      .from("purchases")
+      .insert({
+        fan_id: userId,
+        post_id: postId,
+        paid_amount_cents: resolvedPrice,
+        idempotency_key: iKey,
+      })
+      .select("id")
+      .single();
+
+    if (purchaseError) {
+      // Rollback balance on insert failure
+      await admin
+        .from("wallet_accounts")
+        .upsert(
+          { user_id: userId, available_balance_cents: currentBalance, pending_balance_cents: 0 },
+          { onConflict: "user_id" }
+        );
+      console.error("[paywall] unlockPost: purchase insert error", purchaseError);
+      return { success: false, error: "Purchase recording failed" };
+    }
+
+    // 7. Fan debit transaction
+    await admin.from("transactions").insert({
+      user_id: userId,
+      type: "ppv_purchase",
+      amount_cents: -resolvedPrice,
+      status: "completed",
+      metadata: {
+        post_id: postId,
+        creator_id: post.creator_id,
+        purchase_id: newPurchase?.id,
+        idempotency_key: iKey,
+      },
+    });
+
+    // 8. Creator pending revenue transaction
+    await admin.from("transactions").insert({
+      user_id: post.creator_id,
+      type: "ppv_revenue",
+      amount_cents: resolvedPrice,
+      status: "pending",
+      available_on: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      metadata: {
+        post_id: postId,
+        fan_id: userId,
+        purchase_id: newPurchase?.id,
+      },
+    });
+
+    // 9. Update creator pending balance
+    const { data: creatorWallet } = await admin
+      .from("wallet_accounts")
+      .select("available_balance_cents, pending_balance_cents")
+      .eq("user_id", post.creator_id)
+      .maybeSingle();
+
+    await admin.from("wallet_accounts").upsert(
+      {
+        user_id: post.creator_id,
+        available_balance_cents: creatorWallet?.available_balance_cents ?? 0,
+        pending_balance_cents: (creatorWallet?.pending_balance_cents ?? 0) + resolvedPrice,
+      },
+      { onConflict: "user_id" }
+    );
+
     return {
       success: true,
-      balance_after_cents: data.balance_after_cents ?? data.balance ?? 0,
+      balance_after_cents: newFanBalance,
     };
   } catch (err: unknown) {
     console.error("[paywall] unlockPost exception:", err);
