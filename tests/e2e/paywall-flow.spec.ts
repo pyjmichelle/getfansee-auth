@@ -127,6 +127,12 @@ test.describe("Paywall Flow E2E", () => {
       const postId = createBody.postId as string;
 
       // 5. Fan 查看 Feed（应该看到 locked 遮罩）
+      // 注意：creatorPage 和 page 共享同一个浏览器上下文（cookie），
+      // 所以 Creator 注册后，page 也获得了 Creator 的 session。
+      // 必须在这里重新以 Fan 身份登录，确保 page 使用 Fan 的 session 查看 feed。
+      await signInUser(page, fanEmail, fanPassword);
+      await waitForPageLoad(page);
+
       await page.goto(`${BASE_URL}/home`, { waitUntil: "domcontentloaded", timeout: 30000 });
       await waitForPageLoad(page);
       await page.waitForSelector(`text=${content}`, { timeout: 15000 });
