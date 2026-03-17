@@ -17,6 +17,11 @@ vi.mock("@/lib/supabase-server", () => ({
   getSupabaseServerClient: vi.fn(() => mockSupabase),
 }));
 
+// listCreatorPosts uses admin client to bypass RLS
+vi.mock("@/lib/supabase-admin", () => ({
+  getSupabaseAdminClient: vi.fn(() => mockSupabase),
+}));
+
 vi.mock("@/lib/auth-server", () => ({
   getCurrentUser: vi.fn(() => Promise.resolve({ id: "creator-1", email: "creator@example.com" })),
 }));
@@ -30,6 +35,18 @@ vi.mock("@/lib/profile-server", () => ({
       display_name: "Creator",
     })
   ),
+}));
+
+// Mock paywall batch helpers to avoid needing a live Supabase connection
+vi.mock("@/lib/paywall", () => ({
+  batchCheckSubscriptions: vi.fn(() => Promise.resolve(new Map())),
+  batchCheckPurchases: vi.fn(() => Promise.resolve(new Map())),
+}));
+
+// Mock geo-utils (network-free)
+vi.mock("@/lib/geo-utils", () => ({
+  getVisitorCountry: vi.fn(() => Promise.resolve(null)),
+  isCountryBlocked: vi.fn(() => false),
 }));
 
 describe("posts.ts", () => {

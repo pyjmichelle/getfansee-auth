@@ -28,6 +28,15 @@ allowed=(
   "app/api/report/route.ts"
   "app/api/wallet/recharge/route.ts"
   "app/api/webhooks/didit/route.ts"
+  # compliance: age gate audit logging (non-PII, server-side only)
+  "app/api/age-verify/route.ts"
+  # compliance: KYC document submission (private storage bucket)
+  "app/api/kyc/submit/route.ts"
+  # transactional emails: fetch profile/creator name for receipt emails (read-only)
+  "app/api/subscribe/route.ts"
+  "app/api/unlock/route.ts"
+  # posts: admin client used for RLS bypass on creator post management
+  "app/api/posts/[id]/route.ts"
 )
 
 is_allowed() {

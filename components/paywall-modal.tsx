@@ -48,8 +48,6 @@ export function PaywallModal({
   const [balanceError, setBalanceError] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const isTestMode =
-    process.env.NEXT_PUBLIC_TEST_MODE === "true" || process.env.PLAYWRIGHT_TEST_MODE === "true";
 
   // 当弹窗打开时追踪 paywall 展示事件
   useEffect(() => {
@@ -107,7 +105,7 @@ export function PaywallModal({
     return () => {
       mounted = false;
     };
-  }, [open, type, price, isTestMode]);
+  }, [open, type, price]);
 
   const insufficientBalance =
     type === "ppv" && !isBalanceLoading && balance !== null && balance < price;
@@ -144,16 +142,6 @@ export function PaywallModal({
     }
 
     try {
-      if (isTestMode) {
-        setPaymentState("success");
-        setTimeout(async () => {
-          await onSuccess();
-          onOpenChange(false);
-          setPaymentState("idle");
-        }, 300);
-        return;
-      }
-
       // 根据类型调用不同的支付逻辑
       if (type === "ppv") {
         // PPV 解锁：调用原子扣费函数
@@ -381,6 +369,10 @@ export function PaywallModal({
                 </div>
               )}
             </div>
+            <p className="text-center text-[10px] text-text-disabled mt-2">
+              Statement will show:{" "}
+              <span className="font-semibold text-text-quaternary">GETFANSEE.COM</span>
+            </p>
           </div>
 
           {/* Actions */}

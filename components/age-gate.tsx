@@ -55,6 +55,23 @@ export function AgeGate({ children }: AgeGateProps) {
   const handleConfirmAge = () => {
     localStorage.setItem(AGE_VERIFIED_KEY, AGE_VERIFIED_VALUE);
     setIsVerified(true);
+    // Log age gate confirmation for compliance audit (non-blocking, fire-and-forget)
+    try {
+      let sessionId = localStorage.getItem("getfansee_session_id");
+      if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        localStorage.setItem("getfansee_session_id", sessionId);
+      }
+      fetch("/api/age-verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      }).catch(() => {
+        // Silently ignore network errors — client-side verification is the gate
+      });
+    } catch {
+      // Silently ignore if crypto/fetch not available
+    }
   };
 
   const handleDenyAge = () => {

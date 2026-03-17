@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ArrowLeft, Shield, Upload, CheckCircle, AlertCircle } from "@/lib/icons";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
@@ -10,34 +10,83 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
+import { toast } from "sonner";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 
 type KYCStatus = "not_started" | "pending" | "approved" | "failed";
 
 export default function KYCPage() {
   const [status, setStatus] = useState<KYCStatus>("not_started");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{
+    username: string;
+    role: "fan" | "creator";
+    avatar?: string;
+  } | null>(null);
   const [formData, setFormData] = useState({
     fullName: "",
     dateOfBirth: "",
-    address: "",
+    country: "",
     idType: "",
   });
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const currentUser = {
-    username: "john_doe",
-    role: "fan" as const,
-    avatar: DEFAULT_AVATAR_FAN,
+  useEffect(() => {
+    getAuthBootstrap().then((bootstrap) => {
+      if (bootstrap.authenticated && bootstrap.profile) {
+        setCurrentUser({
+          username: bootstrap.profile.display_name || "user",
+          role: (bootstrap.profile.role || "fan") as "fan" | "creator",
+          avatar: bootstrap.profile.avatar_url || undefined,
+        });
+      }
+    });
+  }, []);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setSelectedFiles((prev) => [...prev, ...files]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.fullName || !formData.dateOfBirth || !formData.idType) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const fd = new FormData();
+      fd.append("fullName", formData.fullName);
+      fd.append("dateOfBirth", formData.dateOfBirth);
+      fd.append("country", formData.country || "Not specified");
+      fd.append("idType", formData.idType);
+      for (const file of selectedFiles) {
+        fd.append("documents", file);
+      }
+
+      const res = await fetch("/api/kyc/submit", {
+        method: "POST",
+        body: fd,
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || "Submission failed");
+      }
+
       setStatus("pending");
-    }, 2000);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Submission failed. Please try again.";
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getStatusBadge = () => {
@@ -74,7 +123,7 @@ export default function KYCPage() {
 
   if (status === "pending") {
     return (
-      <PageShell user={currentUser} notificationCount={3} maxWidth="2xl">
+      <PageShell user={currentUser} notificationCount={0} maxWidth="2xl">
         <div className="section-block py-12">
           <div className="card-block p-8 text-center">
             <div className="w-16 h-16 rounded-full bg-yellow-500/10 flex items-center justify-center mx-auto mb-6">
@@ -96,7 +145,7 @@ export default function KYCPage() {
 
   if (status === "approved") {
     return (
-      <PageShell user={currentUser} notificationCount={3} maxWidth="2xl">
+      <PageShell user={currentUser} notificationCount={0} maxWidth="2xl">
         <div className="section-block py-12">
           <div className="card-block p-8 text-center">
             <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6">
@@ -122,7 +171,7 @@ export default function KYCPage() {
   }
 
   return (
-    <PageShell user={currentUser} notificationCount={3} maxWidth="2xl">
+    <PageShell user={currentUser} notificationCount={0} maxWidth="2xl">
       <div className="section-block py-6">
         <Button asChild variant="ghost" size="sm" className="mb-6">
           <Link href="/me">
@@ -183,13 +232,12 @@ export default function KYCPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="address">Residential Address *</Label>
+                <Label htmlFor="country">Country of Residence</Label>
                 <Input
-                  id="address"
-                  placeholder="Street address, city, state, zip"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  required
+                  id="country"
+                  placeholder="e.g., United States, United Kingdom"
+                  value={formData.country}
+                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                   className="h-11"
                 />
               </div>
@@ -210,23 +258,42 @@ export default function KYCPage() {
 
           <div className="card-block p-6">
             <h2 className="text-lg font-semibold text-text-primary mb-6">Upload Documents</h2>
+            <p className="text-sm text-text-secondary mb-4">
+              Upload your ID document (front &amp; back) and a selfie. Accepted formats: JPG, PNG,
+              PDF (max 10MB each).
+            </p>
 
-            <div className="space-y-4">
-              {[
-                { label: "Upload ID Document (Front)", sub: "PNG, JPG or PDF up to 10MB" },
-                { label: "Upload ID Document (Back)", sub: "PNG, JPG or PDF up to 10MB" },
-                { label: "Upload Selfie", sub: "Clear photo of your face" },
-              ].map((doc, i) => (
-                <div
-                  key={i}
-                  className="border-2 border-dashed border-border-base rounded-lg p-8 text-center hover:border-brand-primary/50 transition-colors cursor-pointer"
-                >
-                  <Upload className="w-8 h-8 text-text-tertiary mx-auto mb-3" />
-                  <p className="text-sm font-medium text-text-primary mb-1">{doc.label}</p>
-                  <p className="text-xs text-text-tertiary">{doc.sub}</p>
-                </div>
-              ))}
+            <div
+              className="border-2 border-dashed border-border-base rounded-lg p-8 text-center hover:border-brand-primary/50 transition-colors cursor-pointer"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload className="w-8 h-8 text-text-tertiary mx-auto mb-3" />
+              <p className="text-sm font-medium text-text-primary mb-1">
+                Click to select documents
+              </p>
+              <p className="text-xs text-text-tertiary">
+                ID front, ID back, selfie — you can select multiple files
+              </p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,application/pdf"
+                multiple
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </div>
+
+            {selectedFiles.length > 0 && (
+              <ul className="mt-3 space-y-1">
+                {selectedFiles.map((file, i) => (
+                  <li key={i} className="text-xs text-text-secondary flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0" />
+                    {file.name}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className="flex gap-3">

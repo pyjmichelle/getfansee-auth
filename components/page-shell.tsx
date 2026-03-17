@@ -2,6 +2,7 @@
 
 import { NavHeader } from "@/components/nav-header";
 import { BottomNavigation } from "@/components/bottom-navigation";
+import { SiteFooter } from "@/components/site-footer";
 import { cn } from "@/lib/utils";
 
 type MaxWidth = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "full";
@@ -61,6 +62,10 @@ export function PageShell({
       >
         {children}
       </main>
+      {/* Desktop footer — hidden on mobile where BottomNavigation takes over */}
+      <div className="hidden md:block">
+        <SiteFooter />
+      </div>
       {!hideBottomNav && (
         <BottomNavigation notificationCount={notificationCount} userRole={user?.role} />
       )}

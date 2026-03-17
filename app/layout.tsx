@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { UnlockProvider } from "@/contexts/unlock-context";
 import { AgeGate } from "@/components/age-gate";
+import { CookieConsent } from "@/components/cookie-consent";
 import { PostHogProvider } from "@/components/providers/posthog-provider";
 import { RoutePerfTracker } from "@/components/providers/route-perf-tracker";
 import { AuthSyncProvider } from "@/components/providers/auth-sync-provider";
@@ -87,6 +88,7 @@ export default function RootLayout({
               <Toaster />
               <SonnerToaster richColors position="top-center" />
               {!isTestMode && <Analytics />}
+              {!isTestMode && <CookieConsent />}
             </AuthSyncProvider>
           </PostHogProvider>
         </Suspense>

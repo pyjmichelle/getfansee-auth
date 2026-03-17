@@ -162,19 +162,21 @@ function PostCard({
         </div>
       )}
 
-      {/* Media */}
-      {mediaUrl && (
+      {/* Media — render block for locked posts with media even when URL is hidden */}
+      {(mediaUrl || (isLocked && hasMedia)) && (
         <div className="relative w-full bg-black overflow-hidden aspect-[4/5] md:aspect-[16/9] md:max-h-[560px]">
           {isVideo ? (
             <div className="w-full h-full flex items-center justify-center bg-bg-elevated text-text-muted text-[12px]">
               Video content
             </div>
-          ) : (
+          ) : mediaUrl ? (
             <img
               src={mediaUrl}
               alt="Post media"
               className={`w-full h-full object-cover transition-all ${shouldBlur ? "blur-[24px] scale-110 opacity-50" : ""}`}
             />
+          ) : (
+            <div className="w-full h-full bg-bg-elevated" />
           )}
 
           {/* Lock overlay */}

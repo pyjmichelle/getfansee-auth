@@ -70,19 +70,60 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">5. Payments and Refunds</h2>
-            <p className="text-text-secondary font-semibold">
-              All purchases on GetFanSee are final. No refunds will be provided for digital goods,
-              including but not limited to:
+            <h2 className="text-2xl font-semibold mb-4">5. Payments, Subscriptions & Refunds</h2>
+            <p className="text-text-secondary">
+              All transactions on GetFanSee are processed securely. By completing a purchase, you
+              agree to the billing terms described below. Our full{" "}
+              <Link href="/refund" className="text-brand-primary underline hover:no-underline">
+                Refund & Cancellation Policy
+              </Link>{" "}
+              is available separately.
             </p>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">Subscriptions</h3>
             <ul className="list-disc pl-6 text-text-secondary space-y-2">
-              <li>Wallet recharges</li>
-              <li>Subscription purchases</li>
-              <li>Pay-per-view content unlocks</li>
-              <li>Tips and donations</li>
+              <li>
+                Subscriptions are billed on a recurring monthly basis from the date of purchase.
+              </li>
+              <li>
+                You may cancel your subscription at any time from your{" "}
+                <Link
+                  href="/subscriptions"
+                  className="text-brand-primary underline hover:no-underline"
+                >
+                  Subscriptions page
+                </Link>
+                . Cancellation takes effect at the end of the current billing period.
+              </li>
+              <li>
+                Refunds for subscription charges may be issued at our discretion within 48 hours of
+                a billing date in cases of technical error or duplicate charge.
+              </li>
             </ul>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">Pay-Per-View & Wallet Purchases</h3>
+            <ul className="list-disc pl-6 text-text-secondary space-y-2">
+              <li>
+                Pay-per-view unlocks and wallet recharges are generally non-refundable once the
+                digital content has been accessed.
+              </li>
+              <li>
+                Refund requests due to technical failures, duplicate charges, or content that was
+                materially misrepresented will be reviewed on a case-by-case basis. To request a
+                refund, contact{" "}
+                <a
+                  href="mailto:support@getfansee.com"
+                  className="text-brand-primary underline hover:no-underline"
+                >
+                  support@getfansee.com
+                </a>{" "}
+                within 14 days of the charge.
+              </li>
+            </ul>
+
             <p className="text-text-secondary mt-4">
-              Chargebacks may result in account suspension or termination.
+              Initiating a chargeback without first contacting our support team may result in
+              account suspension. We are committed to resolving disputes fairly and promptly.
             </p>
           </section>
 
@@ -129,7 +170,9 @@ export default function TermsPage() {
             <ul className="list-disc pl-6 text-text-secondary space-y-2">
               <li>Access to the Service will be revoked</li>
               <li>Pending creator payouts may be forfeited if due to policy violation</li>
-              <li>No refunds will be provided for unused wallet balance</li>
+              <li>
+                Unused wallet balance refund eligibility will be assessed per our Refund Policy
+              </li>
             </ul>
           </section>
 

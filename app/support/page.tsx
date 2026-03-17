@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,13 +14,14 @@ import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 const supabase = getSupabaseBrowserClient();
 
 export default function SupportPage() {
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [currentUser, setCurrentUser] = useState<{
     username: string;
     role: "fan" | "creator";
     avatar?: string;
     email?: string;
+    id?: string;
   } | null>(null);
 
   const [formData, setFormData] = useState({
@@ -33,17 +33,13 @@ export default function SupportPage() {
   useEffect(() => {
     const loadUser = async () => {
       const bootstrap = await getAuthBootstrap();
-      if (!bootstrap.authenticated || !bootstrap.user) {
-        router.push("/auth");
-        return;
-      }
-
-      if (bootstrap.profile) {
+      if (bootstrap.authenticated && bootstrap.user && bootstrap.profile) {
         setCurrentUser({
           username: bootstrap.profile.display_name || "user",
           role: (bootstrap.profile.role || "fan") as "fan" | "creator",
           avatar: bootstrap.profile.avatar_url || undefined,
           email: bootstrap.user.email,
+          id: bootstrap.user.id,
         });
         setFormData((prev) => ({
           ...prev,
@@ -53,12 +49,12 @@ export default function SupportPage() {
     };
 
     loadUser();
-  }, [router]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.subject || !formData.message) {
+    if (!formData.email || !formData.subject || !formData.message) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -67,13 +63,10 @@ export default function SupportPage() {
 
     try {
       const bootstrap = await getAuthBootstrap();
-      if (!bootstrap.authenticated || !bootstrap.user) {
-        router.push("/auth");
-        return;
-      }
+      const userId = bootstrap.authenticated ? bootstrap.user?.id : null;
 
       const { error } = await supabase.from("support_tickets").insert({
-        user_id: bootstrap.user.id,
+        ...(userId ? { user_id: userId } : {}),
         email: formData.email,
         subject: formData.subject,
         message: formData.message,
@@ -83,9 +76,9 @@ export default function SupportPage() {
         throw error;
       }
 
-      toast.success("Support ticket submitted! We'll respond via email.");
+      setSubmitted(true);
+      toast.success("Support ticket submitted! We'll respond via email within 24 hours.");
 
-      // 重置表单
       setFormData({
         email: formData.email,
         subject: "",
@@ -98,20 +91,6 @@ export default function SupportPage() {
       setIsSubmitting(false);
     }
   };
-
-  if (!currentUser) {
-    return (
-      <PageShell user={null} notificationCount={0} maxWidth="5xl">
-        <div className="space-y-4 animate-pulse py-8">
-          <div className="rounded-2xl bg-white/5 p-6 md:p-8">
-            <div className="h-8 w-48 bg-white/8 rounded mb-3" />
-            <div className="h-4 w-72 bg-white/8 rounded" />
-          </div>
-          <div className="rounded-2xl h-96 bg-white/5" />
-        </div>
-      </PageShell>
-    );
-  }
 
   const faqItems = [
     {
@@ -137,8 +116,12 @@ export default function SupportPage() {
     },
   ];
 
+  const userForShell = currentUser
+    ? { username: currentUser.username, role: currentUser.role, avatar: currentUser.avatar }
+    : null;
+
   return (
-    <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
+    <PageShell user={userForShell} notificationCount={0} maxWidth="5xl">
       <div className="pb-24">
         {/* Hero Banner */}
         <div className="card-block bg-gradient-subtle p-6 md:p-8 mb-6">
@@ -149,118 +132,164 @@ export default function SupportPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-text-primary">Contact Support</h1>
           </div>
           <p className="text-text-secondary">
-            Submit a support ticket and we&apos;ll get back to you via email within 24 hours.
+            Submit a support ticket and we&apos;ll get back to you via email within 24 hours. No
+            account required.
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Form */}
-          <div className="flex-1">
-            <div className="card-block p-6 md:p-8">
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-text-primary font-semibold">
-                    Email Address
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
-                    className="bg-surface-raised border-border-base rounded-xl focus-visible:ring-brand-primary"
-                  />
-                  <p className="text-xs text-text-tertiary">
-                    We&apos;ll send our response to this email address
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="subject" className="text-text-primary font-semibold">
-                    Subject
-                  </Label>
-                  <Input
-                    id="subject"
-                    type="text"
-                    value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    placeholder="Brief description of your issue"
-                    required
-                    className="bg-surface-raised border-border-base rounded-xl focus-visible:ring-brand-primary"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="message" className="text-text-primary font-semibold">
-                    Message
-                  </Label>
-                  <Textarea
-                    id="message"
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Please provide details about your issue..."
-                    rows={8}
-                    required
-                    className="bg-surface-raised border-border-base rounded-xl resize-none focus-visible:ring-brand-primary"
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full min-h-[52px] bg-brand-primary text-white font-bold rounded-xl hover-bold shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 mr-2" />
-                      Submit Ticket
-                    </>
-                  )}
-                </Button>
-              </form>
+        {submitted ? (
+          <div className="card-block p-8 text-center">
+            <div className="w-14 h-14 bg-brand-primary-alpha-10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Send className="w-6 h-6 text-brand-primary" />
             </div>
+            <h2 className="text-xl font-bold text-text-primary mb-2">Ticket Submitted!</h2>
+            <p className="text-text-secondary mb-6">
+              We&apos;ve received your request and will respond to{" "}
+              <strong>{formData.email || "your email"}</strong> within 24 hours on weekdays.
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => setSubmitted(false)}
+              className="bg-transparent"
+            >
+              Submit Another Ticket
+            </Button>
           </div>
-
-          {/* Sidebar: FAQ */}
-          <aside className="w-full lg:w-72 shrink-0">
-            <div className="sticky top-24 space-y-3">
-              <h2 className="text-base font-semibold text-text-primary px-1">Common Issues</h2>
-              {faqItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.title} className="card-block p-4 hover-bold">
-                    <div className="flex items-start gap-3">
-                      <div
-                        className={`w-9 h-9 ${item.bg} rounded-xl flex items-center justify-center flex-shrink-0`}
-                      >
-                        <Icon className={`w-5 h-5 ${item.color}`} aria-hidden="true" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-text-primary text-sm mb-0.5">
-                          {item.title}
-                        </h3>
-                        <p className="text-xs text-text-tertiary leading-relaxed">
-                          {item.description}
-                        </p>
-                      </div>
-                    </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Form */}
+            <div className="flex-1">
+              <div className="card-block p-6 md:p-8">
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-text-primary font-semibold">
+                      Email Address <span className="text-error">*</span>
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      placeholder="your@email.com"
+                      required
+                      className="bg-surface-raised border-border-base rounded-xl focus-visible:ring-brand-primary"
+                    />
+                    <p className="text-xs text-text-tertiary">
+                      We&apos;ll send our response to this email address
+                    </p>
                   </div>
-                );
-              })}
-              <div className="card-block p-4 bg-brand-primary-alpha-10 border-brand-primary/20">
-                <p className="text-xs text-text-secondary leading-relaxed">
-                  <span className="font-semibold text-brand-primary">Response time:</span> Usually
-                  within 24 hours on weekdays.
-                </p>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="subject" className="text-text-primary font-semibold">
+                      Subject <span className="text-error">*</span>
+                    </Label>
+                    <Input
+                      id="subject"
+                      type="text"
+                      value={formData.subject}
+                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                      placeholder="Brief description of your issue"
+                      required
+                      className="bg-surface-raised border-border-base rounded-xl focus-visible:ring-brand-primary"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="message" className="text-text-primary font-semibold">
+                      Message <span className="text-error">*</span>
+                    </Label>
+                    <Textarea
+                      id="message"
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      placeholder="Please provide details about your issue..."
+                      rows={8}
+                      required
+                      className="bg-surface-raised border-border-base rounded-xl resize-none focus-visible:ring-brand-primary"
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full min-h-[52px] bg-brand-primary text-white font-bold rounded-xl hover-bold shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 mr-2" />
+                        Submit Ticket
+                      </>
+                    )}
+                  </Button>
+
+                  <p className="text-xs text-text-tertiary text-center">
+                    For billing disputes, please include your transaction date and amount.
+                    Alternatively, email us directly at{" "}
+                    <a
+                      href="mailto:support@getfansee.com"
+                      className="text-brand-primary hover:underline"
+                    >
+                      support@getfansee.com
+                    </a>
+                  </p>
+                </form>
               </div>
             </div>
-          </aside>
-        </div>
+
+            {/* Sidebar: FAQ */}
+            <aside className="w-full lg:w-72 shrink-0">
+              <div className="sticky top-24 space-y-3">
+                <h2 className="text-base font-semibold text-text-primary px-1">Common Issues</h2>
+                {faqItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.title} className="card-block p-4 hover-bold">
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`w-9 h-9 ${item.bg} rounded-xl flex items-center justify-center flex-shrink-0`}
+                        >
+                          <Icon className={`w-5 h-5 ${item.color}`} aria-hidden="true" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-text-primary text-sm mb-0.5">
+                            {item.title}
+                          </h3>
+                          <p className="text-xs text-text-tertiary leading-relaxed">
+                            {item.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div className="card-block p-4 bg-brand-primary-alpha-10 border-brand-primary/20">
+                  <p className="text-xs text-text-secondary leading-relaxed">
+                    <span className="font-semibold text-brand-primary">Response time:</span> Usually
+                    within 24 hours on weekdays.
+                  </p>
+                </div>
+                <div className="card-block p-4">
+                  <p className="text-xs text-text-tertiary leading-relaxed">
+                    See our{" "}
+                    <a href="/faq" className="text-brand-primary hover:underline">
+                      FAQ
+                    </a>{" "}
+                    for quick answers, or our{" "}
+                    <a href="/refund" className="text-brand-primary hover:underline">
+                      Refund Policy
+                    </a>{" "}
+                    for billing questions.
+                  </p>
+                </div>
+              </div>
+            </aside>
+          </div>
+        )}
       </div>
     </PageShell>
   );

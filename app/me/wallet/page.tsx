@@ -553,7 +553,15 @@ export default function WalletPage() {
             {/* Checkout Disclaimer */}
             <div data-testid="checkout-disclaimer">
               <div className="card-block p-5 text-sm text-text-tertiary space-y-2">
-                <p data-testid="no-refund">All purchases are final and non-refundable.</p>
+                <p data-testid="no-refund">
+                  Your statement will show:{" "}
+                  <strong className="text-text-secondary">GETFANSEE.COM</strong>. Refunds are
+                  available in qualifying cases — see our{" "}
+                  <a href="/refund" className="text-brand-primary hover:underline">
+                    Refund Policy
+                  </a>
+                  .
+                </p>
                 <p>
                   By adding funds, you agree to our{" "}
                   <a

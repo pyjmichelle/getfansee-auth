@@ -25,10 +25,39 @@ const nextConfig = {
       {
         source: "/(.*)",
         headers: [
-          // Prevent tech stack inference via common headers
+          // Prevent tech stack inference
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          // HSTS: enforce HTTPS for 1 year, include subdomains
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload",
+          },
+          // Permissions Policy: restrict browser features not needed by the app
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), payment=()",
+          },
+          // Content Security Policy
+          // Note: 'unsafe-inline' for styles is required by Tailwind CSS / shadcn.
+          // Script 'unsafe-eval' is required by some Next.js internals in development.
+          // Tighten nonces in a future iteration once a nonce-based CSP is implemented.
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.posthog.com https://app.posthog.com https://cdn.vercel-insights.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://images.unsplash.com https://ui-avatars.com",
+              "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://app.posthog.com https://vitals.vercel-insights.com https://cdn.vercel-insights.com",
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "upgrade-insecure-requests",
+            ].join("; "),
+          },
         ],
       },
     ];
