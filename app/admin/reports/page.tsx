@@ -241,7 +241,7 @@ export default function ReportsPage() {
                           size="sm"
                           className="border-border-base bg-surface-base hover:bg-surface-raised rounded-xl"
                         >
-                          <Link href={`/post/${report.reported_id}`}>View Post</Link>
+                          <Link href={`/posts/${report.reported_id}`}>View Post</Link>
                         </Button>
                       )}
                       {report.reported_type === "user" && (

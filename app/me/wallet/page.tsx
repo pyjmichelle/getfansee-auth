@@ -15,7 +15,6 @@ import {
   TrendingUp,
   Calendar,
   Unlock,
-  Download,
   AlertTriangle,
   CreditCard,
   X,
@@ -262,7 +261,6 @@ export default function WalletPage() {
     try {
       setIsRecharging(true);
 
-      // 调用服务端 API 进行充值
       const response = await fetch("/api/wallet/recharge", {
         method: "POST",
         headers: {
@@ -287,8 +285,6 @@ export default function WalletPage() {
         // 重新加载交易记录
         const transactionsData = await getTransactions(currentUserId);
         setTransactions(transactionsData);
-
-        // Reset status after 3 seconds
         setTimeout(() => setPaymentStatus("idle"), 3000);
       } else {
         toast.error(result.error || "Recharge failed, please try again");
@@ -392,15 +388,6 @@ export default function WalletPage() {
                 >
                   <Plus className="w-4 h-4" />
                   Add Funds
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled
-                  title="Statement download coming soon"
-                  className="px-5 py-2.5 bg-surface-raised border-border-base flex items-center gap-2 opacity-50 cursor-not-allowed"
-                >
-                  <Download className="w-4 h-4" />
-                  Statement
                 </Button>
               </div>
             </div>

@@ -247,7 +247,7 @@ export default function ContentReviewPage() {
                         size="sm"
                         className="border-border-base bg-surface-base hover:bg-surface-raised rounded-xl active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
                       >
-                        <Link href={`/post/${post.id}`}>
+                        <Link href={`/posts/${post.id}`}>
                           <Eye className="w-4 h-4 mr-2" />
                           View
                         </Link>

@@ -182,8 +182,9 @@ export default function AnalyticsPage() {
               ))}
             </div>
           </div>
-          <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-            Analytics data is coming soon — current figures are estimates for preview purposes.
+          <div className="mb-6 rounded-xl border border-border-base bg-surface-raised px-4 py-3 text-sm text-text-tertiary">
+            Analytics figures reflect activity recorded on the platform. Data is updated
+            periodically.
           </div>
 
           {/* Key Metrics - StatCard */}

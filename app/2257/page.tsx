@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
+import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
   title: "18 U.S.C. § 2257 Compliance Statement - GetFanSee",
@@ -132,6 +133,7 @@ export default function Page2257() {
           </section>
         </div>
       </div>
+      <SiteFooter />
     </div>
   );
 }

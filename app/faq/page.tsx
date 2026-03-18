@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
+import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
   title: "FAQ - GetFanSee",
@@ -245,6 +246,7 @@ export default function FAQPage() {
           </Link>
         </div>
       </div>
+      <SiteFooter />
     </div>
   );
 }

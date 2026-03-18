@@ -136,17 +136,65 @@ export default function TermsPage() {
             </p>
           </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">7. Prohibited Content</h2>
-            <p className="text-text-secondary">The following content is strictly prohibited:</p>
+          <section id="prohibited-content">
+            <h2 className="text-2xl font-semibold mb-4">7. Prohibited Content & Acceptable Use</h2>
+            <p className="text-text-secondary mb-4">
+              GetFanSee is committed to providing a safe and legal platform. The following content
+              and activities are strictly prohibited. Violations may result in immediate account
+              termination, content removal, and referral to law enforcement authorities.
+            </p>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">
+              Absolutely Prohibited (Zero Tolerance)
+            </h3>
             <ul className="list-disc pl-6 text-text-secondary space-y-2">
-              <li>Content involving minors</li>
-              <li>Non-consensual content</li>
-              <li>Illegal activities</li>
-              <li>Harassment or hate speech</li>
-              <li>Content that infringes intellectual property rights</li>
-              <li>Malware or harmful code</li>
+              <li>
+                <strong className="text-text-primary">Content involving minors</strong> — any
+                content that sexually exploits, depicts, or endangers individuals under 18 years of
+                age. We report all such content to the National Center for Missing &amp; Exploited
+                Children (NCMEC) and relevant law enforcement.
+              </li>
+              <li>
+                <strong className="text-text-primary">Non-consensual content</strong> — sharing
+                intimate images or recordings without the subject's explicit consent.
+              </li>
+              <li>
+                <strong className="text-text-primary">Content depicting real violence</strong> —
+                gratuitous gore, torture, or real acts of violence.
+              </li>
+              <li>
+                <strong className="text-text-primary">Bestiality</strong> — sexual content involving
+                animals.
+              </li>
+              <li>
+                <strong className="text-text-primary">Illegal activities</strong> — content that
+                promotes, facilitates, or depicts illegal acts, including drug trafficking, weapons
+                distribution, or human trafficking.
+              </li>
             </ul>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">Also Prohibited</h3>
+            <ul className="list-disc pl-6 text-text-secondary space-y-2">
+              <li>
+                Harassment, bullying, or targeted hate speech based on protected characteristics
+              </li>
+              <li>Content that infringes intellectual property rights (copyright, trademark)</li>
+              <li>Malware, phishing, or any malicious code</li>
+              <li>Spam or unsolicited commercial communications</li>
+              <li>Impersonation of other individuals or entities</li>
+              <li>Content designed to defraud or deceive other users</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">Creator Responsibilities</h3>
+            <p className="text-text-secondary">
+              All creators must verify that every person appearing in their content is at least 18
+              years of age and has provided written consent. Creators must maintain records as
+              required by applicable law, including 18 U.S.C. § 2257. See our{" "}
+              <Link href="/2257" className="text-brand-primary underline hover:no-underline">
+                2257 Compliance Statement
+              </Link>{" "}
+              for details.
+            </p>
           </section>
 
           <section>
@@ -202,7 +250,67 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">13. Contact</h2>
+            <h2 className="text-2xl font-semibold mb-4">13. Governing Law</h2>
+            <p className="text-text-secondary">
+              These Terms of Service and any dispute or claim arising out of or in connection with
+              them (including non-contractual disputes or claims) shall be governed by and construed
+              in accordance with the laws of New South Wales, Australia, without regard to its
+              conflict of law provisions. You consent to the exclusive jurisdiction of courts
+              located in Sydney, New South Wales, Australia for any disputes not subject to
+              arbitration below.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">14. Dispute Resolution & Arbitration</h2>
+            <p className="text-text-secondary mb-4">
+              <strong className="text-text-primary">Please read this section carefully.</strong> It
+              affects your legal rights, including your right to file a lawsuit in court.
+            </p>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">Informal Resolution First</h3>
+            <p className="text-text-secondary">
+              Before initiating any formal dispute, you agree to first contact us at{" "}
+              <a
+                href="mailto:legal@getfansee.com"
+                className="text-brand-primary underline hover:no-underline"
+              >
+                legal@getfansee.com
+              </a>{" "}
+              and provide a written description of your dispute, the relief you seek, and your
+              contact information. We will attempt to resolve the dispute informally within 30 days
+              of receiving your notice.
+            </p>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">Binding Arbitration</h3>
+            <p className="text-text-secondary">
+              If the dispute is not resolved informally, you and GetFanSee agree that any dispute,
+              claim, or controversy arising out of or relating to these Terms or your use of the
+              Service shall be resolved by final and binding arbitration administered by the
+              Australian Centre for International Commercial Arbitration (ACICA) in accordance with
+              the ACICA Arbitration Rules. The seat of arbitration shall be Sydney, Australia. The
+              arbitration shall be conducted in English. The arbitral decision shall be final and
+              binding and may be enforced in any court of competent jurisdiction.
+            </p>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">Class Action Waiver</h3>
+            <p className="text-text-secondary">
+              You agree that any arbitration or proceeding shall be conducted only on an individual
+              basis and not in a class, consolidated, or representative action. You expressly waive
+              any right to bring or participate in any class action lawsuit or class-wide
+              arbitration against GetFanSee.
+            </p>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">Exceptions</h3>
+            <p className="text-text-secondary">
+              Notwithstanding the above, either party may seek injunctive or other equitable relief
+              in any court of competent jurisdiction to prevent the actual or threatened
+              infringement, misappropriation, or violation of intellectual property rights.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">15. Contact</h2>
             <p className="text-text-secondary">
               For questions about these Terms, contact us at:{" "}
               <a

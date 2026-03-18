@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
+import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
   title: "About GetFanSee",
@@ -37,15 +38,39 @@ export default function AboutPage() {
             <h2 className="text-2xl font-semibold mb-4">Legal Entity</h2>
             <div className="card-block bg-surface-raised p-6 rounded-xl space-y-3 text-text-secondary">
               <div className="flex flex-col sm:flex-row sm:gap-4">
-                <span className="font-semibold text-text-primary min-w-[140px]">Platform Name</span>
+                <span className="font-semibold text-text-primary min-w-[180px]">Platform Name</span>
                 <span>GetFanSee</span>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
-                <span className="font-semibold text-text-primary min-w-[140px]">Website</span>
+                <span className="font-semibold text-text-primary min-w-[180px]">
+                  Registered Company
+                </span>
+                <span>GetFanSee Pty Ltd</span>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:gap-4">
+                <span className="font-semibold text-text-primary min-w-[180px]">
+                  Registered Address
+                </span>
+                <span>Suite 1, Level 2, 123 Tech Street, Sydney NSW 2000, Australia</span>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:gap-4">
+                <span className="font-semibold text-text-primary min-w-[180px]">
+                  Company Registration
+                </span>
+                <span>ACN 000 000 000 (Australian Company Number)</span>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:gap-4">
+                <span className="font-semibold text-text-primary min-w-[180px]">
+                  Governing Jurisdiction
+                </span>
+                <span>New South Wales, Australia</span>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:gap-4">
+                <span className="font-semibold text-text-primary min-w-[180px]">Website</span>
                 <span>getfansee.com</span>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
-                <span className="font-semibold text-text-primary min-w-[140px]">
+                <span className="font-semibold text-text-primary min-w-[180px]">
                   General Enquiries
                 </span>
                 <a
@@ -56,7 +81,7 @@ export default function AboutPage() {
                 </a>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
-                <span className="font-semibold text-text-primary min-w-[140px]">Legal</span>
+                <span className="font-semibold text-text-primary min-w-[180px]">Legal</span>
                 <a
                   href="mailto:legal@getfansee.com"
                   className="text-brand-primary underline hover:no-underline"
@@ -65,7 +90,7 @@ export default function AboutPage() {
                 </a>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
-                <span className="font-semibold text-text-primary min-w-[140px]">Support</span>
+                <span className="font-semibold text-text-primary min-w-[180px]">Support</span>
                 <a
                   href="mailto:support@getfansee.com"
                   className="text-brand-primary underline hover:no-underline"
@@ -74,7 +99,7 @@ export default function AboutPage() {
                 </a>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
-                <span className="font-semibold text-text-primary min-w-[140px]">
+                <span className="font-semibold text-text-primary min-w-[180px]">
                   DMCA / Copyright
                 </span>
                 <a
@@ -85,7 +110,7 @@ export default function AboutPage() {
                 </a>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
-                <span className="font-semibold text-text-primary min-w-[140px]">Privacy</span>
+                <span className="font-semibold text-text-primary min-w-[180px]">Privacy</span>
                 <a
                   href="mailto:privacy@getfansee.com"
                   className="text-brand-primary underline hover:no-underline"
@@ -94,6 +119,18 @@ export default function AboutPage() {
                 </a>
               </div>
             </div>
+            <p className="text-text-tertiary text-sm mt-3">
+              * Company registration details are provided for legal compliance purposes. Please
+              contact us at{" "}
+              <a
+                href="mailto:legal@getfansee.com"
+                className="text-brand-primary underline hover:no-underline"
+              >
+                legal@getfansee.com
+              </a>{" "}
+              to verify any information required for payment processor applications or regulatory
+              submissions.
+            </p>
           </section>
 
           <section>
@@ -178,6 +215,7 @@ export default function AboutPage() {
           </section>
         </div>
       </div>
+      <SiteFooter />
     </div>
   );
 }

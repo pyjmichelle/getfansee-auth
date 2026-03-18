@@ -136,6 +136,152 @@ export default function PrivacyPage() {
           </section>
 
           <section>
+            <h2 className="text-2xl font-semibold mb-4">
+              7A. For EEA / UK Users — General Data Protection Regulation (GDPR)
+            </h2>
+            <p className="text-text-secondary mb-4">
+              If you are located in the European Economic Area (EEA) or the United Kingdom, the
+              following additional rights and disclosures apply under the General Data Protection
+              Regulation (GDPR) or the UK GDPR, as applicable.
+            </p>
+
+            <h3 className="text-xl font-medium mb-3 mt-6">Legal Bases for Processing</h3>
+            <p className="text-text-secondary mb-2">
+              We process your personal data under the following legal bases:
+            </p>
+            <ul className="list-disc pl-6 text-text-secondary space-y-2">
+              <li>
+                <strong className="text-text-primary">Contract performance</strong> — to provide the
+                Service you have subscribed to (Art. 6(1)(b) GDPR)
+              </li>
+              <li>
+                <strong className="text-text-primary">Legitimate interests</strong> — fraud
+                prevention, security, and service improvement (Art. 6(1)(f) GDPR)
+              </li>
+              <li>
+                <strong className="text-text-primary">Legal obligation</strong> — compliance with
+                applicable laws including 18 U.S.C. § 2257 and financial record-keeping (Art.
+                6(1)(c) GDPR)
+              </li>
+              <li>
+                <strong className="text-text-primary">Consent</strong> — where you have specifically
+                agreed (e.g., marketing communications, cookies) (Art. 6(1)(a) GDPR)
+              </li>
+            </ul>
+
+            <h3 className="text-xl font-medium mb-3 mt-6">Your GDPR Rights</h3>
+            <ul className="list-disc pl-6 text-text-secondary space-y-2">
+              <li>Right of access (Art. 15)</li>
+              <li>Right to rectification (Art. 16)</li>
+              <li>Right to erasure / "right to be forgotten" (Art. 17)</li>
+              <li>Right to restriction of processing (Art. 18)</li>
+              <li>Right to data portability (Art. 20)</li>
+              <li>Right to object to processing (Art. 21)</li>
+              <li>Rights related to automated decision-making (Art. 22)</li>
+              <li>
+                Right to withdraw consent at any time (without affecting prior lawful processing)
+              </li>
+            </ul>
+
+            <h3 className="text-xl font-medium mb-3 mt-6">
+              Right to Lodge a Supervisory Authority Complaint
+            </h3>
+            <p className="text-text-secondary">
+              You have the right to lodge a complaint with your local data protection authority
+              (e.g., the ICO in the UK, or the relevant national DPA in your EEA country) if you
+              believe we have not handled your data appropriately.
+            </p>
+
+            <h3 className="text-xl font-medium mb-3 mt-6">Data Protection Contact</h3>
+            <p className="text-text-secondary">
+              For any GDPR-related requests or questions, contact our privacy team at{" "}
+              <a
+                href="mailto:privacy@getfansee.com"
+                className="text-brand-primary underline hover:no-underline"
+              >
+                privacy@getfansee.com
+              </a>
+              . We will respond within 30 days.
+            </p>
+
+            <h3 className="text-xl font-medium mb-3 mt-6">International Data Transfers</h3>
+            <p className="text-text-secondary">
+              Where we transfer personal data outside the EEA or UK, we ensure appropriate
+              safeguards are in place, such as Standard Contractual Clauses (SCCs) approved by the
+              European Commission, or transfers to countries with an adequacy decision.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">
+              7B. For California Residents — California Consumer Privacy Act (CCPA) / CPRA
+            </h2>
+            <p className="text-text-secondary mb-4">
+              If you are a California resident, you have specific rights under the California
+              Consumer Privacy Act (CCPA) and California Privacy Rights Act (CPRA).
+            </p>
+
+            <h3 className="text-xl font-medium mb-3 mt-6">Your CCPA Rights</h3>
+            <ul className="list-disc pl-6 text-text-secondary space-y-2">
+              <li>
+                <strong className="text-text-primary">Right to Know</strong> — you may request
+                information about the categories and specific pieces of personal information we have
+                collected, the sources, business purposes, and third parties with whom we share it.
+              </li>
+              <li>
+                <strong className="text-text-primary">Right to Delete</strong> — you may request
+                deletion of personal information we have collected, subject to certain exceptions.
+              </li>
+              <li>
+                <strong className="text-text-primary">Right to Correct</strong> — you may request
+                correction of inaccurate personal information.
+              </li>
+              <li>
+                <strong className="text-text-primary">Right to Opt-Out of Sale or Sharing</strong> —
+                we do <em>not</em> sell your personal information to third parties and do not share
+                it for cross-context behavioural advertising purposes.
+              </li>
+              <li>
+                <strong className="text-text-primary">Right to Limit Use of Sensitive PI</strong> —
+                you may direct us to limit our use of sensitive personal information.
+              </li>
+              <li>
+                <strong className="text-text-primary">Right to Non-Discrimination</strong> — we will
+                not discriminate against you for exercising any CCPA rights.
+              </li>
+            </ul>
+
+            <h3 className="text-xl font-medium mb-3 mt-6">
+              Do Not Sell or Share My Personal Information
+            </h3>
+            <p className="text-text-secondary">
+              GetFanSee does <strong className="text-text-primary">not</strong> sell, rent, or share
+              personal information with third parties for monetary consideration or for
+              cross-context behavioural advertising. To submit any privacy request, contact us at{" "}
+              <a
+                href="mailto:privacy@getfansee.com"
+                className="text-brand-primary underline hover:no-underline"
+              >
+                privacy@getfansee.com
+              </a>
+              .
+            </p>
+
+            <h3 className="text-xl font-medium mb-3 mt-6">Submitting a CCPA Request</h3>
+            <p className="text-text-secondary">
+              To submit a verifiable consumer request, email us at{" "}
+              <a
+                href="mailto:privacy@getfansee.com"
+                className="text-brand-primary underline hover:no-underline"
+              >
+                privacy@getfansee.com
+              </a>{" "}
+              with subject line "CCPA Request". We will verify your identity before processing and
+              respond within 45 days.
+            </p>
+          </section>
+
+          <section>
             <h2 className="text-2xl font-semibold mb-4">8. Cookies</h2>
             <p className="text-text-secondary">We use cookies and similar technologies to:</p>
             <ul className="list-disc pl-6 text-text-secondary space-y-2">

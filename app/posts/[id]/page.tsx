@@ -17,7 +17,6 @@ import Link from "next/link";
 import { ArrowLeft, Share2, Lock, MessageCircle, MoreVertical, CheckCircle2 } from "@/lib/icons";
 import { ShareModal } from "@/components/share-modal";
 import { formatDistanceToNow } from "date-fns";
-import { toast } from "sonner";
 import { Analytics } from "@/lib/analytics";
 import { useCountUp } from "@/hooks/use-count-up";
 import { DEFAULT_AVATAR_CREATOR } from "@/lib/image-fallbacks";
@@ -516,14 +515,6 @@ export default function PostDetailPage() {
                 >
                   <Share2 size={18} aria-hidden="true" />
                 </button>
-                <Button
-                  variant="tip-gradient"
-                  size="sm"
-                  className="ml-auto rounded-full px-4 h-8 gap-1.5 active:scale-95 font-semibold"
-                  onClick={() => toast.info("Tip feature coming soon!")}
-                >
-                  <span className="text-[13px]">Tip</span>
-                </Button>
               </div>
 
               {/* Like count */}

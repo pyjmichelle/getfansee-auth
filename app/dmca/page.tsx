@@ -21,6 +21,7 @@ export default function DMCAPage() {
         </Link>
 
         <h1 className="text-4xl font-bold mb-4">DMCA & Copyright Policy</h1>
+        <p className="text-text-tertiary text-sm mb-2">Last updated: March 17, 2026</p>
         <p className="text-text-secondary mb-8">
           GetFanSee respects intellectual property rights and responds to valid DMCA takedown
           requests.

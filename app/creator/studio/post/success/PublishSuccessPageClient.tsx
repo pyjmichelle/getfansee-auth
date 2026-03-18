@@ -27,7 +27,11 @@ export default function PublishSuccessPageClient({
   };
 
   const resolvedPostId = postId ?? "demo-post";
-  const postUrl = `https://getfansee.com/post/${resolvedPostId}`;
+  const baseUrl =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_SITE_URL || "https://getfansee.com";
+  const postUrl = `${baseUrl}/posts/${resolvedPostId}`;
 
   useEffect(() => {
     setPostId(`demo-post-${Date.now()}`);

@@ -16,7 +16,6 @@ import {
   Lock,
   Sparkles,
   TrendingUp,
-  DollarSign,
   Flame,
   CheckCircle2,
 } from "@/lib/icons";
@@ -248,14 +247,6 @@ function PostCard({
         </button>
 
         <div className="flex-1" />
-
-        <button
-          onClick={() => toast("Tipping coming soon! ✨")}
-          className="flex items-center gap-1 h-7 px-3 rounded-full bg-amber-500/10 border border-amber-500/15 text-amber-400 hover:bg-amber-500/20 transition-colors"
-        >
-          <DollarSign className="size-[12px]" />
-          <span className="text-[11px] font-bold">Tip</span>
-        </button>
       </div>
     </article>
   );
@@ -477,9 +468,9 @@ export function HomeFeedClient({
                       variant="violet"
                       size="xs"
                       className="shrink-0 text-[11px] h-6 px-2.5"
-                      onClick={() => toast.info("Subscribe feature coming soon!")}
+                      asChild
                     >
-                      Follow
+                      <a href={`/creator/${creator.handle}`}>View</a>
                     </Button>
                   </div>
                 ))}
