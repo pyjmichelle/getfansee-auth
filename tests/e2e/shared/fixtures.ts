@@ -180,6 +180,7 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
     .split("@")[0]
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
+  const creatorAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(creatorDisplayName)}&background=6366f1&color=fff&size=150&bold=true`;
   await withAdminRetries(
     () =>
       adminClient.from("profiles").upsert(
@@ -190,7 +191,9 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
           display_name: creatorDisplayName,
           role: "creator",
           age_verified: true,
-          bio: "E2E Test Creator",
+          bio: "E2E Test Creator — sharing exclusive content for subscribers.",
+          avatar_url: creatorAvatarUrl,
+          subscription_price_cents: 999,
         },
         { onConflict: "id" }
       ),
@@ -204,7 +207,8 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
         {
           id: creatorUserId,
           display_name: creatorDisplayName,
-          bio: "E2E Test Creator",
+          bio: "E2E Test Creator — sharing exclusive content for subscribers.",
+          avatar_url: creatorAvatarUrl,
         },
         { onConflict: "id" }
       ),
@@ -317,8 +321,15 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
   };
 }
 
+// Stable picsum seed images for test posts (avoid 404)
+const TEST_POST_IMAGES: Record<string, string> = {
+  free: "https://picsum.photos/seed/e2e-free/800/600",
+  subscribers: "https://picsum.photos/seed/e2e-sub/800/600",
+  ppv: "https://picsum.photos/seed/e2e-ppv/800/600",
+};
+
 /**
- * 创建单个测试帖子
+ * 创建单个测试帖子（含 post_media 记录，确保 profile 内容网格不为空）
  */
 async function createTestPost(
   creatorId: string,
@@ -332,12 +343,14 @@ async function createTestPost(
 
   const title = `Test ${visibility} post ${timestamp}`;
   const content = `This is a test ${visibility} post created by fixtures`;
+  const mediaUrl = TEST_POST_IMAGES[visibility];
 
-  const postData: any = {
+  const postData: Record<string, unknown> = {
     creator_id: creatorId,
     title,
     content,
     visibility,
+    media_url: mediaUrl,
     preview_enabled: visibility === "ppv",
     watermark_enabled: visibility === "ppv",
   };
@@ -359,6 +372,23 @@ async function createTestPost(
     throw new Error(`Failed to create ${visibility} post: ${error.message}`);
   }
 
+  // Insert post_media record so the post grid shows actual content
+  try {
+    await withAdminRetries(
+      () =>
+        adminClient.from("post_media").insert({
+          post_id: data.id,
+          media_url: mediaUrl,
+          media_type: "image",
+          position: 0,
+        }),
+      `insert:post_media:${visibility}`
+    );
+  } catch (mediaErr) {
+    // Non-fatal: post_media table may not exist in all environments
+    console.warn("[fixtures] post_media insert failed (non-fatal):", mediaErr);
+  }
+
   return {
     id: data.id,
     creatorId,
@@ -378,13 +408,21 @@ export async function teardownTestFixtures(fixtures?: TestFixtures | null): Prom
   }
 
   try {
-    // 删除帖子
+    // 删除帖子关联媒体
     const postIds = [
       fixtures.posts?.free?.id,
       fixtures.posts?.subscribers?.id,
       fixtures.posts?.ppv?.id,
     ].filter(Boolean) as string[];
     if (postIds.length > 0) {
+      try {
+        await withAdminRetries(
+          () => adminClient.from("post_media").delete().in("post_id", postIds),
+          "delete:post_media"
+        );
+      } catch {
+        // post_media may not exist in all environments
+      }
       await withAdminRetries(
         () => adminClient.from("posts").delete().in("id", postIds),
         "delete:posts"

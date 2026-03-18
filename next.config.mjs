@@ -13,6 +13,8 @@ const nextConfig = {
       { protocol: "https", hostname: "**.supabase.in" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "ui-avatars.com" },
+      { protocol: "https", hostname: "picsum.photos" },
+      { protocol: "https", hostname: "fastly.picsum.photos" },
     ],
   },
   // Remove X-Powered-By header to avoid leaking Next.js fingerprint
@@ -50,7 +52,7 @@ const nextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.posthog.com https://app.posthog.com https://cdn.vercel-insights.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://images.unsplash.com https://ui-avatars.com",
+              "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://images.unsplash.com https://ui-avatars.com https://picsum.photos https://fastly.picsum.photos",
               "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://app.posthog.com https://vitals.vercel-insights.com https://cdn.vercel-insights.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",

@@ -67,11 +67,14 @@ export default async function HomePage() {
       price_cents: mp.price_cents,
       is_locked: mp.visibility !== "free",
       likes_count: mp.likes_count,
+      comments_count: mp.comments_count,
       created_at: mp.created_at,
       preview_enabled: true,
+      tags: mp.tags ?? [],
       creator: {
         display_name: creatorMap.get(mp.creator_id)?.display_name,
         avatar_url: creatorMap.get(mp.creator_id)?.avatar_url,
+        subscription_price_cents: creatorMap.get(mp.creator_id)?.subscription_price_cents,
       },
     })) as Post[];
   }
