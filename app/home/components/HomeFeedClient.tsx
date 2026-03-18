@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ import {
   TrendingUp,
   Flame,
   CheckCircle2,
+  UserPlus,
+  UserCheck,
 } from "@/lib/icons";
 import { PaywallModal } from "@/components/paywall-modal";
 import { ShareModal } from "@/components/share-modal";
@@ -50,11 +52,19 @@ function PostCard({
   isUnlocked,
   onUnlock,
   onShare,
+  isSubscribed,
+  onSubscribe,
+  isSubscribing,
+  currentUserId,
 }: {
   post: Post;
   isUnlocked: boolean;
   onUnlock: () => void;
   onShare: () => void;
+  isSubscribed: boolean;
+  onSubscribe: (creatorId: string) => void;
+  isSubscribing: boolean;
+  currentUserId: string | null;
 }) {
   const router = useRouter();
   const [liked, setLiked] = useState(false);
@@ -119,6 +129,38 @@ function PostCard({
           </p>
         </div>
 
+        {/* Follow/Subscribe button — hidden for own posts */}
+        {post.creator_id && currentUserId !== post.creator_id && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onSubscribe(post.creator_id!);
+            }}
+            disabled={isSubscribing}
+            data-testid="home-follow-btn"
+            aria-label={isSubscribed ? "Subscribed" : "Follow creator"}
+            className={`shrink-0 flex items-center gap-1 h-7 px-2.5 rounded-full text-[11px] font-semibold transition-all ${
+              isSubscribed
+                ? "bg-violet-500/15 border border-violet-500/30 text-violet-400"
+                : "bg-violet-500/90 hover:bg-violet-500 text-white shadow-glow-violet"
+            } disabled:opacity-60`}
+          >
+            {isSubscribing ? (
+              <span className="size-3 rounded-full border-2 border-current border-t-transparent animate-spin" />
+            ) : isSubscribed ? (
+              <>
+                <UserCheck className="size-[11px]" />
+                <span>Following</span>
+              </>
+            ) : (
+              <>
+                <UserPlus className="size-[11px]" />
+                <span>Follow</span>
+              </>
+            )}
+          </button>
+        )}
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -161,8 +203,8 @@ function PostCard({
         </div>
       )}
 
-      {/* Media — render block for locked posts with media even when URL is hidden */}
-      {(mediaUrl || (isLocked && hasMedia)) && (
+      {/* Media — render block for any locked post (even text-only) so the locked overlay is always visible */}
+      {(mediaUrl || isLocked) && (
         <div className="relative w-full bg-black overflow-hidden aspect-[4/5] md:aspect-[16/9] md:max-h-[560px]">
           {isVideo ? (
             <div className="w-full h-full flex items-center justify-center bg-bg-elevated text-text-muted text-[12px]">
@@ -265,10 +307,43 @@ export function HomeFeedClient({
   const [postViewStates] = useState<Map<string, boolean>>(initialUnlockedStates);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
+  // Subscription state: set of creator IDs the current user subscribes to
+  const [subscribedCreatorIds, setSubscribedCreatorIds] = useState<Set<string>>(new Set());
+  // Currently-processing subscribe action (creator ID or null)
+  const [subscribingCreatorId, setSubscribingCreatorId] = useState<string | null>(null);
+  // PaywallModal for subscribe flow triggered from feed
+  const [subscribeTargetCreatorId, setSubscribeTargetCreatorId] = useState<string | null>(null);
+  // Creator info cache for the subscribe modal (covers sidebar creators with no posts in feed)
+  const [subscribeTargetInfo, setSubscribeTargetInfo] = useState<{
+    name: string;
+    avatar?: string;
+    price: number;
+  } | null>(null);
+
   const trendingTags = ["Art", "Photography", "Fitness", "Design", "Music", "Travel"];
 
+  // Load user's existing subscriptions on mount
+  useEffect(() => {
+    const loadSubscriptions = async () => {
+      try {
+        const res = await fetch("/api/subscriptions");
+        if (!res.ok) return;
+        const data = await res.json();
+        const ids: string[] = (data.subscriptions ?? []).map(
+          (s: { creator_id: string }) => s.creator_id
+        );
+        setSubscribedCreatorIds(new Set(ids));
+      } catch {
+        // non-fatal — subscription state starts empty
+      }
+    };
+    if (currentUser) loadSubscriptions();
+  }, [currentUser]);
+
   const basePosts =
-    activeFeedTab === "for-you" ? posts : posts.filter((p) => p.visibility === "subscribers");
+    activeFeedTab === "for-you"
+      ? posts
+      : posts.filter((p) => p.creator_id && subscribedCreatorIds.has(p.creator_id));
   const displayedPosts = selectedTag
     ? basePosts.filter((p) => p.tags?.includes(selectedTag))
     : basePosts;
@@ -285,6 +360,62 @@ export function HomeFeedClient({
     setPaywallPost(null);
     toast.success("Content unlocked!");
   };
+
+  // Called when user clicks Follow on a post card or suggested creator
+  const handleFollowCreator = useCallback(
+    async (
+      creatorId: string,
+      creatorOverride?: { name: string; avatar?: string; price?: number }
+    ) => {
+      if (!currentUser) {
+        toast.error("Please sign in to follow creators");
+        return;
+      }
+      if (subscribedCreatorIds.has(creatorId)) {
+        return;
+      }
+      // Resolve creator info for the modal
+      const postFromFeed = posts.find((p) => p.creator_id === creatorId);
+      const name = creatorOverride?.name ?? postFromFeed?.creator?.display_name ?? "Creator";
+      const avatar = creatorOverride?.avatar ?? postFromFeed?.creator?.avatar_url ?? undefined;
+      const price =
+        creatorOverride?.price ??
+        ((postFromFeed?.creator as { subscription_price_cents?: number } | undefined)
+          ?.subscription_price_cents ?? 999) / 100;
+
+      setSubscribeTargetInfo({ name, avatar, price });
+      setSubscribeTargetCreatorId(creatorId);
+    },
+    [currentUser, subscribedCreatorIds, posts]
+  );
+
+  // Called when PaywallModal subscribe succeeds from the feed
+  const handleFeedSubscribeSuccess = useCallback(async () => {
+    if (!subscribeTargetCreatorId) return;
+    setSubscribingCreatorId(subscribeTargetCreatorId);
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ creatorId: subscribeTargetCreatorId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSubscribedCreatorIds((prev) => new Set([...prev, subscribeTargetCreatorId]));
+        toast.success("You're now following this creator!");
+      } else {
+        toast.error(data.error || "Failed to subscribe. Please try again.");
+        throw new Error(data.error);
+      }
+    } catch (err) {
+      console.error("[home] subscribe error", err);
+      throw err;
+    } finally {
+      setSubscribingCreatorId(null);
+      setSubscribeTargetCreatorId(null);
+      setSubscribeTargetInfo(null);
+    }
+  }, [subscribeTargetCreatorId]);
 
   return (
     <PageShell
@@ -414,6 +545,10 @@ export function HomeFeedClient({
                   isUnlocked={postViewStates.get(post.id) || isUnlockedGlobal(post.id)}
                   onUnlock={() => handleUnlock(post)}
                   onShare={() => handleShare(post)}
+                  isSubscribed={!!post.creator_id && subscribedCreatorIds.has(post.creator_id)}
+                  onSubscribe={handleFollowCreator}
+                  isSubscribing={subscribingCreatorId === post.creator_id}
+                  currentUserId={currentUser?.id ?? null}
                 />
               ))}
               <div className="py-8 text-center">
@@ -447,30 +582,56 @@ export function HomeFeedClient({
               </h3>
               <div className="space-y-3">
                 {[
-                  { name: "Elena Rivers", handle: "elenarivs", avatar: "/creator-avatar.png" },
                   {
-                    name: "Maya Chen",
-                    handle: "mayacreates",
-                    avatar: "/artist-creator-avatar.jpg",
+                    name: "Sophia Creative",
+                    handle: "sophiacreative",
+                    id: "mock-creator-1",
+                    price: 9.99,
+                    avatar:
+                      "https://ui-avatars.com/api/?name=Sophia+Creative&background=6366f1&color=fff&size=80&bold=true",
                   },
-                  { name: "Alex Martinez", handle: "alexfitlife", avatar: "/fan-user-avatar.jpg" },
+                  {
+                    name: "Emma Lifestyle",
+                    handle: "emmalifestyle",
+                    id: "mock-creator-3",
+                    price: 5.99,
+                    avatar:
+                      "https://ui-avatars.com/api/?name=Emma+Life&background=f59e0b&color=fff&size=80&bold=true",
+                  },
+                  {
+                    name: "Marcus Fitness",
+                    handle: "marcusfit",
+                    id: "mock-creator-4",
+                    price: 12.99,
+                    avatar:
+                      "https://ui-avatars.com/api/?name=Marcus+Fit&background=ef4444&color=fff&size=80&bold=true",
+                  },
                 ].map((creator) => (
                   <div key={creator.handle} className="flex items-center gap-2.5">
-                    <Avatar className="size-8 ring-1 ring-violet-500/20">
-                      <AvatarImage src={creator.avatar} />
-                      <AvatarFallback className="text-[10px]">{creator.name[0]}</AvatarFallback>
-                    </Avatar>
+                    <Link href={`/creator/${creator.id}`} className="shrink-0">
+                      <Avatar className="size-8 ring-1 ring-violet-500/20">
+                        <AvatarImage src={creator.avatar} />
+                        <AvatarFallback className="text-[10px]">{creator.name[0]}</AvatarFallback>
+                      </Avatar>
+                    </Link>
                     <div className="flex-1 min-w-0">
                       <p className="text-[12px] font-medium text-white truncate">{creator.name}</p>
                       <p className="text-[10px] text-text-muted">@{creator.handle}</p>
                     </div>
                     <Button
-                      variant="violet"
+                      variant={subscribedCreatorIds.has(creator.id) ? "outline" : "violet"}
                       size="xs"
                       className="shrink-0 text-[11px] h-6 px-2.5"
-                      asChild
+                      onClick={() =>
+                        handleFollowCreator(creator.id, {
+                          name: creator.name,
+                          avatar: creator.avatar,
+                          price: creator.price,
+                        })
+                      }
+                      disabled={subscribingCreatorId === creator.id}
                     >
-                      <a href={`/creator/${creator.handle}`}>View</a>
+                      {subscribedCreatorIds.has(creator.id) ? "Following" : "Follow"}
                     </Button>
                   </div>
                 ))}
@@ -522,6 +683,32 @@ export function HomeFeedClient({
           postId={paywallPost.id}
           creatorId={paywallPost.creator_id}
           onSuccess={() => handlePaywallSuccess(paywallPost.id)}
+        />
+      )}
+
+      {/* Subscribe modal triggered from Follow button in feed or suggested sidebar */}
+      {subscribeTargetCreatorId && subscribeTargetInfo && (
+        <PaywallModal
+          open={!!subscribeTargetCreatorId}
+          onOpenChange={(open) => {
+            if (!open) {
+              setSubscribeTargetCreatorId(null);
+              setSubscribeTargetInfo(null);
+            }
+          }}
+          type="subscribe"
+          creatorName={subscribeTargetInfo.name}
+          creatorAvatar={subscribeTargetInfo.avatar}
+          price={subscribeTargetInfo.price}
+          billingPeriod="month"
+          benefits={[
+            "Full access to all exclusive posts",
+            "Direct messaging with the creator",
+            "Early access to new content",
+            "Cancel anytime",
+          ]}
+          creatorId={subscribeTargetCreatorId}
+          onSuccess={handleFeedSubscribeSuccess}
         />
       )}
     </PageShell>
