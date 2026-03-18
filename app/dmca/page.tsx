@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, Mail, FileText, AlertCircle } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
   title: "DMCA & Copyright - GetFanSee",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function DMCAPage() {
   return (
-    <div className="min-h-dvh bg-bg-base">
+    <div className="min-h-dvh bg-bg-base flex flex-col">
       <div className="max-w-4xl mx-auto px-4 py-12 section-block">
         <Link href="/">
           <Button variant="ghost" className="mb-8 hover-bold">
@@ -217,6 +218,7 @@ Date: [Current date]`}
           </section>
         </div>
       </div>
+      <SiteFooter />
     </div>
   );
 }

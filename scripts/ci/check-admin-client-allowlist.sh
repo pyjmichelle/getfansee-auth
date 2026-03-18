@@ -37,6 +37,12 @@ allowed=(
   "app/api/unlock/route.ts"
   # posts: admin client used for RLS bypass on creator post management
   "app/api/posts/[id]/route.ts"
+  # payments: create Stripe checkout session, needs user profile lookup
+  "app/api/payments/create-checkout-session/route.ts"
+  # payments: Stripe webhook handler, processes payment events server-side
+  "app/api/webhooks/stripe/route.ts"
+  # subscriptions: cancel/list subscriptions, needs admin bypass for RLS
+  "app/api/subscriptions/route.ts"
 )
 
 is_allowed() {

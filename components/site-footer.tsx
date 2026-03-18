@@ -4,6 +4,7 @@ const legalLinks = [
   { href: "/terms", label: "Terms of Service" },
   { href: "/privacy", label: "Privacy Policy" },
   { href: "/refund", label: "Refund Policy" },
+  { href: "/acceptable-use", label: "Acceptable Use" },
   { href: "/dmca", label: "DMCA" },
   { href: "/2257", label: "18 U.S.C. § 2257" },
   { href: "/about", label: "About" },
