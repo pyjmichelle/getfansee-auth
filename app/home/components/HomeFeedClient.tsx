@@ -249,6 +249,7 @@ function PostCard({
               <Button
                 variant="violet"
                 onClick={onUnlock}
+                data-testid="post-unlock-trigger"
                 className="w-[200px] h-10 rounded-full text-[13px] font-bold"
               >
                 {post.visibility === "subscribers"
