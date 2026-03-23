@@ -262,6 +262,7 @@ test.describe("完整用户旅程测试", () => {
   });
 
   test("边界情况：Fan 用户访问 Creator 路由", async ({ page }) => {
+    test.setTimeout(120_000); // createConfirmedTestUser + session injection can be slow in CI
     const fanAccount = await createConfirmedTestUser("fan");
     try {
       const hostname = new URL(BASE_URL).hostname;

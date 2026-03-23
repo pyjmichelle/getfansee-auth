@@ -62,6 +62,14 @@ async function withAdminRetries<T>(
   throw lastError;
 }
 
+/** Supabase PostgREST 失败时返回 error 对象而不是 throw；必须显式检查，否则会误闯 FK 约束。 */
+function assertDbOk(result: { error: { message?: string } | null }, label: string): void {
+  if (result.error) {
+    const msg = result.error.message ?? JSON.stringify(result.error);
+    throw new Error(`${label}: ${msg}`);
+  }
+}
+
 async function findUserByEmail(email: string) {
   if (!adminClient) {
     return null;
@@ -181,7 +189,7 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
   const creatorAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(creatorDisplayName)}&background=6366f1&color=fff&size=150&bold=true`;
-  await withAdminRetries(
+  const profileCreatorRes = await withAdminRetries(
     () =>
       adminClient.from("profiles").upsert(
         {
@@ -193,15 +201,15 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
           age_verified: true,
           bio: "E2E Test Creator — sharing exclusive content for subscribers.",
           avatar_url: creatorAvatarUrl,
-          subscription_price_cents: 999,
         },
         { onConflict: "id" }
       ),
     "upsert:profiles:creator"
   );
+  assertDbOk(profileCreatorRes, "upsert:profiles:creator");
 
-  // 创建 creators 记录
-  await withAdminRetries(
+  // 创建 creators 记录（posts.creator_id 在多数环境中引用 creators.id）
+  const creatorsRes = await withAdminRetries(
     () =>
       adminClient.from("creators").upsert(
         {
@@ -214,6 +222,19 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
       ),
     "upsert:creators:creator"
   );
+  assertDbOk(creatorsRes, "upsert:creators:creator");
+
+  const { data: creatorRow, error: creatorVerifyErr } = await adminClient
+    .from("creators")
+    .select("id")
+    .eq("id", creatorUserId)
+    .maybeSingle();
+  assertDbOk({ error: creatorVerifyErr }, "select:creators:verify");
+  if (!creatorRow) {
+    throw new Error(
+      `E2E fixtures: creators row still missing for ${creatorUserId} after profile upsert — cannot insert posts (FK)`
+    );
+  }
 
   // 2. 创建 Fan（带钱包余额）
   const fanEmail = `e2e-fan-${uniqueSuffix}@example.com`;
@@ -266,7 +287,7 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
     .split("@")[0]
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
-  await withAdminRetries(
+  const profileFanRes = await withAdminRetries(
     () =>
       adminClient.from("profiles").upsert(
         {
@@ -281,10 +302,11 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
       ),
     "upsert:profiles:fan"
   );
+  assertDbOk(profileFanRes, "upsert:profiles:fan");
 
   // 创建钱包并充值 $50（应用使用 wallet_accounts，非 user_wallets）
   const walletBalance = 5000; // 50.00 USD in cents
-  await withAdminRetries(
+  const walletRes = await withAdminRetries(
     () =>
       adminClient.from("wallet_accounts").upsert(
         {
@@ -296,6 +318,7 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
       ),
     "upsert:wallet_accounts:fan"
   );
+  assertDbOk(walletRes, "upsert:wallet_accounts:fan");
 
   // 3. 创建测试帖子
   const posts: TestFixtures["posts"] = {
@@ -374,16 +397,17 @@ async function createTestPost(
 
   // Insert post_media record so the post grid shows actual content
   try {
-    await withAdminRetries(
+    const mediaRes = await withAdminRetries(
       () =>
         adminClient.from("post_media").insert({
           post_id: data.id,
           media_url: mediaUrl,
           media_type: "image",
-          position: 0,
+          sort_order: 0,
         }),
       `insert:post_media:${visibility}`
     );
+    assertDbOk(mediaRes, `insert:post_media:${visibility}`);
   } catch (mediaErr) {
     // Non-fatal: post_media table may not exist in all environments
     console.warn("[fixtures] post_media insert failed (non-fatal):", mediaErr);
@@ -503,7 +527,7 @@ export async function topUpWallet(userId: string, amountCents: number): Promise<
   }
 
   // 应用使用 wallet_accounts (user_id, available_balance_cents)
-  const { data: wallet } = await withAdminRetries(
+  const walletSelect = await withAdminRetries(
     () =>
       adminClient
         .from("wallet_accounts")
@@ -512,11 +536,12 @@ export async function topUpWallet(userId: string, amountCents: number): Promise<
         .maybeSingle(),
     "select:wallet_accounts"
   );
+  assertDbOk(walletSelect, "select:wallet_accounts");
 
-  const currentBalance = wallet?.available_balance_cents ?? 0;
+  const currentBalance = walletSelect.data?.available_balance_cents ?? 0;
   const newBalance = currentBalance + amountCents;
 
-  await withAdminRetries(
+  const walletUpsert = await withAdminRetries(
     () =>
       adminClient.from("wallet_accounts").upsert(
         {
@@ -528,9 +553,10 @@ export async function topUpWallet(userId: string, amountCents: number): Promise<
       ),
     "upsert:wallet_accounts"
   );
+  assertDbOk(walletUpsert, "upsert:wallet_accounts");
 
   // 记录交易（应用使用 transactions 表）
-  await withAdminRetries(
+  const txInsert = await withAdminRetries(
     () =>
       adminClient.from("transactions").insert({
         user_id: userId,
@@ -541,6 +567,7 @@ export async function topUpWallet(userId: string, amountCents: number): Promise<
       }),
     "insert:transactions"
   );
+  assertDbOk(txInsert, "insert:transactions");
 }
 
 /**
