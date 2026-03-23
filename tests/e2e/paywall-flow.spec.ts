@@ -139,10 +139,14 @@ test.describe("Paywall Flow E2E", () => {
 
       const lockedContent = page.getByTestId("post-locked-preview").first();
       await expect(lockedContent).toBeVisible({ timeout: 15000 });
+      // Scroll the locked overlay into view so child elements are fully rendered
+      await lockedContent.scrollIntoViewIfNeeded();
 
       // 6. Fan 订阅 Creator（路径 A：creator-subscribe-button 直订阅 /api/subscribe；路径 B：unlock-trigger → modal → paywall-subscribe-button）
       const creatorSubscribeBtn = page.getByTestId("creator-subscribe-button").first();
-      const unlockTrigger = page.getByTestId("post-unlock-trigger").first();
+      // Scope the trigger search within the visible locked overlay to avoid
+      // picking up a sibling element in another off-screen card via .first()
+      const unlockTrigger = lockedContent.getByTestId("post-unlock-trigger");
       let usedUnlockTrigger = false;
       let creatorIdForStatus: string | null = null;
 
