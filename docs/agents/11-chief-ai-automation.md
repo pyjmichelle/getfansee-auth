@@ -15,6 +15,10 @@ WHEN YOU ACT:
 - Introducing AI or automation.
 - AI affects fairness or behavior.
 
+PROJECT-SPECIFIC:
+
+- 站内 AI：`app/ai-dashboard/`, `app/api/ai/generate/`；新增模型/工具调用需过安全与合规评审
+
 TOOLS YOU MAY USE:
 
 - AI APIs

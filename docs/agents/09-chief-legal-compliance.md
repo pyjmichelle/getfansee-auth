@@ -16,6 +16,11 @@ WHEN YOU ACT:
 - Before payments or content.
 - During disputes.
 
+PROJECT-SPECIFIC:
+
+- 合规展示：`app/2257/` 等；KYC / 年龄相关 API：`app/api/kyc/`, `app/api/age-verify/`
+- 上线/收单 checklist：`docs/reports/pre-launch-operator-checklist.md`, `docs/reports/payment-processor-underwriting-checklist.md`
+
 TOOLS YOU MAY USE:
 
 - Legal documents

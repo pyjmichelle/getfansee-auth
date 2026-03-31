@@ -6,12 +6,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { HelpCircle, CreditCard, User, AlertTriangle, Send, Loader2 } from "@/lib/icons";
 import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 
-const supabase = getSupabaseBrowserClient();
+const CONTACT_REASONS = [
+  { value: "general_inquiry", label: "General Inquiry" },
+  { value: "technical_support", label: "Technical Support" },
+  { value: "account_issue", label: "Account Issue" },
+  { value: "payment_billing", label: "Payment & Billing" },
+  { value: "content_removal_dmca", label: "Content Removal / DMCA" },
+  { value: "age_verification", label: "Age Verification Help" },
+  { value: "report_abuse", label: "Report Abuse / Violation" },
+  { value: "creator_support", label: "Creator Support" },
+  { value: "fan_subscriber_support", label: "Fan / Subscriber Support" },
+  { value: "feature_suggestion", label: "Feature Suggestion" },
+  { value: "business_partnership", label: "Business / Partnership Inquiry" },
+  { value: "other", label: "Other" },
+];
 
 export default function SupportPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,6 +45,7 @@ export default function SupportPage() {
 
   const [formData, setFormData] = useState({
     email: "",
+    reason: "",
     subject: "",
     message: "",
   });
@@ -54,7 +74,7 @@ export default function SupportPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.email || !formData.subject || !formData.message) {
+    if (!formData.email || !formData.reason || !formData.subject || !formData.message) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -65,15 +85,21 @@ export default function SupportPage() {
       const bootstrap = await getAuthBootstrap();
       const userId = bootstrap.authenticated ? bootstrap.user?.id : null;
 
-      const { error } = await supabase.from("support_tickets").insert({
-        ...(userId ? { user_id: userId } : {}),
-        email: formData.email,
-        subject: formData.subject,
-        message: formData.message,
+      const response = await fetch("/api/support", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          email: formData.email,
+          reason: formData.reason,
+          subject: formData.subject,
+          message: formData.message,
+        }),
       });
 
-      if (error) {
-        throw error;
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Failed to submit ticket");
       }
 
       setSubmitted(true);
@@ -81,6 +107,7 @@ export default function SupportPage() {
 
       setFormData({
         email: formData.email,
+        reason: "",
         subject: "",
         message: "",
       });
@@ -177,6 +204,30 @@ export default function SupportPage() {
                     <p className="text-xs text-text-tertiary">
                       We&apos;ll send our response to this email address
                     </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="reason" className="text-text-primary font-semibold">
+                      Reason <span className="text-error">*</span>
+                    </Label>
+                    <Select
+                      value={formData.reason}
+                      onValueChange={(value) => setFormData({ ...formData, reason: value })}
+                    >
+                      <SelectTrigger
+                        id="reason"
+                        className="w-full bg-surface-raised border-border-base rounded-xl focus:ring-brand-primary"
+                      >
+                        <SelectValue placeholder="Select a reason..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CONTACT_REASONS.map((r) => (
+                          <SelectItem key={r.value} value={r.value}>
+                            {r.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-2">

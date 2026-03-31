@@ -23,8 +23,8 @@ export default function AboutPage() {
 
         <h1 className="text-4xl font-bold text-brand-primary mb-8">About GetFanSee</h1>
 
-        <div className="card-block p-8 prose prose-invert max-w-none space-y-8">
-          <section>
+        <div className="prose prose-invert max-w-none space-y-6">
+          <div className="card-block p-8 rounded-2xl">
             <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
             <p className="text-text-secondary">
               GetFanSee is a premium adult creator subscription platform designed to help creators
@@ -32,11 +32,11 @@ export default function AboutPage() {
               provide a safe, transparent, and compliant environment for adult content creators and
               their subscribers.
             </p>
-          </section>
+          </div>
 
-          <section>
+          <div className="card-block p-8 rounded-2xl">
             <h2 className="text-2xl font-semibold mb-4">Legal Entity</h2>
-            <div className="card-block bg-surface-raised p-6 rounded-xl space-y-3 text-text-secondary">
+            <div className="bg-surface-raised p-6 rounded-xl space-y-3 text-text-secondary">
               <div className="flex flex-col sm:flex-row sm:gap-4">
                 <span className="font-semibold text-text-primary min-w-[180px]">Platform Name</span>
                 <span>GetFanSee</span>
@@ -131,9 +131,9 @@ export default function AboutPage() {
               to verify any information required for payment processor applications or regulatory
               submissions.
             </p>
-          </section>
+          </div>
 
-          <section>
+          <div className="card-block p-8 rounded-2xl">
             <h2 className="text-2xl font-semibold mb-4">Our Commitment to Safety</h2>
             <p className="text-text-secondary mb-4">
               GetFanSee is committed to operating a safe and legal platform. Our key safeguards
@@ -172,9 +172,9 @@ export default function AboutPage() {
                 .
               </li>
             </ul>
-          </section>
+          </div>
 
-          <section>
+          <div className="card-block p-8 rounded-2xl">
             <h2 className="text-2xl font-semibold mb-4">Legal Documents</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
@@ -188,15 +188,15 @@ export default function AboutPage() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="card-block p-4 text-brand-primary text-sm font-medium hover:bg-surface-raised transition-colors rounded-xl"
+                  className="bg-surface-raised p-4 text-brand-primary text-sm font-medium hover:bg-white/10 transition-colors rounded-xl"
                 >
                   {link.label} →
                 </Link>
               ))}
             </div>
-          </section>
+          </div>
 
-          <section>
+          <div className="card-block p-8 rounded-2xl">
             <h2 className="text-2xl font-semibold mb-4">Contact Us</h2>
             <p className="text-text-secondary">
               For any enquiries, support requests, or legal matters, please contact us through our{" "}
@@ -212,7 +212,7 @@ export default function AboutPage() {
               </a>
               .
             </p>
-          </section>
+          </div>
         </div>
       </div>
       <SiteFooter />

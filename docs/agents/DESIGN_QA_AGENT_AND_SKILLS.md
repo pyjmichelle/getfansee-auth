@@ -25,7 +25,9 @@
 | **P1** | **web-design-guidelines** | `.cursor/skills/web-design-guidelines.skill.md` | 可访问性、键盘、焦点、表单错误、UX 审查                                               |
 | **P1** | **e2e-test-setup**        | `.cursor/skills/e2e-test-setup.skill.md`        | Playwright 截图脚本、稳定等待、testid、断言                                           |
 | **P2** | **agent-browser**         | `.cursor/skills/agent-browser/SKILL.md`         | 快速验证/探索页面、CLI 截图与快照（与 Playwright 互补）                               |
+| **P2** | **ui-ux-pro-max**         | `.cursor/skills/ui-ux-pro-max/SKILL.md`         | 按 Next.js/shadcn 数据表做版式、色彩、组件栈对齐（与 frontend-design 互补）           |
 | **P2** | **audit-website**         | `.cursor/skills/audit-website.skill.md`         | 全站审计：性能、a11y、SEO、安全                                                       |
+| **—**  | **code-check**            | `.cursor/skills/code-check/SKILL.md`            | PR 前「跑检查」：`pnpm check-all`（不含 build；完整发布链见 chief-quality）           |
 
 ---
 
@@ -73,4 +75,6 @@
 
 ---
 
-_与 `.cursor/agents/chief-frontend.md`、`.cursor/skills/SKILLS_APPLICATION_GUIDE.md` 保持一致。_
+**E2E 冒烟**：优先 `pnpm test:e2e:smoke`（`tests/e2e/smoke.spec.ts`）；与 release-gate 文档一致。
+
+_与 `.cursor/agents/chief-frontend.md`、`.cursor/skills/SKILLS_APPLICATION_GUIDE.md` 保持一致（最后同步：2026-03-31）。_

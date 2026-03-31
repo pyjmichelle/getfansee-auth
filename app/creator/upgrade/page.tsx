@@ -98,12 +98,9 @@ export default function CreatorUpgradePage() {
           <h2 className="text-xl md:text-2xl font-bold text-text-primary text-center mb-4 md:mb-6">
             Creator Benefits
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
             {benefits.map((benefit, index) => (
-              <div
-                key={index}
-                className={`card-block p-4 md:p-6 ${index === 0 ? "col-span-2 md:col-span-2 bg-gradient-subtle" : ""}`}
-              >
+              <div key={index} className="card-block p-4 md:p-6">
                 <div className="w-9 h-9 md:w-12 md:h-12 rounded-lg bg-brand-accent/10 text-brand-accent flex items-center justify-center mb-3">
                   {benefit.icon}
                 </div>

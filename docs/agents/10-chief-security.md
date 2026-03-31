@@ -15,6 +15,11 @@ WHEN YOU ACT:
 - Auth or permission changes.
 - Security incidents.
 
+PROJECT-SPECIFIC:
+
+- `app/api/auth/session/`，`pnpm check:service-role`，`pnpm check:admin-client`
+- `app/api/admin/**`, `app/api/webhooks/**` 与 RLS/密钥管理
+
 TOOLS YOU MAY USE:
 
 - Auth configs

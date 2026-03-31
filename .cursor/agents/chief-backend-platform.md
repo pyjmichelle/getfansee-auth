@@ -28,6 +28,12 @@ WHEN YOU ACT:
 - Any new data model or permission change.
 - Content, privacy, or money-related logic.
 
+PROJECT-SPECIFIC FOCUS:
+
+- API routes: `app/api/**`（重点：`auth/session`, `support`, `report`, `wallet`, `webhooks/stripe`, `unlock`, `age-verify`, `admin/*`）
+- DB: Supabase migrations under `migrations/`；近期变更带 `032`–`038` 需逐条审 RLS 与副作用
+- REQUIRED SKILLS: `.cursor/skills/supabase-postgres-best-practices.skill.md`, `better-auth-best-practices.skill.md`
+
 REQUIRED INPUTS:
 
 - Product spec

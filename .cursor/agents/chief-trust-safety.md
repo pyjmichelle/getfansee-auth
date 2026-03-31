@@ -28,6 +28,12 @@ WHEN YOU ACT:
 - Content publishing enabled.
 - Reports or abuse signals appear.
 
+PROJECT-SPECIFIC SURFACES:
+
+- User reporting & help: `app/report/`, `app/support/`, `app/api/report/`, `app/api/support/`
+- Admin moderation: `app/admin/content-review/`, `app/admin/reports/`
+- Content visibility / enforcement 与 `migrations/`、RLS 变更强相关，需与 **chief-backend-platform** 联合评审
+
 REQUIRED INPUTS:
 
 - Content type

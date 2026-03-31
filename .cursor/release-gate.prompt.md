@@ -151,7 +151,7 @@ At least one of:
 pnpm type-check
 pnpm lint
 pnpm build
-pnpm exec playwright test tests/e2e/smoke-check.spec.ts
+pnpm test:e2e:smoke
 pnpm qa:gate
 ```
 

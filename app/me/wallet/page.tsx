@@ -644,14 +644,14 @@ export default function WalletPage() {
                   <label className="block text-sm font-semibold mb-3 text-text-secondary">
                     Select Amount
                   </label>
-                  <div className="snap-row mb-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
                     {fundingOptions.map(({ amount: amt, bonus, popular }) => (
                       <Button
                         key={amt}
                         onClick={() => setSelectedAmount(amt)}
                         data-testid={`recharge-amount-${amt}`}
                         variant="outline"
-                        className={`relative min-w-[140px] h-auto px-4 py-4 rounded-xl border-2 font-semibold ${
+                        className={`relative w-full h-auto px-4 py-4 rounded-xl border-2 font-semibold ${
                           popular
                             ? "border-brand-accent bg-brand-accent/10 shadow-glow-gold"
                             : selectedAmount === amt
@@ -672,6 +672,35 @@ export default function WalletPage() {
                       </Button>
                     ))}
                   </div>
+                </div>
+
+                <div className="mb-6 p-4 rounded-xl bg-brand-primary/5 border border-brand-primary/10">
+                  <h4 className="text-sm font-semibold text-text-primary mb-2">
+                    Why preload funds on your account?
+                  </h4>
+                  <ul className="space-y-1.5 text-xs text-text-tertiary">
+                    <li className="flex items-start gap-2">
+                      <span className="text-brand-primary mt-0.5">✓</span>
+                      <span>
+                        <strong className="text-text-secondary">Instant access</strong> — Unlock
+                        exclusive content without extra steps
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-brand-primary mt-0.5">✓</span>
+                      <span>
+                        <strong className="text-text-secondary">No interruptions</strong> — Tip and
+                        subscribe without re-entering payment info
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-brand-primary mt-0.5">✓</span>
+                      <span>
+                        <strong className="text-text-secondary">Avoid failed transactions</strong> —
+                        Prevent declined cards at the wrong moment
+                      </span>
+                    </li>
+                  </ul>
                 </div>
 
                 <div className="mb-6">

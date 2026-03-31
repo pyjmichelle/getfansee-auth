@@ -29,6 +29,16 @@ WHEN YOU ACT:
 - Any new page or user flow.
 - Frontend state inconsistency or UX regression.
 
+PROJECT-SPECIFIC ROUTES (KEEP CURRENT):
+
+- Auth & onboarding: `app/auth/*`
+- Feed & content: `app/home/`, `app/posts/`, `app/search/`（含 `components/search-modal.tsx` 等）
+- Roles: `app/creator/*`（含 `upgrade/apply`）, `app/me/*`（含 `wallet/`）
+- Trust & help: `app/report/`, `app/support/`
+- Admin UI: `app/admin/*`
+- AI demo: `app/ai-dashboard/` + `app/api/ai/generate/`
+- REQUIRED SKILLS (typical): `.cursor/skills/shadcn-ui.skill.md`, `frontend-design.skill.md`, `react-best-practices.skill.md`; Design QA 另见 `docs/agents/DESIGN_QA_AGENT_AND_SKILLS.md`
+
 REQUIRED INPUTS:
 
 - Product decision

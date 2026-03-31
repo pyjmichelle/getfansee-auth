@@ -408,7 +408,7 @@ export default function ProfilePage() {
           </aside>
 
           {/* Right content area */}
-          <div className="flex-1 min-w-0 min-h-[540px]">
+          <div className="flex-1 min-w-0 md:w-0 min-h-[540px]">
             <SettingsTabs value={activeTab} onValueChange={setActiveTab} items={settingsTabs}>
               <TabsContent value="profile" className="mt-4">
                 <GlassCard className="p-6">

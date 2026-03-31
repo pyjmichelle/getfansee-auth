@@ -139,7 +139,7 @@ At least one of:
 pnpm type-check
 pnpm lint
 pnpm build
-pnpm exec playwright test tests/e2e/smoke-check.spec.ts
+pnpm test:e2e:smoke
 pnpm qa:gate
 ```
 
@@ -309,22 +309,24 @@ All CI checks are subordinate to RELEASE GATE SUPREME LAW.
 pnpm check-all
 ```
 
-这个命令会依次执行:
+这个命令会依次执行（以 `package.json` 为准）:
 - ✅ `pnpm type-check` - TypeScript 类型检查
 - ✅ `pnpm lint` - ESLint 代码规范
 - ✅ `pnpm format:check` - Prettier 格式检查
-- ✅ `pnpm test:unit` - 单元测试
-- ✅ `pnpm build` - 构建验证
+- ✅ `pnpm check:service-role` - 服务端密钥泄漏检查
+- ✅ `pnpm check:admin-client` - Admin 客户端白名单检查
+
+**不在 `check-all` 内、合并前仍须绿的路径**：`pnpm build`、`pnpm test:unit`、`pnpm qa:gate`、Playwright（见 CI `.github/workflows/ci.yml` 与内核 DoD）。
 
 ### 2. 所有检查必须通过
 - **0 TypeScript 错误**
 - **0 ESLint 错误** (警告可接受但需评估)
 - **格式符合 Prettier 规范**
-- **所有单元测试通过**
-- **构建成功无错误**
+- **服务角色 / admin 脚本检查通过**
+- **合并前另需：构建、单测与 CI 阶段 E2E/QA Gate 按流水线通过**
 
 ### 3. Git Hook 自动保护
-- `.husky/pre-push` 会在每次推送前自动运行检查
+- `.husky/pre-push` 运行 `SKIP_QA_GATE=1 pnpm ci:verify`（含 `check:env`、lint、type-check、**build**；**跳过** `qa:gate` 与 E2E，由 CI 跑全量）
 - 如果检查失败,推送会被阻止
 - 你会看到清晰的错误信息和修复建议
 

@@ -15,6 +15,11 @@ WHEN YOU ACT:
 - Content publishing enabled.
 - Reports or abuse signals appear.
 
+PROJECT-SPECIFIC SURFACES:
+
+- `app/report/`, `app/support/`, `app/api/report/`, `app/api/support/`
+- `app/admin/content-review/`, `app/admin/reports/`
+
 TOOLS YOU MAY USE:
 
 - Behavior logs

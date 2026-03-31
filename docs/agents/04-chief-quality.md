@@ -26,9 +26,11 @@ TOOLS YOU MAY USE:
 PROJECT-SPECIFIC COVERAGE (MUST CHECK):
 
 - Auth flows: `app/auth/`, `app/auth/verify/`, `app/auth/forgot-password/`, `app/auth/reset-password/`
-- Creator/Fan critical flows: `app/creator/`, `app/me/`, `app/posts/`, `app/search/`
+- Creator/Fan critical flows: `app/creator/`（含 `upgrade/`）, `app/me/`（含 `wallet/`）, `app/posts/`, `app/search/`, `app/home/`
+- Trust & safety surfaces: `app/report/`, `app/support/`, `app/api/report/`, `app/api/support/`
 - Admin surfaces: `app/admin/content-review/`, `app/admin/creator-verifications/`, `app/admin/reports/`
-- Reliability-sensitive APIs: `app/api/**`, migrations `032` to `035`
+- Money & subscriptions APIs: `app/api/wallet/`, `app/api/payments/`, `app/api/webhooks/stripe/`, `app/api/unlock/`, `app/api/subscriptions/`
+- Reliability-sensitive APIs: `app/api/**`, migrations `032`–`038`（新 PR 必须点名相关迁移）
 
 REQUIRED SKILLS (MANDATORY):
 
@@ -48,7 +50,7 @@ DEFAULT VERIFICATION COMMANDS:
 SCOPED COMMANDS (BY CHANGE TYPE):
 
 - Auth related: `pnpm test:auth:mock` and `pnpm test:auth:full`
-- UI regression: `pnpm test:e2e:smoke` or relevant route spec under `tests/e2e/`
+- UI regression: `pnpm test:e2e:smoke`（`tests/e2e/smoke.spec.ts`）或 `tests/e2e/` 下相关 spec
 - API or DB behavior: `pnpm test:server-health` plus targeted E2E
 
 REQUIRED INPUTS:

@@ -29,6 +29,12 @@ WHEN YOU ACT:
 - Before payments or content.
 - During disputes.
 
+PROJECT-SPECIFIC:
+
+- 站内合规页：`app/2257/` 等静态合规入口；支付/退款条款见 `app` 下 policies 类页面（以路由为准）
+- KYC / 年龄：`app/api/kyc/`, `app/api/age-verify/`, `app/admin/creator-verifications/`
+- 运营清单样例：`docs/reports/pre-launch-operator-checklist.md`, `docs/reports/payment-processor-underwriting-checklist.md`（非法律意见，仅对齐检查项）
+
 REQUIRED INPUTS:
 
 - Jurisdiction

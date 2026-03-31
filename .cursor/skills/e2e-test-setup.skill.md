@@ -93,3 +93,10 @@ await page.context().addCookies([
 - 确保 Supabase 项目已关闭邮箱验证（或使用 Admin API 自动确认）
 - 测试用户的邮箱格式为 `e2e-{role}-{timestamp}@example.com`
 - 所有测试数据都应在测试结束后清理
+
+## 与本仓库 Playwright 配置对齐（必读）
+
+- **配置**: 根目录 `playwright.config.ts`，`testDir: ./tests/e2e`。
+- **工程**: `chromium` / `firefox` / `webkit`（默认忽略 `auth-real`、`auth-mock`）；隔离认证用 `auth-mock-chromium`、`auth-real-chromium`。
+- **服务**: 未设 `PLAYWRIGHT_SKIP_SERVER` 时 webServer 为 **先 `pnpm build` 再 `pnpm start`**，健康检查 `GET /api/health`。
+- **冒烟脚本**: `pnpm test:e2e:smoke` → `tests/e2e/smoke.spec.ts`（与 `package.json` 一致）。

@@ -278,8 +278,8 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
             </CommandGroup>
           )}
 
-          {/* View all */}
-          {!isSearching && query.length >= 2 && hasResults && (
+          {/* View all — always shown when query is long enough */}
+          {!isSearching && query.length >= 2 && (
             <CommandGroup className={showDualColumn ? "col-span-2" : undefined}>
               <CommandItem
                 value="view-all"
@@ -288,7 +288,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                 aria-label={`View all results for ${query}`}
               >
                 <Search className="h-4 w-4 mr-2" aria-hidden="true" />
-                View all results for &quot;{query}&quot;
+                See all results for &quot;{query}&quot;
               </CommandItem>
             </CommandGroup>
           )}
