@@ -2,9 +2,11 @@
 
 本文档说明当前已安装的 skills 及与 release-gate 必选列表的对应关系。
 
-**Release-gate 必选 (10 个)**：better-auth-best-practices、supabase-postgres-best-practices、shadcn-ui、react-best-practices、frontend-design、e2e-test-setup、fixture-generator、test-report-generator、ci-pipeline-config、api-test-runner。
+**Release-gate 必选（与 `.cursor/rules` 对齐，10 个）**：better-auth-best-practices、supabase-postgres-best-practices、shadcn-ui、react-best-practices、frontend-design、e2e-test-setup、fixture-generator、test-report-generator、ci-pipeline-config、api-test-runner。
 
-**项目保留 (5 个)**：agent-browser、ci-auto-fix、planning-with-files、audit-website、web-design-guidelines。
+**项目内常用补充（非 release-gate 清单替代项）**：`code-check`（等价于对话里「跑 check-all」）、`planning-with-files`、`agent-browser`、`ui-ux-pro-max`（设计 token/栈对齐）、`feishu-docs`（飞书需求对齐时）。
+
+**维护类**：ci-auto-fix、audit-website、web-design-guidelines。
 
 ## 项目技术栈概览
 
@@ -15,13 +17,23 @@
 - **UI 库**: shadcn/ui (基于 Radix UI) + Tailwind CSS
 - **测试**: Playwright (E2E), Vitest (单元测试)
 
-## 项目当前关键业务面（2026-03）
+## 门禁命令（以 `package.json` 为准）
 
-- **新增认证链路**: 忘记密码与重置密码（`app/auth/forgot-password/`, `app/auth/reset-password/`）
-- **新增管理后台**: `app/admin/content-review/`, `app/admin/creator-verifications/`, `app/admin/reports/`
-- **新增核心页面**: `app/notifications/`, `app/ai-dashboard/`
-- **数据库侧近期变更**: `migrations/032` 至 `migrations/035`（RLS 修复、查询收口、索引与钱包约束）
-- **E2E 结构演进**: `tests/e2e/auth-mock/`, `tests/e2e/auth-real/`, `tests/e2e/design-qa/`
+- **`pnpm check-all`**：`type-check` → `lint` → `format:check` → `check:service-role` → `check:admin-client`。（**不含** `test:unit`、**不含** `build`。）
+- **合并前完整路径（与内核一致）**：`pnpm check-all` → `pnpm build` → `pnpm qa:gate` → `pnpm exec playwright test --project=chromium`（或按变更范围跑 `pnpm test:e2e:smoke` / 定向 spec）。
+- **`pnpm test:e2e:smoke`**：对应 `tests/e2e/smoke.spec.ts`。另有 `tests/e2e/smoke-check.spec.ts`（历史/补充冒烟），以脚本为准优先用 `test:e2e:smoke`。
+- **Pre-push（`.husky/pre-push`）**：`SKIP_QA_GATE=1 pnpm ci:verify` → 当前为 `check:env`、`lint`、`type-check`、`build`；**跳过** `qa:gate` 与 E2E（由 CI 承担）。
+
+## 项目当前关键业务面（2026-03-31）
+
+- **认证**: `app/auth/*`（含 `forgot-password/`、`reset-password/`、`verify/`）
+- **创作者 / 个人**: `app/creator/`、`app/creator/upgrade/`、`app/me/`（含 `wallet/`）
+- **内容与发现**: `app/home/`、`app/posts/`、`app/search/`
+- **合规与信任**: `app/report/`、`app/support/`、`app/api/support/`、`app/api/report/`、`app/api/age-verify/`
+- **管理后台**: `app/admin/content-review/`、`app/admin/creator-verifications/`、`app/admin/reports/` 等
+- **AI 演示面**: `app/ai-dashboard/`、`app/api/ai/generate/`
+- **数据库侧近期评审带**: `migrations/032`–`038`（RLS/可见性、索引、钱包硬化、年龄验证、support tickets 等；以具体文件名与 PR 为准）
+- **Playwright**: `playwright.config.ts` 中 `testDir: tests/e2e`；工程 `chromium` | `firefox` | `webkit` | `auth-mock-chromium` | `auth-real-chromium`；子目录含 `auth-mock/`、`auth-real/`、`design-qa/`
 
 ---
 
@@ -126,7 +138,7 @@ Supabase 和 PostgreSQL 最佳实践。
 - **查询优化**: 避免 N+1、索引、并行查询 — `lib/posts.ts`, `app/home/page.tsx`
 - **RLS**: 策略与数据最小化 — 所有表与查询
 - **事务**: 多步操作 — `lib/paywall.ts` 解锁逻辑
-- **迁移评审重点**: `migrations/032`~`035`（RLS 递归修复、posts 可见性收口、性能索引、钱包函数硬化）
+- **迁移评审重点**: `migrations/032`~`038`（RLS/可见性、性能索引、钱包与解锁、年龄验证、support 相关表等；新迁移必须过 RLS 与支付/隐私审查）
 
 ### 使用时机总结
 
@@ -155,17 +167,20 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ## 其他 Skills（简要）
 
-| Skill                                                    | 用途                                             |
-| -------------------------------------------------------- | ------------------------------------------------ |
-| **agent-browser** (`agent-browser/SKILL.md`)             | 前端 agent-browser CLI 自动化测试与网页交互      |
-| **ci-auto-fix**                                          | CI 失败分析与自动修复，与 plans 配合使用         |
-| **planning-with-files** (`planning-with-files/SKILL.md`) | 规划与文件工作流（.cursor/plans、docs/planning） |
-| **e2e-test-setup**                                       | E2E 测试环境与 Playwright 配置                   |
-| **fixture-generator**                                    | 测试 fixture 生成                                |
-| **test-report-generator**                                | 测试报告生成                                     |
-| **ci-pipeline-config**                                   | CI 流水线配置                                    |
-| **api-test-runner**                                      | API 测试运行与断言                               |
-| **shadcn-ui**                                            | shadcn/ui 组件与 cn() 使用规范                   |
+| Skill                                                    | 用途                                                                |
+| -------------------------------------------------------- | ------------------------------------------------------------------- |
+| **code-check** (`code-check/SKILL.md`)                   | 用户说「检查代码」时跑 `pnpm check-all`（+ 可选 `build`）并解读输出 |
+| **agent-browser** (`agent-browser/SKILL.md`)             | 前端 agent-browser CLI 自动化测试与网页交互                         |
+| **ui-ux-pro-max** (`ui-ux-pro-max/SKILL.md`)             | 按栈（含 Next/shadcn）检索设计数据 CSV，做 UI 一致性                |
+| **feishu-docs** (`feishu-docs/SKILL.md`)                 | 飞书文档为需求源时的读取与对齐流程                                  |
+| **ci-auto-fix**                                          | CI 失败分析与自动修复，与 plans 配合使用                            |
+| **planning-with-files** (`planning-with-files/SKILL.md`) | 规划与文件工作流（.cursor/plans、docs/planning）                    |
+| **e2e-test-setup**                                       | E2E 测试环境与 Playwright 配置                                      |
+| **fixture-generator**                                    | 测试 fixture 生成                                                   |
+| **test-report-generator**                                | 测试报告生成                                                        |
+| **ci-pipeline-config**                                   | CI 流水线配置（对齐 `.github/workflows/ci.yml`）                    |
+| **api-test-runner**                                      | API 测试运行与断言                                                  |
+| **shadcn-ui**                                            | shadcn/ui 组件与 cn() 使用规范                                      |
 
 ---
 
@@ -207,22 +222,24 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ## 快速参考：何时使用哪个 Skill
 
-| 任务              | 使用的 Skill                                                 |
-| ----------------- | ------------------------------------------------------------ |
-| 编写新 React 组件 | react-best-practices                                         |
-| 实现数据获取      | react-best-practices, supabase-postgres-best-practices       |
-| 审查 UI           | web-design-guidelines, frontend-design                       |
-| 优化性能          | react-best-practices, audit-website                          |
-| 数据库查询        | supabase-postgres-best-practices                             |
-| 认证实现          | better-auth-best-practices                                   |
-| 移动端/响应式     | frontend-design, web-design-guidelines                       |
-| 全站审计          | audit-website                                                |
-| 安全审查          | better-auth-best-practices, supabase-postgres-best-practices |
-| 前端自动化测试    | agent-browser                                                |
-| CI 修复与配置     | ci-auto-fix, ci-pipeline-config, api-test-runner             |
-| E2E/测试报告      | e2e-test-setup, fixture-generator, test-report-generator     |
-| 发布门禁判定      | e2e-test-setup, test-report-generator, ci-pipeline-config    |
+| 任务               | 使用的 Skill                                                 |
+| ------------------ | ------------------------------------------------------------ |
+| 编写新 React 组件  | react-best-practices                                         |
+| 实现数据获取       | react-best-practices, supabase-postgres-best-practices       |
+| 审查 UI            | web-design-guidelines, frontend-design                       |
+| 优化性能           | react-best-practices, audit-website                          |
+| 数据库查询         | supabase-postgres-best-practices                             |
+| 认证实现           | better-auth-best-practices                                   |
+| 移动端/响应式      | frontend-design, web-design-guidelines                       |
+| 全站审计           | audit-website                                                |
+| 安全审查           | better-auth-best-practices, supabase-postgres-best-practices |
+| 前端自动化测试     | agent-browser                                                |
+| CI 修复与配置      | ci-auto-fix, ci-pipeline-config, api-test-runner             |
+| E2E/测试报告       | e2e-test-setup, fixture-generator, test-report-generator     |
+| 发布门禁判定       | e2e-test-setup, test-report-generator, ci-pipeline-config    |
+| 口语「跑一下检查」 | code-check（→ `pnpm check-all`）                             |
+| 设计系统深度对齐   | ui-ux-pro-max, frontend-design, shadcn-ui                    |
 
 ---
 
-_最后更新: 2026-03-12_
+_最后更新: 2026-03-31_

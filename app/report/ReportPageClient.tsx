@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Shield, CheckCircle, AlertCircle, Lock, FileText } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { PageShell } from "@/components/page-shell";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 
 type ReportType = "post" | "comment" | "user";
 
@@ -57,6 +58,25 @@ export default function ReportPageClient({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{
+    username: string;
+    role: "fan" | "creator";
+    avatar?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const bootstrap = await getAuthBootstrap();
+      if (bootstrap.authenticated && bootstrap.user && bootstrap.profile) {
+        setCurrentUser({
+          username: bootstrap.profile.display_name || "user",
+          role: (bootstrap.profile.role || "fan") as "fan" | "creator",
+          avatar: bootstrap.profile.avatar_url || undefined,
+        });
+      }
+    };
+    loadUser();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +118,7 @@ export default function ReportPageClient({
 
   if (success) {
     return (
-      <PageShell user={null} maxWidth="md">
+      <PageShell user={currentUser} maxWidth="md">
         <div className="flex items-center justify-center py-16">
           <div className="card-block p-10 text-center w-full">
             <div className="w-16 h-16 mx-auto rounded-full bg-success/10 flex items-center justify-center mb-4">
@@ -123,8 +143,38 @@ export default function ReportPageClient({
     );
   }
 
+  if (!initialId) {
+    return (
+      <PageShell user={currentUser} maxWidth="4xl">
+        <div className="py-4">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-error/10 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-error" aria-hidden="true" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-text-primary">Report Content</h1>
+              <p className="text-sm text-text-tertiary">Help us maintain a safe community</p>
+            </div>
+          </div>
+          <Alert variant="destructive" role="alert">
+            <AlertCircle className="h-4 w-4" aria-hidden="true" />
+            <AlertDescription>
+              No content was specified to report. Please navigate to the content you want to report
+              and use the report button there.
+            </AlertDescription>
+          </Alert>
+          <div className="mt-4">
+            <Button variant="outline" onClick={() => router.back()}>
+              Go Back
+            </Button>
+          </div>
+        </div>
+      </PageShell>
+    );
+  }
+
   return (
-    <PageShell user={null} maxWidth="4xl">
+    <PageShell user={currentUser} maxWidth="4xl">
       <div className="py-4">
         {/* Page Header */}
         <div className="flex items-center gap-3 mb-6">

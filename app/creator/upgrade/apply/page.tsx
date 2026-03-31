@@ -2,15 +2,37 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, User, FileText, Check } from "@/lib/icons";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import Link from "next/link";
-import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+
+const CONTENT_CATEGORIES = [
+  "Art & Illustration",
+  "Photography",
+  "Fitness & Wellness",
+  "Gaming",
+  "Music",
+  "Cooking & Food",
+  "Fashion & Beauty",
+  "Education & Tutorials",
+  "Travel & Lifestyle",
+  "Comedy & Entertainment",
+  "Adult Content",
+  "Other",
+];
 
 export default function CreatorApplicationPage() {
   const [step, setStep] = useState<"form" | "success">("form");
@@ -22,15 +44,40 @@ export default function CreatorApplicationPage() {
     socialLinks: "",
     reason: "",
   });
+  const [currentUser, setCurrentUser] = useState<{
+    username: string;
+    role: "fan" | "creator";
+    avatar?: string;
+  }>({
+    username: "user",
+    role: "fan",
+  });
 
-  const currentUser = {
-    username: "john_doe",
-    role: "fan" as const,
-    avatar: DEFAULT_AVATAR_FAN,
-  };
+  useEffect(() => {
+    const loadUser = async () => {
+      const bootstrap = await getAuthBootstrap();
+      if (bootstrap.authenticated && bootstrap.user && bootstrap.profile) {
+        setCurrentUser({
+          username: bootstrap.profile.display_name || bootstrap.user.email?.split("@")[0] || "user",
+          role: (bootstrap.profile.role || "fan") as "fan" | "creator",
+          avatar: bootstrap.profile.avatar_url || undefined,
+        });
+        if (!formData.displayName) {
+          setFormData((prev) => ({
+            ...prev,
+            displayName: bootstrap.profile?.display_name || "",
+          }));
+        }
+      }
+    };
+    loadUser();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.category) {
+      return;
+    }
     setIsSubmitting(true);
 
     setTimeout(() => {
@@ -145,14 +192,21 @@ export default function CreatorApplicationPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="category">Content Category *</Label>
-                <Input
-                  id="category"
-                  placeholder="e.g., Art, Fitness, Gaming, Education"
+                <Select
                   value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  required
-                  className="h-11"
-                />
+                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                >
+                  <SelectTrigger id="category" className="w-full h-11">
+                    <SelectValue placeholder="Select your content category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CONTENT_CATEGORIES.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>

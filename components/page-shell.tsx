@@ -49,11 +49,17 @@ export function PageShell({
   hideBottomNav = false,
 }: PageShellProps) {
   return (
-    <div className={cn("min-h-dvh bg-bg-base flex flex-col", meshBg && "mesh-bg", className)}>
+    <div
+      className={cn(
+        "min-h-dvh bg-bg-base flex flex-col overflow-x-hidden",
+        meshBg && "mesh-bg",
+        className
+      )}
+    >
       <NavHeader user={user ?? undefined} notificationCount={notificationCount} />
       <main
         className={cn(
-          "flex-1 pt-4 md:pt-6 md:pb-8",
+          "flex-1 pt-4 md:pt-6 md:pb-8 overflow-x-hidden",
           /* When page has its own fixed action bar, don't add bottom padding for BottomNavigation */
           hideBottomNav ? "pb-6" : "pb-24",
           !noPadding && [maxWidthMap[maxWidth], "mx-auto px-4 md:px-6"],

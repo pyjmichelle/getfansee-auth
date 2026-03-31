@@ -37,7 +37,7 @@ import { MOCK_CREATORS, MOCK_POSTS } from "@/lib/mock-data";
 /* -------------------------------------------------------------------------- */
 /* Constants (outside component to avoid re-creation on every render)          */
 /* -------------------------------------------------------------------------- */
-const CONTENT_FILTERS = ["All", "Photos", "Videos", "Behind the Scenes", "Exclusive", "Tutorials"];
+const CONTENT_FILTERS = ["All", "Photos", "Videos", "Behind the Scenes", "Exclusive", "Collab"];
 
 const formatCount = (n: number) =>
   n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1) + "K" : String(n);
@@ -169,7 +169,9 @@ export default function CreatorProfilePage() {
 
         // Fallback to mock data when creator not found in DB (demo mode)
         if (!creator) {
-          const mockCreator = MOCK_CREATORS.find((c) => c.id === creatorId);
+          const mockCreator = MOCK_CREATORS.find(
+            (c) => c.id === creatorId || c.username === creatorId
+          );
           if (mockCreator) {
             creator = {
               id: mockCreator.id,
@@ -178,12 +180,12 @@ export default function CreatorProfilePage() {
               avatar_url: mockCreator.avatar_url,
               subscription_price_cents: 999,
             };
-            const mockPostsForCreator = MOCK_POSTS.filter((p) => p.creator_id === creatorId).map(
-              (p) => ({
-                ...p,
-                creator: mockCreator,
-              })
-            );
+            const mockPostsForCreator = MOCK_POSTS.filter(
+              (p) => p.creator_id === mockCreator.id || p.creator_id === creatorId
+            ).map((p) => ({
+              ...p,
+              creator: mockCreator,
+            }));
             setPosts(mockPostsForCreator);
             setSubscribersCount(mockCreator.subscriber_count || 0);
             const states = new Map<string, boolean>();

@@ -28,6 +28,12 @@ WHEN YOU ACT:
 - Any payment introduction or modification.
 - Chargebacks or abnormal transactions.
 
+PROJECT-SPECIFIC SURFACES:
+
+- UI: `app/me/wallet/`, paywall / purchase flows（`components/paywall-modal.tsx` 等）, `app/purchases/`（若存在）
+- APIs: `app/api/wallet/`, `app/api/payments/create-checkout-session/`, `app/api/webhooks/stripe/`, `app/api/unlock/`, `app/api/subscriptions/`, `app/api/transactions/`, `app/api/cron/financial-audit/`
+- Schema: `migrations/` 中与 billing、wallet、webhook、unlock 相关的变更
+
 REQUIRED INPUTS:
 
 - Payment flow proposal

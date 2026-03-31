@@ -68,14 +68,16 @@ export default function ForgotPasswordPage() {
               Click the link in the email to reset your password. The link will expire in 1 hour.
             </p>
             <div className="space-y-3">
-              <Button
-                onClick={() => {
-                  window.open("https://mail.google.com", "_blank");
-                }}
-                className="w-full"
-              >
-                Open Gmail
-              </Button>
+              {email.toLowerCase().endsWith("@gmail.com") && (
+                <Button
+                  onClick={() => {
+                    window.open("https://mail.google.com", "_blank");
+                  }}
+                  className="w-full"
+                >
+                  Open Gmail
+                </Button>
+              )}
               <Button asChild variant="outline" className="w-full bg-transparent">
                 <Link href="/auth">
                   <ArrowLeft className="w-4 h-4 mr-2" />

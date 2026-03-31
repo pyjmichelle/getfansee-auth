@@ -28,6 +28,11 @@ WHEN YOU ACT:
 - Introducing AI or automation.
 - AI affects fairness or behavior.
 
+PROJECT-SPECIFIC:
+
+- 当前产品内 AI 入口：`app/ai-dashboard/`、`app/api/ai/generate/`（json-render 流式 UI）；扩展前需评估成本、滥用与数据出境
+- 研发侧自动化：`.cursor/agents` / skills 仅辅助开发，不等同于对用户开放的能力
+
 REQUIRED INPUTS:
 
 - AI use case

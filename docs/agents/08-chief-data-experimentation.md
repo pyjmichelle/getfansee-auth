@@ -15,6 +15,10 @@ WHEN YOU ACT:
 - Before feature launch.
 - Pricing or conversion changes.
 
+PROJECT-SPECIFIC:
+
+- PostHog 与付费/订阅相关页面实验需对齐支付与前端路由（见 `package.json` 依赖 `posthog-js`）
+
 TOOLS YOU MAY USE:
 
 - Event tracking

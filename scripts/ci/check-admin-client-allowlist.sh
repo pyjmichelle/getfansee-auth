@@ -26,6 +26,8 @@ allowed=(
   "app/api/auth/session/route.ts"
   "app/api/cron/financial-audit/route.ts"
   "app/api/report/route.ts"
+  # support: public ticket insert (anonymous + logged-in), bypass RLS
+  "app/api/support/route.ts"
   "app/api/wallet/recharge/route.ts"
   "app/api/webhooks/didit/route.ts"
   # compliance: age gate audit logging (non-PII, server-side only)

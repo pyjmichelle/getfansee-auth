@@ -15,6 +15,11 @@ WHEN YOU ACT:
 - Any new data model or permission change.
 - Content, privacy, or money-related logic.
 
+PROJECT-SPECIFIC FOCUS:
+
+- API routes: `app/api/**`（`auth/session`, `support`, `report`, `wallet`, `webhooks/stripe`, `unlock`, `age-verify`, `admin/*`）
+- Migrations: `migrations/`；`032`–`038` 及以后迁移必须审 RLS、支付与隐私影响
+
 TOOLS YOU MAY USE:
 
 - Supabase

@@ -28,6 +28,11 @@ WHEN YOU ACT:
 - Before feature launch.
 - Pricing or conversion changes.
 
+PROJECT-SPECIFIC:
+
+- 产品内埋点：`posthog-js`（见依赖）；实验与漏斗需对齐支付墙、订阅、创作者转化（`app/creator/`, `app/me/`）
+- 事件定义变更时同步 **chief-frontend**（UI）与 **chief-payments-risk**（账务口径）
+
 REQUIRED INPUTS:
 
 - Business goal

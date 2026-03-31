@@ -452,8 +452,8 @@ export default function NotificationsPage() {
 
         {/* Two-column layout on Desktop */}
         <div className="flex flex-col lg:flex-row gap-4">
-          {/* Notifications List */}
-          <div className="flex-1 min-w-0">
+          {/* Notifications List — w-0 prevents intrinsic content width from affecting flex calculation */}
+          <div className="flex-1 min-w-0 lg:w-0">
             {filteredNotifications.length === 0 ? (
               <div className="text-center py-20 card-block">
                 <div className="w-24 h-24 bg-white/8 rounded-3xl flex items-center justify-center mx-auto mb-6">

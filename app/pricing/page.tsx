@@ -123,7 +123,7 @@ export default function PricingPage() {
               ))}
             </ul>
 
-            <div className="card-block bg-surface-raised rounded-lg p-3 mb-4 text-xs text-text-tertiary">
+            <div className="bg-surface-raised rounded-lg p-3 mb-4 text-xs text-text-tertiary">
               <strong className="text-text-secondary">Recurring billing notice:</strong>{" "}
               Subscriptions renew automatically each month on the date you subscribed. You will be
               charged the same amount unless you cancel before the renewal date.
@@ -154,7 +154,7 @@ export default function PricingPage() {
               { label: "Billing", value: "One-time charge" },
               { label: "Refund eligibility", value: "See Refund Policy" },
             ].map((item) => (
-              <div key={item.label} className="card-block bg-surface-raised p-3 rounded-lg">
+              <div key={item.label} className="bg-surface-raised p-3 rounded-lg">
                 <p className="text-xs text-text-tertiary mb-1">{item.label}</p>
                 <p className="text-sm font-semibold text-text-primary">{item.value}</p>
               </div>
@@ -185,12 +185,12 @@ export default function PricingPage() {
           </p>
 
           <div className="grid sm:grid-cols-2 gap-4 mb-6">
-            <div className="card-block bg-surface-raised p-4 rounded-xl">
+            <div className="bg-surface-raised p-4 rounded-xl">
               <p className="text-xs text-text-tertiary mb-2">Creator keeps</p>
               <p className="text-3xl font-bold text-green-400">80%</p>
               <p className="text-xs text-text-tertiary mt-1">of every subscription &amp; PPV</p>
             </div>
-            <div className="card-block bg-surface-raised p-4 rounded-xl">
+            <div className="bg-surface-raised p-4 rounded-xl">
               <p className="text-xs text-text-tertiary mb-2">Platform fee</p>
               <p className="text-3xl font-bold text-text-secondary">20%</p>
               <p className="text-xs text-text-tertiary mt-1">

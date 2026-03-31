@@ -16,6 +16,11 @@ WHEN YOU ACT:
 - Performance issues
 - Pre-release smoke checks
 
+PROJECT-SPECIFIC:
+
+- `pnpm ci:verify` / `.husky/pre-push` 行为见 `scripts/ci/verify.sh`（pre-push 常跳过 QA Gate 与 E2E）
+- Playwright：`tests/e2e/`，工程名 `chromium` / `auth-mock-chromium` / `auth-real-chromium` 等
+
 TOOLS YOU MAY USE:
 
 - Logs

@@ -15,6 +15,11 @@ WHEN YOU ACT:
 - Any payment introduction or modification.
 - Chargebacks or abnormal transactions.
 
+PROJECT-SPECIFIC SURFACES:
+
+- UI: `app/me/wallet/`, 购买/订阅与 paywall 相关页面与组件
+- APIs: `app/api/wallet/`, `app/api/payments/`, `app/api/webhooks/stripe/`, `app/api/unlock/`, `app/api/subscriptions/`, `app/api/transactions/`, `app/api/cron/financial-audit/`
+
 TOOLS YOU MAY USE:
 
 - Payment dashboards

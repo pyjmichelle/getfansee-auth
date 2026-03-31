@@ -28,6 +28,12 @@ WHEN YOU ACT:
 - Auth or permission changes.
 - Security incidents.
 
+PROJECT-SPECIFIC:
+
+- 会话与鉴权：`app/api/auth/session/`, `lib/auth-server.ts`, `lib/auth.ts`
+- 自动化门禁：`pnpm check:service-role`, `pnpm check:admin-client`（`scripts/ci/check-no-service-role-leaks.sh`, `scripts/ci/check-admin-client-allowlist.sh`）
+- 管理/API 面：`app/api/admin/**`, `app/api/webhooks/**`；改动需对照 RLS 与最小权限
+
 REQUIRED INPUTS:
 
 - System surface

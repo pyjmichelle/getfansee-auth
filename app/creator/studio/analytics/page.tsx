@@ -138,8 +138,8 @@ export default function AnalyticsPage() {
 
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
-      <div className="pb-24 flex flex-col lg:flex-row gap-8">
-        <main className="flex-1 min-w-0" data-testid="analytics-ready">
+      <div className="pb-24 flex flex-col lg:flex-row gap-8 overflow-x-hidden">
+        <main className="flex-1 min-w-0 overflow-x-hidden" data-testid="analytics-ready">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-4">
@@ -354,7 +354,7 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Top Performing Content */}
-          <div className="card-block p-6">
+          <div className="card-block p-6 overflow-hidden">
             <h3 className="font-semibold text-lg mb-6 text-text-primary">Top Performing Content</h3>
             {topPosts.length === 0 ? (
               <EmptyState
