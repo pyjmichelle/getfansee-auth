@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
       creators?: Array<{
         id: string;
         display_name: string;
+        username?: string;
         avatar_url?: string;
         bio?: string;
         role: string;
@@ -56,12 +57,11 @@ export async function GET(request: NextRequest) {
     }
     const results: SearchResults = { success: true, creators: [], posts: [] };
 
-    // Search Creators - 使用 public_creator_profiles view（只暴露公开信息）
     if (searchType === "all" || searchType === "creators") {
       const { data: creators, error: creatorsError } = await supabase
         .from("public_creator_profiles")
-        .select("id, display_name, avatar_url, bio, role")
-        .or(`display_name.ilike.%${query}%,bio.ilike.%${query}%`)
+        .select("id, display_name, username, avatar_url, bio, role")
+        .or(`display_name.ilike.%${query}%,username.ilike.%${query}%,bio.ilike.%${query}%`)
         .limit(10);
 
       if (creatorsError) {

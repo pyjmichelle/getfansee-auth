@@ -31,6 +31,7 @@ export interface AuthProfile {
   role: string;
   is_banned?: boolean;
   display_name?: string;
+  age_verified?: boolean;
 }
 
 /**
@@ -79,6 +80,7 @@ export async function requireUser(): Promise<AuthResult> {
       role: profile.role,
       is_banned: isBanned,
       display_name: profile.display_name,
+      age_verified: "age_verified" in profile ? !!profile.age_verified : false,
     },
   };
 }
@@ -124,6 +126,29 @@ export async function requireCreator(): Promise<AuthResult> {
   // 检查 creator 角色
   if (result.profile.role !== "creator") {
     throw new HttpError(403, "FORBIDDEN_CREATOR", "Creator access required");
+  }
+
+  return result;
+}
+
+/**
+ * 要求用户为已通过 KYC 验证的 Creator
+ *
+ * 检查：
+ * 1. 存在有效的 session（401）
+ * 2. 用户未被封禁（403）
+ * 3. 用户角色为 creator（403）
+ * 4. 用户已完成身份验证 age_verified（403）
+ *
+ * @throws HttpError 401 - 未登录
+ * @throws HttpError 403 - 非 Creator / 未验证 / 被封禁
+ * @returns { user, profile }
+ */
+export async function requireVerifiedCreator(): Promise<AuthResult> {
+  const result = await requireCreator();
+
+  if (!result.profile.age_verified) {
+    throw new HttpError(403, "KYC_REQUIRED", "Identity verification required");
   }
 
   return result;

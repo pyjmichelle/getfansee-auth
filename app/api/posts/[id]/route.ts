@@ -95,7 +95,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
   } catch (error: unknown) {
     console.error("[GET /api/posts/[id]] Error:", error);
-    const message = error instanceof Error ? error.message : "Internal server error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    const msg = error instanceof Error ? error.message : "";
+    const isSensitive =
+      msg.includes("SERVICE_ROLE_KEY") || msg.includes("service role") || msg.includes(".env");
+    return NextResponse.json(
+      {
+        success: false,
+        error: isSensitive ? "Service temporarily unavailable" : msg || "Internal server error",
+      },
+      { status: 500 }
+    );
   }
 }

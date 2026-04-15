@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
+import { requireCreator } from "@/lib/authz";
+import { jsonError } from "@/lib/http-errors";
 import {
   getCreatorStats,
   getCreatorChartData,
@@ -11,10 +12,7 @@ type RecentPost = Awaited<ReturnType<typeof getRecentPosts>>[number];
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    const { user } = await requireCreator();
 
     const { searchParams } = new URL(request.url);
     const timeRange = (searchParams.get("timeRange") || "30d") as "7d" | "30d" | "90d";
@@ -47,7 +45,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(response);
   } catch (err: unknown) {
     console.error("[api/creator/stats] Exception:", err);
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return jsonError(err);
   }
 }

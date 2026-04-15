@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Check, X, Calendar, Globe, FileText } from "@/lib/icons";
+import { KycStatusBadge } from "@/components/kyc/kyc-status-badge";
+import type { KycStatus } from "@/lib/kyc/kyc-status";
 import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -33,6 +34,14 @@ interface Verification {
   id_doc_urls: string[];
   status: string;
   created_at: string;
+  kyc_provider?: string;
+  kyc_session_id?: string;
+  kyc_external_status?: string;
+  kyc_started_at?: string;
+  kyc_submitted_at?: string;
+  kyc_decided_at?: string;
+  kyc_age_verified?: boolean;
+  kyc_last_error?: string;
   user?: {
     display_name?: string;
     avatar_url?: string;
@@ -185,9 +194,7 @@ export default function CreatorVerificationsPage() {
                         {verification.user?.display_name ||
                           `User ${verification.user_id.slice(0, 8)}`}
                       </h3>
-                      <Badge className="bg-brand-secondary/10 text-brand-secondary border-brand-secondary/20 rounded-lg">
-                        Pending
-                      </Badge>
+                      <KycStatusBadge status={verification.status as KycStatus} />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -213,27 +220,75 @@ export default function CreatorVerificationsPage() {
                       </div>
                     </div>
 
-                    {/* ID Documents */}
-                    <div className="mb-4">
-                      <Label className="text-sm text-text-tertiary mb-2 block">ID Documents:</Label>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {verification.id_doc_urls.map((url, index) => (
-                          <a
-                            key={index}
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="relative aspect-video bg-surface-raised rounded-xl overflow-hidden hover:opacity-80 transition-opacity"
-                          >
-                            <img
-                              src={url}
-                              alt={`ID Document ${index + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </a>
-                        ))}
+                    {/* ID Documents (legacy manual uploads) */}
+                    {verification.id_doc_urls &&
+                      verification.id_doc_urls.length > 0 &&
+                      verification.id_doc_urls[0] !== "" && (
+                        <div className="mb-4">
+                          <Label className="text-sm text-text-tertiary mb-2 block">
+                            ID Documents:
+                          </Label>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            {verification.id_doc_urls.map((url, index) => (
+                              <a
+                                key={index}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="relative aspect-video bg-surface-raised rounded-xl overflow-hidden hover:opacity-80 transition-opacity"
+                              >
+                                <img
+                                  src={url}
+                                  alt={`ID Document ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {/* Didit KYC Metadata */}
+                    {verification.kyc_provider === "didit" && (
+                      <div className="mb-4 p-3 bg-surface-raised rounded-xl">
+                        <Label className="text-sm text-text-tertiary mb-2 block">
+                          Didit Verification
+                        </Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                          {verification.kyc_session_id && (
+                            <div className="text-text-tertiary">
+                              <span className="text-text-secondary">Session:</span>{" "}
+                              <code className="text-xs bg-surface-base px-1 py-0.5 rounded">
+                                {verification.kyc_session_id.slice(0, 12)}...
+                              </code>
+                            </div>
+                          )}
+                          {verification.kyc_external_status && (
+                            <div className="text-text-tertiary">
+                              <span className="text-text-secondary">External Status:</span>{" "}
+                              {verification.kyc_external_status}
+                            </div>
+                          )}
+                          {verification.kyc_started_at && (
+                            <div className="text-text-tertiary">
+                              <span className="text-text-secondary">Started:</span>{" "}
+                              {format(new Date(verification.kyc_started_at), "MMM d, yyyy HH:mm")}
+                            </div>
+                          )}
+                          {verification.kyc_decided_at && (
+                            <div className="text-text-tertiary">
+                              <span className="text-text-secondary">Decided:</span>{" "}
+                              {format(new Date(verification.kyc_decided_at), "MMM d, yyyy HH:mm")}
+                            </div>
+                          )}
+                          {verification.kyc_last_error && (
+                            <div className="text-error text-xs col-span-2">
+                              Error: {verification.kyc_last_error}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Actions */}
                     <div className="flex gap-3 pt-4 border-t border-border-base">

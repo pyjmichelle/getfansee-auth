@@ -51,21 +51,40 @@ export type AuthenticatedRouteHandler = (
   context: WithAuthContext
 ) => Promise<NextResponse> | NextResponse;
 
+function isSensitiveMessage(msg: string): boolean {
+  const lower = msg.toLowerCase();
+  return (
+    lower.includes("is not configured") ||
+    lower.includes("service_role") ||
+    lower.includes("secret") ||
+    lower.includes("api_key") ||
+    lower.includes(".env")
+  );
+}
+
+export function sanitizeErrorForClient(error: unknown): string {
+  const msg = error instanceof Error ? error.message : String(error);
+  if (isSensitiveMessage(msg)) {
+    return "Service temporarily unavailable. Please try again later.";
+  }
+  return msg;
+}
+
 /**
- * 包装需要登录的 Route Handler：自动取当前用户，未登录则返回 401 统一 JSON
- *
- * @example
- * export const GET = withAuth(async (request, { user }) => {
- *   const data = await getData(user.id);
- *   return NextResponse.json(data);
- * });
+ * 包装需要登录的 Route Handler：自动取当前用户，未登录则返回 401 统一 JSON。
+ * 同时在外层 catch 中过滤敏感错误信息。
  */
 export function withAuth(handler: AuthenticatedRouteHandler) {
   return async function wrapped(request: NextRequest): Promise<NextResponse> {
-    const user = await getCurrentUser();
-    if (!user) {
-      return unauthorized();
+    try {
+      const user = await getCurrentUser();
+      if (!user) {
+        return unauthorized();
+      }
+      return await handler(request, { user });
+    } catch (err) {
+      console.error("[withAuth] Unhandled error:", err);
+      return serverError(sanitizeErrorForClient(err));
     }
-    return handler(request, { user });
   };
 }

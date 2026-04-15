@@ -1,20 +1,35 @@
 "use client";
+import { useState, useEffect } from "react";
 import { Star, TrendingUp, DollarSign, Users, Shield, ArrowRight } from "@/lib/icons";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useCountUp } from "@/hooks/use-count-up";
-import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
+import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 
 export default function CreatorUpgradePage() {
   const animatedCreatorCount = useCountUp(2847, { duration: 900, decimals: 0 });
   const animatedKeepShare = useCountUp(80, { duration: 900, decimals: 0 });
   const animatedFeeShare = useCountUp(20, { duration: 900, decimals: 0 });
-  const currentUser = {
-    username: "john_doe",
-    role: "fan" as const,
-    avatar: DEFAULT_AVATAR_FAN,
-  };
+  const [currentUser, setCurrentUser] = useState<{
+    username: string;
+    role: "fan" | "creator";
+    avatar?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const bootstrap = await getAuthBootstrap();
+      if (bootstrap.authenticated && bootstrap.user && bootstrap.profile) {
+        setCurrentUser({
+          username: bootstrap.profile.display_name || bootstrap.user.email?.split("@")[0] || "user",
+          role: (bootstrap.profile.role || "fan") as "fan" | "creator",
+          avatar: bootstrap.profile.avatar_url || undefined,
+        });
+      }
+    };
+    loadUser();
+  }, []);
 
   const benefits = [
     {

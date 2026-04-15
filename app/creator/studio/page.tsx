@@ -191,7 +191,11 @@ export default function CreatorStudioPage() {
 
   if (isLoading) {
     return (
-      <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
+      <PageShell
+        user={currentUser ?? { username: "", role: "creator" }}
+        notificationCount={0}
+        maxWidth="5xl"
+      >
         <div className="pb-24 space-y-6 animate-pulse">
           <div className="card-block bg-gradient-subtle p-6 md:p-8">
             <div className="h-8 w-56 bg-white/8 rounded mb-3" />

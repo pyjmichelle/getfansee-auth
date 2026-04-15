@@ -103,7 +103,6 @@ export default function SupportPage() {
       }
 
       setSubmitted(true);
-      toast.success("Support ticket submitted! We'll respond via email within 24 hours.");
 
       setFormData({
         email: formData.email,
@@ -174,13 +173,22 @@ export default function SupportPage() {
               We&apos;ve received your request and will respond to{" "}
               <strong>{formData.email || "your email"}</strong> within 24 hours on weekdays.
             </p>
-            <Button
-              variant="outline"
-              onClick={() => setSubmitted(false)}
-              className="bg-transparent"
-            >
-              Submit Another Ticket
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button
+                variant="default"
+                onClick={() => (window.location.href = "/home")}
+                className="bg-brand-primary text-white"
+              >
+                Back to Home
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setSubmitted(false)}
+                className="bg-transparent"
+              >
+                Submit Another Ticket
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col lg:flex-row gap-6">

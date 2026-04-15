@@ -185,36 +185,32 @@ export default function PostDetailPage() {
 
         const response = await fetch(`/api/posts/${postId}`);
         if (!response.ok) {
-          // Fallback to shared mock data (for demo post IDs)
-          const mockPost = MOCK_POSTS_DATA.find((p) => p.id === postId);
-          if (mockPost) {
-            const mockCreator = MOCK_CREATORS.find((c) => c.id === mockPost.creator_id);
-            setPost({
-              ...mockPost,
-              creator: mockCreator,
-            } as Post);
-            setCanView(mockPost.visibility === "free");
-            const others = MOCK_POSTS_DATA.filter(
-              (p) => p.creator_id === mockPost.creator_id && p.id !== postId
-            ).slice(0, 6);
-            setRelatedPosts(others.map((p) => ({ ...p, creator: mockCreator }) as Post));
-            return;
+          if (isTestMode) {
+            const mockPost = MOCK_POSTS_DATA.find((p) => p.id === postId);
+            if (mockPost) {
+              const mockCreator = MOCK_CREATORS.find((c) => c.id === mockPost.creator_id);
+              setPost({ ...mockPost, creator: mockCreator } as Post);
+              setCanView(mockPost.visibility === "free");
+              const others = MOCK_POSTS_DATA.filter(
+                (p) => p.creator_id === mockPost.creator_id && p.id !== postId
+              ).slice(0, 6);
+              setRelatedPosts(others.map((p) => ({ ...p, creator: mockCreator }) as Post));
+              return;
+            }
           }
           throw new Error("Failed to load post");
         }
 
         const data = await response.json();
         if (!data.success) {
-          // Fallback to shared mock data
-          const mockPost = MOCK_POSTS_DATA.find((p) => p.id === postId);
-          if (mockPost) {
-            const mockCreator = MOCK_CREATORS.find((c) => c.id === mockPost.creator_id);
-            setPost({
-              ...mockPost,
-              creator: mockCreator,
-            } as Post);
-            setCanView(mockPost.visibility === "free");
-            return;
+          if (isTestMode) {
+            const mockPost = MOCK_POSTS_DATA.find((p) => p.id === postId);
+            if (mockPost) {
+              const mockCreator = MOCK_CREATORS.find((c) => c.id === mockPost.creator_id);
+              setPost({ ...mockPost, creator: mockCreator } as Post);
+              setCanView(mockPost.visibility === "free");
+              return;
+            }
           }
           throw new Error(data.error || "Failed to load post");
         }
@@ -508,7 +504,7 @@ export default function PostDetailPage() {
                   aria-label="View comments"
                 >
                   <MessageCircle size={18} aria-hidden="true" />
-                  <span>{post.likes_count || 0}</span>
+                  <span>{post.comments_count || 0}</span>
                 </button>
                 <button
                   className="flex items-center gap-1.5 text-text-muted hover:text-white transition-colors text-[13px] cursor-pointer focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:rounded"

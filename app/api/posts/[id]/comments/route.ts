@@ -24,7 +24,15 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const limit = parseInt(searchParams.get("limit") || "50");
     const offset = parseInt(searchParams.get("offset") || "0");
 
-    // Removed debug console.log - vercel-react-best-practices
+    const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === "true";
+    if (isTestMode && postId.startsWith("mock-")) {
+      return NextResponse.json({
+        success: true,
+        comments: [],
+        total: 0,
+        hasMore: false,
+      });
+    }
 
     const result = await getPostComments(postId, limit, offset);
 

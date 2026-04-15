@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { setRoleCreator } from "@/lib/profile-server";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
 type CreatorPayload = {
   display_name?: string;
@@ -11,7 +12,9 @@ type CreatorPayload = {
 
 /**
  * POST /api/creator/create
- * 将当前用户设置为 creator 并创建 creator 记录
+ *
+ * Upgrades the current user to a creator. Requires KYC approval.
+ * If KYC is not yet approved, returns 403 with guidance to complete KYC first.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -20,16 +23,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Gate: require KYC approved before granting creator role
+    const adminSupabase = getSupabaseAdminClient();
+    const { data: verification } = await adminSupabase
+      .from("creator_verifications")
+      .select("status")
+      .eq("user_id", user.id)
+      .single();
+
+    if (verification?.status !== "approved") {
+      return NextResponse.json(
+        {
+          error: "KYC_REQUIRED",
+          message: "Complete identity verification before becoming a creator",
+          kycStatus: verification?.status ?? "not_started",
+        },
+        { status: 403 }
+      );
+    }
+
     const body = (await request.json()) as CreatorPayload;
     const { display_name, bio, avatar_url } = body;
 
-    // 设置角色为 creator
     const success = await setRoleCreator(user.id);
     if (!success) {
       return NextResponse.json({ error: "Failed to set creator role" }, { status: 500 });
     }
 
-    // 创建 creator 记录
     const supabase = await getSupabaseServerClient();
     const { error: creatorError } = await supabase.from("creators").upsert(
       {

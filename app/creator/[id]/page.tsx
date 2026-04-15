@@ -104,6 +104,12 @@ export default function CreatorProfilePage() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [showPpvModal, setShowPpvModal] = useState(false);
+  const [selectedPpvPost, setSelectedPpvPost] = useState<{
+    id: string;
+    price: number;
+    title?: string;
+  } | null>(null);
   const [subscriptionPrice, setSubscriptionPrice] = useState(9.99);
   const [postViewStates, setPostViewStates] = useState<Map<string, boolean>>(new Map());
   const [activeTab, setActiveTab] = useState<"posts" | "about">("posts");
@@ -123,6 +129,20 @@ export default function CreatorProfilePage() {
     if (selectedFilter === "Videos")
       return posts.filter((p) => p.media && p.media[0]?.media_type === "video");
     if (selectedFilter === "Exclusive") return posts.filter((p) => p.visibility === "subscribers");
+    if (selectedFilter === "Behind the Scenes")
+      return posts.filter(
+        (p) =>
+          p.tags?.includes("behindthescenes") ||
+          p.tags?.includes("behind-the-scenes") ||
+          p.title?.toLowerCase().includes("behind the scenes")
+      );
+    if (selectedFilter === "Collab")
+      return posts.filter(
+        (p) =>
+          p.tags?.includes("collab") ||
+          p.tags?.includes("collaboration") ||
+          p.title?.toLowerCase().includes("collab")
+      );
     return posts;
   }, [posts, selectedFilter]);
 
@@ -316,7 +336,7 @@ export default function CreatorProfilePage() {
   };
 
   const handleReport = () => {
-    toast.info("Report submitted. Our team will review it shortly.");
+    router.push(`/report?type=creator&id=${creatorId}`);
   };
 
   const isOwnProfile = currentUserId === creatorId;
@@ -399,7 +419,7 @@ export default function CreatorProfilePage() {
       </div>
 
       {/* Profile Section */}
-      <div className="max-w-3xl mx-auto px-4 md:px-6 pb-28">
+      <div className="max-w-3xl mx-auto px-4 md:px-6 pb-40">
         {/* Desktop inline back row */}
         <div className="hidden md:flex items-center gap-3 pt-4 mb-2">
           <Button
@@ -579,7 +599,7 @@ export default function CreatorProfilePage() {
 
         {/* Posts Tab */}
         {activeTab === "posts" && (
-          <>
+          <div className="min-h-[400px]">
             {/* Content Filter Pills */}
             <div className="flex items-center gap-2 overflow-x-auto py-3 mb-3 scrollbar-none -mx-4 px-4">
               {CONTENT_FILTERS.map((f) => (
@@ -613,17 +633,28 @@ export default function CreatorProfilePage() {
                     post={post}
                     isUnlocked={postViewStates.get(post.id) === true}
                     currentUserId={currentUserId}
-                    onUnlock={() => setShowSubscribeModal(true)}
+                    onUnlock={() => {
+                      if (post.visibility === "ppv" && post.price_cents) {
+                        setSelectedPpvPost({
+                          id: post.id,
+                          price: post.price_cents / 100,
+                          title: post.title || undefined,
+                        });
+                        setShowPpvModal(true);
+                      } else {
+                        setShowSubscribeModal(true);
+                      }
+                    }}
                   />
                 ))}
               </div>
             )}
-          </>
+          </div>
         )}
 
         {/* About Tab */}
         {activeTab === "about" && (
-          <div className="pt-4 pb-8 space-y-4">
+          <div className="pt-4 pb-8 space-y-4 min-h-[400px]">
             <div className="glass-card rounded-[var(--radius-md)] p-5">
               <h3 className="text-[14px] font-semibold text-white mb-3 flex items-center gap-2">
                 <Star size={14} className="text-violet-400" />
@@ -652,7 +683,10 @@ export default function CreatorProfilePage() {
 
       {/* Mobile Floating Subscribe */}
       {!isOwnProfile && (
-        <div className="md:hidden fixed bottom-14 left-0 right-0 p-3 bg-bg-base/95 backdrop-blur-sm border-t border-white/6 z-[45]">
+        <div
+          className="md:hidden fixed bottom-14 left-0 right-0 p-3 bg-bg-base/95 backdrop-blur-sm border-t border-white/6"
+          style={{ zIndex: "var(--z-sticky)" as unknown as number }}
+        >
           {isSubscribed ? (
             <Button
               variant="outline"
@@ -696,6 +730,35 @@ export default function CreatorProfilePage() {
           ]}
           creatorId={creatorId}
           onSuccess={confirmSubscribe}
+        />
+      )}
+
+      {/* PPV Unlock PaywallModal */}
+      {!isOwnProfile && creatorProfile && selectedPpvPost && (
+        <PaywallModal
+          open={showPpvModal}
+          onOpenChange={(open) => {
+            setShowPpvModal(open);
+            if (!open) setSelectedPpvPost(null);
+          }}
+          type="ppv"
+          creatorName={creatorProfile.display_name || "Creator"}
+          creatorAvatar={creatorProfile.avatar_url}
+          price={selectedPpvPost.price}
+          benefits={[
+            selectedPpvPost.title || "Exclusive content",
+            "Permanent access after purchase",
+            "High-quality media",
+          ]}
+          postId={selectedPpvPost.id}
+          creatorId={creatorId}
+          onSuccess={async () => {
+            setPostViewStates((prev) => {
+              const next = new Map(prev);
+              next.set(selectedPpvPost.id, true);
+              return next;
+            });
+          }}
         />
       )}
     </PageShell>

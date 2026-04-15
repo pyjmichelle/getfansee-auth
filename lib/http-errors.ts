@@ -85,13 +85,19 @@ export function jsonError(
     return NextResponse.json(body, { status: error.status });
   }
 
-  // 标准 Error - 未预期的错误
   if (error instanceof Error) {
+    const isSensitive =
+      error.message.includes("SERVICE_ROLE_KEY") ||
+      error.message.includes("secret") ||
+      error.message.includes(".env");
     const body: { error: string; code: string; message: string; requestId?: string } = {
       error: "INTERNAL_ERROR",
       code: "INTERNAL_ERROR",
-      message:
-        process.env.NODE_ENV === "development" ? error.message : "An unexpected error occurred",
+      message: isSensitive
+        ? "Service temporarily unavailable"
+        : process.env.NODE_ENV === "development"
+          ? error.message
+          : "An unexpected error occurred",
     };
     if (requestId) {
       body.requestId = requestId;

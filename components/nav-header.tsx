@@ -114,12 +114,20 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
           setSearchResults(
             data.creators
               .slice(0, 5)
-              .map((c: { id: string; display_name?: string; avatar_url?: string }) => ({
-                id: c.id,
-                name: c.display_name || "Creator",
-                username: (c.display_name || "creator").replace(/\s+/g, "").toLowerCase(),
-                avatar: c.avatar_url,
-              }))
+              .map(
+                (c: {
+                  id: string;
+                  display_name?: string;
+                  username?: string;
+                  avatar_url?: string;
+                }) => ({
+                  id: c.id,
+                  name: c.display_name || "Creator",
+                  username:
+                    c.username || (c.display_name || "creator").replace(/\s+/g, "").toLowerCase(),
+                  avatar: c.avatar_url,
+                })
+              )
           );
         } else {
           setSearchResults([]);

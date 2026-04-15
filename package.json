@@ -68,6 +68,7 @@
     "qa:gate:with-sessions": "bash scripts/qa/check-server.sh && pnpm test:session:auto:all && pnpm test:gate:ui && pnpm test:gate:deadclick && pnpm audit:full"
   },
   "dependencies": {
+    "@didit-protocol/sdk-web": "^0.1.8",
     "@hookform/resolvers": "^3.10.0",
     "@json-render/core": "latest",
     "@json-render/react": "latest",

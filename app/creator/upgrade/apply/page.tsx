@@ -3,21 +3,16 @@
 import type React from "react";
 
 import { useState, useEffect } from "react";
-import { ArrowLeft, User, FileText, Check } from "@/lib/icons";
+import { ArrowLeft, User, FileText, Check, X } from "@/lib/icons";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { toast } from "sonner";
 import Link from "next/link";
 import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { cn } from "@/lib/utils";
 
 const CONTENT_CATEGORIES = [
   "Art & Illustration",
@@ -30,6 +25,7 @@ const CONTENT_CATEGORIES = [
   "Education & Tutorials",
   "Travel & Lifestyle",
   "Comedy & Entertainment",
+  "Collab",
   "Adult Content",
   "Other",
 ];
@@ -40,7 +36,8 @@ export default function CreatorApplicationPage() {
   const [formData, setFormData] = useState({
     displayName: "",
     bio: "",
-    category: "",
+    categories: [] as string[],
+    customCategory: "",
     socialLinks: "",
     reason: "",
   });
@@ -73,17 +70,61 @@ export default function CreatorApplicationPage() {
     loadUser();
   }, []);
 
+  const toggleCategory = (cat: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      categories: prev.categories.includes(cat)
+        ? prev.categories.filter((c) => c !== cat)
+        : [...prev.categories, cat],
+    }));
+  };
+
+  const addCustomCategory = () => {
+    const custom = formData.customCategory.trim();
+    if (custom && !formData.categories.includes(custom)) {
+      setFormData((prev) => ({
+        ...prev,
+        categories: [...prev.categories, custom],
+        customCategory: "",
+      }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.category) {
+    if (formData.categories.length === 0) {
+      toast.error("Please select at least one content category");
+      return;
+    }
+    if (formData.bio.trim().length < 50) {
+      toast.error("Bio must be at least 50 characters");
       return;
     }
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const response = await fetch("/api/creator/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          displayName: formData.displayName,
+          bio: formData.bio,
+          categories: formData.categories,
+          socialLinks: formData.socialLinks,
+          reason: formData.reason,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Failed to submit application");
+      }
       setStep("success");
-    }, 2000);
+    } catch (err) {
+      console.error("[creator-apply] submit error:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to submit. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (step === "success") {
@@ -126,7 +167,7 @@ export default function CreatorApplicationPage() {
                 variant="default"
                 className="flex-1 text-white shadow-glow hover-bold"
               >
-                <Link href="/me">View Profile</Link>
+                <Link href="/creator/upgrade/kyc">Start Verification</Link>
               </Button>
             </div>
           </div>
@@ -191,22 +232,60 @@ export default function CreatorApplicationPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">Content Category *</Label>
-                <Select
-                  value={formData.category}
-                  onValueChange={(value) => setFormData({ ...formData, category: value })}
-                >
-                  <SelectTrigger id="category" className="w-full h-11">
-                    <SelectValue placeholder="Select your content category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CONTENT_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
+                <Label>
+                  Content Categories *{" "}
+                  <span className="text-text-tertiary font-normal">(select one or more)</span>
+                </Label>
+                <div className="flex flex-wrap gap-2">
+                  {CONTENT_CATEGORIES.map((cat) => {
+                    const selected = formData.categories.includes(cat);
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => toggleCategory(cat)}
+                        className={cn(
+                          "px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
+                          selected
+                            ? "bg-brand-primary/15 border-brand-primary/40 text-brand-primary"
+                            : "bg-surface-raised border-border-base text-text-secondary hover:border-brand-primary/30"
+                        )}
+                      >
                         {cat}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                        {selected && <X className="w-3 h-3 ml-1 inline" />}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex gap-2 mt-2">
+                  <Input
+                    placeholder="Add custom category..."
+                    value={formData.customCategory}
+                    onChange={(e) => setFormData({ ...formData, customCategory: e.target.value })}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addCustomCategory();
+                      }
+                    }}
+                    className="h-9 text-sm flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addCustomCategory}
+                    disabled={!formData.customCategory.trim()}
+                    className="h-9"
+                  >
+                    Add
+                  </Button>
+                </div>
+                {formData.categories.length > 0 && (
+                  <p className="text-xs text-text-tertiary">
+                    Selected: {formData.categories.join(", ")}
+                  </p>
+                )}
               </div>
             </div>
           </div>
