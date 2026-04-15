@@ -3,10 +3,9 @@ import { getCurrentUser } from "@/lib/auth-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
 /**
- * POST /api/kyc/submit
- * Accepts multipart/form-data KYC submission from the KYC page.
- * Uploads documents to private "verification" storage bucket and
- * inserts a creator_verifications record with status "pending".
+ * @deprecated Legacy manual KYC document upload endpoint.
+ * New KYC verification uses Didit hosted sessions via POST /api/kyc/session.
+ * Retained for backward compatibility only — will be removed in a future cleanup.
  */
 export async function POST(request: NextRequest) {
   try {

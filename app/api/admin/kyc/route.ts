@@ -24,13 +24,21 @@ export async function GET(_request: NextRequest) {
         id_doc_urls,
         status,
         created_at,
+        kyc_provider,
+        kyc_session_id,
+        kyc_external_status,
+        kyc_started_at,
+        kyc_submitted_at,
+        kyc_decided_at,
+        kyc_age_verified,
+        kyc_last_error,
         profiles!creator_verifications_user_id_fkey (
           display_name,
           avatar_url
         )
       `
       )
-      .eq("status", "pending")
+      .in("status", ["pending", "initiated", "in_progress", "submitted"])
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -47,6 +55,14 @@ export async function GET(_request: NextRequest) {
       id_doc_urls: string[];
       status: string;
       created_at: string;
+      kyc_provider?: string;
+      kyc_session_id?: string;
+      kyc_external_status?: string;
+      kyc_started_at?: string;
+      kyc_submitted_at?: string;
+      kyc_decided_at?: string;
+      kyc_age_verified?: boolean;
+      kyc_last_error?: string;
       profiles?: { display_name?: string; avatar_url?: string } | null;
     };
 
@@ -59,6 +75,14 @@ export async function GET(_request: NextRequest) {
       id_doc_urls: v.id_doc_urls,
       status: v.status,
       created_at: v.created_at,
+      kyc_provider: v.kyc_provider,
+      kyc_session_id: v.kyc_session_id,
+      kyc_external_status: v.kyc_external_status,
+      kyc_started_at: v.kyc_started_at,
+      kyc_submitted_at: v.kyc_submitted_at,
+      kyc_decided_at: v.kyc_decided_at,
+      kyc_age_verified: v.kyc_age_verified,
+      kyc_last_error: v.kyc_last_error,
       user: v.profiles
         ? { display_name: v.profiles.display_name, avatar_url: v.profiles.avatar_url }
         : undefined,

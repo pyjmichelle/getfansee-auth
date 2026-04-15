@@ -156,6 +156,7 @@ export default function SearchPageClient() {
   const performSearch = async (value: string) => {
     const normalized = value.trim();
     if (!normalized || normalized.length < 2) {
+      setIsSearching(false);
       setCreators([]);
       return;
     }

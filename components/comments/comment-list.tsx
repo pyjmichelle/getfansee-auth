@@ -28,6 +28,7 @@ export function CommentList({
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [total, setTotal] = useState(0);
@@ -37,6 +38,7 @@ export function CommentList({
     try {
       if (offset === 0) {
         setIsLoading(true);
+        setLoadError(null);
       } else {
         setIsLoadingMore(true);
       }
@@ -59,7 +61,11 @@ export function CommentList({
     } catch (err) {
       const error = err as Error;
       console.error("[CommentList] Load error:", error);
-      toast.error(error.message || "Failed to load comments");
+      if (offset === 0) {
+        setLoadError(error.message || "Failed to load comments");
+      } else {
+        toast.error(error.message || "Failed to load comments");
+      }
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -144,6 +150,19 @@ export function CommentList({
         <div className="flex items-center justify-center py-8">
           <Loader2 className="w-6 h-6 animate-spin text-text-tertiary" aria-hidden="true" />
           <span className="sr-only">Loading comments...</span>
+        </div>
+      ) : loadError ? (
+        <div className="text-center py-8">
+          <MessageSquare className="w-12 h-12 mx-auto mb-2 text-error/50" aria-hidden="true" />
+          <p className="text-sm text-error mb-3">Failed to load comments</p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => loadComments(0)}
+            className="min-h-[36px]"
+          >
+            Try Again
+          </Button>
         </div>
       ) : comments.length === 0 ? (
         <div className="text-center py-8 text-text-tertiary">

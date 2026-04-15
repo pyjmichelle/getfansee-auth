@@ -13,7 +13,12 @@ export const env = createEnv({
     SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
     /** JWT Secret，用于本地验证 Supabase access_token 签名（可选，缺失时降级为 claims-only 模式） */
     SUPABASE_JWT_SECRET: z.string().optional(),
+    /** Didit API Key for creating verification sessions (server-side only) */
+    DIDIT_API_KEY: z.string().optional(),
+    /** Didit Webhook Secret for verifying inbound webhook signatures */
     DIDIT_WEBHOOK_SECRET: z.string().optional(),
+    /** Didit Workflow ID — identifies which verification flow to use */
+    DIDIT_WORKFLOW_ID: z.string().optional(),
     CRON_SECRET: z.string().optional(),
     ALERT_SLACK_WEBHOOK: z.string().optional(),
     PENDING_STUCK_MINUTES: z.coerce.number().optional(),
@@ -42,7 +47,9 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     SUPABASE_JWT_SECRET: process.env.SUPABASE_JWT_SECRET,
+    DIDIT_API_KEY: process.env.DIDIT_API_KEY,
     DIDIT_WEBHOOK_SECRET: process.env.DIDIT_WEBHOOK_SECRET,
+    DIDIT_WORKFLOW_ID: process.env.DIDIT_WORKFLOW_ID,
     CRON_SECRET: process.env.CRON_SECRET,
     ALERT_SLACK_WEBHOOK: process.env.ALERT_SLACK_WEBHOOK,
     PENDING_STUCK_MINUTES: process.env.PENDING_STUCK_MINUTES,

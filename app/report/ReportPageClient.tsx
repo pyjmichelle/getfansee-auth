@@ -58,6 +58,7 @@ export default function ReportPageClient({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [currentUser, setCurrentUser] = useState<{
     username: string;
     role: "fan" | "creator";
@@ -66,13 +67,17 @@ export default function ReportPageClient({
 
   useEffect(() => {
     const loadUser = async () => {
-      const bootstrap = await getAuthBootstrap();
-      if (bootstrap.authenticated && bootstrap.user && bootstrap.profile) {
-        setCurrentUser({
-          username: bootstrap.profile.display_name || "user",
-          role: (bootstrap.profile.role || "fan") as "fan" | "creator",
-          avatar: bootstrap.profile.avatar_url || undefined,
-        });
+      try {
+        const bootstrap = await getAuthBootstrap();
+        if (bootstrap.authenticated && bootstrap.user && bootstrap.profile) {
+          setCurrentUser({
+            username: bootstrap.profile.display_name || "user",
+            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
+            avatar: bootstrap.profile.avatar_url || undefined,
+          });
+        }
+      } finally {
+        setIsLoadingAuth(false);
       }
     };
     loadUser();
@@ -115,6 +120,23 @@ export default function ReportPageClient({
       setIsSubmitting(false);
     }
   };
+
+  if (isLoadingAuth) {
+    return (
+      <PageShell user={null} maxWidth="4xl">
+        <div className="py-4 animate-pulse space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white/5" />
+            <div className="space-y-2">
+              <div className="h-6 w-40 bg-white/5 rounded" />
+              <div className="h-4 w-56 bg-white/5 rounded" />
+            </div>
+          </div>
+          <div className="h-64 bg-white/5 rounded-xl" />
+        </div>
+      </PageShell>
+    );
+  }
 
   if (success) {
     return (

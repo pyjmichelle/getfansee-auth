@@ -248,9 +248,19 @@ export async function signInWithGoogle(): Promise<{ success: boolean; error?: st
       },
     });
     if (error) {
-      return { success: false, error: error.message };
+      const msg = error.message || "";
+      if (
+        msg.includes("missing OAuth secret") ||
+        msg.includes("Unsupported provider") ||
+        msg.includes("provider is not enabled")
+      ) {
+        return {
+          success: false,
+          error: "Google sign-in is currently unavailable. Please use email login instead.",
+        };
+      }
+      return { success: false, error: msg };
     }
-    // OAuth 重定向开始，视为成功
     return { success: true };
   } catch (err: unknown) {
     return { success: false, error: err instanceof Error ? err.message : "Unknown error" };

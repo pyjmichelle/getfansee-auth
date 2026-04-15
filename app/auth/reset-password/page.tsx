@@ -22,25 +22,32 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    // Supabase redirects with a fragment containing the tokens.
-    // The browser client handles the exchange automatically on mount.
     const { data: listener } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         setIsReady(true);
       }
     });
 
-    // Also check if there's already a session (in case event fired before listener)
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) {
         setIsReady(true);
       }
     });
 
+    const timeout = setTimeout(() => {
+      if (!isReady) {
+        setError(
+          "Unable to verify your reset link. It may have expired. Please request a new password reset."
+        );
+        setIsReady(true);
+      }
+    }, 10000);
+
     return () => {
       listener.subscription.unsubscribe();
+      clearTimeout(timeout);
     };
-  }, []);
+  }, [isReady]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

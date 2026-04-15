@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
+import { sendSupportTicketNotification } from "@/lib/email";
 
 type SupportTicketPayload = {
   userId?: string | null;
@@ -50,9 +51,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    sendSupportTicketNotification({
+      ticketEmail: email.trim(),
+      category: reason,
+      subject: subject.trim(),
+      message: message.trim(),
+      userId: userId || null,
+    }).catch((err) => {
+      console.error("[api/support] email notification error:", err);
+    });
+
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
     console.error("[api/support] POST error:", err);
-    return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
+    const msg = err instanceof Error ? err.message : "";
+    const isSensitive = msg.includes("SERVICE_ROLE_KEY") || msg.includes(".env");
+    return NextResponse.json(
+      {
+        success: false,
+        error: isSensitive ? "Service temporarily unavailable" : "Internal server error",
+      },
+      { status: 500 }
+    );
   }
 }

@@ -38,7 +38,8 @@ export type Post = {
   price_cents?: number | null;
   preview_enabled?: boolean;
   watermark_enabled?: boolean | null;
-  likes_count?: number; // 点赞数
+  likes_count?: number;
+  comments_count?: number;
   created_at?: string;
   creator?: {
     display_name?: string;

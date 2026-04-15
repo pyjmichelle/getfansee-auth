@@ -45,6 +45,8 @@ allowed=(
   "app/api/webhooks/stripe/route.ts"
   # subscriptions: cancel/list subscriptions, needs admin bypass for RLS
   "app/api/subscriptions/route.ts"
+  # creator application: insert into creator_applications (or profiles metadata fallback)
+  "app/api/creator/apply/route.ts"
 )
 
 is_allowed() {

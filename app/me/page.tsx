@@ -185,14 +185,20 @@ export default function ProfilePage() {
       });
 
       if (!createResponse.ok) {
-        alert("Failed to create creator profile, please try again");
+        const errorData = await createResponse.json().catch(() => null);
+        if (errorData?.error === "KYC_REQUIRED") {
+          toast.info("Identity verification required before becoming a creator");
+          router.push("/creator/upgrade/kyc");
+          return;
+        }
+        toast.error("Failed to create creator profile, please try again");
         return;
       }
 
       if (currentUser) {
         setCurrentUser({ ...currentUser, role: "creator" });
       }
-      alert("Creator profile created successfully!");
+      toast.success("Creator profile created successfully!");
     } catch (err) {
       console.error("[me] handleCreateCreator error:", err);
       alert("Failed to create, please try again");

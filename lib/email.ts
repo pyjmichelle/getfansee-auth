@@ -66,6 +66,64 @@ function baseEmailHtml(title: string, body: string): string {
 </html>`;
 }
 
+export interface SupportTicketNotificationParams {
+  ticketEmail: string;
+  category: string;
+  subject: string;
+  message: string;
+  userId?: string | null;
+}
+
+export async function sendSupportTicketNotification(
+  params: SupportTicketNotificationParams
+): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const body = `
+    <h2 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#f1f5f9;">New Support Ticket</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#94a3b8;">A new support ticket has been submitted.</p>
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:12px;margin-bottom:24px;">
+      <tr>
+        <td style="padding:20px 24px;">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="font-size:13px;color:#94a3b8;padding-bottom:8px;">From</td>
+              <td align="right" style="font-size:13px;color:#f1f5f9;padding-bottom:8px;">${params.ticketEmail}</td>
+            </tr>
+            <tr>
+              <td style="font-size:13px;color:#94a3b8;padding-bottom:8px;">Category</td>
+              <td align="right" style="font-size:13px;color:#f1f5f9;padding-bottom:8px;">${params.category}</td>
+            </tr>
+            <tr>
+              <td style="font-size:13px;color:#94a3b8;padding-bottom:8px;">Subject</td>
+              <td align="right" style="font-size:13px;color:#f1f5f9;padding-bottom:8px;">${params.subject}</td>
+            </tr>
+            ${params.userId ? `<tr><td style="font-size:13px;color:#94a3b8;">User ID</td><td align="right" style="font-size:13px;color:#f1f5f9;">${params.userId}</td></tr>` : ""}
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px 24px;margin-bottom:24px;">
+      <p style="margin:0 0 8px;font-size:13px;color:#94a3b8;font-weight:600;">Message:</p>
+      <p style="margin:0;font-size:14px;color:#e2e8f0;white-space:pre-wrap;">${params.message}</p>
+    </div>
+  `;
+
+  try {
+    await resend.emails.send({
+      from: FROM_ADDRESS,
+      to: "support@getfansee.com",
+      subject: `[Support] ${params.category}: ${params.subject}`,
+      html: baseEmailHtml("New Support Ticket", body),
+    });
+  } catch (err) {
+    console.error("[email] Failed to send support ticket notification:", err);
+  }
+}
+
 export interface SubscriptionConfirmationParams {
   toEmail: string;
   toName: string;

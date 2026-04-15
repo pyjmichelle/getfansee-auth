@@ -9,6 +9,7 @@ export {
   forbidden,
   badRequest,
   serverError,
+  sanitizeErrorForClient,
   type ApiErrorBody,
   type WithAuthContext,
   type AuthenticatedRouteHandler,

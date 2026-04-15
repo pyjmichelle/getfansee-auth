@@ -275,17 +275,18 @@ export default function WalletPage() {
 
       if (result.success) {
         Analytics.walletTopUpCompleted(selectedAmount * 100);
+        setIsRecharging(false);
         toast.success(`Successfully recharged $${selectedAmount}`);
         setPaymentStatus("success");
         setSelectedAmount(null);
-
-        // 更新余额显示
         setAvailableBalance(result.balance);
+        setTimeout(() => {
+          setShowAddFunds(false);
+          setPaymentStatus("idle");
+        }, 1500);
 
-        // 重新加载交易记录
-        const transactionsData = await getTransactions(currentUserId);
-        setTransactions(transactionsData);
-        setTimeout(() => setPaymentStatus("idle"), 3000);
+        void getTransactions(currentUserId).then(setTransactions).catch(console.error);
+        return;
       } else {
         toast.error(result.error || "Recharge failed, please try again");
         setPaymentStatus("failed");
@@ -295,6 +296,8 @@ export default function WalletPage() {
       console.error("[wallet] recharge error:", err);
       const message = err instanceof Error ? err.message : "Recharge failed, please try again";
       toast.error(message);
+      setPaymentStatus("failed");
+      setTimeout(() => setPaymentStatus("idle"), 3000);
     } finally {
       setIsRecharging(false);
     }
@@ -425,7 +428,10 @@ export default function WalletPage() {
           {/* Main column: Transactions */}
           <div className="flex-1 min-w-0">
             {/* Transactions */}
-            <div className="card-block overflow-hidden mb-6" data-testid="transaction-history">
+            <div
+              className="card-block overflow-hidden mb-6 min-h-[400px]"
+              data-testid="transaction-history"
+            >
               <div className="p-6 border-b border-border-base">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <h3 className="text-lg font-bold text-text-primary">Transaction History</h3>
@@ -619,6 +625,33 @@ export default function WalletPage() {
                 <Plus className="w-4 h-4" />
                 Add Funds
               </Button>
+
+              <div className="card-block p-4">
+                <h4 className="text-sm font-semibold text-text-primary mb-2">Why preload funds?</h4>
+                <ul className="space-y-1.5 text-xs text-text-tertiary">
+                  <li className="flex items-start gap-2">
+                    <span className="text-brand-primary mt-0.5 shrink-0">&#10003;</span>
+                    <span>
+                      <strong className="text-text-secondary">Instant access</strong> &mdash; Unlock
+                      exclusive content without extra steps
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-brand-primary mt-0.5 shrink-0">&#10003;</span>
+                    <span>
+                      <strong className="text-text-secondary">No interruptions</strong> &mdash; Tip
+                      and subscribe without re-entering payment info
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-brand-primary mt-0.5 shrink-0">&#10003;</span>
+                    <span>
+                      <strong className="text-text-secondary">Avoid failed transactions</strong>{" "}
+                      &mdash; Prevent declined cards at the wrong moment
+                    </span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </aside>
         </div>
@@ -644,7 +677,7 @@ export default function WalletPage() {
                   <label className="block text-sm font-semibold mb-3 text-text-secondary">
                     Select Amount
                   </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                  <div className="grid grid-cols-3 gap-3 mb-4">
                     {fundingOptions.map(({ amount: amt, bonus, popular }) => (
                       <Button
                         key={amt}
@@ -746,7 +779,11 @@ export default function WalletPage() {
                     data-testid="recharge-submit-button"
                     className="w-full px-6 py-3.5 bg-brand-primary text-white hover:bg-brand-primary-subtle disabled:opacity-50 shadow-lg shadow-brand-primary/25"
                   >
-                    {isRecharging ? "Processing..." : `Add $${selectedAmount || "0.00"}`}
+                    {isRecharging
+                      ? "Processing..."
+                      : selectedAmount
+                        ? `Add $${selectedAmount}`
+                        : "Select an Amount"}
                   </Button>
                   <Button
                     variant="outline"

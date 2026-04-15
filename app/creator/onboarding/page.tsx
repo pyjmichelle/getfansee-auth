@@ -9,11 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload } from "@/lib/icons";
-import { submitVerification } from "@/lib/kyc";
+import { KycStatusCard } from "@/components/kyc/kyc-status-card";
 import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 import { toast } from "sonner";
-import { Analytics } from "@/lib/analytics";
 import { LoadingState } from "@/components/loading-state";
 import { DEFAULT_AVATAR_CREATOR, PLACEHOLDER_GENERIC } from "@/lib/image-fallbacks";
 
@@ -22,8 +20,8 @@ export default function CreatorOnboardingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [profile, setProfile] = useState<{
+    id?: string;
     role: string;
     display_name?: string;
     bio?: string;
@@ -35,21 +33,8 @@ export default function CreatorOnboardingPage() {
     bio: "",
     avatar_url: "",
   });
-  const [kycData, setKycData] = useState({
-    real_name: "",
-    birth_date: "",
-    country: "",
-    id_doc_files: [] as File[],
-  });
   const [currentStep, setCurrentStep] = useState<"profile" | "kyc">("profile");
-  const [isSubmittingKYC, setIsSubmittingKYC] = useState(false);
-  const [verificationStatus, setVerificationStatus] = useState<{
-    status: string;
-    reviewed_at: string | null;
-    rejection_reason: string | null;
-  } | null>(null);
 
-  // 加载用户信息和 profile
   useEffect(() => {
     const loadProfile = async () => {
       try {
@@ -59,9 +44,6 @@ export default function CreatorOnboardingPage() {
           return;
         }
 
-        setCurrentUserId(bootstrap.user.id);
-
-        // 加载 profile（通过 API）
         const profileResponse = await fetch("/api/profile");
         if (profileResponse.ok) {
           const profileData = (await profileResponse.json()).profile;
@@ -73,16 +55,12 @@ export default function CreatorOnboardingPage() {
               avatar_url: profileData.avatar_url || "",
             });
 
-            // 检查是否已有验证记录（通过 API）
-            const verificationResponse = await fetch("/api/kyc/verification");
-            if (verificationResponse.ok) {
-              const verificationData = await verificationResponse.json();
-              const verification = verificationData.verification;
-              if (verification) {
-                setVerificationStatus(verification);
-                if (verification.status === "pending") {
-                  setCurrentStep("kyc");
-                }
+            // Check if KYC is already in progress or completed
+            const kycResponse = await fetch("/api/kyc/status");
+            if (kycResponse.ok) {
+              const kycData = await kycResponse.json();
+              if (kycData.status && kycData.status !== "not_started") {
+                setCurrentStep("kyc");
               }
             }
           }
@@ -101,7 +79,7 @@ export default function CreatorOnboardingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!currentUserId) {
+    if (!profile?.id) {
       setError("User not logged in");
       return;
     }
@@ -184,7 +162,7 @@ export default function CreatorOnboardingPage() {
   };
 
   return (
-    <PageShell user={currentUser} notificationCount={0} maxWidth="3xl">
+    <PageShell user={currentUser} notificationCount={0} maxWidth="3xl" hideBottomNav>
       <div className="py-6" data-testid="onboarding-ready">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-text-primary mb-2">Become a Creator</h1>
@@ -299,204 +277,25 @@ export default function CreatorOnboardingPage() {
             </form>
           ) : (
             <div className="space-y-6">
-              {verificationStatus?.status === "pending" && (
-                <div className="bg-[var(--bg-purple-500-10)] border border-[var(--border-purple-500-20)] rounded-xl p-4">
-                  <p className="text-sm text-[var(--color-purple-400)]">
-                    Your verification request is under review. Please wait patiently.
-                  </p>
-                </div>
-              )}
-
-              {verificationStatus?.status === "rejected" && (
-                <div className="bg-error/10 border border-error/20 rounded-xl p-4">
-                  <p className="text-sm text-error font-medium mb-2">Verification Rejected</p>
-                  {verificationStatus.rejection_reason && (
-                    <p className="text-sm text-text-tertiary">
-                      Reason: {verificationStatus.rejection_reason}
-                    </p>
-                  )}
-                  <p className="text-sm text-text-tertiary mt-2">
-                    You can resubmit your application.
-                  </p>
-                </div>
-              )}
-
-              {verificationStatus?.status === "approved" && (
-                <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4">
-                  <p className="text-sm text-green-600 dark:text-green-400 font-medium">
-                    Verification Approved
-                  </p>
-                  <Button
-                    onClick={() => router.push("/home")}
-                    variant="gradient"
-                    className="mt-4 rounded-xl shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
-                  >
-                    Complete
-                  </Button>
-                </div>
-              )}
-
-              {(!verificationStatus || verificationStatus.status === "rejected") && (
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    if (!currentUserId) return;
-
-                    if (!kycData.real_name.trim() || !kycData.birth_date || !kycData.country) {
-                      toast.error("Please fill in all required fields");
-                      return;
-                    }
-
-                    if (kycData.id_doc_files.length === 0) {
-                      toast.error("Please upload at least one ID document photo");
-                      return;
-                    }
-
-                    setIsSubmittingKYC(true);
-                    try {
-                      const success = await submitVerification(currentUserId, {
-                        real_name: kycData.real_name.trim(),
-                        birth_date: kycData.birth_date,
-                        country: kycData.country,
-                        id_doc_files: kycData.id_doc_files,
-                      });
-
-                      if (success) {
-                        Analytics.kycSubmitted();
-                        toast.success("Verification request submitted. Awaiting review");
-                        // 通过 API 获取验证状态
-                        const verificationResponse = await fetch("/api/kyc/verification");
-                        if (verificationResponse.ok) {
-                          const verificationData = await verificationResponse.json();
-                          const verification = verificationData.verification;
-                          if (verification) {
-                            setVerificationStatus(verification);
-                          }
-                        }
-                      } else {
-                        toast.error("Submission failed. Please try again");
-                      }
-                    } catch (err: unknown) {
-                      console.error("[onboarding] submit KYC error:", err);
-                      const message =
-                        err instanceof Error ? err.message : "Submission failed. Please try again";
-                      toast.error(message);
-                    } finally {
-                      setIsSubmittingKYC(false);
-                    }
-                  }}
-                  className="space-y-6"
+              <KycStatusCard
+                approvedHref="/creator/studio"
+                onStatusChange={(newStatus) => {
+                  if (newStatus === "approved") {
+                    toast.success("Your creator account is now active!");
+                    setTimeout(() => router.push("/creator/studio"), 2000);
+                  }
+                }}
+              />
+              <div className="flex gap-4 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setCurrentStep("profile")}
+                  className="flex-1 border-border-base bg-surface-base hover:bg-surface-raised rounded-xl active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
                 >
-                  <div className="space-y-2">
-                    <Label htmlFor="real_name">
-                      Legal Name <span className="text-error">*</span>
-                    </Label>
-                    <Input
-                      id="real_name"
-                      type="text"
-                      value={kycData.real_name}
-                      onChange={(e) => setKycData({ ...kycData, real_name: e.target.value })}
-                      required
-                      disabled={isSubmittingKYC}
-                      className="bg-surface-base border-border-base rounded-xl"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="birth_date">
-                      Date of Birth <span className="text-error">*</span>
-                    </Label>
-                    <Input
-                      id="birth_date"
-                      type="date"
-                      value={kycData.birth_date}
-                      onChange={(e) => setKycData({ ...kycData, birth_date: e.target.value })}
-                      required
-                      disabled={isSubmittingKYC}
-                      className="bg-surface-base border-border-base rounded-xl"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="country">
-                      Country <span className="text-error">*</span>
-                    </Label>
-                    <Input
-                      id="country"
-                      type="text"
-                      value={kycData.country}
-                      onChange={(e) => setKycData({ ...kycData, country: e.target.value })}
-                      placeholder="e.g., US, CN, JP"
-                      required
-                      disabled={isSubmittingKYC}
-                      className="bg-surface-base border-border-base rounded-xl"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>
-                      ID Document Photos <span className="text-error">*</span>
-                    </Label>
-                    <div className="border-2 border-dashed border-border-base rounded-xl p-6 text-center hover:border-brand-primary/50 transition-colors">
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/jpg,image/png,image/webp"
-                        multiple
-                        onChange={(e) => {
-                          const files = Array.from(e.target.files || []);
-                          setKycData({ ...kycData, id_doc_files: files });
-                        }}
-                        disabled={isSubmittingKYC}
-                        className="hidden"
-                        id="id_doc_upload"
-                      />
-                      <label
-                        htmlFor="id_doc_upload"
-                        className="cursor-pointer flex flex-col items-center gap-2"
-                      >
-                        <Upload className="w-8 h-8 text-text-tertiary" />
-                        <span className="text-sm text-text-tertiary">
-                          {kycData.id_doc_files.length > 0
-                            ? `${kycData.id_doc_files.length} file${kycData.id_doc_files.length > 1 ? "s" : ""} selected`
-                            : "Click to upload ID document photos (multiple files supported)"}
-                        </span>
-                      </label>
-                    </div>
-                    {kycData.id_doc_files.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {kycData.id_doc_files.map((file, index) => (
-                          <div
-                            key={index}
-                            className="text-xs text-text-tertiary bg-surface-raised px-2 py-1 rounded"
-                          >
-                            {file.name}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex gap-4 pt-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setCurrentStep("profile")}
-                      disabled={isSubmittingKYC}
-                      className="flex-1 border-border-base bg-surface-base hover:bg-surface-raised rounded-xl active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={isSubmittingKYC}
-                      variant="gradient"
-                      className="flex-1 rounded-xl shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50 disabled:shadow-none"
-                    >
-                      {isSubmittingKYC ? "Submitting…" : "Submit Verification"}
-                    </Button>
-                  </div>
-                </form>
-              )}
+                  Previous
+                </Button>
+              </div>
             </div>
           )}
         </Card>

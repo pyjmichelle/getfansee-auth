@@ -1,8 +1,9 @@
 "use client";
 
 /**
- * KYC 身份验证数据访问层
- * 创作者身份验证提交和审核
+ * @deprecated Legacy manual KYC upload flow.
+ * All new KYC verification uses Didit hosted sessions via lib/kyc/kyc-service.ts.
+ * This file is retained only for backward compatibility with admin review pages.
  */
 
 import { getSupabaseBrowserClient } from "./supabase-browser";
