@@ -41,7 +41,7 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 glass-nav border-t border-white/6 md:hidden"
+      className="fixed bottom-0 left-0 right-0 glass-nav border-t border-white/6 lg:hidden"
       role="navigation"
       aria-label="Main navigation"
       style={{ zIndex: "var(--z-bottom-nav)" as unknown as number }}

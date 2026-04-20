@@ -38,7 +38,10 @@ type JwtPayload = {
 function validateSupabaseJwt(token: string): JwtPayload | null {
   // 1. Must be exactly 3 base64url segments
   const parts = token.split(".");
-  if (parts.length !== 3) return null;
+  if (parts.length !== 3) {
+    console.warn("[validateJwt] malformed token: expected 3 segments, got", parts.length);
+    return null;
+  }
 
   // 2. Decode the payload segment
   let payload: JwtPayload;
@@ -46,29 +49,37 @@ function validateSupabaseJwt(token: string): JwtPayload | null {
     const json = Buffer.from(parts[1], "base64url").toString("utf-8");
     payload = JSON.parse(json) as JwtPayload;
   } catch {
+    console.warn("[validateJwt] failed to decode/parse JWT payload segment");
     return null;
   }
 
   // 3. Must not be expired
   const now = Math.floor(Date.now() / 1000);
   if (!payload.exp || payload.exp <= now) {
+    console.warn(
+      `[validateJwt] token expired: exp=${payload.exp}, now=${now}, delta=${(payload.exp ?? 0) - now}s`
+    );
     return null;
   }
 
   // 4. Issuer must match our Supabase project
-  const expectedIss = `${env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1`;
+  const supabaseUrl = (env.NEXT_PUBLIC_SUPABASE_URL || "").replace(/\/+$/, "");
+  const expectedIss = `${supabaseUrl}/auth/v1`;
   if (payload.iss !== expectedIss) {
+    console.warn(`[validateJwt] iss mismatch: got "${payload.iss}", expected "${expectedIss}"`);
     return null;
   }
 
   // 5. Audience must be "authenticated"
   const aud = Array.isArray(payload.aud) ? payload.aud[0] : payload.aud;
   if (aud !== "authenticated") {
+    console.warn(`[validateJwt] aud mismatch: got "${aud}", expected "authenticated"`);
     return null;
   }
 
   // 6. Must have a subject (user UUID)
   if (!payload.sub) {
+    console.warn("[validateJwt] missing sub claim");
     return null;
   }
 
@@ -82,9 +93,11 @@ function validateSupabaseJwt(token: string): JwtPayload | null {
       const expected = Buffer.from(expectedSig);
       const actual = Buffer.from(actualSig);
       if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) {
+        console.warn("[validateJwt] HMAC signature mismatch — check SUPABASE_JWT_SECRET");
         return null;
       }
     } catch {
+      console.warn("[validateJwt] signature comparison threw — buffer length issue");
       return null;
     }
   } else {

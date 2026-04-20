@@ -528,31 +528,9 @@ export default function CreatorProfilePage() {
             </p>
           )}
 
-          {/* Mobile: Subscribe + Share */}
+          {/* Mobile: Share only — Subscribe is in the sticky bottom bar */}
           {!isOwnProfile && (
             <div className="flex md:hidden gap-3 mt-1">
-              {isSubscribed ? (
-                <Button
-                  variant="outline"
-                  onClick={handleCancelSubscription}
-                  disabled={isSubscribing}
-                  className="flex-1 rounded-full active:scale-[0.98]"
-                >
-                  {isSubscribing ? "…" : "Subscribed"}
-                </Button>
-              ) : (
-                <Button
-                  variant="violet"
-                  onClick={handleSubscribe}
-                  disabled={isSubscribing}
-                  className="flex-1 rounded-full gap-1.5 shadow-glow-violet active:scale-[0.98]"
-                  data-testid="subscribe-button"
-                  aria-label="Subscribe to this creator"
-                >
-                  <Plus size={14} />
-                  Subscribe ${subscriptionPrice}/mo
-                </Button>
-              )}
               <Button
                 variant="outline"
                 size="icon"

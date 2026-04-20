@@ -48,6 +48,7 @@ export default function ProfilePage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [activeTab, setActiveTab] = useState("profile");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   useSkeletonMetric("me_page", isLoading);
   const creatorSocialCount = useCountUp(currentUser?.role === "creator" ? 1284 : 1283, {
     duration: 900,
@@ -267,9 +268,15 @@ export default function ProfilePage() {
   };
 
   const handleLogout = async () => {
-    await fetch("/api/auth/session", { method: "DELETE" });
-    await signOut();
-    router.push("/auth");
+    setIsLoggingOut(true);
+    try {
+      await fetch("/api/auth/session", { method: "DELETE" });
+      await signOut();
+      router.push("/auth");
+    } catch {
+      setIsLoggingOut(false);
+      toast.error("Failed to log out. Please try again.");
+    }
   };
 
   if (isLoading || !currentUser) {
@@ -406,9 +413,11 @@ export default function ProfilePage() {
             <div className="mt-4 pt-4 border-t border-white/6">
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-2.5 rounded-[var(--radius-sm)] text-[13px] font-medium text-red-400 hover:bg-red-500/8 transition-all"
+                disabled={isLoggingOut}
+                className="w-full text-left px-4 py-2.5 rounded-[var(--radius-sm)] text-[13px] font-medium text-red-400 hover:bg-red-500/8 transition-all disabled:opacity-50 flex items-center gap-2"
               >
-                Log Out
+                {isLoggingOut ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                {isLoggingOut ? "Logging out..." : "Log Out"}
               </button>
             </div>
           </aside>
@@ -614,10 +623,15 @@ export default function ProfilePage() {
                 <Button
                   variant="outline"
                   onClick={handleLogout}
+                  disabled={isLoggingOut}
                   aria-label="Log out of your account"
                 >
-                  <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
-                  Log Out
+                  {isLoggingOut ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
+                  )}
+                  {isLoggingOut ? "Logging out..." : "Log Out"}
                 </Button>
               </div>
             </GlassCard>

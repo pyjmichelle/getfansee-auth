@@ -19,7 +19,27 @@ export async function POST() {
     const appUrl = env.NEXT_PUBLIC_APP_URL || env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
     const callbackUrl = `${appUrl}/creator/upgrade/kyc?verified=1`;
 
-    const result = await createOrResumeSession(user.id, callbackUrl, profile.email);
+    let result;
+    try {
+      result = await createOrResumeSession(user.id, callbackUrl, profile.email);
+    } catch (serviceError) {
+      const msg = serviceError instanceof Error ? serviceError.message : "";
+      const isInfraIssue =
+        msg.includes("SERVICE_ROLE_KEY") ||
+        msg.includes("relation") ||
+        msg.includes("does not exist");
+      if (isInfraIssue) {
+        logger.error("[api/kyc/session] Infrastructure unavailable for KYC", { error: msg });
+        return NextResponse.json(
+          {
+            success: false,
+            error: "KYC service is temporarily unavailable. Please try again later.",
+          },
+          { status: 503 }
+        );
+      }
+      throw serviceError;
+    }
 
     return NextResponse.json({
       success: true,

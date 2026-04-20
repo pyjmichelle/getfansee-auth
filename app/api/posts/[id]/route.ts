@@ -3,71 +3,102 @@ import { createClient } from "@/lib/supabase-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getCurrentUser } from "@/lib/auth-server";
 import { resolveSubscriptionUserColumn } from "@/lib/subscriptions";
+import { MOCK_POSTS, MOCK_CREATORS } from "@/lib/mock-data";
+
+function getMockPostById(postId: string) {
+  const mockPost = MOCK_POSTS.find((p) => p.id === postId);
+  if (!mockPost) return null;
+  const mockCreator = MOCK_CREATORS.find((c) => c.id === mockPost.creator_id);
+  return {
+    ...mockPost,
+    creator: mockCreator
+      ? {
+          id: mockCreator.id,
+          display_name: mockCreator.display_name,
+          avatar_url: mockCreator.avatar_url,
+        }
+      : null,
+  };
+}
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    // Use admin client to fetch the post so that RLS does not block reading PPV/subscriber
-    // post metadata before the user has purchased/subscribed. Access control (canView) is
-    // applied explicitly below; sensitive content fields are stripped when !canView.
-    const adminSupabase = getSupabaseAdminClient();
-    const supabase = await createClient(); // kept for RLS-scoped access checks (purchases, subscriptions)
     const resolvedParams = await params;
     const postId = resolvedParams.id;
 
-    // 获取当前用户
     const user = await getCurrentUser();
 
     if (!user) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    // 获取帖子详情（包含创作者信息）— admin client bypasses RLS so fans can
-    // see PPV post metadata (title, preview) even before purchasing.
-    const { data: post, error: postError } = await adminSupabase
-      .from("posts")
-      .select(
-        `
-        *,
-        creator:profiles!posts_creator_id_fkey(
-          id,
-          display_name,
-          avatar_url
-        )
-      `
-      )
-      .eq("id", postId)
-      .single();
+    let post: Record<string, unknown> | null = null;
+    let usedMockFallback = false;
 
-    if (postError || !post) {
-      console.error("[GET /api/posts/[id]] Post fetch error:", postError);
+    try {
+      const adminSupabase = getSupabaseAdminClient();
+      const { data, error: postError } = await adminSupabase
+        .from("posts")
+        .select(
+          `
+          *,
+          creator:profiles!posts_creator_id_fkey(
+            id,
+            display_name,
+            avatar_url
+          )
+        `
+        )
+        .eq("id", postId)
+        .single();
+
+      if (!postError && data) {
+        post = data;
+      }
+    } catch (adminError) {
+      console.warn(
+        "[GET /api/posts/[id]] Admin client unavailable, trying mock fallback:",
+        adminError instanceof Error ? adminError.message : adminError
+      );
+    }
+
+    if (!post && postId.startsWith("mock-")) {
+      const mockData = getMockPostById(postId);
+      if (mockData) {
+        post = mockData as unknown as Record<string, unknown>;
+        usedMockFallback = true;
+      }
+    }
+
+    if (!post) {
       return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
     }
-    // 检查查看权限
+
+    if (usedMockFallback) {
+      const canView = post.visibility === "free";
+      const safePost = canView ? post : { ...post, content: null, media_url: null };
+      return NextResponse.json({ success: true, post: safePost, canView, isMock: true });
+    }
+
+    const supabase = await createClient();
     let canView = false;
 
-    // 1. 创作者自己可以查看
     if (post.creator_id === user.id) {
       canView = true;
-    }
-    // 2. 免费内容所有人可以查看
-    else if (post.visibility === "free") {
+    } else if (post.visibility === "free") {
       canView = true;
-    }
-    // 3. 订阅内容 - 检查是否已订阅
-    else if (post.visibility === "subscribers") {
+    } else if (post.visibility === "subscribers") {
       const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
       const { data: subscription } = await supabase
         .from("subscriptions")
         .select("id")
         .eq(subscriptionUserColumn, user.id)
-        .eq("creator_id", post.creator_id)
+        .eq("creator_id", post.creator_id as string)
         .eq("status", "active")
         .single();
 
       canView = !!subscription;
-    }
-    // 4. PPV 内容 - 检查是否已购买
-    else if (post.visibility === "ppv") {
+    } else if (post.visibility === "ppv") {
       const { data: purchase } = await supabase
         .from("purchases")
         .select("id")
@@ -78,8 +109,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       canView = !!purchase;
     }
 
-    // Strip sensitive fields when the viewer does not have access.
-    // Prevents content leaking via API even if RLS is misconfigured.
     const safePost = canView
       ? post
       : {
