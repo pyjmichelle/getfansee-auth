@@ -177,7 +177,7 @@ export default function CreatorApplicationPage() {
   }
 
   return (
-    <PageShell user={currentUser} notificationCount={3} maxWidth="2xl">
+    <PageShell user={currentUser} notificationCount={3} maxWidth="2xl" hideBottomNav>
       <div className="section-block py-6">
         <Button asChild variant="ghost" size="sm" className="mb-6">
           <Link href="/creator/upgrade">

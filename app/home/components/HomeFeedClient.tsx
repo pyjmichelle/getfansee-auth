@@ -20,6 +20,7 @@ import {
   CheckCircle2,
   UserPlus,
   UserCheck,
+  Loader2,
 } from "@/lib/icons";
 import { PaywallModal } from "@/components/paywall-modal";
 import { ShareModal } from "@/components/share-modal";
@@ -69,6 +70,7 @@ function PostCard({
   const router = useRouter();
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes_count ?? 0);
+  const [isNavigatingToComments, setIsNavigatingToComments] = useState(false);
 
   const handle = post.creator?.display_name?.toLowerCase().replace(/\s+/g, "") || "user";
   const hasMedia = post.media && post.media.length > 0;
@@ -273,10 +275,19 @@ function PostCard({
         </button>
 
         <button
-          onClick={() => router.push(`/posts/${post.id}`)}
-          className="flex items-center gap-1.5 h-8 px-2.5 rounded-full text-text-muted hover:text-white hover:bg-white/8 transition-all"
+          onClick={() => {
+            setIsNavigatingToComments(true);
+            router.push(`/posts/${post.id}`);
+          }}
+          disabled={isNavigatingToComments}
+          className="flex items-center gap-1.5 h-8 px-2.5 rounded-full text-text-muted hover:text-white hover:bg-white/8 transition-all disabled:opacity-50"
+          aria-label="View comments"
         >
-          <MessageCircle className="size-[15px]" />
+          {isNavigatingToComments ? (
+            <Loader2 className="size-[15px] animate-spin" />
+          ) : (
+            <MessageCircle className="size-[15px]" />
+          )}
           <span className="text-[12px] font-medium">{commentCount}</span>
         </button>
 
@@ -484,7 +495,7 @@ export function HomeFeedClient({
         {/* ── Main feed ──────────────────────────────────── */}
         <main className="home-feed min-w-0">
           {/* Feed tabs */}
-          <div className="sticky top-12 md:top-[52px] z-30 bg-bg-base/95 backdrop-blur-md border-b border-white/6 mb-4">
+          <div className="sticky top-12 md:top-[52px] z-30 bg-bg-base/95 backdrop-blur-md border-b border-white/6 mb-6">
             {/* Trending tags scroll (mobile) */}
             <div className="flex items-center gap-2 px-3 py-2 overflow-x-auto no-scrollbar lg:hidden">
               <TrendingUp className="size-[13px] text-violet-500 shrink-0" />

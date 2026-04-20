@@ -395,17 +395,12 @@ export default function NotificationsPage() {
             <div className="h-10 w-24 bg-white/8 rounded-xl animate-pulse" />
             <div className="h-10 w-28 bg-white/8 rounded-xl animate-pulse" />
           </div>
-          {/* Items skeleton */}
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="card-block p-3 flex gap-3 animate-pulse">
-              <div className="w-10 h-10 rounded-xl bg-surface-raised flex-shrink-0" />
-              <div className="flex-1 space-y-2">
-                <div className="h-3.5 w-32 bg-white/8 rounded" />
-                <div className="h-3 w-full bg-white/8 rounded" />
-                <div className="h-3 w-20 bg-white/8 rounded" />
-              </div>
-            </div>
-          ))}
+          {/* Empty-state skeleton — matches the real empty state layout */}
+          <div className="text-center py-20 card-block animate-pulse">
+            <div className="w-24 h-24 bg-white/8 rounded-3xl mx-auto mb-6" />
+            <div className="h-6 w-48 bg-white/8 rounded mx-auto mb-3" />
+            <div className="h-4 w-64 bg-white/8 rounded mx-auto" />
+          </div>
         </div>
       </PageShell>
     );

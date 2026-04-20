@@ -172,11 +172,15 @@ export default function NewPostPage() {
           router.push("/home");
         }, 500);
       } else {
-        setError(result.error || "Failed to create, please try again");
+        const errMsg = result.error || "Failed to create, please try again";
+        setError(errMsg);
+        toast.error(errMsg);
       }
     } catch (err) {
       console.error("[new-post] handleSubmit error", err);
-      setError("Failed to create, please try again");
+      const errMsg = "Failed to create, please try again";
+      setError(errMsg);
+      toast.error(errMsg);
     } finally {
       setIsSaving(false);
     }
