@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { HelpCircle, CreditCard, User, AlertTriangle, Send, Loader2 } from "@/lib/icons";
 import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { SUPPORT_CONTACT_EMAIL } from "@/lib/constants/legal";
 
 const CONTACT_REASONS = [
   { value: "general_inquiry", label: "General Inquiry" },
@@ -290,10 +291,10 @@ export default function SupportPage() {
                     For billing disputes, please include your transaction date and amount.
                     Alternatively, email us directly at{" "}
                     <a
-                      href="mailto:support@getfansee.com"
+                      href={`mailto:${SUPPORT_CONTACT_EMAIL}`}
                       className="text-brand-primary hover:underline"
                     >
-                      support@getfansee.com
+                      {SUPPORT_CONTACT_EMAIL}
                     </a>
                   </p>
                 </form>

@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { SUPPORT_CONTACT_EMAIL } from "@/lib/constants/legal";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_ADDRESS = process.env.RESEND_FROM_ADDRESS || "GetFanSee <noreply@getfansee.com>";
@@ -115,7 +116,7 @@ export async function sendSupportTicketNotification(
   try {
     await resend.emails.send({
       from: FROM_ADDRESS,
-      to: "support@getfansee.com",
+      to: SUPPORT_CONTACT_EMAIL,
       subject: `[Support] ${params.category}: ${params.subject}`,
       html: baseEmailHtml("New Support Ticket", body),
     });
@@ -183,7 +184,7 @@ export async function sendSubscriptionConfirmation(
 
     <p style="margin:24px 0 0;font-size:12px;color:#475569;text-align:center;">
       If you have any questions, contact us at
-      <a href="mailto:support@getfansee.com" style="color:#7c3aed;text-decoration:none;">support@getfansee.com</a>
+      <a href="mailto:${SUPPORT_CONTACT_EMAIL}" style="color:#7c3aed;text-decoration:none;">${SUPPORT_CONTACT_EMAIL}</a>
     </p>
   `;
 
@@ -253,7 +254,7 @@ export async function sendPPVConfirmation(params: PPVConfirmationParams): Promis
     <p style="margin:24px 0 0;font-size:12px;color:#475569;text-align:center;">
       Refund requests must be submitted within 14 days.
       <a href="${SITE_URL}/refund" style="color:#7c3aed;text-decoration:none;">Refund Policy</a> &nbsp;·&nbsp;
-      <a href="mailto:support@getfansee.com" style="color:#7c3aed;text-decoration:none;">Contact Support</a>
+      <a href="mailto:${SUPPORT_CONTACT_EMAIL}" style="color:#7c3aed;text-decoration:none;">Contact Support</a>
     </p>
   `;
 

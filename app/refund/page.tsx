@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
+import { LEGAL_EFFECTIVE_DATE, SUPPORT_CONTACT_EMAIL } from "@/lib/constants/legal";
 
 export const metadata: Metadata = {
   title: "Refund & Cancellation Policy - GetFanSee",
@@ -23,7 +24,7 @@ export default function RefundPage() {
         <h1 className="text-4xl font-bold text-brand-primary mb-8">Refund & Cancellation Policy</h1>
 
         <div className="card-block p-8 prose prose-invert max-w-none space-y-8">
-          <p className="text-text-tertiary">Last updated: March 17, 2026</p>
+          <p className="text-text-tertiary">Last updated: {LEGAL_EFFECTIVE_DATE}</p>
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">1. Overview</h2>
@@ -115,10 +116,10 @@ export default function RefundPage() {
               <li>
                 <strong>Email:</strong>{" "}
                 <a
-                  href="mailto:support@getfansee.com"
+                  href={`mailto:${SUPPORT_CONTACT_EMAIL}`}
                   className="text-brand-primary underline hover:no-underline"
                 >
-                  support@getfansee.com
+                  {SUPPORT_CONTACT_EMAIL}
                 </a>
               </li>
               <li>
@@ -167,10 +168,10 @@ export default function RefundPage() {
             <p className="text-text-secondary">
               For all billing and refund enquiries:{" "}
               <a
-                href="mailto:support@getfansee.com"
+                href={`mailto:${SUPPORT_CONTACT_EMAIL}`}
                 className="text-brand-primary underline hover:no-underline"
               >
-                support@getfansee.com
+                {SUPPORT_CONTACT_EMAIL}
               </a>
             </p>
           </section>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
+import { LEGAL_EFFECTIVE_DATE } from "@/lib/constants/legal";
 
 export const metadata: Metadata = {
   title: "Privacy Policy - GetFanSee",
@@ -23,7 +24,7 @@ export default function PrivacyPage() {
         <h1 className="text-4xl font-bold text-brand-primary mb-8">Privacy Policy</h1>
 
         <div className="card-block p-8 prose prose-invert max-w-none space-y-8">
-          <p className="text-text-tertiary">Last updated: January 18, 2026</p>
+          <p className="text-text-tertiary">Last updated: {LEGAL_EFFECTIVE_DATE}</p>
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>

@@ -3,6 +3,16 @@ import Link from "next/link";
 import { ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
+import {
+  LEGAL_COMPANY_NAME,
+  LEGAL_COMPANY_REGISTRATION,
+  LEGAL_CONTACT_EMAIL,
+  LEGAL_EFFECTIVE_DATE,
+  LEGAL_GOVERNING_JURISDICTION,
+  LEGAL_REGISTERED_ADDRESS,
+  PLATFORM_NAME,
+  SUPPORT_CONTACT_EMAIL,
+} from "@/lib/constants/legal";
 
 export const metadata: Metadata = {
   title: "About GetFanSee",
@@ -39,31 +49,37 @@ export default function AboutPage() {
             <div className="bg-surface-raised p-6 rounded-xl space-y-3 text-text-secondary">
               <div className="flex flex-col sm:flex-row sm:gap-4">
                 <span className="font-semibold text-text-primary min-w-[180px]">Platform Name</span>
-                <span>GetFanSee</span>
+                <span>{PLATFORM_NAME}</span>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
                 <span className="font-semibold text-text-primary min-w-[180px]">
                   Registered Company
                 </span>
-                <span>GetFanSee Pty Ltd</span>
+                <span>{LEGAL_COMPANY_NAME}</span>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
                 <span className="font-semibold text-text-primary min-w-[180px]">
                   Registered Address
                 </span>
-                <span>Suite 1, Level 2, 123 Tech Street, Sydney NSW 2000, Australia</span>
+                <span>{LEGAL_REGISTERED_ADDRESS}</span>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
                 <span className="font-semibold text-text-primary min-w-[180px]">
                   Company Registration
                 </span>
-                <span>ACN 000 000 000 (Australian Company Number)</span>
+                <span>{LEGAL_COMPANY_REGISTRATION}</span>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:gap-4">
+                <span className="font-semibold text-text-primary min-w-[180px]">
+                  Effective Date
+                </span>
+                <span>{LEGAL_EFFECTIVE_DATE}</span>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
                 <span className="font-semibold text-text-primary min-w-[180px]">
                   Governing Jurisdiction
                 </span>
-                <span>New South Wales, Australia</span>
+                <span>{LEGAL_GOVERNING_JURISDICTION}</span>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
                 <span className="font-semibold text-text-primary min-w-[180px]">Website</span>
@@ -83,19 +99,19 @@ export default function AboutPage() {
               <div className="flex flex-col sm:flex-row sm:gap-4">
                 <span className="font-semibold text-text-primary min-w-[180px]">Legal</span>
                 <a
-                  href="mailto:legal@getfansee.com"
+                  href={`mailto:${LEGAL_CONTACT_EMAIL}`}
                   className="text-brand-primary underline hover:no-underline"
                 >
-                  legal@getfansee.com
+                  {LEGAL_CONTACT_EMAIL}
                 </a>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
                 <span className="font-semibold text-text-primary min-w-[180px]">Support</span>
                 <a
-                  href="mailto:support@getfansee.com"
+                  href={`mailto:${SUPPORT_CONTACT_EMAIL}`}
                   className="text-brand-primary underline hover:no-underline"
                 >
-                  support@getfansee.com
+                  {SUPPORT_CONTACT_EMAIL}
                 </a>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
@@ -123,10 +139,10 @@ export default function AboutPage() {
               * Company registration details are provided for legal compliance purposes. Please
               contact us at{" "}
               <a
-                href="mailto:legal@getfansee.com"
+                href={`mailto:${LEGAL_CONTACT_EMAIL}`}
                 className="text-brand-primary underline hover:no-underline"
               >
-                legal@getfansee.com
+                {LEGAL_CONTACT_EMAIL}
               </a>{" "}
               to verify any information required for payment processor applications or regulatory
               submissions.

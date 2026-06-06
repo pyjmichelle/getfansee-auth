@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, ShieldAlert, AlertTriangle, CheckCircle } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
+import { LEGAL_EFFECTIVE_DATE } from "@/lib/constants/legal";
 
 export const metadata: Metadata = {
   title: "Acceptable Use Policy - GetFanSee",
@@ -24,7 +25,7 @@ export default function AcceptableUsePage() {
         <h1 className="text-4xl font-bold text-brand-primary mb-2">
           Acceptable Use &amp; Content Guidelines
         </h1>
-        <p className="text-text-tertiary mb-8">Last updated: January 18, 2026</p>
+        <p className="text-text-tertiary mb-8">Last updated: {LEGAL_EFFECTIVE_DATE}</p>
 
         <div className="card-block p-8 prose prose-invert max-w-none space-y-8">
           <section>
