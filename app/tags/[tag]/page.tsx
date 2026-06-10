@@ -33,11 +33,8 @@ export default function TagPage() {
       try {
         setIsLoading(true);
 
+        // Public tag listing: guests can browse — no /auth redirect.
         const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
-          router.push("/auth");
-          return;
-        }
 
         if (bootstrap.profile) {
           setCurrentUser({

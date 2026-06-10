@@ -32,7 +32,8 @@ PROJECT-SPECIFIC SURFACES:
 
 - UI: `app/me/wallet/`, paywall / purchase flows（`components/paywall-modal.tsx` 等）, `app/purchases/`（若存在）
 - APIs: `app/api/wallet/`, `app/api/payments/create-checkout-session/`, `app/api/webhooks/stripe/`, `app/api/unlock/`, `app/api/subscriptions/`, `app/api/transactions/`, `app/api/cron/financial-audit/`
-- Schema: `migrations/` 中与 billing、wallet、webhook、unlock 相关的变更
+- Ambassador 佣金（新）: 推荐计划（`migrations/042`）定义了推荐奖励与佣金分成逻辑；MVP 阶段仅追踪不提现，后续钱包入账需通过此 agent 审查；业务代码见 `lib/ambassador/server.ts`、`lib/referral.ts`
+- Schema: `migrations/` 中与 billing、wallet、webhook、unlock、ambassador 相关的变更（近期带：042）
 
 REQUIRED INPUTS:
 

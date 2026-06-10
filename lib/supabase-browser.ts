@@ -1,19 +1,8 @@
 "use client";
 
-import { createBrowserClient } from "@supabase/auth-helpers-nextjs";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { env } from "@/lib/env";
-
-const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_ANON_KEY = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-let browserClient: SupabaseClient | null = null;
-
-export function getSupabaseBrowserClient(): SupabaseClient {
-  if (!browserClient) {
-    browserClient = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      isSingleton: true,
-    });
-  }
-  return browserClient;
-}
+/**
+ * Browser Supabase client.
+ * Canonical implementation lives in `lib/supabase/client.ts` (@supabase/ssr).
+ * This file is kept as a re-export to preserve existing import paths.
+ */
+export { getSupabaseBrowserClient } from "@/lib/supabase/client";

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Shield, FileText, UserCheck, Flag, LayoutDashboard } from "@/lib/icons";
+import { Shield, FileText, UserCheck, Flag, LayoutDashboard, Users, DollarSign } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -10,6 +10,8 @@ const navItems = [
   { href: "/admin/creator-verifications", label: "KYC Reviews", icon: UserCheck },
   { href: "/admin/content-review", label: "Content Review", icon: FileText },
   { href: "/admin/reports", label: "Reports", icon: Flag },
+  { href: "/admin/referrals", label: "Referrals", icon: Users },
+  { href: "/admin/commissions", label: "Commissions", icon: DollarSign },
 ];
 
 export function AdminSidebar() {

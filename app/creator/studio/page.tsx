@@ -253,6 +253,7 @@ export default function CreatorStudioPage() {
               {[
                 { href: "/creator/studio/earnings", icon: DollarSign, label: "Earnings" },
                 { href: "/creator/studio/subscribers", icon: Users, label: "Subscribers" },
+                { href: "/creator/studio/tips", icon: Heart, label: "Tips" },
                 { href: "/creator/studio/post/list", icon: FileText, label: "Post List" },
                 { href: "/creator/studio/analytics", icon: BarChart3, label: "Analytics" },
               ].map(({ href, icon: Icon, label }) => (
@@ -477,6 +478,7 @@ export default function CreatorStudioPage() {
                     { href: "/creator/new-post", icon: Plus, label: "Create Post" },
                     { href: "/creator/studio/earnings", icon: DollarSign, label: "Earnings" },
                     { href: "/creator/studio/subscribers", icon: Users, label: "Subscribers" },
+                    { href: "/creator/studio/tips", icon: Heart, label: "Tips" },
                     { href: "/creator/studio/post/list", icon: Eye, label: "Post List" },
                     { href: "/creator/studio/analytics", icon: BarChart3, label: "Analytics" },
                   ].map(({ href, icon: Icon, label }) => (

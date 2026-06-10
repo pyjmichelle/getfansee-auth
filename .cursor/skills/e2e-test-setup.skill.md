@@ -38,7 +38,7 @@ triggers:
 
 ### 2. 创建测试用户
 
-使用 `e2e/shared/fixtures.ts` 中的 `setupTestFixtures()` 函数：
+使用 `tests/e2e/shared/fixtures.ts` 中的 `setupTestFixtures()` 函数：
 
 - 创建 1 个 Creator（已验证 KYC）
 - 创建 1 个 Fan（钱包余额 $50）

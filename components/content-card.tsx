@@ -12,6 +12,7 @@ import {
   DollarSign,
   CheckCircle2,
 } from "@/lib/icons";
+import { VerifiedBadge } from "@/components/verified-badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -114,7 +115,7 @@ export function ContentCard({
             >
               {creator.name}
             </Link>
-            {creator.isVerified && <CheckCircle2 className="size-[12px] text-amber-400 shrink-0" />}
+            {creator.isVerified && <VerifiedBadge size={12} />}
           </div>
           <p className="text-[11px] text-text-muted">
             @{creator.username} · {timeAgo}

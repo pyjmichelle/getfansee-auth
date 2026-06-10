@@ -18,6 +18,7 @@ import {
   type KycStatus,
   getKycStatusMeta,
 } from "./kyc-status";
+import { transitionToKycVerified } from "@/lib/ambassador/bind";
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -303,11 +304,11 @@ export async function processWebhookEvent(
     .update({ status: newInternalStatus })
     .eq("external_session_id", externalSessionId);
 
-  // 9. If approved: activate creator role + age_verified
+  // 9. If approved: activate creator role + age_verified + is_verified badge
   if (newInternalStatus === KYC_STATUS.APPROVED) {
     const { error: profileError } = await supabase
       .from("profiles")
-      .update({ age_verified: true, role: "creator" })
+      .update({ age_verified: true, role: "creator", is_verified: true })
       .eq("id", userId);
 
     if (profileError) {
@@ -332,6 +333,15 @@ export async function processWebhookEvent(
     }
 
     logger.info("[kyc-service] Creator activated via KYC approval", { userId });
+
+    // Ambassador: transition attribution to kyc_verified + evaluate qualification.
+    // Best-effort — never throws; KYC flow must not be blocked.
+    transitionToKycVerified(userId).catch((err) => {
+      logger.warn("[kyc-service] ambassador transitionToKycVerified failed (non-fatal)", {
+        userId,
+        err,
+      });
+    });
   }
 
   // 10. Record audit event

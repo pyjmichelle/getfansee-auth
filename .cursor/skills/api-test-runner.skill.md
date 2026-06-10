@@ -16,14 +16,16 @@ triggers:
 ## 使用方式
 
 ```bash
-# 运行所有 API 测试
-pnpm test:integration
+# 运行所有集成测试（无独立 test:integration script，直接用 vitest）
+pnpm vitest run tests/integration/
 
 # 运行特定模块测试
 pnpm vitest run tests/integration/api/posts.test.ts
 pnpm vitest run tests/integration/api/paywall.test.ts
 pnpm vitest run tests/integration/api/wallet.test.ts
 ```
+
+> 注：`pnpm test:integration` 不在 `package.json` scripts 中，请用上述 `pnpm vitest run` 命令直接指定路径。
 
 ## 测试覆盖范围
 

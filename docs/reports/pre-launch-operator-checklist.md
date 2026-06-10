@@ -15,13 +15,16 @@ These placeholders exist in the live site and **must be replaced before processo
 | Company Name                    | GetFanSee Pty Ltd                                             | Confirm this is your registered company name            |
 | Registered Address              | Suite 1, Level 2, 123 Tech Street, Sydney NSW 2000, Australia | Your **real** registered business address               |
 | ACN (Australian Company Number) | `000 000 000`                                                 | Your **real** ACN from ASIC registration                |
-| DMCA Agent Contact              | `dmca@getfansee.com`                                          | A **monitored** email inbox; must be responsive         |
+| General / Social Contact        | `socials@getfansee.com`                                       | A **monitored** email inbox for general enquiries       |
+| Support Contact                 | `support@getfansee.com`                                       | A **monitored** email inbox with SLA (24h response)     |
+| Creator Support Contact         | `creators@getfansee.com`                                      | A **monitored** email inbox for creator & payout issues |
+| Legal / Arbitration Contact     | `legal@getfansee.com`                                         | A **monitored** email inbox                             |
 | 2257 Records Custodian          | `compliance@getfansee.com`                                    | Real name + address of the designated records custodian |
 | Privacy / DPO Contact           | `privacy@getfansee.com`                                       | A **monitored** email inbox; required by GDPR/CCPA      |
-| Legal / Arbitration Contact     | `legal@getfansee.com`                                         | A **monitored** email inbox                             |
-| Support Contact                 | `support@getfansee.com`                                       | A **monitored** email inbox with SLA (24h response)     |
+| Trust & Safety Contact          | `safety@getfansee.com`                                        | A **monitored** email inbox; urgent reports (P0, 24h)   |
+| DMCA Agent Contact              | `dmca@getfansee.com`                                          | A **monitored** email inbox; must be responsive         |
 
-**Action required:** Register "GetFanSee Pty Ltd" with ASIC (Australian Securities & Investments Commission) if not already done. Get your ACN, then update `app/about/page.tsx`.
+**Action required:** Confirm all inboxes above are provisioned and monitored. Site contact constants live in `lib/constants/legal.ts` and are rendered on `/about`, `/privacy`, `/dmca`, `/2257`, `/acceptable-use`, `/terms`, `/support`, and related pages.
 
 ---
 

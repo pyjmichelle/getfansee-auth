@@ -46,6 +46,22 @@
   - pnpm qa:gate
   - pnpm exec playwright test --project=chromium
 
+### P0 – Creator Ambassador Program: Phase 0 + Phase 1
+
+- Scope:
+  - Phase 0: 审计现有系统，核验 PRD Part 0 所有假设（迁移编号、KYC 钩子、transactions 类型约束、referrer_id 位置、set_updated_at 函数、public_creator_profiles 视图字段、authz 原语）
+  - Phase 1: 创建 `migrations/042_creator_ambassador_program.sql`（5 张新表 + ambassador_referrals_safe 视图 + RLS + settings 种子行）；创建 `lib/ambassador/types.ts`（完整 TypeScript 类型）
+  - PRD 文档补强：`docs/planning/creator-ambassador-referral-program.md`
+- Acceptance Criteria:
+  - 迁移文件幂等，可在全新 DB 上无报错执行
+  - 5 张表 + 视图 + RLS + settings 种子行均验证通过
+  - lib/ambassador/types.ts 无 lint / type-check 错误
+  - pnpm type-check 通过
+- Required Gates:
+  - pnpm type-check
+  - pnpm lint
+- Status: Phase 0 ✅ Phase 1 ✅（迁移待 Supabase 环境执行验证）
+
 ### 已做（backfill）
 
 - **lib/comments.ts**：post_comments 无直接 FK 到 profiles，改为两次查询（评论 + profiles）合并，避免 PostgREST 关系错误。

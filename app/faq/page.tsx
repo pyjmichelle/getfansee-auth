@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
+import { SUPPORT_CONTACT_EMAIL } from "@/lib/constants/legal";
 
 export const metadata: Metadata = {
   title: "FAQ - GetFanSee",
@@ -118,10 +119,10 @@ const refundFAQ: FAQItem[] = [
         </Link>{" "}
         or by emailing{" "}
         <a
-          href="mailto:support@getfansee.com"
+          href={`mailto:${SUPPORT_CONTACT_EMAIL}`}
           className="text-brand-primary underline hover:no-underline"
         >
-          support@getfansee.com
+          {SUPPORT_CONTACT_EMAIL}
         </a>
         . Include your account email, transaction date, and amount. We aim to respond within 2
         business days.
@@ -183,10 +184,10 @@ const accountFAQ: FAQItem[] = [
         </Link>{" "}
         or email{" "}
         <a
-          href="mailto:support@getfansee.com"
+          href={`mailto:${SUPPORT_CONTACT_EMAIL}`}
           className="text-brand-primary underline hover:no-underline"
         >
-          support@getfansee.com
+          {SUPPORT_CONTACT_EMAIL}
         </a>
         . We respond within 24 hours on weekdays.
       </>

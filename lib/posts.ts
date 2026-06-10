@@ -416,12 +416,13 @@ export async function listFeed(
       display_name: string | null;
       avatar_url: string | null;
       blocked_countries: string[] | null;
+      is_verified: boolean | null;
     }
     const { data: creatorProfiles } =
       creatorIds.length > 0
         ? await adminSupabase
             .from("public_creator_profiles")
-            .select("id, display_name, avatar_url, blocked_countries")
+            .select("id, display_name, avatar_url, blocked_countries, is_verified")
             .in("id", creatorIds)
         : { data: [] as CreatorProfileRow[] };
     const creatorProfileMap = new Map(
@@ -545,6 +546,7 @@ export async function listFeed(
         creator: {
           display_name: creatorProfileMap.get(item.creator_id)?.display_name ?? undefined,
           avatar_url: creatorProfileMap.get(item.creator_id)?.avatar_url ?? undefined,
+          is_verified: creatorProfileMap.get(item.creator_id)?.is_verified ?? false,
         },
       };
 

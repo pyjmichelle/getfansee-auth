@@ -32,9 +32,9 @@ triggers:
 ```markdown
 # 测试报告
 
-**生成时间**: 2024-01-15 10:30:00
-**项目**: Authentication Flow Design
-**版本**: 1.0.0
+**生成时间**: 2026-06-07 10:30:00
+**项目**: GetFanSee
+**版本**: sprint-current
 
 ## 总体统计
 
@@ -226,17 +226,29 @@ triggers:
 **趋势**: ✅ 通过率持续上升，覆盖率稳步提高
 ```
 
-## 生成命令
+## 生成命令（本项目实际命令）
 
 ```bash
-# 运行所有测试并生成报告
-pnpm test:unit && pnpm test:integration && pnpm test:e2e
-pnpm vitest run --coverage
-pnpm playwright test --reporter=html
+# Unit tests (Vitest)
+pnpm vitest run tests/unit/
+# pnpm test:unit (if script exists)
 
-# 查看报告
-open coverage/index.html
+# Integration tests
+pnpm vitest run tests/integration/
+
+# E2E smoke
+pnpm test:e2e:smoke
+
+# E2E full chromium
+pnpm exec playwright test --project=chromium
+
+# HTML report (Playwright)
+pnpm exec playwright test --reporter=html
 open playwright-report/index.html
+
+# QA gate summary
+pnpm qa:gate
+cat artifacts/agent-browser-full/summary.json | jq .
 ```
 
 ## 报告格式
@@ -274,3 +286,24 @@ open playwright-report/index.html
 3. **失败分析**：详细记录失败原因和修复建议
 4. **覆盖率目标**：设置最低覆盖率阈值（如 80%）
 5. **性能监控**：跟踪测试执行时间，优化慢测试
+
+## 本项目 UI 走查报告格式（参考模板）
+
+UI/UX 类测试报告使用 F-XXX 编号体系，存放于 `docs/reports/`：
+
+```markdown
+## Issue Log
+
+| ID    | Severity | Route           | Description               | Evidence        |
+| ----- | -------- | --------------- | ------------------------- | --------------- |
+| F-001 | P0       | /auth           | Login button unresponsive | screenshot path |
+| F-002 | P1       | /creator/studio | Layout shift on mobile    | screenshot path |
+```
+
+参考模板：
+
+- `docs/reports/ui-walkthrough-20260420-demo-release-review.md`
+- `docs/reports/_qa-20260420-notes.md`（实时 issue log 格式）
+- `docs/reports/ui-regression-20260421-demo-rerun.md`（回归对比格式）
+
+配套 skill：`release-review-walkthrough`（完整走查流程）

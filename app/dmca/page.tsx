@@ -4,6 +4,13 @@ import { ArrowLeft, Mail, FileText, AlertCircle } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SiteFooter } from "@/components/site-footer";
+import {
+  DMCA_CONTACT_EMAIL,
+  LEGAL_COMPANY_NAME,
+  LEGAL_EFFECTIVE_DATE,
+  LEGAL_REGISTERED_ADDRESS,
+  PLATFORM_NAME,
+} from "@/lib/constants/legal";
 
 export const metadata: Metadata = {
   title: "DMCA & Copyright - GetFanSee",
@@ -22,7 +29,7 @@ export default function DMCAPage() {
         </Link>
 
         <h1 className="text-4xl font-bold mb-4">DMCA & Copyright Policy</h1>
-        <p className="text-text-tertiary text-sm mb-2">Last updated: March 17, 2026</p>
+        <p className="text-text-tertiary text-sm mb-2">Last updated: {LEGAL_EFFECTIVE_DATE}</p>
         <p className="text-text-secondary mb-8">
           GetFanSee respects intellectual property rights and responds to valid DMCA takedown
           requests.
@@ -42,10 +49,10 @@ export default function DMCAPage() {
                 To submit a DMCA takedown request, please send an email to:
               </p>
               <a
-                href="mailto:dmca@getfansee.com"
+                href={`mailto:${DMCA_CONTACT_EMAIL}`}
                 className="inline-flex items-center gap-2 text-brand-primary font-semibold text-lg hover:underline"
               >
-                dmca@getfansee.com
+                {DMCA_CONTACT_EMAIL}
               </a>
               <p className="text-sm text-text-secondary">
                 Please include all required information listed below in your request.
@@ -106,9 +113,9 @@ export default function DMCAPage() {
                 <pre className="text-sm text-text-secondary whitespace-pre-wrap font-mono">
                   {`Subject: DMCA Takedown Request
 
-To: dmca@getfansee.com
+To: ${DMCA_CONTACT_EMAIL}
 
-Dear GetFanSee DMCA Agent,
+Dear ${PLATFORM_NAME} DMCA Agent,
 
 I am writing to request removal of content that infringes my copyright.
 
@@ -202,7 +209,14 @@ Date: [Current date]`}
             <h2 className="text-2xl font-semibold mb-4">DMCA Agent Contact</h2>
             <div className="text-text-secondary space-y-2">
               <p>
-                <strong className="text-brand-primary">Email:</strong> dmca@getfansee.com
+                <strong className="text-brand-primary">Designated Agent:</strong>{" "}
+                {LEGAL_COMPANY_NAME}
+              </p>
+              <p>
+                <strong className="text-brand-primary">Address:</strong> {LEGAL_REGISTERED_ADDRESS}
+              </p>
+              <p>
+                <strong className="text-brand-primary">Email:</strong> {DMCA_CONTACT_EMAIL}
               </p>
               <p>
                 <strong className="text-brand-primary">Subject Line:</strong> DMCA Takedown Request

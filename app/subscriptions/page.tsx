@@ -48,6 +48,8 @@ export default function SubscriptionsPage() {
   const router = useRouter();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [cancellingSubscriptionId, setCancellingSubscriptionId] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<{
     id?: string;
@@ -90,6 +92,8 @@ export default function SubscriptionsPage() {
 
   useEffect(() => {
     const loadData = async () => {
+      setIsLoading(true);
+      setLoadError(null);
       try {
         if (isTestMode) {
           setCurrentUser({
@@ -103,15 +107,6 @@ export default function SubscriptionsPage() {
 
         const bootstrap = await getAuthBootstrap();
         if (!bootstrap.authenticated || !bootstrap.user) {
-          if (isTestMode) {
-            setCurrentUser({
-              username: "test-user",
-              role: "fan",
-            });
-            setSubscriptions(MOCK_SUBSCRIPTIONS);
-            setIsLoading(false);
-            return;
-          }
           router.push("/auth");
           return;
         }
@@ -139,6 +134,7 @@ export default function SubscriptionsPage() {
 
         if (error) {
           console.error("[subscriptions] load error:", error);
+          setLoadError("Failed to load your subscriptions. Please try again.");
           return;
         }
 
@@ -179,6 +175,8 @@ export default function SubscriptionsPage() {
         if (isTestMode) {
           setCurrentUser({ username: "test-user", role: "fan" });
           setSubscriptions(MOCK_SUBSCRIPTIONS);
+        } else {
+          setLoadError("Something went wrong loading your subscriptions. Please try again.");
         }
       } finally {
         setIsLoading(false);
@@ -186,7 +184,7 @@ export default function SubscriptionsPage() {
     };
 
     loadData();
-  }, [router]);
+  }, [router, reloadKey, isTestMode]);
 
   const handleCancel = async (subscriptionId: string, creatorId: string) => {
     try {
@@ -278,7 +276,20 @@ export default function SubscriptionsPage() {
   const animatedSupportCount = useCountUp(subscriptions.length, { duration: 900, decimals: 0 });
   const animatedMonthlyCost = useCountUp(monthlyCost, { duration: 900, decimals: 2 });
 
-  if (isLoading || !currentUser) {
+  if (loadError) {
+    return (
+      <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
+        <div className="py-16 flex flex-col items-center text-center gap-4">
+          <p className="text-text-secondary max-w-sm">{loadError}</p>
+          <Button variant="violet" onClick={() => setReloadKey((k) => k + 1)}>
+            Try again
+          </Button>
+        </div>
+      </PageShell>
+    );
+  }
+
+  if (isLoading) {
     return (
       <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
         <div className="space-y-4 pt-6">

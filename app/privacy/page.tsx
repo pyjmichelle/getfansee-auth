@@ -3,6 +3,13 @@ import Link from "next/link";
 import { ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
+import {
+  LEGAL_COMPANY_NAME,
+  LEGAL_EFFECTIVE_DATE,
+  LEGAL_REGISTERED_ADDRESS,
+  PLATFORM_NAME,
+  PRIVACY_CONTACT_EMAIL,
+} from "@/lib/constants/legal";
 
 export const metadata: Metadata = {
   title: "Privacy Policy - GetFanSee",
@@ -23,14 +30,14 @@ export default function PrivacyPage() {
         <h1 className="text-4xl font-bold text-brand-primary mb-8">Privacy Policy</h1>
 
         <div className="card-block p-8 prose prose-invert max-w-none space-y-8">
-          <p className="text-text-tertiary">Last updated: January 18, 2026</p>
+          <p className="text-text-tertiary">Last updated: {LEGAL_EFFECTIVE_DATE}</p>
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
             <p className="text-text-secondary">
-              GetFanSee ("we", "our", or "us") is committed to protecting your privacy. This Privacy
-              Policy explains how we collect, use, disclose, and safeguard your information when you
-              use our service.
+              {PLATFORM_NAME}, operated by {LEGAL_COMPANY_NAME} ("we", "our", or "us"), is committed
+              to protecting your privacy. This Privacy Policy explains how we collect, use,
+              disclose, and safeguard your information when you use our service.
             </p>
           </section>
 
@@ -128,10 +135,10 @@ export default function PrivacyPage() {
             <p className="text-text-secondary mt-4">
               To exercise these rights, contact us at{" "}
               <a
-                href="mailto:privacy@getfansee.com"
+                href={`mailto:${PRIVACY_CONTACT_EMAIL}`}
                 className="text-brand-primary underline hover:no-underline"
               >
-                privacy@getfansee.com
+                {PRIVACY_CONTACT_EMAIL}
               </a>
             </p>
           </section>
@@ -197,10 +204,10 @@ export default function PrivacyPage() {
             <p className="text-text-secondary">
               For any GDPR-related requests or questions, contact our privacy team at{" "}
               <a
-                href="mailto:privacy@getfansee.com"
+                href={`mailto:${PRIVACY_CONTACT_EMAIL}`}
                 className="text-brand-primary underline hover:no-underline"
               >
-                privacy@getfansee.com
+                {PRIVACY_CONTACT_EMAIL}
               </a>
               . We will respond within 30 days.
             </p>
@@ -260,10 +267,10 @@ export default function PrivacyPage() {
               personal information with third parties for monetary consideration or for
               cross-context behavioural advertising. To submit any privacy request, contact us at{" "}
               <a
-                href="mailto:privacy@getfansee.com"
+                href={`mailto:${PRIVACY_CONTACT_EMAIL}`}
                 className="text-brand-primary underline hover:no-underline"
               >
-                privacy@getfansee.com
+                {PRIVACY_CONTACT_EMAIL}
               </a>
               .
             </p>
@@ -272,10 +279,10 @@ export default function PrivacyPage() {
             <p className="text-text-secondary">
               To submit a verifiable consumer request, email us at{" "}
               <a
-                href="mailto:privacy@getfansee.com"
+                href={`mailto:${PRIVACY_CONTACT_EMAIL}`}
                 className="text-brand-primary underline hover:no-underline"
               >
-                privacy@getfansee.com
+                {PRIVACY_CONTACT_EMAIL}
               </a>{" "}
               with subject line "CCPA Request". We will verify your identity before processing and
               respond within 45 days.
@@ -330,10 +337,10 @@ export default function PrivacyPage() {
               <li>
                 Email:{" "}
                 <a
-                  href="mailto:privacy@getfansee.com"
+                  href={`mailto:${PRIVACY_CONTACT_EMAIL}`}
                   className="text-brand-primary underline hover:no-underline"
                 >
-                  privacy@getfansee.com
+                  {PRIVACY_CONTACT_EMAIL}
                 </a>
               </li>
               <li>
@@ -341,6 +348,14 @@ export default function PrivacyPage() {
                 <Link href="/support" className="text-brand-primary underline hover:no-underline">
                   Support page
                 </Link>
+              </li>
+              <li>
+                <span className="font-semibold text-text-primary">Legal entity:</span>{" "}
+                {LEGAL_COMPANY_NAME}
+              </li>
+              <li>
+                <span className="font-semibold text-text-primary">Registered address:</span>{" "}
+                {LEGAL_REGISTERED_ADDRESS}
               </li>
             </ul>
           </section>

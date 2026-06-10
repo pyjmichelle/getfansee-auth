@@ -3,6 +3,13 @@ import Link from "next/link";
 import { ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
+import {
+  COMPLIANCE_CONTACT_EMAIL,
+  LEGAL_COMPANY_NAME,
+  LEGAL_EFFECTIVE_DATE,
+  LEGAL_REGISTERED_ADDRESS,
+  PLATFORM_NAME,
+} from "@/lib/constants/legal";
 
 export const metadata: Metadata = {
   title: "18 U.S.C. § 2257 Compliance Statement - GetFanSee",
@@ -27,7 +34,7 @@ export default function Page2257() {
         <p className="text-text-secondary mb-8">Record-Keeping Requirements Compliance Statement</p>
 
         <div className="prose prose-invert max-w-none space-y-6">
-          <p className="text-text-tertiary">Last updated: March 17, 2026</p>
+          <p className="text-text-tertiary">Last updated: {LEGAL_EFFECTIVE_DATE}</p>
 
           <div className="card-block p-8 rounded-2xl">
             <h2 className="text-2xl font-semibold mb-4">Statement of Compliance</h2>
@@ -76,16 +83,19 @@ export default function Page2257() {
             </p>
             <div className="mt-4 p-4 bg-surface-raised rounded-xl text-text-secondary space-y-1">
               <p>
-                <strong>GetFanSee — Custodian of Records</strong>
+                <strong>
+                  {PLATFORM_NAME} — Custodian of Records ({LEGAL_COMPANY_NAME})
+                </strong>
               </p>
               <p>Legal Department</p>
+              <p>{LEGAL_REGISTERED_ADDRESS}</p>
               <p>
                 Email:{" "}
                 <a
-                  href="mailto:legal@getfansee.com"
+                  href={`mailto:${COMPLIANCE_CONTACT_EMAIL}`}
                   className="text-brand-primary underline hover:no-underline"
                 >
-                  legal@getfansee.com
+                  {COMPLIANCE_CONTACT_EMAIL}
                 </a>
               </p>
             </div>

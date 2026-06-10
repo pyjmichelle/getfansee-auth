@@ -489,3 +489,36 @@ pnpm type-check
 - [Reviewdog Documentation](https://github.com/reviewdog/reviewdog)
 - [Self-Healing CI Patterns](https://smartscope.blog/en/ai-development/github-actions-self-healing-workflows-2025/)
 - [Next.js Font Optimization](https://nextjs.org/docs/app/building-your-application/optimizing/fonts)
+
+---
+
+## Project-Specific CI Scripts (GetFanSee)
+
+For local CI debugging and auto-fix, use these scripts:
+
+```bash
+# Auto-monitor and attempt fix (wraps common CI failure patterns)
+bash scripts/ci/auto-monitor-and-fix.sh
+
+# Local full CI verification (pre-push equivalent)
+pnpm ci:verify
+# Expands to: check:env → lint → type-check → build
+
+# Security checks (also part of check-all)
+pnpm check:service-role    # scripts/ci/check-no-service-role-leaks.sh
+pnpm check:admin-client    # scripts/ci/check-admin-client-allowlist.sh
+
+# Assert test-mode is not on staging
+bash scripts/ci/assert-no-test-mode-on-staging.sh
+```
+
+### GitHub Actions Workflow Files
+
+| Workflow     | File                                     | Trigger                 | Stages                                 |
+| ------------ | ---------------------------------------- | ----------------------- | -------------------------------------- |
+| Main CI      | `.github/workflows/ci.yml`               | push/PR to main/develop | lint → build → QA gate → E2E → summary |
+| Code Quality | `.github/workflows/code-quality.yml`     | PR                      | type-check, lint, prettier + Reviewdog |
+| PR Review    | `.github/workflows/pr-auto-review.yml`   | PR                      | size/file labels                       |
+| Claude CI    | `.github/workflows/claude-ci-helper.yml` | CI failure              | Claude auto-fix                        |
+
+Full workflow guide: `.github/workflows/WORKFLOW_GUIDE.md`

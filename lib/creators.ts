@@ -11,6 +11,10 @@ export type Creator = {
   avatar_url?: string;
   bio?: string;
   created_at: string;
+  is_verified?: boolean;
+  subscription_price_cents?: number | null;
+  subscribers_count?: number | null;
+  subscriber_count?: number | null;
 };
 
 /**
@@ -55,7 +59,13 @@ export async function getCreator(creatorId: string): Promise<Creator | null> {
       .maybeSingle();
 
     if (!error && data) {
-      return data;
+      // creators table doesn't have is_verified — fetch from profiles
+      const { data: pv } = await supabase
+        .from("profiles")
+        .select("is_verified")
+        .eq("id", creatorId)
+        .maybeSingle();
+      return { ...data, is_verified: pv?.is_verified ?? false };
     }
 
     if (error) {
@@ -65,7 +75,9 @@ export async function getCreator(creatorId: string): Promise<Creator | null> {
     // Fallback: query profiles for any user with role='creator'
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("id, display_name, avatar_url, bio, created_at, subscription_price_cents")
+      .select(
+        "id, display_name, avatar_url, bio, created_at, subscription_price_cents, is_verified"
+      )
       .eq("id", creatorId)
       .eq("role", "creator")
       .maybeSingle();
@@ -85,6 +97,7 @@ export async function getCreator(creatorId: string): Promise<Creator | null> {
       avatar_url: profile.avatar_url ?? undefined,
       bio: profile.bio ?? undefined,
       created_at: profile.created_at,
+      is_verified: profile.is_verified ?? false,
     } satisfies Creator;
   } catch (err) {
     console.error("[creators] getCreator exception:", err);

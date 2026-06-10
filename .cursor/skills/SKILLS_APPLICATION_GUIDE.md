@@ -2,7 +2,9 @@
 
 本文档说明当前已安装的 skills 及与 release-gate 必选列表的对应关系。
 
-**Release-gate 必选（与 `.cursor/rules` 对齐，10 个）**：better-auth-best-practices、supabase-postgres-best-practices、shadcn-ui、react-best-practices、frontend-design、e2e-test-setup、fixture-generator、test-report-generator、ci-pipeline-config、api-test-runner。
+**Release-gate 必选（与 `.cursor/rules` 对齐，10 个）**：supabase（官方 supabase/agent-skills）、supabase-postgres-best-practices、shadcn-ui、react-best-practices、frontend-design、e2e-test-setup、fixture-generator、test-report-generator、ci-pipeline-config、api-test-runner。
+
+> 注：`better-auth-best-practices` 已从 release-gate 必选列表中移除，项目使用 Supabase Auth（非 Better Auth），请改用 `supabase` 官方 skill（`supabase/agent-skills`）覆盖认证安全场景。
 
 **项目内常用补充（非 release-gate 清单替代项）**：`code-check`（等价于对话里「跑 check-all」）、`planning-with-files`、`agent-browser`、`ui-ux-pro-max`（设计 token/栈对齐）、`feishu-docs`（飞书需求对齐时）。
 
@@ -13,9 +15,11 @@
 - **框架**: Next.js 16 (App Router), React 19
 - **语言**: TypeScript (严格模式)
 - **数据库**: Supabase (PostgreSQL)
-- **认证**: Supabase Auth
-- **UI 库**: shadcn/ui (基于 Radix UI) + Tailwind CSS
+- **认证**: Supabase Auth（`lib/server/auth-server.ts` 为服务端核心；`lib/auth-server.ts` 为历史遗留，逐步向 `lib/server/` 迁移）
+- **UI 库**: shadcn/ui (基于 Radix UI) + Tailwind CSS v4
 - **测试**: Playwright (E2E), Vitest (单元测试)
+- **KYC**: Didit（`lib/kyc/kyc-service.ts`，Webhook + Admin API）
+- **支付**: Stripe + 内置 Wallet
 
 ## 门禁命令（以 `package.json` 为准）
 
@@ -24,15 +28,18 @@
 - **`pnpm test:e2e:smoke`**：对应 `tests/e2e/smoke.spec.ts`。另有 `tests/e2e/smoke-check.spec.ts`（历史/补充冒烟），以脚本为准优先用 `test:e2e:smoke`。
 - **Pre-push（`.husky/pre-push`）**：`SKIP_QA_GATE=1 pnpm ci:verify` → 当前为 `check:env`、`lint`、`type-check`、`build`；**跳过** `qa:gate` 与 E2E（由 CI 承担）。
 
-## 项目当前关键业务面（2026-03-31）
+## 项目当前关键业务面（2026-06-07）
 
 - **认证**: `app/auth/*`（含 `forgot-password/`、`reset-password/`、`verify/`）
 - **创作者 / 个人**: `app/creator/`、`app/creator/upgrade/`、`app/me/`（含 `wallet/`）
+- **Ambassador / 推荐计划（新）**: `app/creator/studio/ambassador/`（Studio 页面）、`app/api/referral/enroll/`、`app/api/referral/me/`、`app/api/referral/me/referrals/`、`app/r/[code]/route.ts`（推荐码落地重定向）；业务逻辑：`lib/ambassador/bind.ts`、`lib/ambassador/server.ts`、`lib/ambassador/types.ts`、`lib/referral.ts`；PRD 见 `docs/planning/creator-ambassador-referral-program.md`
 - **内容与发现**: `app/home/`、`app/posts/`、`app/search/`
 - **合规与信任**: `app/report/`、`app/support/`、`app/api/support/`、`app/api/report/`、`app/api/age-verify/`
+- **法律合规页（已更新）**: `app/2257/`、`app/privacy/`、`app/dmca/`、`app/about/`、`app/acceptable-use/`；常量见 `lib/constants/legal.ts`
 - **管理后台**: `app/admin/content-review/`、`app/admin/creator-verifications/`、`app/admin/reports/` 等
 - **AI 演示面**: `app/ai-dashboard/`、`app/api/ai/generate/`
-- **数据库侧近期评审带**: `migrations/032`–`038`（RLS/可见性、索引、钱包硬化、年龄验证、support tickets 等；以具体文件名与 PR 为准）
+- **KYC / 创作者申请**: `app/api/kyc/`、`app/api/creator/apply/`、`lib/kyc/kyc-service.ts`
+- **数据库侧近期评审带**: `migrations/032`–`042`（RLS/可见性、索引、钱包硬化、年龄验证、support tickets、Didit KYC（040）、creator ambassador program（042）等；以具体文件名与 PR 为准）
 - **Playwright**: `playwright.config.ts` 中 `testDir: tests/e2e`；工程 `chromium` | `firefox` | `webkit` | `auth-mock-chromium` | `auth-real-chromium`；子目录含 `auth-mock/`、`auth-real/`、`design-qa/`
 
 ---
@@ -108,22 +115,26 @@ React 和 Next.js 性能优化指南，包含 57 条规则，按影响优先级�
 
 ---
 
-## 4. better-auth-best-practices
+## 4. supabase（官方 skill，替代 better-auth-best-practices）
+
+> 通过 `npx skills add supabase/agent-skills --skill supabase -a cursor` 安装，存放于 `.cursor/skills/supabase/`。
 
 ### 功能
 
-认证实现最佳实践（Better Auth 或类似库）。
+Supabase 官方 Agent Skill，覆盖所有 Supabase 产品的认证、SSR 集成、数据库、RLS、迁移、MCP 用法。
 
 ### 在本项目中的应用场景
 
-- **安全实践**: 会话管理、错误处理、速率限制 — `lib/auth.ts`, `lib/auth-server.ts`, AuthPageClient, API 路由
-- **OAuth**: Google / xTwitter 登录流程安全 — `lib/auth.ts`
-- **邮箱链路**: verify / forgot-password / reset-password 页面与 API 交互一致性
+- **服务端认证**: `lib/server/auth-server.ts`（核心）、`lib/auth-server.ts`（历史，逐步迁移）；`@supabase/ssr` Cookie 管理；`getAll`/`setAll` 模式（不可用旧的 `get`/`set`/`remove`）
+- **OAuth**: Google / xTwitter 登录流程 — middleware + callback 路由安全
+- **邮箱链路**: verify / forgot-password / reset-password 页面与 Supabase Auth API 一致性
+- **RLS 审查**: 所有 `migrations/032`–`042`，重点 040（Didit KYC）、042（ambassador 推荐计划）
+- **MCP**: 连接 Supabase MCP 可让 agent 直接查询真实 schema 与 RLS 策略（见 `.cursor/mcp.json`）
 - **测试覆盖**: `tests/e2e/auth-mock/`, `tests/e2e/auth-real/`
 
 ### 使用时机总结
 
-- 实现认证流程、审查安全实践、处理会话、实现 OAuth 时使用。
+- 实现或审查 Supabase Auth、RLS、迁移、Edge Functions、Storage 时使用。
 
 ---
 
@@ -143,6 +154,7 @@ Supabase 和 PostgreSQL 最佳实践。
 ### 使用时机总结
 
 - 编写数据库查询、设计模式、实现 RLS、优化性能、处理事务时使用。
+- **迁移评审重点**: `migrations/032`~`042`（新增：040 Didit KYC、042 creator ambassador program）；新迁移必须过 RLS 与支付/隐私审查。
 
 ---
 
@@ -167,20 +179,20 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ## 其他 Skills（简要）
 
-| Skill                                                    | 用途                                                                |
-| -------------------------------------------------------- | ------------------------------------------------------------------- |
-| **code-check** (`code-check/SKILL.md`)                   | 用户说「检查代码」时跑 `pnpm check-all`（+ 可选 `build`）并解读输出 |
-| **agent-browser** (`agent-browser/SKILL.md`)             | 前端 agent-browser CLI 自动化测试与网页交互                         |
-| **ui-ux-pro-max** (`ui-ux-pro-max/SKILL.md`)             | 按栈（含 Next/shadcn）检索设计数据 CSV，做 UI 一致性                |
-| **feishu-docs** (`feishu-docs/SKILL.md`)                 | 飞书文档为需求源时的读取与对齐流程                                  |
-| **ci-auto-fix**                                          | CI 失败分析与自动修复，与 plans 配合使用                            |
-| **planning-with-files** (`planning-with-files/SKILL.md`) | 规划与文件工作流（.cursor/plans、docs/planning）                    |
-| **e2e-test-setup**                                       | E2E 测试环境与 Playwright 配置                                      |
-| **fixture-generator**                                    | 测试 fixture 生成                                                   |
-| **test-report-generator**                                | 测试报告生成                                                        |
-| **ci-pipeline-config**                                   | CI 流水线配置（对齐 `.github/workflows/ci.yml`）                    |
-| **api-test-runner**                                      | API 测试运行与断言                                                  |
-| **shadcn-ui**                                            | shadcn/ui 组件与 cn() 使用规范                                      |
+| Skill                                                    | 用途                                                                                           |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **code-check** (`code-check/SKILL.md`)                   | 用户说「检查代码」时跑 `pnpm check-all`（+ 可选 `build`）并解读输出                            |
+| **agent-browser** (`agent-browser/SKILL.md`)             | 前端 agent-browser CLI 自动化测试与网页交互（含 `creator/studio/ambassador` 路由）             |
+| **ui-ux-pro-max** (`ui-ux-pro-max/SKILL.md`)             | 按栈（含 Next/shadcn）检索设计数据 CSV，做 UI 一致性；脚本路径 `.cursor/skills/ui-ux-pro-max/` |
+| **feishu-docs** (`feishu-docs/SKILL.md`)                 | 飞书文档为需求源时的读取与对齐流程                                                             |
+| **ci-auto-fix**                                          | CI 失败分析与自动修复，互链 `scripts/ci/auto-monitor-and-fix.sh`                               |
+| **planning-with-files** (`planning-with-files/SKILL.md`) | 规划与文件工作流（.cursor/plans、docs/planning）；ambassador PRD 首选                          |
+| **e2e-test-setup**                                       | E2E 测试环境与 Playwright 配置；fixture 路径 `tests/e2e/shared/fixtures.ts`                    |
+| **fixture-generator**                                    | 测试 fixture 生成                                                                              |
+| **test-report-generator**                                | 测试报告生成（格式参考 `docs/reports/ui-walkthrough-*`）                                       |
+| **ci-pipeline-config**                                   | CI 流水线配置（对齐 `.github/workflows/ci.yml`）                                               |
+| **api-test-runner**                                      | API 测试运行；命令：`pnpm vitest run tests/integration/api/`                                   |
+| **shadcn-ui**                                            | shadcn/ui 组件与 cn() 使用规范（Next 16 + Tailwind v4）                                        |
 
 ---
 
@@ -212,7 +224,7 @@ Supabase 和 PostgreSQL 最佳实践。
 ### 近期应用 (中优先级)
 
 4. **frontend-design** — 设计一致性
-5. **better-auth-best-practices** — 安全与认证审查
+5. **supabase**（官方 skill）— 安全与认证审查、RLS、迁移
 
 ### 按需应用 (低优先级)
 
@@ -222,24 +234,24 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ## 快速参考：何时使用哪个 Skill
 
-| 任务               | 使用的 Skill                                                 |
-| ------------------ | ------------------------------------------------------------ |
-| 编写新 React 组件  | react-best-practices                                         |
-| 实现数据获取       | react-best-practices, supabase-postgres-best-practices       |
-| 审查 UI            | web-design-guidelines, frontend-design                       |
-| 优化性能           | react-best-practices, audit-website                          |
-| 数据库查询         | supabase-postgres-best-practices                             |
-| 认证实现           | better-auth-best-practices                                   |
-| 移动端/响应式      | frontend-design, web-design-guidelines                       |
-| 全站审计           | audit-website                                                |
-| 安全审查           | better-auth-best-practices, supabase-postgres-best-practices |
-| 前端自动化测试     | agent-browser                                                |
-| CI 修复与配置      | ci-auto-fix, ci-pipeline-config, api-test-runner             |
-| E2E/测试报告       | e2e-test-setup, fixture-generator, test-report-generator     |
-| 发布门禁判定       | e2e-test-setup, test-report-generator, ci-pipeline-config    |
-| 口语「跑一下检查」 | code-check（→ `pnpm check-all`）                             |
-| 设计系统深度对齐   | ui-ux-pro-max, frontend-design, shadcn-ui                    |
+| 任务               | 使用的 Skill                                              |
+| ------------------ | --------------------------------------------------------- |
+| 编写新 React 组件  | react-best-practices                                      |
+| 实现数据获取       | react-best-practices, supabase-postgres-best-practices    |
+| 审查 UI            | web-design-guidelines, frontend-design                    |
+| 优化性能           | react-best-practices, audit-website                       |
+| 数据库查询         | supabase-postgres-best-practices                          |
+| 认证实现           | supabase（官方 skill）                                    |
+| 移动端/响应式      | frontend-design, web-design-guidelines                    |
+| 全站审计           | audit-website                                             |
+| 安全审查           | supabase（官方 skill）、supabase-postgres-best-practices  |
+| 前端自动化测试     | agent-browser                                             |
+| CI 修复与配置      | ci-auto-fix, ci-pipeline-config, api-test-runner          |
+| E2E/测试报告       | e2e-test-setup, fixture-generator, test-report-generator  |
+| 发布门禁判定       | e2e-test-setup, test-report-generator, ci-pipeline-config |
+| 口语「跑一下检查」 | code-check（→ `pnpm check-all`）                          |
+| 设计系统深度对齐   | ui-ux-pro-max, frontend-design, shadcn-ui                 |
 
 ---
 
-_最后更新: 2026-03-31_
+_最后更新: 2026-06-07_

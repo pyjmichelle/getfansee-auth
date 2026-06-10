@@ -17,11 +17,13 @@ import {
   Sparkles,
   TrendingUp,
   Flame,
-  CheckCircle2,
   UserPlus,
   UserCheck,
   Loader2,
+  DollarSign,
 } from "@/lib/icons";
+import { VerifiedBadge } from "@/components/verified-badge";
+import { TipModal } from "@/components/tip-modal";
 import { PaywallModal } from "@/components/paywall-modal";
 import { ShareModal } from "@/components/share-modal";
 import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
@@ -53,6 +55,7 @@ function PostCard({
   isUnlocked,
   onUnlock,
   onShare,
+  onTip,
   isSubscribed,
   onSubscribe,
   isSubscribing,
@@ -62,6 +65,7 @@ function PostCard({
   isUnlocked: boolean;
   onUnlock: () => void;
   onShare: () => void;
+  onTip: (postId: string, creatorId: string, creatorName: string) => void;
   isSubscribed: boolean;
   onSubscribe: (creatorId: string) => void;
   isSubscribing: boolean;
@@ -114,7 +118,7 @@ function PostCard({
             >
               {post.creator?.display_name || "Unknown Creator"}
             </Link>
-            <CheckCircle2 className="size-[12px] text-violet-500 shrink-0" />
+            {post.creator?.is_verified && <VerifiedBadge size={12} />}
             {post.visibility === "subscribers" && (
               <Badge variant="purple" className="text-[10px] py-0">
                 Sub
@@ -301,6 +305,18 @@ function PostCard({
         </button>
 
         <div className="flex-1" />
+        {!isLocked && post.creator_id && post.creator_id !== currentUserId && (
+          <button
+            onClick={() =>
+              onTip(post.id, post.creator_id!, post.creator?.display_name ?? "Creator")
+            }
+            className="flex items-center gap-1 h-8 px-2.5 rounded-full text-amber-400 hover:bg-amber-400/10 transition-all text-[12px] font-semibold"
+            aria-label="Send tip"
+          >
+            <DollarSign className="size-[14px]" />
+            Tip
+          </button>
+        )}
       </div>
     </article>
   );
@@ -316,6 +332,11 @@ export function HomeFeedClient({
   const [posts] = useState<Post[]>(initialPosts);
   const [paywallPost, setPaywallPost] = useState<Post | null>(null);
   const [sharePost, setSharePost] = useState<Post | null>(null);
+  const [tipTarget, setTipTarget] = useState<{
+    postId: string;
+    creatorId: string;
+    creatorName: string;
+  } | null>(null);
   const [postViewStates] = useState<Map<string, boolean>>(initialUnlockedStates);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
@@ -557,6 +578,9 @@ export function HomeFeedClient({
                   isUnlocked={postViewStates.get(post.id) || isUnlockedGlobal(post.id)}
                   onUnlock={() => handleUnlock(post)}
                   onShare={() => handleShare(post)}
+                  onTip={(postId, creatorId, creatorName) =>
+                    setTipTarget({ postId, creatorId, creatorName })
+                  }
                   isSubscribed={!!post.creator_id && subscribedCreatorIds.has(post.creator_id)}
                   onSubscribe={handleFollowCreator}
                   isSubscribing={subscribingCreatorId === post.creator_id}
@@ -663,6 +687,16 @@ export function HomeFeedClient({
         }
         title={sharePost?.content?.slice(0, 80) || "Check out this post on GetFanSee"}
       />
+
+      {tipTarget && (
+        <TipModal
+          open={!!tipTarget}
+          onOpenChange={(open) => !open && setTipTarget(null)}
+          creatorId={tipTarget.creatorId}
+          creatorName={tipTarget.creatorName}
+          postId={tipTarget.postId}
+        />
+      )}
 
       {paywallPost && (
         <PaywallModal

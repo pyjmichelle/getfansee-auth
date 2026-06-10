@@ -34,6 +34,8 @@ PROJECT-SPECIFIC ROUTES (KEEP CURRENT):
 - Auth & onboarding: `app/auth/*`
 - Feed & content: `app/home/`, `app/posts/`, `app/search/`（含 `components/search-modal.tsx` 等）
 - Roles: `app/creator/*`（含 `upgrade/apply`）, `app/me/*`（含 `wallet/`）
+- Ambassador / 推荐计划（新）: `app/creator/studio/ambassador/`（Studio 管理页）；`app/r/[code]/route.ts`（推荐码落地重定向）
+- 法律合规页（已更新）: `app/2257/`, `app/privacy/`, `app/dmca/`, `app/about/`, `app/acceptable-use/`
 - Trust & help: `app/report/`, `app/support/`
 - Admin UI: `app/admin/*`
 - AI demo: `app/ai-dashboard/` + `app/api/ai/generate/`

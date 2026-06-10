@@ -3,6 +3,15 @@ import Link from "next/link";
 import { ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
+import {
+  LEGAL_COMPANY_NAME,
+  LEGAL_CONTACT_EMAIL,
+  LEGAL_EFFECTIVE_DATE,
+  LEGAL_GOVERNING_JURISDICTION,
+  LEGAL_REGISTERED_ADDRESS,
+  PLATFORM_NAME,
+  SUPPORT_CONTACT_EMAIL,
+} from "@/lib/constants/legal";
 
 export const metadata: Metadata = {
   title: "Terms of Service - GetFanSee",
@@ -23,13 +32,14 @@ export default function TermsPage() {
         <h1 className="text-4xl font-bold text-brand-primary mb-8">Terms of Service</h1>
 
         <div className="card-block p-8 prose prose-invert max-w-none space-y-8">
-          <p className="text-text-tertiary">Last updated: January 18, 2026</p>
+          <p className="text-text-tertiary">Last updated: {LEGAL_EFFECTIVE_DATE}</p>
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
             <p className="text-text-secondary">
-              By accessing or using GetFanSee ("the Service"), you agree to be bound by these Terms
-              of Service. If you do not agree to these terms, please do not use the Service.
+              By accessing or using {PLATFORM_NAME}, operated by {LEGAL_COMPANY_NAME} ("we", "our",
+              or "us"), you agree to be bound by these Terms of Service ("the Service"). If you do
+              not agree to these terms, please do not use the Service.
             </p>
           </section>
 
@@ -113,10 +123,10 @@ export default function TermsPage() {
                 materially misrepresented will be reviewed on a case-by-case basis. To request a
                 refund, contact{" "}
                 <a
-                  href="mailto:support@getfansee.com"
+                  href={`mailto:${SUPPORT_CONTACT_EMAIL}`}
                   className="text-brand-primary underline hover:no-underline"
                 >
-                  support@getfansee.com
+                  {SUPPORT_CONTACT_EMAIL}
                 </a>{" "}
                 within 14 days of the charge.
               </li>
@@ -128,8 +138,62 @@ export default function TermsPage() {
             </p>
           </section>
 
+          <section id="tips">
+            <h2 className="text-2xl font-semibold mb-4">6. Tips / Gratuities</h2>
+            <p className="text-text-secondary">
+              The Service lets fans send creators optional <strong>tips</strong> (also referred to
+              as &quot;buy me a coffee&quot;, gratuities, or support). The following terms apply to
+              every tip:
+            </p>
+            <ul className="list-disc pl-6 text-text-secondary space-y-2 mt-3">
+              <li>
+                <strong className="text-text-primary">Voluntary gift, not a purchase.</strong> A tip
+                is a voluntary expression of appreciation. It is not a payment for, and does not
+                entitle the fan to, any content, service, message, custom request, access, or other
+                reward.
+              </li>
+              <li>
+                <strong className="text-text-primary">No quid-pro-quo.</strong> Creators are
+                prohibited from offering, promising, or implying anything in exchange for a tip.
+                Paid deliverables must be sold through subscriptions or pay-per-view, not tips.
+              </li>
+              <li>
+                <strong className="text-text-primary">Platform is not a party.</strong>{" "}
+                {PLATFORM_NAME} merely facilitates the transfer of a tip from fan to creator. We are
+                not a party to, and make no representation, warranty, or guarantee regarding, any
+                expectation, understanding, or private arrangement between a fan and a creator. We
+                are not liable for a creator&apos;s failure to provide anything a fan may have hoped
+                to receive.
+              </li>
+              <li>
+                <strong className="text-text-primary">Final and non-refundable.</strong> Tips are
+                final once sent and are non-refundable except in the narrow cases described in our{" "}
+                <Link href="/refund" className="text-brand-primary underline hover:no-underline">
+                  Refund &amp; Cancellation Policy
+                </Link>{" "}
+                (duplicate charge, technical error, or reported payment fraud).
+              </li>
+              <li>
+                <strong className="text-text-primary">Service fee.</strong> {PLATFORM_NAME} retains
+                a platform service fee from each tip; the remaining net amount is credited to the
+                creator&apos;s pending balance, subject to the holding period and payout terms. Fee
+                rates are disclosed in-product at the time of tipping and may change.
+              </li>
+              <li>
+                <strong className="text-text-primary">Creator tax responsibility.</strong> Tips are
+                income to the receiving creator, who is solely responsible for reporting and paying
+                any applicable taxes.
+              </li>
+              <li>
+                <strong className="text-text-primary">In-platform only.</strong> Tips must be sent
+                through the Service. Soliciting or routing tips off-platform, or using tips to evade
+                platform fees or our policies, is prohibited.
+              </li>
+            </ul>
+          </section>
+
           <section>
-            <h2 className="text-2xl font-semibold mb-4">6. Creator Payouts</h2>
+            <h2 className="text-2xl font-semibold mb-4">7. Creator Payouts</h2>
             <p className="text-text-secondary">
               Creators receive payouts subject to platform fees and minimum thresholds. GetFanSee
               reserves the right to withhold payments pending investigation of policy violations.
@@ -138,7 +202,7 @@ export default function TermsPage() {
           </section>
 
           <section id="prohibited-content">
-            <h2 className="text-2xl font-semibold mb-4">7. Prohibited Content & Acceptable Use</h2>
+            <h2 className="text-2xl font-semibold mb-4">8. Prohibited Content & Acceptable Use</h2>
             <p className="text-text-secondary mb-4">
               GetFanSee is committed to providing a safe and legal platform. The following content
               and activities are strictly prohibited. Violations may result in immediate account
@@ -199,7 +263,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">8. Intellectual Property</h2>
+            <h2 className="text-2xl font-semibold mb-4">9. Intellectual Property</h2>
             <p className="text-text-secondary">
               GetFanSee respects intellectual property rights. If you believe content infringes your
               copyright, please submit a DMCA notice through our designated process at{" "}
@@ -211,7 +275,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">9. Termination</h2>
+            <h2 className="text-2xl font-semibold mb-4">10. Termination</h2>
             <p className="text-text-secondary">
               We reserve the right to suspend or terminate accounts that violate these Terms. Upon
               termination:
@@ -226,7 +290,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">10. Disclaimer of Warranties</h2>
+            <h2 className="text-2xl font-semibold mb-4">11. Disclaimer of Warranties</h2>
             <p className="text-text-secondary">
               THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. WE DISCLAIM ALL
               WARRANTIES, EXPRESS OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -235,7 +299,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">11. Limitation of Liability</h2>
+            <h2 className="text-2xl font-semibold mb-4">12. Limitation of Liability</h2>
             <p className="text-text-secondary">
               IN NO EVENT SHALL GETFANSEE BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL,
               CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING FROM YOUR USE OF THE SERVICE.
@@ -243,7 +307,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">12. Changes to Terms</h2>
+            <h2 className="text-2xl font-semibold mb-4">13. Changes to Terms</h2>
             <p className="text-text-secondary">
               We may update these Terms at any time. Continued use of the Service after changes
               constitutes acceptance of the modified Terms.
@@ -251,76 +315,57 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">13. Governing Law</h2>
+            <h2 className="text-2xl font-semibold mb-4">
+              14. Governing Law and Dispute Resolution
+            </h2>
             <p className="text-text-secondary">
-              These Terms of Service and any dispute or claim arising out of or in connection with
-              them (including non-contractual disputes or claims) shall be governed by and construed
-              in accordance with the laws of New South Wales, Australia, without regard to its
-              conflict of law provisions. You consent to the exclusive jurisdiction of courts
-              located in Sydney, New South Wales, Australia for any disputes not subject to
-              arbitration below.
+              These Terms and any dispute, claim, or controversy arising out of or relating to these
+              Terms, the Services, your account, your use of the Services, any subscription, paid
+              content, creator payout, content moderation decision, or any relationship between you
+              and {PLATFORM_NAME} shall be governed by and construed in accordance with the laws of
+              the {LEGAL_GOVERNING_JURISDICTION}, without regard to its conflict of law principles.
             </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">14. Dispute Resolution & Arbitration</h2>
-            <p className="text-text-secondary mb-4">
-              <strong className="text-text-primary">Please read this section carefully.</strong> It
-              affects your legal rights, including your right to file a lawsuit in court.
+            <p className="text-text-secondary mt-4">
+              Subject to any mandatory consumer protection laws that may apply in your place of
+              residence, you and {PLATFORM_NAME} agree that the state and federal courts located in
+              Wyoming shall have exclusive jurisdiction over any dispute, claim, or controversy
+              arising out of or relating to these Terms or the Services. You and {PLATFORM_NAME}{" "}
+              each consent to the personal jurisdiction and venue of such courts.
             </p>
-
-            <h3 className="text-lg font-semibold mt-4 mb-2">Informal Resolution First</h3>
-            <p className="text-text-secondary">
-              Before initiating any formal dispute, you agree to first contact us at{" "}
-              <a
-                href="mailto:legal@getfansee.com"
-                className="text-brand-primary underline hover:no-underline"
-              >
-                legal@getfansee.com
-              </a>{" "}
-              and provide a written description of your dispute, the relief you seek, and your
-              contact information. We will attempt to resolve the dispute informally within 30 days
-              of receiving your notice.
+            <p className="text-text-secondary mt-4">
+              Nothing in this section prevents either party from seeking injunctive or equitable
+              relief in any court of competent jurisdiction to protect intellectual property rights,
+              confidential information, platform security, payment integrity, user safety, or to
+              address unauthorized use, misuse, or distribution of content.
             </p>
-
-            <h3 className="text-lg font-semibold mt-4 mb-2">Binding Arbitration</h3>
-            <p className="text-text-secondary">
-              If the dispute is not resolved informally, you and GetFanSee agree that any dispute,
-              claim, or controversy arising out of or relating to these Terms or your use of the
-              Service shall be resolved by final and binding arbitration administered by the
-              Australian Centre for International Commercial Arbitration (ACICA) in accordance with
-              the ACICA Arbitration Rules. The seat of arbitration shall be Sydney, Australia. The
-              arbitration shall be conducted in English. The arbitral decision shall be final and
-              binding and may be enforced in any court of competent jurisdiction.
-            </p>
-
-            <h3 className="text-lg font-semibold mt-4 mb-2">Class Action Waiver</h3>
-            <p className="text-text-secondary">
-              You agree that any arbitration or proceeding shall be conducted only on an individual
-              basis and not in a class, consolidated, or representative action. You expressly waive
-              any right to bring or participate in any class action lawsuit or class-wide
-              arbitration against GetFanSee.
-            </p>
-
-            <h3 className="text-lg font-semibold mt-4 mb-2">Exceptions</h3>
-            <p className="text-text-secondary">
-              Notwithstanding the above, either party may seek injunctive or other equitable relief
-              in any court of competent jurisdiction to prevent the actual or threatened
-              infringement, misappropriation, or violation of intellectual property rights.
+            <p className="text-text-secondary mt-4">
+              If you are a consumer residing in a jurisdiction where applicable law does not permit
+              exclusive jurisdiction or venue in Wyoming, this section applies only to the maximum
+              extent permitted by applicable law.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">15. Contact</h2>
-            <p className="text-text-secondary">
+            <p className="text-text-secondary mb-3">
               For questions about these Terms, contact us at:{" "}
               <a
-                href="mailto:legal@getfansee.com"
+                href={`mailto:${LEGAL_CONTACT_EMAIL}`}
                 className="text-brand-primary underline hover:no-underline"
               >
-                legal@getfansee.com
+                {LEGAL_CONTACT_EMAIL}
               </a>
             </p>
+            <ul className="list-none pl-0 text-text-secondary space-y-1">
+              <li>
+                <span className="font-semibold text-text-primary">Legal entity:</span>{" "}
+                {LEGAL_COMPANY_NAME}
+              </li>
+              <li>
+                <span className="font-semibold text-text-primary">Registered address:</span>{" "}
+                {LEGAL_REGISTERED_ADDRESS}
+              </li>
+            </ul>
           </section>
         </div>
       </div>

@@ -140,11 +140,14 @@ The billing descriptor **GETFANSEE.COM** appears in:
 
 ## Section 6 — Contact Information for Underwriting
 
-| Type               | Contact                                                       |
-| ------------------ | ------------------------------------------------------------- |
-| General            | hello@getfansee.com                                           |
-| Legal / Compliance | legal@getfansee.com                                           |
-| Support            | support@getfansee.com                                         |
-| Privacy            | privacy@getfansee.com                                         |
-| DMCA               | dmca@getfansee.com                                            |
-| Registered Address | Suite 1, Level 2, 123 Tech Street, Sydney NSW 2000, Australia |
+| Type               | Contact                                                |
+| ------------------ | ------------------------------------------------------ |
+| General / Social   | socials@getfansee.com                                  |
+| Support            | support@getfansee.com                                  |
+| Creators           | creators@getfansee.com                                 |
+| Legal              | legal@getfansee.com                                    |
+| Compliance (2257)  | compliance@getfansee.com                               |
+| Privacy            | privacy@getfansee.com                                  |
+| Trust & Safety     | safety@getfansee.com                                   |
+| DMCA               | dmca@getfansee.com                                     |
+| Registered Address | 30 N Gould St Ste N, Sheridan, WY 82801, United States |

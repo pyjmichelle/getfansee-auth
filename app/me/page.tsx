@@ -43,6 +43,8 @@ export default function ProfilePage() {
   } | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -57,6 +59,8 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const loadProfile = async () => {
+      setIsLoading(true);
+      setLoadError(null);
       try {
         const bootstrap = await getAuthBootstrap();
         if (!bootstrap.authenticated || !bootstrap.user) {
@@ -66,6 +70,18 @@ export default function ProfilePage() {
 
         setCurrentUserId(bootstrap.user.id);
         setEmail(bootstrap.user.email || "");
+
+        // Seed from the SSR-injected snapshot so the page renders immediately
+        // even if the /api/profile fetch is slow or fails.
+        if (bootstrap.profile) {
+          setUsername(bootstrap.profile.display_name || "");
+          setAvatar(bootstrap.profile.avatar_url || "");
+          setCurrentUser({
+            username: bootstrap.profile.display_name || "user",
+            role: bootstrap.profile.role === "creator" ? "creator" : "fan",
+            avatar: bootstrap.profile.avatar_url || undefined,
+          });
+        }
 
         // 加载 profile（通过 API）
         const profileResponse = await fetch("/api/profile");
@@ -82,16 +98,19 @@ export default function ProfilePage() {
               avatar: profile.avatar_url || undefined,
             });
           }
+        } else if (!bootstrap.profile) {
+          setLoadError("Failed to load your profile. Please try again.");
         }
       } catch (err) {
         console.error("[me] loadProfile error:", err);
+        setLoadError("Something went wrong loading your profile. Please try again.");
       } finally {
         setIsLoading(false);
       }
     };
 
     loadProfile();
-  }, [router]);
+  }, [router, reloadKey]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -279,7 +298,22 @@ export default function ProfilePage() {
     }
   };
 
-  if (isLoading || !currentUser) {
+  if (!isLoading && (loadError || !currentUser)) {
+    return (
+      <PageShell user={currentUser} notificationCount={0} maxWidth="3xl">
+        <div className="py-16 flex flex-col items-center text-center gap-4">
+          <p className="text-text-secondary max-w-sm">
+            {loadError || "Failed to load your profile. Please try again."}
+          </p>
+          <Button variant="violet" onClick={() => setReloadKey((k) => k + 1)}>
+            Try again
+          </Button>
+        </div>
+      </PageShell>
+    );
+  }
+
+  if (isLoading) {
     return (
       <PageShell user={currentUser} notificationCount={0} maxWidth="3xl">
         <div className="pb-24 space-y-6">
@@ -363,6 +397,8 @@ export default function ProfilePage() {
       setIsSaving(false);
     }
   };
+
+  if (!currentUser) return null;
 
   const settingsTabs = [
     { value: "profile", label: "Profile" },
