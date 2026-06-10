@@ -4,8 +4,8 @@ import { ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import {
+  COMPLIANCE_CONTACT_EMAIL,
   LEGAL_COMPANY_NAME,
-  LEGAL_CONTACT_EMAIL,
   LEGAL_EFFECTIVE_DATE,
   LEGAL_REGISTERED_ADDRESS,
   PLATFORM_NAME,
@@ -92,10 +92,10 @@ export default function Page2257() {
               <p>
                 Email:{" "}
                 <a
-                  href={`mailto:${LEGAL_CONTACT_EMAIL}`}
+                  href={`mailto:${COMPLIANCE_CONTACT_EMAIL}`}
                   className="text-brand-primary underline hover:no-underline"
                 >
-                  {LEGAL_CONTACT_EMAIL}
+                  {COMPLIANCE_CONTACT_EMAIL}
                 </a>
               </p>
             </div>

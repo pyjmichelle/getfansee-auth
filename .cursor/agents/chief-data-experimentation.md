@@ -31,7 +31,8 @@ WHEN YOU ACT:
 PROJECT-SPECIFIC:
 
 - 产品内埋点：`posthog-js`（见依赖）；实验与漏斗需对齐支付墙、订阅、创作者转化（`app/creator/`, `app/me/`）
-- 事件定义变更时同步 **chief-frontend**（UI）与 **chief-payments-risk**（账务口径）
+- 推荐计划漏斗（新）：ambassador 计划关键指标包括：推荐码生成率、点击率（`app/r/[code]/`）、注册转化率、首次付费转化率、佣金累计；埋点变更同步 **chief-payments-risk**（账务口径）
+- 事件定义变更时同步 **chief-frontend-architect**（UI）与 **chief-payments-risk-officer**（账务口径）
 
 REQUIRED INPUTS:
 

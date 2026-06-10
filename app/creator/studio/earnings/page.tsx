@@ -91,17 +91,22 @@ export default function EarningsPage() {
   const completedTransactions = transactions.filter((t) => t.status === "completed");
   const pendingTransactions = transactions.filter((t) => t.status === "pending");
 
-  const totalEarnings = completedTransactions.reduce((sum, t) => sum + t.amount_cents, 0) / 100;
-  const pendingEarnings = pendingTransactions.reduce((sum, t) => sum + t.amount_cents, 0) / 100;
+  // Tips are already stored NET of the platform fee (see /api/tip + lib/constants/fees).
+  // Other sources keep the legacy 0.8 estimate; tips must not be discounted twice.
+  const sumCents = (rows: Transaction[]) => rows.reduce((sum, t) => sum + t.amount_cents, 0);
+  const completedTipCents = sumCents(completedTransactions.filter((t) => t.type === "tip"));
+  const completedNonTipCents = sumCents(completedTransactions.filter((t) => t.type !== "tip"));
+  const pendingTipCents = sumCents(pendingTransactions.filter((t) => t.type === "tip"));
+  const pendingNonTipCents = sumCents(pendingTransactions.filter((t) => t.type !== "tip"));
 
-  const _platformFee = totalEarnings * 0.2;
-  const yourCut = totalEarnings * 0.8;
+  const totalEarnings = (completedTipCents + completedNonTipCents) / 100;
+  const pendingEarnings = (pendingTipCents + pendingNonTipCents) / 100;
 
-  // 可提金额（已结算的）
-  const availableBalance = yourCut;
+  // 可提金额（已结算的）: tips at true net + non-tip legacy estimate
+  const availableBalance = (completedNonTipCents * 0.8 + completedTipCents) / 100;
 
   // 待结算金额（pending 的，需要等待 available_on）
-  const pendingBalance = pendingEarnings * 0.8;
+  const pendingBalance = (pendingNonTipCents * 0.8 + pendingTipCents) / 100;
 
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), "MMM d, yyyy HH:mm");
@@ -329,7 +334,7 @@ export default function EarningsPage() {
               <StatCard
                 title="Tips"
                 value={`$${animatedTipRevenue.toFixed(0)}`}
-                description={`${tipPercent}% of total`}
+                description={`${tipPercent}% of total · net of fees`}
                 icon={<Gift className="w-5 h-5" />}
                 className="border border-border-base hover:border-success/30 transition-all"
               />
@@ -426,6 +431,7 @@ export default function EarningsPage() {
                   { href: "/creator/new-post", icon: Plus, label: "Create Post" },
                   { href: "/creator/studio/earnings", icon: DollarSign, label: "Earnings" },
                   { href: "/creator/studio/subscribers", icon: Users, label: "Subscribers" },
+                  { href: "/creator/studio/tips", icon: Gift, label: "Tips" },
                   { href: "/creator/studio/post/list", icon: FileText, label: "Post List" },
                   { href: "/creator/studio/analytics", icon: BarChart3, label: "Analytics" },
                 ].map(({ href, icon: Icon, label }) => {

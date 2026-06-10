@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth, badRequest, serverError } from "@/lib/route-handler";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
+import { transitionToCreatorRoleSelected } from "@/lib/ambassador/bind";
 
 type CreatorApplicationPayload = {
   displayName: string;
@@ -59,12 +60,17 @@ export const POST = withAuth(async (request: NextRequest, { user }) => {
           return serverError("Failed to submit application");
         }
 
+        // Ambassador: transition attribution (best-effort)
+        transitionToCreatorRoleSelected(user.id).catch(() => {});
         return NextResponse.json({ success: true });
       }
 
       console.error("[api/creator/apply] insert error:", error);
       return serverError("Failed to submit application");
     }
+
+    // Ambassador: transition attribution to creator_role_selected (best-effort)
+    transitionToCreatorRoleSelected(user.id).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch (err) {

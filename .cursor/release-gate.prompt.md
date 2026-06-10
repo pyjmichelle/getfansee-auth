@@ -72,15 +72,15 @@ Goals:
 
 Dispatch **by problem type**:
 
-| Problem             | Agent                    |
-| ------------------- | ------------------------ |
-| Auth / Supabase     | `chief-backend-platform` |
-| UI / test selectors | `chief-frontend`         |
-| E2E failures        | `chief-quality`          |
-| CI / env / ports    | `chief-reliability`      |
-| Payments / wallet   | `chief-payments-risk`    |
-| Legal / DMCA / KYC  | `chief-legal-compliance` |
-| Abuse / safety      | `chief-trust-safety`     |
+| Problem             | Agent                              |
+| ------------------- | ---------------------------------- |
+| Auth / Supabase     | `chief-backend-platform-architect` |
+| UI / test selectors | `chief-frontend-architect`         |
+| E2E failures        | `chief-quality-officer`            |
+| CI / env / ports    | `chief-reliability-architect`      |
+| Payments / wallet   | `chief-payments-risk-officer`      |
+| Legal / DMCA / KYC  | `chief-legal-compliance-advisor`   |
+| Abuse / safety      | `chief-trust-safety-officer`       |
 
 ❌ Skipping the correct agent = INVALID FIX.
 
@@ -96,7 +96,7 @@ Minimum required skills per category:
 
 #### Auth / Identity
 
-- `better-auth-best-practices.skill.md`
+- `supabase`（官方 skill，`supabase/agent-skills`，覆盖 Supabase Auth/SSR/RLS）
 - `supabase-postgres-best-practices.skill.md`
 
 #### UI / Frontend

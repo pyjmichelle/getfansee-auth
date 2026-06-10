@@ -1,0 +1,102 @@
+---
+description: Next.js + Supabase Auth SSR best practices. Activate when working on auth routes, middleware, or Supabase client setup.
+globs: ["app/auth/**", "middleware.ts", "lib/server/auth-server.ts", "lib/auth*.ts", "app/api/auth/**"]
+alwaysApply: false
+---
+
+# Next.js + Supabase Auth — SSR 规范
+
+> **项目注意（渐进迁移）**：`package.json` 中仍依赖 `@supabase/auth-helpers-nextjs`（遗留）。
+> 新代码必须使用 `@supabase/ssr`；已有遗留代码按 Sprint 计划逐步迁移，不强制一次性重写。
+> 服务端认证核心：`lib/server/auth-server.ts`；遗留入口：`lib/auth-server.ts`。
+
+## ABSOLUTE REQUIREMENTS
+
+1. 服务端 client 必须使用 `@supabase/ssr` 的 `createServerClient`
+2. Cookie 操作只能用 `getAll` 和 `setAll`，**严禁** `get`、`set`、`remove`
+3. **严禁** 从 `@supabase/auth-helpers-nextjs` 导入（新代码）
+4. middleware 中必须调用 `supabase.auth.getUser()` 来验证 session
+5. Service Role key 只能在 `lib/server/supabase-admin.ts` 中初始化，绝不暴露给客户端
+
+## Server Client 模式
+
+```typescript
+// lib/server/auth-server.ts 示例
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+
+export async function createSupabaseServerClient() {
+  const cookieStore = await cookies();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return cookieStore.getAll(); },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+}
+```
+
+## Middleware 模式
+
+```typescript
+// middleware.ts
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
+
+export async function middleware(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request });
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return request.cookies.getAll(); },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          supabaseResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+  // 必须在此处调用 getUser，不可在 getUser 前后插入任何可能中断的逻辑
+  const { data: { user } } = await supabase.auth.getUser();
+  // 保护路由示例
+  if (!user && request.nextUrl.pathname.startsWith("/me")) {
+    return NextResponse.redirect(new URL("/auth", request.url));
+  }
+  return supabaseResponse;
+}
+```
+
+## Next.js 16 特有注意
+
+- `params` 在 Next 16 中是 `Promise`，必须 `await params`（Route Handler 与 Page 组件均适用）
+- `cookies()` 在 Server Action / Route Handler 中需 `await`
+
+## 本项目认证路由
+
+- 登录/注册：`app/auth/`（含 `forgot-password/`、`reset-password/`、`verify/`）
+- OAuth callback：`app/auth/callback/`
+- Session API：`app/api/auth/session/`
+- Ambassador 推荐码绑定（新）：`app/r/[code]/route.ts`（需验证 session 后绑定）
+
+## AI 生成代码校验步骤
+
+在生成任何认证相关代码前确认：
+1. 是否只使用了 `getAll` / `setAll`？否则停止并修正。
+2. 是否从 `@supabase/ssr` 导入？否则停止并修正。
+3. 是否有 `get`、`set`、`remove` 调用？有则停止并修正。
+4. 是否从 `auth-helpers-nextjs` 导入（新代码）？有则停止并修正。

@@ -128,7 +128,7 @@ To request a payout, creators must:
 
 ### Contact Support
 
-- Email: payouts@getfansee.com
+- Email: creators@getfansee.com
 - Response time: 24-48 hours
 - Include: Username, transaction ID, issue description
 

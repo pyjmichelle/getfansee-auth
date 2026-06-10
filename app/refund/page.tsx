@@ -3,7 +3,12 @@ import Link from "next/link";
 import { ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
-import { LEGAL_EFFECTIVE_DATE, SUPPORT_CONTACT_EMAIL } from "@/lib/constants/legal";
+import {
+  LEGAL_COMPANY_NAME,
+  LEGAL_EFFECTIVE_DATE,
+  LEGAL_REGISTERED_ADDRESS,
+  SUPPORT_CONTACT_EMAIL,
+} from "@/lib/constants/legal";
 
 export const metadata: Metadata = {
   title: "Refund & Cancellation Policy - GetFanSee",
@@ -108,7 +113,31 @@ export default function RefundPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">5. How to Request a Refund</h2>
+            <h2 className="text-2xl font-semibold mb-4">5. Tips / Gratuities</h2>
+            <p className="text-text-secondary">
+              Tips (also called &quot;buy me a coffee&quot;, gratuities, or support) are{" "}
+              <strong>voluntary gifts</strong> to a creator and are{" "}
+              <strong>final and non-refundable</strong> once sent. A tip is not a purchase of any
+              content, service, message, or reward, and no specific outcome is owed in return for a
+              tip.
+            </p>
+            <p className="text-text-secondary mt-4">
+              As a narrow exception, we will review a tip refund request only where:
+            </p>
+            <ul className="list-disc pl-6 text-text-secondary space-y-2 mt-3">
+              <li>A duplicate charge occurred due to a payment or platform processing error.</li>
+              <li>A technical error caused an incorrect tip amount to be sent.</li>
+              <li>Fraudulent use of your payment method was reported promptly.</li>
+            </ul>
+            <p className="text-text-secondary mt-4">
+              Because tips are credited toward a creator&apos;s earnings, requests outside these
+              cases cannot be honoured. Tip refund requests must be submitted within{" "}
+              <strong>14 days</strong> of the transaction.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">6. How to Request a Refund</h2>
             <p className="text-text-secondary">
               To request a refund, please contact our support team:
             </p>
@@ -138,7 +167,7 @@ export default function RefundPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">6. Chargebacks & Disputes</h2>
+            <h2 className="text-2xl font-semibold mb-4">7. Chargebacks & Disputes</h2>
             <p className="text-text-secondary">
               If you have a billing concern, we strongly encourage you to contact us before
               initiating a chargeback with your bank or card issuer. Chargebacks initiated without
@@ -155,7 +184,7 @@ export default function RefundPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">7. What Will Appear on Your Statement</h2>
+            <h2 className="text-2xl font-semibold mb-4">8. What Will Appear on Your Statement</h2>
             <p className="text-text-secondary">
               Charges from GetFanSee will appear on your bank or credit card statement as{" "}
               <strong>GETFANSEE.COM</strong>. If you do not recognise a charge, please contact us
@@ -164,8 +193,8 @@ export default function RefundPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">8. Contact</h2>
-            <p className="text-text-secondary">
+            <h2 className="text-2xl font-semibold mb-4">9. Contact</h2>
+            <p className="text-text-secondary mb-3">
               For all billing and refund enquiries:{" "}
               <a
                 href={`mailto:${SUPPORT_CONTACT_EMAIL}`}
@@ -174,6 +203,16 @@ export default function RefundPage() {
                 {SUPPORT_CONTACT_EMAIL}
               </a>
             </p>
+            <ul className="list-none pl-0 text-text-secondary space-y-1">
+              <li>
+                <span className="font-semibold text-text-primary">Legal entity:</span>{" "}
+                {LEGAL_COMPANY_NAME}
+              </li>
+              <li>
+                <span className="font-semibold text-text-primary">Registered address:</span>{" "}
+                {LEGAL_REGISTERED_ADDRESS}
+              </li>
+            </ul>
           </section>
         </div>
       </div>

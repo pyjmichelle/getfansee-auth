@@ -14,8 +14,17 @@ import { PageShell } from "@/components/page-shell";
 import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
 import { type Post } from "@/lib/types";
 import Link from "next/link";
-import { ArrowLeft, Share2, Lock, MessageCircle, MoreVertical, CheckCircle2 } from "@/lib/icons";
+import {
+  ArrowLeft,
+  Share2,
+  Lock,
+  MessageCircle,
+  MoreVertical,
+  CheckCircle2,
+  Heart,
+} from "@/lib/icons";
 import { ShareModal } from "@/components/share-modal";
+import { TipModal } from "@/components/tip-modal";
 import { formatDistanceToNow } from "date-fns";
 import { Analytics } from "@/lib/analytics";
 import { useCountUp } from "@/hooks/use-count-up";
@@ -140,6 +149,7 @@ export default function PostDetailPage() {
   const [canView, setCanView] = useState(false);
   const [showPaywallModal, setShowPaywallModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showTipModal, setShowTipModal] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
   const socialUnlockCount = useCountUp(0, { duration: 900, decimals: 0 });
@@ -166,15 +176,12 @@ export default function PostDetailPage() {
           return;
         }
 
+        // Public page: guests can view the post (paid content shows the paywall).
+        // Do NOT redirect to /auth — only authenticated viewers get a currentUser.
         const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
-          // Redirect to auth — even in test mode, unauthenticated users must log in.
-          // Setting canView(true) here was masking real auth failures in E2E tests.
-          router.push("/auth");
-          return;
-        }
+        const viewerId = bootstrap.authenticated && bootstrap.user ? bootstrap.user.id : null;
 
-        if (bootstrap.profile) {
+        if (bootstrap.user && bootstrap.profile) {
           setCurrentUser({
             id: bootstrap.user.id,
             username: bootstrap.profile.display_name || "user",
@@ -217,7 +224,7 @@ export default function PostDetailPage() {
 
         setPost(data.post);
 
-        const isCreator = data.post.creator_id === bootstrap.user.id;
+        const isCreator = viewerId != null && data.post.creator_id === viewerId;
         const isFree = data.post.visibility === "free";
         setCanView(isCreator || isFree || data.canView || false);
 
@@ -513,6 +520,18 @@ export default function PostDetailPage() {
                 >
                   <Share2 size={18} aria-hidden="true" />
                 </button>
+                {/* Tip — only on viewable posts that aren't the creator's own */}
+                {!isCreator && canView && (
+                  <button
+                    className="ml-auto flex items-center gap-1.5 text-amber-400 hover:text-amber-300 transition-colors text-[13px] font-medium cursor-pointer focus-visible:outline-2 focus-visible:outline-amber-400 focus-visible:rounded"
+                    onClick={() => setShowTipModal(true)}
+                    aria-label="Send a tip"
+                    data-testid="post-tip-button"
+                  >
+                    <Heart size={18} aria-hidden="true" />
+                    <span>Tip</span>
+                  </button>
+                )}
               </div>
 
               {/* Like count */}
@@ -553,6 +572,16 @@ export default function PostDetailPage() {
             url={typeof window !== "undefined" ? window.location.href : ""}
             title={post?.title || post?.content?.slice(0, 80) || "Check out this post on GetFanSee"}
           />
+
+          {!isCreator && post && post.creator_id && (
+            <TipModal
+              open={showTipModal}
+              onOpenChange={setShowTipModal}
+              creatorId={post.creator_id}
+              creatorName={post.creator?.display_name ?? undefined}
+              postId={post.id}
+            />
+          )}
 
           {post && (
             <PaywallModal

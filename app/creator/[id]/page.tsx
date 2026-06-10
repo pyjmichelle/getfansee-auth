@@ -18,8 +18,12 @@ import {
   CheckCircle2,
   MoreVertical,
   Plus,
+  DollarSign,
 } from "@/lib/icons";
+import { VerifiedBadge } from "@/components/verified-badge";
 import { PaywallModal } from "@/components/paywall-modal";
+import { TipModal } from "@/components/tip-modal";
+import { SupportBlock } from "@/components/support-block";
 import { PostGridItem } from "@/components/post-grid-item";
 import {
   DropdownMenu,
@@ -93,6 +97,7 @@ export default function CreatorProfilePage() {
     display_name?: string;
     bio?: string;
     avatar_url?: string;
+    is_verified?: boolean;
   } | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [currentUser, setCurrentUser] = useState<{
@@ -115,6 +120,8 @@ export default function CreatorProfilePage() {
   const [activeTab, setActiveTab] = useState<"posts" | "about">("posts");
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [subscribersCount, setSubscribersCount] = useState(0);
+  const [showTipModal, setShowTipModal] = useState(false);
+  const [tipRefreshKey, setTipRefreshKey] = useState(0);
 
   const totalPosts = posts.length;
   const totalLikes = posts.reduce((sum, post) => sum + (post.likes_count || 0), 0);
@@ -152,13 +159,12 @@ export default function CreatorProfilePage() {
         setIsLoading(true);
         setError(null);
 
+        // Public profile: guests can view (paywalled posts show the paywall).
+        // Do NOT redirect to /auth — only set viewer identity when logged in.
         const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
-          router.push("/auth");
-          return;
-        }
+        const viewerId = bootstrap.authenticated && bootstrap.user ? bootstrap.user.id : null;
 
-        setCurrentUserId(bootstrap.user.id);
+        setCurrentUserId(viewerId);
 
         if (bootstrap.profile) {
           setCurrentUser({
@@ -168,9 +174,10 @@ export default function CreatorProfilePage() {
           });
         }
 
-        // Fetch subscription status + creator profile in parallel
+        // Fetch subscription status + creator profile in parallel.
+        // Subscription status only matters for logged-in viewers who aren't the creator.
         const [statusResponse, creatorResponse] = await Promise.all([
-          bootstrap.user.id !== creatorId
+          viewerId && viewerId !== creatorId
             ? fetch(`/api/subscription/status?creatorId=${creatorId}`)
             : Promise.resolve(null),
           fetch(`/api/creator/${creatorId}`),
@@ -236,6 +243,7 @@ export default function CreatorProfilePage() {
           display_name: creator.display_name,
           bio: creator.bio,
           avatar_url: creator.avatar_url,
+          is_verified: creator.is_verified ?? false,
         });
         // Subscription price (cents → dollars); default 9.99 if not set
         if (creator.subscription_price_cents && creator.subscription_price_cents > 0) {
@@ -383,7 +391,7 @@ export default function CreatorProfilePage() {
           </Button>
           <span className="font-semibold text-white truncate max-w-[220px] flex items-center gap-1.5 text-[15px]">
             {creatorProfile.display_name || "Creator"}
-            <CheckCircle2 className="size-[15px] text-violet-400 shrink-0" aria-hidden="true" />
+            {creatorProfile.is_verified && <VerifiedBadge size={15} />}
           </span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -445,9 +453,19 @@ export default function CreatorProfilePage() {
               {creatorProfile.display_name?.[0]?.toUpperCase() || "C"}
             </AvatarFallback>
           </Avatar>
-          {/* PC Subscribe button */}
+          {/* PC Subscribe + Tip buttons */}
           {!isOwnProfile && (
-            <div className="hidden md:block pb-1">
+            <div className="hidden md:flex items-center gap-2 pb-1">
+              <Button
+                variant="gold"
+                size="sm"
+                className="rounded-full px-4 gap-1.5 active:scale-95"
+                onClick={() => setShowTipModal(true)}
+                aria-label="Send a tip"
+              >
+                <DollarSign size={13} />
+                Tip
+              </Button>
               {isSubscribed ? (
                 <Button
                   variant="outline"
@@ -497,7 +515,7 @@ export default function CreatorProfilePage() {
             <h1 className="text-xl md:text-2xl font-bold text-white leading-tight">
               {creatorProfile.display_name || "Creator"}
             </h1>
-            <CheckCircle2 className="size-[18px] text-violet-400 shrink-0" aria-hidden="true" />
+            {creatorProfile.is_verified && <VerifiedBadge size={18} />}
           </div>
           <p className="text-[13px] text-text-muted mb-3">
             @{(creatorProfile.display_name || "creator").replace(/\s+/g, "").toLowerCase()}
@@ -528,7 +546,7 @@ export default function CreatorProfilePage() {
             </p>
           )}
 
-          {/* Mobile: Share only — Subscribe is in the sticky bottom bar */}
+          {/* Mobile: Share + Tip — Subscribe is in the sticky bottom bar */}
           {!isOwnProfile && (
             <div className="flex md:hidden gap-3 mt-1">
               <Button
@@ -540,6 +558,16 @@ export default function CreatorProfilePage() {
                 data-testid="creator-share-btn"
               >
                 <Share2 size={18} />
+              </Button>
+              <Button
+                variant="gold"
+                size="sm"
+                className="rounded-full px-4 gap-1.5"
+                onClick={() => setShowTipModal(true)}
+                aria-label="Send a tip"
+              >
+                <DollarSign size={13} />
+                Tip
               </Button>
             </div>
           )}
@@ -553,6 +581,18 @@ export default function CreatorProfilePage() {
             </Button>
           )}
         </div>
+
+        {/* Support / Buy-me-a-coffee block */}
+        {!isOwnProfile && (
+          <div className="mb-5">
+            <SupportBlock
+              creatorId={creatorId}
+              creatorName={creatorProfile.display_name ?? undefined}
+              onTip={() => setShowTipModal(true)}
+              refreshKey={tipRefreshKey}
+            />
+          </div>
+        )}
 
         {/* Tabs: Posts | About */}
         <div className="flex border-b border-white/8 mb-0" role="tablist">
@@ -737,6 +777,17 @@ export default function CreatorProfilePage() {
               return next;
             });
           }}
+        />
+      )}
+
+      {/* Tip Modal */}
+      {!isOwnProfile && creatorProfile && (
+        <TipModal
+          open={showTipModal}
+          onOpenChange={setShowTipModal}
+          creatorId={creatorId}
+          creatorName={creatorProfile.display_name ?? undefined}
+          onSuccess={() => setTipRefreshKey((k) => k + 1)}
         />
       )}
     </PageShell>

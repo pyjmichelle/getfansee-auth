@@ -9,7 +9,8 @@ import { AgeGate } from "@/components/age-gate";
 import { CookieConsent } from "@/components/cookie-consent";
 import { PostHogProvider } from "@/components/providers/posthog-provider";
 import { RoutePerfTracker } from "@/components/providers/route-perf-tracker";
-import { AuthSyncProvider } from "@/components/providers/auth-sync-provider";
+import { AuthProvider } from "@/contexts/auth-context";
+import { getServerAuthState } from "@/lib/server/auth-state";
 import { Suspense } from "react";
 import "./globals.css";
 
@@ -67,11 +68,15 @@ export const metadata: Metadata = {
 const isTestMode =
   process.env.NEXT_PUBLIC_TEST_MODE === "true" || process.env.PLAYWRIGHT_TEST_MODE === "true";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Server-rendered auth state: injected once so every page knows auth at first
+  // render (no client bootstrap fetch, no permanent skeletons).
+  const initialAuth = await getServerAuthState();
+
   return (
     <html lang="en" className="dark">
       <head>
@@ -80,7 +85,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <Suspense fallback={null}>
           <PostHogProvider>
-            <AuthSyncProvider>
+            <AuthProvider initialAuth={initialAuth}>
               <RoutePerfTracker />
               <UnlockProvider>
                 <AgeGate>{children}</AgeGate>
@@ -89,7 +94,7 @@ export default function RootLayout({
               <SonnerToaster richColors position="top-center" />
               {!isTestMode && <Analytics />}
               {!isTestMode && <CookieConsent />}
-            </AuthSyncProvider>
+            </AuthProvider>
           </PostHogProvider>
         </Suspense>
       </body>

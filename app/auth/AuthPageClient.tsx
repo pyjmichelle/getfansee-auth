@@ -12,15 +12,15 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ensureProfile, signInWithGoogle, signUpWithEmail } from "@/lib/auth";
-import { syncSessionCookies } from "@/lib/auth-session-client";
 import { captureReferralFromUrl } from "@/lib/referral";
 import { Analytics } from "@/lib/analytics";
-import { invalidateAuthBootstrap, prefetchAuthBootstrap } from "@/lib/auth-bootstrap-client";
 import { AlertCircle, Loader2, Eye, EyeOff, DollarSign, Lock, Globe, Sparkles } from "@/lib/icons";
 import { TrustStrip } from "@/components/trust-strip";
 
 type AuthPageClientProps = {
   initialMode?: "login" | "signup";
+  isInvited?: boolean;
+  refName?: string;
 };
 
 const devLog = (...args: unknown[]) => {
@@ -32,7 +32,11 @@ const devLog = (...args: unknown[]) => {
 const getErrorMessage = (error: unknown, fallback = "Internal server error") =>
   error instanceof Error ? error.message : fallback;
 
-export default function AuthPageClient({ initialMode = "login" }: AuthPageClientProps) {
+export default function AuthPageClient({
+  initialMode = "login",
+  isInvited = false,
+  refName,
+}: AuthPageClientProps) {
   const supabase = getSupabaseBrowserClient();
   const router = useRouter();
   const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === "true";
@@ -45,7 +49,10 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"login" | "signup">(initialMode);
+  // If arriving via a referral invite, default to the signup tab
+  const [activeTab, setActiveTab] = useState<"login" | "signup">(
+    isInvited ? "signup" : initialMode
+  );
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
 
@@ -140,34 +147,21 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
         return;
       }
 
-      let sessionSyncOk = await syncSessionCookies(data.session);
-      if (!sessionSyncOk) {
-        // Retry once with latest session snapshot to avoid transient verification races
-        const { data: refreshed } = await supabase.auth.getSession();
-        if (refreshed.session) {
-          sessionSyncOk = await syncSessionCookies(refreshed.session);
-        }
-      }
-      if (!sessionSyncOk) {
-        console.warn("[auth] Session sync failed; continuing with client session.");
-      }
-      devLog("[auth] Session synced");
-
+      // The @supabase/ssr browser client has already persisted the session to
+      // the standard auth cookie — no manual cookie sync needed.
       devLog("[auth] Sign-in successful, user ID:", data.user.id);
-      devLog("[auth] Ensuring profile...");
       void ensureProfile().catch((err) => {
         console.warn("[auth] ensureProfile failed:", err);
       });
-      invalidateAuthBootstrap();
-      prefetchAuthBootstrap();
 
       Analytics.identify(data.user.id);
       Analytics.userLoggedIn("email");
 
-      devLog("[auth] Profile ensured, navigating to /home");
+      devLog("[auth] Navigating to /home");
+      // router.refresh() re-renders the layout (AuthProvider) with the new
+      // server-side auth state before navigating.
+      router.refresh();
       router.push("/home");
-
-      devLog("[auth] Navigation initiated");
     } catch (err) {
       devLog("[auth] Login error:", err);
       console.error("[auth] Full error stack:", err);
@@ -209,17 +203,11 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
       if (sessionData?.session) {
         devLog("[auth] Signup successful with session, redirecting...");
 
-        const sessionSyncOk = await syncSessionCookies(sessionData.session);
-        if (!sessionSyncOk) {
-          console.warn("[auth] Session sync failed but continuing...");
-        }
-
         void ensureProfile().catch((err) => {
           console.warn("[auth] ensureProfile failed:", err);
         });
-        invalidateAuthBootstrap();
-        prefetchAuthBootstrap();
 
+        router.refresh();
         router.push("/home");
         return;
       }
@@ -240,17 +228,12 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
       devLog("[auth] Auto-login successful, redirecting...");
       Analytics.identify(loginData.session.user.id);
       Analytics.userRegistered("email");
-      const sessionSyncOk = await syncSessionCookies(loginData.session);
-      if (!sessionSyncOk) {
-        console.warn("[auth] Session sync failed but continuing...");
-      }
 
       void ensureProfile().catch((err) => {
         console.warn("[auth] ensureProfile failed:", err);
       });
-      invalidateAuthBootstrap();
-      prefetchAuthBootstrap();
 
+      router.refresh();
       router.push("/home");
     } catch (err) {
       setError(getErrorMessage(err));
@@ -558,6 +541,31 @@ export default function AuthPageClient({ initialMode = "login" }: AuthPageClient
 
             {/* ── Sign Up Tab ── */}
             <TabsContent value="signup">
+              {/* InvitedBanner — shown when user arrives via a referral link */}
+              {isInvited && (
+                <div className="mb-4 rounded-xl border border-brand-primary/30 bg-brand-primary/8 px-4 py-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-base shrink-0">✦</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13px] font-semibold text-text-primary">
+                        {refName ? `Invited by ${refName}` : "You were invited"}
+                      </p>
+                      <p className="text-[11px] text-text-secondary mt-0.5">
+                        Create exclusive content and earn on your terms.{" "}
+                        <a
+                          href="/privacy"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-text-tertiary underline underline-offset-2"
+                        >
+                          Privacy Policy
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <form onSubmit={handleSignupSubmit} className="space-y-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="signup-email">Email</Label>

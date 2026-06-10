@@ -4,6 +4,9 @@ import { ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import {
+  COMPLIANCE_CONTACT_EMAIL,
+  CREATORS_CONTACT_EMAIL,
+  DMCA_CONTACT_EMAIL,
   LEGAL_COMPANY_NAME,
   LEGAL_COMPANY_REGISTRATION,
   LEGAL_CONTACT_EMAIL,
@@ -11,6 +14,9 @@ import {
   LEGAL_GOVERNING_JURISDICTION,
   LEGAL_REGISTERED_ADDRESS,
   PLATFORM_NAME,
+  PRIVACY_CONTACT_EMAIL,
+  SAFETY_CONTACT_EMAIL,
+  SOCIALS_CONTACT_EMAIL,
   SUPPORT_CONTACT_EMAIL,
 } from "@/lib/constants/legal";
 
@@ -90,19 +96,10 @@ export default function AboutPage() {
                   General Enquiries
                 </span>
                 <a
-                  href="mailto:hello@getfansee.com"
+                  href={`mailto:${SOCIALS_CONTACT_EMAIL}`}
                   className="text-brand-primary underline hover:no-underline"
                 >
-                  hello@getfansee.com
-                </a>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:gap-4">
-                <span className="font-semibold text-text-primary min-w-[180px]">Legal</span>
-                <a
-                  href={`mailto:${LEGAL_CONTACT_EMAIL}`}
-                  className="text-brand-primary underline hover:no-underline"
-                >
-                  {LEGAL_CONTACT_EMAIL}
+                  {SOCIALS_CONTACT_EMAIL}
                 </a>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
@@ -115,23 +112,61 @@ export default function AboutPage() {
                 </a>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
-                <span className="font-semibold text-text-primary min-w-[180px]">
-                  DMCA / Copyright
-                </span>
+                <span className="font-semibold text-text-primary min-w-[180px]">Creators</span>
                 <a
-                  href="mailto:dmca@getfansee.com"
+                  href={`mailto:${CREATORS_CONTACT_EMAIL}`}
                   className="text-brand-primary underline hover:no-underline"
                 >
-                  dmca@getfansee.com
+                  {CREATORS_CONTACT_EMAIL}
+                </a>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:gap-4">
+                <span className="font-semibold text-text-primary min-w-[180px]">Legal</span>
+                <a
+                  href={`mailto:${LEGAL_CONTACT_EMAIL}`}
+                  className="text-brand-primary underline hover:no-underline"
+                >
+                  {LEGAL_CONTACT_EMAIL}
+                </a>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:gap-4">
+                <span className="font-semibold text-text-primary min-w-[180px]">Compliance</span>
+                <a
+                  href={`mailto:${COMPLIANCE_CONTACT_EMAIL}`}
+                  className="text-brand-primary underline hover:no-underline"
+                >
+                  {COMPLIANCE_CONTACT_EMAIL}
                 </a>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
                 <span className="font-semibold text-text-primary min-w-[180px]">Privacy</span>
                 <a
-                  href="mailto:privacy@getfansee.com"
+                  href={`mailto:${PRIVACY_CONTACT_EMAIL}`}
                   className="text-brand-primary underline hover:no-underline"
                 >
-                  privacy@getfansee.com
+                  {PRIVACY_CONTACT_EMAIL}
+                </a>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:gap-4">
+                <span className="font-semibold text-text-primary min-w-[180px]">
+                  DMCA / Copyright
+                </span>
+                <a
+                  href={`mailto:${DMCA_CONTACT_EMAIL}`}
+                  className="text-brand-primary underline hover:no-underline"
+                >
+                  {DMCA_CONTACT_EMAIL}
+                </a>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:gap-4">
+                <span className="font-semibold text-text-primary min-w-[180px]">
+                  Trust &amp; Safety
+                </span>
+                <a
+                  href={`mailto:${SAFETY_CONTACT_EMAIL}`}
+                  className="text-brand-primary underline hover:no-underline"
+                >
+                  {SAFETY_CONTACT_EMAIL}
                 </a>
               </div>
             </div>
@@ -219,14 +254,21 @@ export default function AboutPage() {
               <Link href="/support" className="text-brand-primary underline hover:no-underline">
                 Support page
               </Link>{" "}
-              or at{" "}
+              or email us at{" "}
               <a
-                href="mailto:hello@getfansee.com"
+                href={`mailto:${SOCIALS_CONTACT_EMAIL}`}
                 className="text-brand-primary underline hover:no-underline"
               >
-                hello@getfansee.com
-              </a>
-              .
+                {SOCIALS_CONTACT_EMAIL}
+              </a>{" "}
+              (general) or{" "}
+              <a
+                href={`mailto:${SUPPORT_CONTACT_EMAIL}`}
+                className="text-brand-primary underline hover:no-underline"
+              >
+                {SUPPORT_CONTACT_EMAIL}
+              </a>{" "}
+              (support).
             </p>
           </div>
         </div>

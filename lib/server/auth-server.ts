@@ -3,6 +3,7 @@ import "server-only";
 import { cookies, headers } from "next/headers";
 import { getSupabaseServerClient } from "./supabase-server";
 import { env } from "@/lib/env";
+import { bindAmbassadorAttribution } from "@/lib/ambassador/bind";
 
 export type AppUser = {
   id: string;
@@ -178,5 +179,23 @@ export async function ensureProfile(currentUser?: AppUser | null) {
 
   if (insertError) {
     console.error("[auth-server] ensureProfile insert error", insertError);
+    return;
+  }
+
+  // Ambassador attribution: read the httpOnly `aref` cookie and bind server-side.
+  // Best-effort — never blocks or throws; signup succeeds regardless.
+  try {
+    const cookieStore = await cookies();
+    const arefCode = cookieStore.get("aref")?.value ?? null;
+
+    const headersStore = await headers();
+    const rawIp =
+      headersStore.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      headersStore.get("x-real-ip") ??
+      null;
+
+    await bindAmbassadorAttribution(user.id, user.email, arefCode, rawIp);
+  } catch (bindErr) {
+    console.error("[auth-server] ensureProfile: ambassador bind error (non-fatal)", bindErr);
   }
 }

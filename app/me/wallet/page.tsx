@@ -321,6 +321,8 @@ export default function WalletPage() {
       return transaction.metadata?.creator_id
         ? `Subscription to creator ${transaction.metadata.creator_id}`
         : "Subscription";
+    } else if (transaction.type === "tip") {
+      return "Tip";
     }
     return transaction.type;
   };

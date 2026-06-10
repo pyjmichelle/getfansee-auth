@@ -34,6 +34,8 @@ export default function PurchasesPage() {
   const router = useRouter();
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [currentUser, setCurrentUser] = useState<{
     username: string;
     role: "fan" | "creator";
@@ -44,6 +46,8 @@ export default function PurchasesPage() {
 
   useEffect(() => {
     const loadData = async () => {
+      setIsLoading(true);
+      setLoadError(null);
       try {
         const bootstrap = await getAuthBootstrap();
         if (!bootstrap.authenticated || !bootstrap.user) {
@@ -107,6 +111,7 @@ export default function PurchasesPage() {
             ]);
           } else {
             console.error("[purchases] failed to load purchases:", purchasesResponse.status);
+            setLoadError("Failed to load your purchases. Please try again.");
           }
           return;
         }
@@ -192,6 +197,8 @@ export default function PurchasesPage() {
               },
             },
           ]);
+        } else {
+          setLoadError("Something went wrong loading your purchases. Please try again.");
         }
       } finally {
         setIsLoading(false);
@@ -199,7 +206,7 @@ export default function PurchasesPage() {
     };
 
     loadData();
-  }, [router]);
+  }, [router, reloadKey, isTestMode]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -214,7 +221,7 @@ export default function PurchasesPage() {
   const animatedPurchaseCount = useCountUp(purchases.length, { duration: 900, decimals: 0 });
   const animatedSpent = useCountUp(totalSpentUsd, { duration: 900, decimals: 2 });
 
-  if (isLoading || !currentUser) {
+  if (isLoading) {
     return (
       <PageShell user={currentUser} notificationCount={0} maxWidth="4xl">
         <div className="py-8 space-y-4">
@@ -226,6 +233,19 @@ export default function PurchasesPage() {
           {[1, 2, 3].map((i) => (
             <div key={i} className="rounded-2xl h-28 bg-white/5 animate-pulse" />
           ))}
+        </div>
+      </PageShell>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <PageShell user={currentUser} notificationCount={0} maxWidth="4xl">
+        <div className="py-16 flex flex-col items-center text-center gap-4">
+          <p className="text-text-secondary max-w-sm">{loadError}</p>
+          <Button variant="violet" onClick={() => setReloadKey((k) => k + 1)}>
+            Try again
+          </Button>
         </div>
       </PageShell>
     );

@@ -3,7 +3,13 @@ import Link from "next/link";
 import { ArrowLeft, ShieldAlert, AlertTriangle, CheckCircle } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
-import { LEGAL_EFFECTIVE_DATE } from "@/lib/constants/legal";
+import {
+  CREATORS_CONTACT_EMAIL,
+  LEGAL_COMPANY_NAME,
+  LEGAL_EFFECTIVE_DATE,
+  LEGAL_REGISTERED_ADDRESS,
+  SAFETY_CONTACT_EMAIL,
+} from "@/lib/constants/legal";
 
 export const metadata: Metadata = {
   title: "Acceptable Use Policy - GetFanSee",
@@ -239,6 +245,42 @@ export default function AcceptableUsePage() {
                   obscenity, taxation, and labour. GetFanSee does not provide legal advice.
                 </p>
               </div>
+
+              <div>
+                <h3 className="text-lg font-semibold mb-2">
+                  Tips Must Remain Voluntary Gratuities
+                </h3>
+                <p className="text-text-secondary">
+                  Tips (also called &quot;buy me a coffee&quot;, gratuities, or support) are
+                  voluntary gifts from fans. Creators must <strong>not</strong>:
+                </p>
+                <ul className="list-disc pl-6 text-text-secondary space-y-2 mt-2">
+                  <li>
+                    Offer, promise, or imply any specific content, service, message, custom request,
+                    access, or reward in exchange for a tip (a prohibited &quot;quid-pro-quo&quot;).
+                    Paid content must be sold through subscriptions or pay-per-view, not solicited
+                    as a tip.
+                  </li>
+                  <li>
+                    Solicit, route, or pressure fans to tip through off-platform or third-party
+                    payment methods, or use tipping to evade platform fees.
+                  </li>
+                  <li>
+                    Use tip messages, goals, or thank-you notes to circumvent our content, age
+                    verification, or{" "}
+                    <Link href="/2257" className="text-brand-primary underline hover:no-underline">
+                      18 U.S.C. § 2257
+                    </Link>{" "}
+                    record-keeping rules.
+                  </li>
+                </ul>
+                <p className="text-text-secondary mt-2">
+                  Tips are final and non-refundable. Because tips are not purchases, the platform is
+                  not a party to and does not guarantee any private arrangement a creator may make
+                  off-platform. Misusing tips to sell content or services may result in content
+                  removal, withheld payouts, or account termination.
+                </p>
+              </div>
             </div>
           </section>
 
@@ -268,10 +310,10 @@ export default function AcceptableUsePage() {
                 <strong className="text-text-primary">Appeals process</strong> — creators whose
                 content is removed may appeal the decision by contacting{" "}
                 <a
-                  href="mailto:content@getfansee.com"
+                  href={`mailto:${CREATORS_CONTACT_EMAIL}`}
                   className="text-brand-primary underline hover:no-underline"
                 >
-                  content@getfansee.com
+                  {CREATORS_CONTACT_EMAIL}
                 </a>{" "}
                 within 30 days of the removal notice.
               </li>
@@ -292,10 +334,10 @@ export default function AcceptableUsePage() {
               <li>
                 For urgent matters (CSAM or imminent harm), email{" "}
                 <a
-                  href="mailto:urgent@getfansee.com"
+                  href={`mailto:${SAFETY_CONTACT_EMAIL}`}
                   className="text-brand-primary underline hover:no-underline"
                 >
-                  urgent@getfansee.com
+                  {SAFETY_CONTACT_EMAIL}
                 </a>{" "}
                 directly. We treat all such reports as P0 and respond within 24 hours.
               </li>
@@ -319,16 +361,26 @@ export default function AcceptableUsePage() {
           {/* Contact */}
           <section>
             <h2 className="text-2xl font-semibold mb-4">Contact</h2>
-            <p className="text-text-secondary">
+            <p className="text-text-secondary mb-3">
               For questions about this Acceptable Use Policy, contact our Trust &amp; Safety team
               at:{" "}
               <a
-                href="mailto:safety@getfansee.com"
+                href={`mailto:${SAFETY_CONTACT_EMAIL}`}
                 className="text-brand-primary underline hover:no-underline"
               >
-                safety@getfansee.com
+                {SAFETY_CONTACT_EMAIL}
               </a>
             </p>
+            <ul className="list-none pl-0 text-text-secondary space-y-1">
+              <li>
+                <span className="font-semibold text-text-primary">Legal entity:</span>{" "}
+                {LEGAL_COMPANY_NAME}
+              </li>
+              <li>
+                <span className="font-semibold text-text-primary">Registered address:</span>{" "}
+                {LEGAL_REGISTERED_ADDRESS}
+              </li>
+            </ul>
           </section>
         </div>
       </div>

@@ -218,7 +218,7 @@ export async function getCreatorEarnings(creatorId: string): Promise<
       .from("transactions")
       .select("id, type, amount_cents, status, available_on, metadata, created_at")
       .eq("user_id", creatorId)
-      .in("type", ["subscription", "ppv_purchase", "ppv_revenue", "deposit", "withdrawal"])
+      .in("type", ["subscription", "ppv_purchase", "ppv_revenue", "deposit", "withdrawal", "tip"])
       .order("created_at", { ascending: false });
 
     if (error) {

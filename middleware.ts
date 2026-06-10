@@ -1,61 +1,43 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { createServerClient } from "@supabase/auth-helpers-nextjs";
-import { env } from "@/lib/env";
+import { updateSession } from "@/lib/supabase/middleware";
 
 /**
- * 中间件：保护 Creator 和 Admin 路由
- * 检查用户是否已登录，以及是否有对应权限
+ * Middleware: refreshes the Supabase auth session on EVERY request (so the
+ * cookie never silently expires), then enforces redirects for protected routes.
+ *
+ * Running on all routes (not just protected ones) is required by the
+ * @supabase/ssr pattern — otherwise navigating across public pages lets the
+ * access-token cookie go stale and the user appears logged out on the next
+ * protected request.
  */
+const USER_PROTECTED_PATHS = ["/me", "/subscriptions", "/purchases", "/notifications"];
+const CREATOR_PROTECTED_PATHS = ["/creator/new-post", "/creator/studio", "/creator/onboarding"];
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const response = NextResponse.next();
+
+  // Always refresh the session and capture the rotated-cookie response.
+  const { response, user, supabase } = await updateSession(request);
 
   const isAdminPath = pathname.startsWith("/admin");
-  const userProtectedPaths = ["/me", "/subscriptions", "/purchases", "/notifications"];
-  const isUserProtectedPath = userProtectedPaths.some((path) => pathname.startsWith(path));
+  const isUserProtected = USER_PROTECTED_PATHS.some((p) => pathname.startsWith(p));
+  const isCreatorProtected = CREATOR_PROTECTED_PATHS.some((p) => pathname.startsWith(p));
+  const isProtected = isAdminPath || isUserProtected || isCreatorProtected;
 
-  // 保护 Creator 路由（除了公开的 /creator/[id] 查看页面）
-  const creatorProtectedPaths = ["/creator/new-post", "/creator/studio"];
-  const isCreatorProtectedPath = creatorProtectedPaths.some((path) => pathname.startsWith(path));
-
-  if (!isCreatorProtectedPath && !isAdminPath && !isUserProtectedPath) {
+  // Public routes: session already refreshed, nothing else to enforce.
+  if (!isProtected) {
     return response;
-  }
-
-  const supabase = createServerClient(
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value);
-            response.cookies.set(name, value, options);
-          });
-        },
-      },
-    }
-  );
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error) {
-    console.error("[middleware] getUser error:", error);
   }
 
   if (!user) {
     const loginUrl = new URL("/auth", request.url);
     loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+    return redirectPreservingCookies(loginUrl, response);
   }
 
-  // Admin 路由：必须是 admin 角色（只信任 app_metadata，不信任用户可自改的 user_metadata）
+  // Admin routes: require the admin role (trust only app_metadata, then the
+  // profiles table — never user-editable user_metadata).
   if (isAdminPath) {
     let userRole: string | null = (user.app_metadata?.role as string | undefined) ?? null;
     if (!userRole) {
@@ -77,25 +59,36 @@ export async function middleware(request: NextRequest) {
     }
 
     if (userRole !== "admin") {
-      return NextResponse.redirect(new URL("/home", request.url));
+      return redirectPreservingCookies(new URL("/home", request.url), response);
     }
-    return response;
   }
 
-  // Creator 路由只要求登录；角色判定下沉到页面/API，减少切页时额外数据库查询。
-
+  // Creator routes only require login; role checks are enforced at the
+  // page/API layer to avoid an extra DB query on every navigation.
   return response;
+}
+
+/**
+ * Builds a redirect response that preserves the refreshed Set-Cookie headers
+ * produced by updateSession. Without copying them, a session rotated during
+ * this request would be lost on the redirect, forcing another refresh.
+ */
+function redirectPreservingCookies(url: URL, sourceResponse: NextResponse): NextResponse {
+  const redirect = NextResponse.redirect(url);
+  sourceResponse.cookies.getAll().forEach((cookie) => {
+    redirect.cookies.set(cookie);
+  });
+  return redirect;
 }
 
 export const config = {
   matcher: [
-    "/me/:path*",
-    "/subscriptions/:path*",
-    "/purchases/:path*",
-    "/notifications/:path*",
-    "/creator/new-post/:path*",
-    "/creator/onboarding/:path*",
-    "/creator/studio/:path*",
-    "/admin/:path*",
+    /*
+     * Match all request paths except static assets and image files:
+     * - _next/static, _next/image
+     * - common static file extensions
+     * - favicon / manifest / robots / sitemap
+     */
+    "/((?!_next/static|_next/image|favicon.ico|manifest.json|robots.txt|sitemap.xml|icon.svg|apple-icon.png|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|css|js|map|woff|woff2|ttf|otf)$).*)",
   ],
 };

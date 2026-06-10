@@ -270,7 +270,7 @@ export default function ProfilePage() {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await fetch("/api/auth/session", { method: "DELETE" });
+      // signOut() clears the standard auth cookie via the @supabase/ssr client.
       await signOut();
       router.push("/auth");
     } catch {

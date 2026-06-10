@@ -44,6 +44,7 @@ export type Post = {
   creator?: {
     display_name?: string;
     avatar_url?: string;
+    is_verified?: boolean;
   };
   profiles?:
     | {

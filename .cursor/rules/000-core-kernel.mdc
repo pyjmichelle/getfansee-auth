@@ -126,13 +126,13 @@ Route problems correctly:
 
 UI / hydration / layout → chief-frontend-architect
 
-API / DB / Supabase → chief-backend-platform
+API / DB / Supabase → chief-backend-platform-architect
 
 Tests / CI / Playwright → chief-quality-officer
 
 Security / auth / permissions → chief-security-architect
 
-Payments / billing → chief-payments-risk
+Payments / billing → chief-payments-risk-officer
 
 Wrong agent = invalid solution.
 
@@ -157,7 +157,7 @@ Must pass:
 pnpm check-all
 ```
 
-Includes (as configured in repo):
+Includes (as configured in repo, 5 步):
 
 type-check
 
@@ -165,9 +165,11 @@ lint (respect max-warnings threshold)
 
 format check
 
-unit tests
+check:service-role
 
-build
+check:admin-client
+
+（不含 test:unit 与 build — 由 CI 和合并前完整路径承担）
 
 Repo config is the source of truth.
 Do NOT assume warnings are acceptable.

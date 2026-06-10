@@ -5,13 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SiteFooter } from "@/components/site-footer";
 import {
+  DMCA_CONTACT_EMAIL,
   LEGAL_COMPANY_NAME,
   LEGAL_EFFECTIVE_DATE,
   LEGAL_REGISTERED_ADDRESS,
   PLATFORM_NAME,
 } from "@/lib/constants/legal";
-
-const DMCA_CONTACT_EMAIL = "dmca@getfansee.com";
 
 export const metadata: Metadata = {
   title: "DMCA & Copyright - GetFanSee",
