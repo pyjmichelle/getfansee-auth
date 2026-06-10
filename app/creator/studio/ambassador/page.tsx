@@ -22,6 +22,8 @@ import {
   ChevronUp,
   TrendingUp,
   Sparkles,
+  Flame,
+  type LucideIcon,
 } from "@/lib/icons";
 import { PageShell } from "@/components/page-shell";
 import { StatCard } from "@/components/stat-card";
@@ -68,7 +70,7 @@ interface ReferredCreator {
 interface Milestone {
   label: string;
   minQualified: number;
-  icon: string;
+  Icon: LucideIcon;
   color: string;
   bgColor: string;
   borderColor: string;
@@ -79,37 +81,37 @@ const MILESTONES: Milestone[] = [
   {
     label: "Starter",
     minQualified: 0,
-    icon: "✦",
-    color: "text-text-secondary",
-    bgColor: "bg-surface-raised",
-    borderColor: "border-border-base",
+    Icon: Sparkles,
+    color: "text-[var(--text-secondary)]",
+    bgColor: "bg-[var(--bg-raised)]",
+    borderColor: "border-[var(--border-subtle)]",
     rewardHint: "Enroll and get your referral link",
   },
   {
     label: "Rising Star",
     minQualified: 1,
-    icon: "⭐",
-    color: "text-brand-secondary",
-    bgColor: "bg-brand-secondary/10",
-    borderColor: "border-brand-secondary/30",
+    Icon: Star,
+    color: "text-[var(--wine)]",
+    bgColor: "bg-[var(--wine-tint)]",
+    borderColor: "border-[var(--wine)]/30",
     rewardHint: "1+ qualified creator",
   },
   {
     label: "Champion",
     minQualified: 5,
-    icon: "🏆",
-    color: "text-yellow-400",
-    bgColor: "bg-yellow-400/10",
-    borderColor: "border-yellow-400/30",
+    Icon: Flame,
+    color: "text-[var(--premium)]",
+    bgColor: "bg-[var(--premium-tint)]",
+    borderColor: "border-[var(--premium)]/30",
     rewardHint: "5+ qualified creators",
   },
   {
     label: "Legend",
     minQualified: 10,
-    icon: "👑",
-    color: "text-brand-primary",
-    bgColor: "bg-brand-primary/10",
-    borderColor: "border-brand-primary/30",
+    Icon: Star,
+    color: "text-[var(--premium)]",
+    bgColor: "bg-[var(--premium-tint)]",
+    borderColor: "border-[var(--premium)]/40",
     rewardHint: "10+ qualified creators",
   },
 ];
@@ -374,7 +376,7 @@ export default function AmbassadorPage() {
     return (
       `Hey! I'm a creator on GetFanSee — it's a platform where you control your audience and earn from exclusive content.\n\n` +
       `Sign up with my referral link and get started:\n${data.link}\n\n` +
-      `Looking forward to seeing you there! 🚀\n\n` +
+      `Looking forward to seeing you there!\n\n` +
       `(Referral link — I earn a reward if you sign up through this link)`
     );
   };
@@ -513,11 +515,11 @@ export default function AmbassadorPage() {
                 {MILESTONES.map((m, i) => (
                   <div key={m.label} className="flex flex-col items-center gap-1 flex-1">
                     <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${i === 0 ? "bg-brand-primary/10 border border-brand-primary/30" : "bg-surface-overlay border border-border-subtle"}`}
+                      className={`w-8 h-8 rounded-[var(--radius-sm)] flex items-center justify-center ${i === 0 ? "bg-[var(--wine-tint)] border border-[var(--wine)]/30" : "bg-[var(--bg-raised)] border border-[var(--border-subtle)]"}`}
                     >
-                      {m.icon}
+                      <m.Icon size={14} className={m.color} aria-hidden />
                     </div>
-                    <span className="text-[10px] text-text-tertiary text-center leading-tight">
+                    <span className="text-[0.625rem] text-[var(--text-muted)] text-center leading-tight">
                       {m.label}
                     </span>
                   </div>
@@ -529,8 +531,9 @@ export default function AmbassadorPage() {
               </p>
 
               <Button
-                variant="subscribe-gradient"
-                className="w-full py-3 text-base font-semibold"
+                variant="default"
+                size="lg"
+                className="w-full"
                 onClick={handleEnroll}
                 disabled={isEnrolling}
               >
@@ -581,9 +584,9 @@ export default function AmbassadorPage() {
 
           {/* First qualified celebration */}
           {showFirstQualifiedCelebration && (
-            <div className="card-block border-success/30 bg-success/5 p-5 mb-6">
+            <div className="rounded-[var(--radius-lg)] border border-[var(--success)]/30 bg-[var(--success)]/5 p-5 mb-6">
               <div className="flex items-start gap-3">
-                <div className="text-2xl">🎉</div>
+                <Gift size={20} className="text-[var(--success)] shrink-0 mt-0.5" aria-hidden />
                 <div>
                   <p className="font-semibold text-success text-sm mb-1">
                     First Qualified Referral!
@@ -609,7 +612,7 @@ export default function AmbassadorPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-lg">{currentMilestone.icon}</span>
+                  <currentMilestone.Icon size={18} className={currentMilestone.color} aria-hidden />
                   <span className={`text-base font-bold ${currentMilestone.color}`}>
                     {currentMilestone.label}
                   </span>
@@ -633,7 +636,7 @@ export default function AmbassadorPage() {
               <div className="mb-4">
                 <div className="h-2.5 bg-surface-raised rounded-full overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary transition-all duration-700"
+                    className="h-full rounded-full bg-[var(--wine)] transition-all duration-700"
                     style={{ width: `${progressInfo.pct}%` }}
                   />
                 </div>
@@ -642,7 +645,7 @@ export default function AmbassadorPage() {
                     {progressInfo.current}/{progressInfo.next}
                   </span>
                   <span className="text-[10px] text-text-tertiary">
-                    Next: {nextMilestone.label} {nextMilestone.icon}
+                    Next: {nextMilestone.label}
                   </span>
                 </div>
               </div>
@@ -657,15 +660,19 @@ export default function AmbassadorPage() {
                   <div key={m.label} className="flex items-center flex-1 gap-1">
                     <div className="flex flex-col items-center flex-1">
                       <div
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center text-base border transition-all ${
+                        className={`w-9 h-9 rounded-[var(--radius-sm)] flex items-center justify-center border transition-all ${
                           isCurrent
-                            ? `${m.bgColor} ${m.borderColor} ring-2 ring-brand-primary/30`
+                            ? `${m.bgColor} ${m.borderColor} ring-2 ring-[var(--wine)]/30`
                             : reached
                               ? `${m.bgColor} ${m.borderColor}`
-                              : "bg-surface-overlay border-border-subtle opacity-50"
+                              : "bg-[var(--bg-overlay)] border-[var(--border-subtle)] opacity-50"
                         }`}
                       >
-                        {m.icon}
+                        <m.Icon
+                          size={14}
+                          className={reached ? m.color : "text-[var(--text-muted)]"}
+                          aria-hidden
+                        />
                       </div>
                       <span
                         className={`text-[10px] mt-1 font-medium text-center leading-tight ${

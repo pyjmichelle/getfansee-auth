@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ensureProfile, signInWithGoogle, signUpWithEmail } from "@/lib/auth";
 import { captureReferralFromUrl } from "@/lib/referral";
 import { Analytics } from "@/lib/analytics";
-import { AlertCircle, Loader2, Eye, EyeOff, DollarSign, Lock, Globe, Sparkles } from "@/lib/icons";
+import { AlertCircle, Eye, EyeOff, DollarSign, Lock, Globe, Sparkles } from "@/lib/icons";
 import { TrustStrip } from "@/components/trust-strip";
 
 type AuthPageClientProps = {
@@ -265,7 +265,7 @@ export default function AuthPageClient({
       style={{ touchAction: "manipulation", overscrollBehaviorY: "contain" }}
     >
       {/* ── PC Hero Side (left 45%) ─────────────────────── */}
-      <aside className="auth-hero relative overflow-hidden bg-gradient-to-br from-[#0d0720] via-[#150a2e] to-[#0a0d2e]">
+      <aside className="auth-hero relative overflow-hidden bg-[#0E0B0C]">
         {/* Hero background photo (required by design spec) */}
         <Image
           src="/images/auth/hero-pc.jpg"
@@ -305,17 +305,16 @@ export default function AuthPageClient({
           <line x1="100%" y1="0" x2="0" y2="100%" stroke="white" strokeWidth="0.4" />
         </svg>
 
-        {/* Glowing orbs */}
-        <div className="absolute top-1/4 left-1/3 w-72 h-72 rounded-full bg-violet-600/25 blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-indigo-500/20 blur-3xl" />
-        <div className="absolute top-2/3 left-1/5 w-56 h-56 rounded-full bg-purple-400/15 blur-2xl" />
+        {/* Subtle warm ambient glow */}
+        <div className="absolute top-1/4 left-1/3 w-72 h-72 rounded-full bg-[var(--wine)]/12 blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-[var(--premium)]/8 blur-3xl" />
 
         {/* Content */}
         <div className="absolute inset-0 flex flex-col justify-between p-10">
           {/* Top branding */}
           <div className="flex items-center gap-3">
-            <div className="size-12 rounded-[var(--radius-sm)] bg-white/10 border border-white/20 flex items-center justify-center shadow-glow-violet backdrop-blur-sm">
-              <Sparkles className="w-6 h-6 text-violet-300" aria-hidden="true" />
+            <div className="size-12 rounded-[var(--radius-sm)] bg-[var(--wine)]/15 border border-[var(--wine)]/30 flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-[var(--wine)]" aria-hidden="true" />
             </div>
             <span className="font-bold text-[22px] text-white tracking-tight">GetFanSee</span>
           </div>
@@ -326,35 +325,37 @@ export default function AuthPageClient({
               {
                 Icon: DollarSign,
                 text: "Monetize your passion & earn more",
-                color: "text-emerald-400",
+                color: "text-[var(--success)]",
               },
               {
                 Icon: Lock,
                 text: "Exclusive content for your subscribers",
-                color: "text-violet-400",
+                color: "text-[var(--wine)]",
               },
-              { Icon: Globe, text: "Reach fans all around the world", color: "text-sky-400" },
+              { Icon: Globe, text: "Reach fans all around the world", color: "text-[var(--info)]" },
             ].map((f) => (
               <div
                 key={f.text}
-                className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl bg-white/6 border border-white/10 backdrop-blur-sm"
+                className="flex items-center gap-3.5 px-4 py-3.5 rounded-[var(--radius-lg)] bg-white/4 border border-white/8"
               >
-                <div className="w-9 h-9 rounded-xl bg-white/8 flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-[var(--radius-sm)] bg-white/6 flex items-center justify-center shrink-0">
                   <f.Icon className={`w-5 h-5 ${f.color}`} aria-hidden="true" />
                 </div>
-                <p className="text-[15px] text-white/90 font-medium leading-snug">{f.text}</p>
+                <p className="text-[0.9375rem] text-[var(--text-primary)] font-medium leading-snug">
+                  {f.text}
+                </p>
               </div>
             ))}
           </div>
 
-          {/* Bottom title */}
+          {/* Bottom title — Fraunces display */}
           <div>
-            <p className="text-5xl font-serif font-bold text-white leading-tight mb-3">
+            <p className="font-display text-5xl font-bold text-[var(--text-primary)] leading-tight mb-3">
               Where Creators
               <br />
-              <span className="text-gradient-primary">Get Paid.</span>
+              <span className="text-[var(--wine)]">Get Paid.</span>
             </p>
-            <p className="text-lg text-white/50 leading-relaxed">
+            <p className="text-[1.0625rem] text-[var(--text-muted)] leading-relaxed">
               The premium content platform
               <br />
               built for independent creators.
@@ -368,18 +369,18 @@ export default function AuthPageClient({
         <div className="w-full max-w-sm">
           {/* Logo (mobile only — desktop logo is in hero) */}
           <div className="flex items-center gap-2 mb-6 lg:hidden">
-            <div className="size-8 rounded-[var(--radius-sm)] bg-gradient-to-br from-violet-600 to-violet-400 flex items-center justify-center shadow-glow-violet">
-              <span className="text-white font-bold text-[12px]">G</span>
+            <div className="size-8 rounded-[var(--radius-sm)] bg-[var(--wine)] flex items-center justify-center">
+              <span className="text-[#F5F0EE] font-bold text-[0.75rem]">G</span>
             </div>
-            <span className="font-bold text-[16px] text-white">GetFanSee</span>
+            <span className="font-bold text-[1rem] text-[var(--text-primary)]">GetFanSee</span>
           </div>
 
           {/* Heading */}
           <div className="mb-6">
-            <h1 className="font-serif text-h1 text-white mb-1">
+            <h1 className="text-h1 text-[var(--text-primary)] mb-1.5">
               {activeTab === "login" ? "Welcome back" : "Join the community"}
             </h1>
-            <p className="text-[13px] text-text-muted">
+            <p className="text-[0.875rem] text-[var(--text-muted)]">
               {activeTab === "login"
                 ? "Sign in to access your exclusive content"
                 : "Create your account and discover exclusive creators"}
@@ -401,20 +402,20 @@ export default function AuthPageClient({
             {error && (
               <div
                 data-testid="auth-error"
-                className="flex items-start gap-2 mb-4 p-3 rounded-[var(--radius-sm)] bg-red-500/10 border border-red-500/20"
+                className="flex items-start gap-2 mb-4 p-3 rounded-[var(--radius-md)] bg-[var(--error)]/8 border border-[var(--error)]/25"
                 role="alert"
               >
-                <AlertCircle className="size-[14px] text-red-400 shrink-0 mt-0.5" />
-                <p className="text-[12px] text-red-400">{error}</p>
+                <AlertCircle className="size-[0.875rem] text-[var(--error)] shrink-0 mt-0.5" />
+                <p className="text-[0.75rem] text-[var(--error)]">{error}</p>
               </div>
             )}
             {info && (
               <div
                 data-testid="auth-info"
-                className="mb-4 p-3 rounded-[var(--radius-sm)] bg-emerald-500/10 border border-emerald-500/20"
+                className="mb-4 p-3 rounded-[var(--radius-md)] bg-[var(--success)]/8 border border-[var(--success)]/25"
                 role="status"
               >
-                <p className="text-[12px] text-emerald-400">{info}</p>
+                <p className="text-[0.75rem] text-[var(--success)]">{info}</p>
               </div>
             )}
 
@@ -469,7 +470,7 @@ export default function AuthPageClient({
                 <div className="flex justify-end">
                   <Link
                     href="/auth/forgot-password"
-                    className="text-[12px] text-violet-400 hover:text-violet-300 transition-colors"
+                    className="text-[0.75rem] text-[var(--wine)] hover:text-[var(--wine-hover)] transition-colors"
                   >
                     Forgot password?
                   </Link>
@@ -477,20 +478,13 @@ export default function AuthPageClient({
 
                 <Button
                   type="submit"
-                  variant="violet"
+                  variant="default"
                   size="lg"
                   className="w-full"
                   disabled={isLoading}
                   data-testid="auth-submit"
                 >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="size-[14px] animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    "Sign In"
-                  )}
+                  Sign In
                 </Button>
               </form>
 
@@ -501,8 +495,8 @@ export default function AuthPageClient({
                       <span className="w-full border-t border-white/8" />
                     </div>
                     <div className="relative flex justify-center">
-                      <span className="bg-bg-base px-3 text-[11px] text-text-muted uppercase tracking-wider">
-                        Or continue with
+                      <span className="bg-[var(--bg-base)] px-3 text-[0.6875rem] text-[var(--text-muted)]">
+                        or continue with
                       </span>
                     </div>
                   </div>
@@ -543,9 +537,9 @@ export default function AuthPageClient({
             <TabsContent value="signup">
               {/* InvitedBanner — shown when user arrives via a referral link */}
               {isInvited && (
-                <div className="mb-4 rounded-xl border border-brand-primary/30 bg-brand-primary/8 px-4 py-3">
+                <div className="mb-4 rounded-[var(--radius-lg)] border border-[var(--wine)]/25 bg-[var(--wine-tint)] px-4 py-3">
                   <div className="flex items-center gap-2.5">
-                    <span className="text-base shrink-0">✦</span>
+                    <Sparkles size={16} className="text-[var(--wine)] shrink-0" aria-hidden />
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px] font-semibold text-text-primary">
                         {refName ? `Invited by ${refName}` : "You were invited"}
@@ -626,11 +620,11 @@ export default function AuthPageClient({
                     className="text-[12px] text-text-muted leading-relaxed cursor-pointer"
                   >
                     I confirm I am 18 years or older and agree to the{" "}
-                    <Link href="/terms" className="text-violet-400 hover:underline">
+                    <Link href="/terms" className="text-[var(--wine)] hover:underline">
                       Terms of Service
                     </Link>{" "}
                     and{" "}
-                    <Link href="/privacy" className="text-violet-400 hover:underline">
+                    <Link href="/privacy" className="text-[var(--wine)] hover:underline">
                       Privacy Policy
                     </Link>
                   </label>
@@ -644,20 +638,13 @@ export default function AuthPageClient({
 
                 <Button
                   type="submit"
-                  variant="violet"
+                  variant="default"
                   size="lg"
                   className="w-full"
                   disabled={isLoading || !ageConfirmed}
                   data-testid="auth-submit"
                 >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="size-[14px] animate-spin" />
-                      Creating account...
-                    </>
-                  ) : (
-                    "Create Account"
-                  )}
+                  Create Account
                 </Button>
               </form>
 
@@ -668,8 +655,8 @@ export default function AuthPageClient({
                       <span className="w-full border-t border-white/8" />
                     </div>
                     <div className="relative flex justify-center">
-                      <span className="bg-bg-base px-3 text-[11px] text-text-muted uppercase tracking-wider">
-                        Or continue with
+                      <span className="bg-[var(--bg-base)] px-3 text-[0.6875rem] text-[var(--text-muted)]">
+                        or continue with
                       </span>
                     </div>
                   </div>
