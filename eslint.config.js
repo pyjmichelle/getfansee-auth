@@ -11,6 +11,7 @@ export default [
       'e2e/**/*',
       'tests/**/*',
       'scripts/**/*',
+      '.agents/**/*',
       '.next/**/*',
       'node_modules/**/*',
       'out/**/*',
