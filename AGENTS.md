@@ -49,6 +49,19 @@ All agent definitions live in [`.cursor/agents/`](.cursor/agents/). Mirror docs 
 
 ---
 
+## Parallel / Multi-Agent Coordination (anti-conflict law)
+
+When more than one file-editing agent runs (parallel tasks, subagents, best-of-N),
+follow [`.cursor/rules/parallel-agent-coordination.mdc`](.cursor/rules/parallel-agent-coordination.mdc) (always-applied).
+
+- **Default = one isolated worktree / Cloud Agent per agent → own branch → PR merge.** Two file-writing agents in the same checkout is forbidden.
+- Overlapping file sets (e.g. UI restyle ↔ logic/auth refactor on the same pages) → **serialize**, never parallelize.
+- Domain ownership: `ui` (`components/**`, css), `auth`/logic (`lib/**`, `middleware.ts`, `contexts/**`, page data), `infra` (`*.config.*`, `package.json`, `migrations/**`, `.cursor/**`).
+- Hard enforcement: `.cursor/hooks.json` (`check-file-ownership.py`) + `.cursor/agent-locks.json` (safe by default, `enforce:false`).
+- Reconcile gate before "done": `pnpm type-check && pnpm build`.
+
+---
+
 ## Release Gate Agent Pipeline
 
 For repair / refactor / pre-merge, dispatch agents in this order:

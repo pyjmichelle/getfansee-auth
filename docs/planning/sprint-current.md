@@ -7,6 +7,20 @@
 
 ## Active Tasks
 
+### P1 – 并行多 agent 防冲突机制（worktree-per-agent + PR 合并）— ✅ 已落地
+
+- 背景：UI pass 与 auth/logic 重写在同一 checkout 互相覆盖（UI 改动回退了逻辑修复）。
+- Scope（已完成）:
+  - 三层防御：Layer1 隔离（`.cursor/worktrees.json`）；Layer2 编排+域归属（`.cursor/rules/parallel-agent-coordination.mdc` always-apply、`.cursor/skills/parallel-agent-orchestration/SKILL.md`）；Layer3 强制（`.cursor/hooks.json` + `check-file-ownership.py` + `.cursor/agent-locks.json`，默认 `enforce:false` 不误拦）。
+  - **默认强制路径**：每 agent 一个 worktree / Cloud Agent → 各自分支 → PR 合并；同一 checkout 不得有两个写文件 agent；文件集重叠 → 串行。
+  - 交叉引用写入强制文档：`000-core-kernel.mdc` §5.1、`AGENTS.md`。
+- Acceptance Criteria:
+  - 规则 always-apply 且 kernel/AGENTS 可发现；hook 默认不拦截任何人（已验证）。
+  - 合并前 Verifier 跑 `pnpm type-check && pnpm build` 兜底语义冲突。
+- Required Gates:
+  - pnpm check-all
+  - pnpm build
+
 ### P2 – Agent/Skill 文档与项目迭代同步机制（2026-03-31 已对齐一版）
 
 - Scope（已完成本轮）:

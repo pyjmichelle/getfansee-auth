@@ -49,6 +49,18 @@ The following **DO NOT require prior planning** and MUST be fixed immediately:
 
 Using “missing planning file” as a reason to refuse fixing gates is **FORBIDDEN**.
 
+### 1.4 Authorship is irrelevant to gate fixes (NO "not my change")
+If `pnpm check-all` (or any required gate) is RED, you MUST make it green before
+declaring done — **regardless of who introduced the failure**, including
+pre-existing debt and files you never touched (e.g. a stray `format:check` or
+`check:admin-client` failure in unrelated files).
+
+- "It was already broken / not my diff" is **NOT** a valid reason to leave a gate red.
+- Use the minimal correct fix: `prettier --write` for format-only debt; add a
+  verified, justified allowlist entry for legitimate admin-client routes; etc.
+- Never green a gate by weakening it (raising `--max-warnings`, deleting checks,
+  `--no-verify`) — see §7.2.
+
 ---
 
 ## 2. VERIFY OR DIE (Testing)
@@ -135,6 +147,17 @@ Security / auth / permissions → chief-security-architect
 Payments / billing → chief-payments-risk-officer
 
 Wrong agent = invalid solution.
+
+5.1 PARALLEL / MULTI-AGENT LAW (MANDATORY)
+
+Any work that runs more than one file-editing agent (parallel tasks, subagents,
+best-of-N) MUST follow `.cursor/rules/parallel-agent-coordination.mdc`.
+
+- DEFAULT = one isolated worktree / Cloud Agent per agent → own branch → PR merge.
+- Two file-writing agents in the SAME checkout is FORBIDDEN.
+- Overlapping file sets → serialize, do not parallelize.
+- Before "done": Verifier runs `pnpm type-check && pnpm build` to catch
+  "clean merge, broken build" semantic conflicts.
 
 6. FILE ORGANIZATION LAW
 

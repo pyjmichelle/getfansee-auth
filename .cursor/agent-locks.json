@@ -1,0 +1,16 @@
+{
+  "_doc": "Parallel-agent file-ownership registry. The preToolUse hook (.cursor/hooks/check-file-ownership.py) reads this. SAFE BY DEFAULT: with enforce=false nothing is ever blocked. To activate mutual exclusion: (1) set enforce=true, (2) add claims with disjoint globs, (3) each parallel agent/worktree exports CURSOR_AGENT_OWNER=<its owner label> before editing. A Write/Delete to a path matching another owner's active claim is denied.",
+  "enforce": false,
+  "claims": [
+    {
+      "owner": "EXAMPLE-ui",
+      "active": false,
+      "globs": ["components/**", "app/**/*.css", "styles/**", "tailwind.config.*"]
+    },
+    {
+      "owner": "EXAMPLE-auth",
+      "active": false,
+      "globs": ["lib/supabase/**", "lib/server/**", "middleware.ts", "contexts/**"]
+    }
+  ]
+}

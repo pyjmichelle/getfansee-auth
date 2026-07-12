@@ -1,0 +1,7 @@
+{
+  "setup-worktree": [
+    "pnpm install --frozen-lockfile || pnpm install",
+    "cp \"$ROOT_WORKTREE_PATH/.env.local\" .env.local 2>/dev/null || true",
+    "cp \"$ROOT_WORKTREE_PATH/.env\" .env 2>/dev/null || true"
+  ]
+}

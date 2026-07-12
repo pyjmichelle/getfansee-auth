@@ -1,0 +1,66 @@
+---
+description: PARALLEL AGENT LAW — how multiple agents share this repo without overwriting each other. Read before running work in parallel or spawning subagents that edit files.
+globs: *
+alwaysApply: true
+---
+# Parallel Agent Coordination (anti-conflict law)
+
+Multiple agents editing **one shared working directory** silently overwrite each
+other (e.g. a UI pass reverting a logic fix in the same file). Prevent this with
+three layers. **Isolation is primary; an orchestrator alone is not enough.**
+
+## DEFAULT (mandatory) — worktree per agent → PR merge
+
+> For ANY parallel/multi-agent work the **default and required** execution is:
+> **one isolated worktree (or Cloud Agent / `best-of-n-runner`) per agent → each on its own branch → reconcile via PR merge.**
+> Editing the same shared checkout with two file-writing agents is **forbidden**.
+> A single agent in the main checkout (serial work) is the only exception.
+
+## Decision: parallel or serial?
+
+- **Files overlap** between the tasks (same files/components/pages) → **run SERIAL**, not parallel. Overlap-heavy combos (e.g. UI restyle ↔ logic/auth refactor that touch the same pages) MUST be serialized.
+- **Files are disjoint** → parallel is allowed, but only under isolation (below).
+
+## Layer 1 — Isolation (required for true parallel work)
+
+Never run two file-editing agents in the same checkout. Give each its own:
+- **Worktrees** (local): editor `/worktree`, `/best-of-n`, `/apply-worktree`, or the Agents Window. Init is configured in `.cursor/worktrees.json`. Each agent = its own checkout + branch; merge via PR.
+- **Cloud Agents** / `best-of-n-runner` subagent: isolated VM/worktree + branch + PR.
+
+## Layer 2 — Decomposition with disjoint file ownership
+
+A **lead/orchestrator** (Planner → Implementer → Verifier) splits work so domains do not overlap. Default ownership map for this repo:
+
+| Domain | Owner label | Globs (claim) |
+| --- | --- | --- |
+| UI / styling | `ui` | `components/**`, `app/**/*.css`, `styles/**`, `tailwind.config.*` |
+| Auth / data / logic | `auth` | `lib/supabase/**`, `lib/server/**`, `middleware.ts`, `contexts/**`, page data/loading logic |
+| Infra / config | `infra` | `*.config.*`, `package.json`, `migrations/**`, `.cursor/**` |
+
+If two tasks need the same file, that file is a **serialization point** — do not split it across parallel agents.
+
+## Layer 3 — Enforcement (Rules are soft; Hooks are hard)
+
+This rule is guidance only. Hard enforcement lives in:
+- `.cursor/hooks.json` → `preToolUse` runs `.cursor/hooks/check-file-ownership.py` (denies cross-owner Write/Delete) and `afterFileEdit` audits to `.cursor/agent-edit-log.ndjson`.
+- Registry: `.cursor/agent-locks.json`. **Safe by default (`enforce:false` blocks nothing).**
+
+To activate mutual exclusion for a parallel run:
+1. Set `enforce: true` in `.cursor/agent-locks.json`.
+2. Add claims with **disjoint** globs and `active: true` per the ownership map.
+3. Each agent/worktree exports its label before editing: `export CURSOR_AGENT_OWNER=ui` (or `auth`/`infra`).
+4. After all branches finish: merge in dependency order, then run the green gate.
+
+## Merge / reconcile gate (always)
+
+Worktrees prevent file collisions but NOT semantic conflicts ("clean merge, broken build"). Before declaring done, a Verifier must run: `pnpm type-check && pnpm build` (+ lint within budget). Reconcile any regression before merge.
+
+## Quick checklist
+
+```
+[ ] Tasks' file sets are disjoint (else serialize)
+[ ] Each parallel agent in its own worktree/VM + branch
+[ ] Ownership claims registered + CURSOR_AGENT_OWNER set (if enforcing)
+[ ] Merge in dependency order
+[ ] pnpm type-check && pnpm build green before "done"
+```

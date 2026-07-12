@@ -41,6 +41,8 @@ lerna-debug.log*
 
 # Cursor
 .cursor/debug.log
+.cursor/debug-*.log
+.cursor/agent-edit-log.ndjson
 
 # Vercel
 .vercel

@@ -234,24 +234,32 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ## 快速参考：何时使用哪个 Skill
 
-| 任务               | 使用的 Skill                                              |
-| ------------------ | --------------------------------------------------------- |
-| 编写新 React 组件  | react-best-practices                                      |
-| 实现数据获取       | react-best-practices, supabase-postgres-best-practices    |
-| 审查 UI            | web-design-guidelines, frontend-design                    |
-| 优化性能           | react-best-practices, audit-website                       |
-| 数据库查询         | supabase-postgres-best-practices                          |
-| 认证实现           | supabase（官方 skill）                                    |
-| 移动端/响应式      | frontend-design, web-design-guidelines                    |
-| 全站审计           | audit-website                                             |
-| 安全审查           | supabase（官方 skill）、supabase-postgres-best-practices  |
-| 前端自动化测试     | agent-browser                                             |
-| CI 修复与配置      | ci-auto-fix, ci-pipeline-config, api-test-runner          |
-| E2E/测试报告       | e2e-test-setup, fixture-generator, test-report-generator  |
-| 发布门禁判定       | e2e-test-setup, test-report-generator, ci-pipeline-config |
-| 口语「跑一下检查」 | code-check（→ `pnpm check-all`）                          |
-| 设计系统深度对齐   | ui-ux-pro-max, frontend-design, shadcn-ui                 |
+| 任务                | 使用的 Skill                                                        |
+| ------------------- | ------------------------------------------------------------------- |
+| 编写新 React 组件   | react-best-practices                                                |
+| 实现数据获取        | react-best-practices, supabase-postgres-best-practices              |
+| 审查 UI             | web-design-guidelines, frontend-design                              |
+| 优化性能            | react-best-practices, audit-website                                 |
+| 数据库查询          | supabase-postgres-best-practices                                    |
+| 认证实现            | supabase（官方 skill）                                              |
+| 移动端/响应式       | frontend-design, web-design-guidelines                              |
+| 全站审计            | audit-website                                                       |
+| 安全审查            | supabase（官方 skill）、supabase-postgres-best-practices            |
+| 前端自动化测试      | agent-browser                                                       |
+| CI 修复与配置       | ci-auto-fix, ci-pipeline-config, api-test-runner                    |
+| E2E/测试报告        | e2e-test-setup, fixture-generator, test-report-generator            |
+| 发布门禁判定        | e2e-test-setup, test-report-generator, ci-pipeline-config           |
+| 口语「跑一下检查」  | code-check（→ `pnpm check-all`）                                    |
+| 设计系统深度对齐    | ui-ux-pro-max, frontend-design, shadcn-ui                           |
+| 并行多 agent/防冲突 | parallel-agent-orchestration（+ `parallel-agent-coordination.mdc`） |
 
 ---
 
-_最后更新: 2026-06-07_
+## 治理层自动同步（rule → agent/skill）
+
+- 规则/门禁/路由/迁移变更受 `agent-skill-sync.mdc`（软）+ `.cursor/hooks/check-rule-sync.py`（`postToolUse` 硬层）双重约束：编辑治理文件会**自动注入同步清单**，必须在同一任务内同步 agent/skill/本指南并刷新日期。
+- 门红与作者无关（内核 §1.4）：`pnpm check-all` 任一步红都必须修绿，哪怕是预存债或非本次改动。
+
+---
+
+_最后更新: 2026-06-11_
