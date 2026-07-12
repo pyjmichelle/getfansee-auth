@@ -105,7 +105,7 @@ export async function bindAmbassadorAttribution(
       .from("creator_referral_attributions")
       .select("id")
       .eq("referred_user_id", referredUserId)
-      .single();
+      .maybeSingle();
 
     if (existingAttr) {
       return { bound: false, reason: "already_attributed" };
@@ -128,7 +128,7 @@ export async function bindAmbassadorAttribution(
       .from("profiles")
       .select("email")
       .eq("id", referrerUserId)
-      .single();
+      .maybeSingle();
 
     if (
       referrerProfile?.email &&
@@ -243,7 +243,7 @@ async function transitionAttribution(
       .select("id, status, referral_code")
       .eq("referred_user_id", referredUserId)
       .eq("is_fraud", false)
-      .single();
+      .maybeSingle();
 
     if (!attr) return; // no attribution — not referred via ambassador program
     if (attr.status !== fromStatus) return; // already advanced or wrong state
@@ -312,7 +312,7 @@ export async function evaluateQualification(referredUserId: string): Promise<voi
       .eq("referred_user_id", referredUserId)
       .eq("is_fraud", false)
       .not("status", "in", '("rejected","fraud","qualified","revenue_eligible")')
-      .single();
+      .maybeSingle();
 
     if (!attr) return; // not referred, already qualified, or fraud/rejected
 
@@ -321,7 +321,7 @@ export async function evaluateQualification(referredUserId: string): Promise<voi
       .from("profiles")
       .select("role, age_verified")
       .eq("id", referredUserId)
-      .single();
+      .maybeSingle();
 
     if (profile?.role !== "creator" || !profile?.age_verified) return;
 

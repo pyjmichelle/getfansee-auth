@@ -55,7 +55,7 @@ export async function enrollAmbassador(userId: string): Promise<CreatorReferralP
     .from("creator_referral_profiles")
     .select("*")
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
 
   if (existing) {
     return existing as CreatorReferralProfile;
@@ -111,15 +111,14 @@ export async function getAmbassadorProfile(userId: string): Promise<CreatorRefer
     .from("creator_referral_profiles")
     .select("*")
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
 
-  if (error?.code === "PGRST116") return null; // no rows
   if (error) {
     logger.error("[ambassador] getAmbassadorProfile error", error, { userId });
     return null;
   }
 
-  return data as CreatorReferralProfile;
+  return (data as CreatorReferralProfile | null) ?? null;
 }
 
 // ─── Stats ────────────────────────────────────────────────
@@ -195,7 +194,7 @@ async function getReferralCodeForUser(userId: string): Promise<string> {
     .from("creator_referral_profiles")
     .select("referral_code")
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
   return data?.referral_code ?? "";
 }
 
@@ -318,7 +317,7 @@ export async function validateReferralCode(code: string): Promise<string | null>
     .from("creator_referral_profiles")
     .select("user_id, status")
     .eq("referral_code", code)
-    .single();
+    .maybeSingle();
 
   if (!data || data.status !== "active") return null;
   return data.user_id as string;
@@ -342,7 +341,7 @@ export async function getReferralCodeDisplayName(code: string): Promise<string |
     .from("creator_referral_profiles")
     .select("user_id, status")
     .eq("referral_code", code)
-    .single();
+    .maybeSingle();
 
   if (!prof || prof.status !== "active") return null;
 
@@ -350,7 +349,7 @@ export async function getReferralCodeDisplayName(code: string): Promise<string |
     .from("profiles")
     .select("display_name")
     .eq("id", prof.user_id as string)
-    .single();
+    .maybeSingle();
 
   return (profile?.display_name as string | null) || null;
 }

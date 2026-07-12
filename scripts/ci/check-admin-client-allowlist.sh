@@ -23,7 +23,6 @@ allowed=(
   "app/api/admin/content-review/route.ts"
   "app/api/admin/kyc/route.ts"
   "app/api/admin/reports/route.ts"
-  "app/api/auth/session/route.ts"
   "app/api/cron/financial-audit/route.ts"
   "app/api/report/route.ts"
   # support: public ticket insert (anonymous + logged-in), bypass RLS
@@ -47,6 +46,23 @@ allowed=(
   "app/api/subscriptions/route.ts"
   # creator application: insert into creator_applications (or profiles metadata fallback)
   "app/api/creator/apply/route.ts"
+  # creator: creator profile creation (auth-gated, 401 if not signed in)
+  "app/api/creator/create/route.ts"
+  # tips: server-side wallet debit/credit + tips insert (auth-gated, 401)
+  "app/api/tip/route.ts"
+  # tips: creator manages own tip settings (auth-gated, RLS bypass for own row)
+  "app/api/creator/tip-settings/route.ts"
+  # tips: public read of creator tip panel (read-only RLS bypass; only opt-in display_name/avatar, no PII)
+  "app/api/creator/[id]/tip-settings/route.ts"
+  # ambassador: admin commission review (requireAdmin)
+  "app/api/admin/commissions/route.ts"
+  "app/api/admin/commissions/[id]/approve/route.ts"
+  "app/api/admin/commissions/[id]/reject/route.ts"
+  # ambassador: admin referral attribution management (requireAdmin)
+  "app/api/admin/referrals/route.ts"
+  "app/api/admin/referrals/[id]/fraud/route.ts"
+  # ambassador: admin program settings (requireAdmin)
+  "app/api/admin/referral-settings/route.ts"
 )
 
 is_allowed() {
