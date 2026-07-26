@@ -30,7 +30,7 @@ WHEN YOU ACT:
 
 PROJECT-SPECIFIC:
 
-- 会话与鉴权：`app/api/auth/session/`；服务端核心 `lib/server/auth-server.ts`（新），`lib/auth-server.ts`（历史遗留，功能向 `lib/server/` 迁移）；`lib/auth.ts`
+- 会话与鉴权：`app/api/auth/bootstrap/`（SSR 重写后唯一读端点；旧 `app/api/auth/session/` 已删除）；服务端核心 `lib/server/auth-server.ts`（新），`lib/auth-server.ts`（历史遗留，功能向 `lib/server/` 迁移）；`lib/auth.ts`
 - 推荐计划安全（新）：`app/r/[code]/route.ts` 推荐码绑定安全（防 Cookie 劫持、重复绑定、自绑定）；`lib/ambassador/bind.ts` 绑定逻辑需审查幂等性与竞态
 - 自动化门禁：`pnpm check:service-role`, `pnpm check:admin-client`（`scripts/ci/check-no-service-role-leaks.sh`, `scripts/ci/check-admin-client-allowlist.sh`）
 - 管理/API 面：`app/api/admin/**`, `app/api/webhooks/**`；改动需对照 RLS 与最小权限

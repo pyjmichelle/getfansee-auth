@@ -2,7 +2,7 @@
  * Regression Test Suite — Bug Fix Verification
  *
  * Covers every root-cause fix made in this conversation:
- *   1. /api/auth/session  — local JWT claim validation (replaced admin.auth.getUser)
+ *   1. /api/auth/bootstrap — SSR auth rewrite replacement for deleted /api/auth/session
  *   2. Login → Logout → Re-login — no "session sync error"
  *   3. Search bar — returns results, placeholder disappears on focus
  *   4. Creator page — Share button works, three-dot dropdown opens
@@ -18,92 +18,48 @@ import { createConfirmedTestUser, deleteTestUser, injectSupabaseSession } from "
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 1. /api/auth/session  — local JWT claim validation
-//    Root cause fixed: removed admin.auth.getUser() network call → replaced
-//    with local JWT payload decode checking iss/aud/exp/sub.
+// 1. /api/auth/bootstrap — current auth surface after SSR rewrite
+//    `/api/auth/session` was removed (see docs/reports/auth-ssr-rewrite-20260610.md).
+//    Bootstrap is the remaining read endpoint: anonymous → authenticated:false,
+//    signed-in → authenticated:true + user/profile.
 // ─────────────────────────────────────────────────────────────────────────────
-test.describe("1. /api/auth/session — local JWT validation", () => {
-  test("1-a: valid Supabase token → 200 + sets httpOnly cookies", async ({ page }) => {
-    // Get a real Supabase access_token by signing in inside the browser context
-    await page.goto(`${BASE_URL}/auth`, { waitUntil: "domcontentloaded" });
-
+test.describe("1. /api/auth/bootstrap — session bootstrap", () => {
+  test("1-a: signed-in user → 200 + authenticated:true", async ({ page }) => {
     const { email, password, userId } = await createConfirmedTestUser("fan");
+    try {
+      await injectSupabaseSession(page, email, password, BASE_URL);
 
-    // Sign in via the test-session API to get valid cookies, then extract the token
-    const result = await page.evaluate(
-      async ({ origin, em, pw }) => {
-        // First sign in to get a real session
-        const loginRes = await fetch(`${origin}/api/test/session`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+      const result = await page.evaluate(async (origin) => {
+        const res = await fetch(`${origin}/api/auth/bootstrap`, {
           credentials: "include",
-          body: JSON.stringify({ email: em, password: pw }),
         });
-        if (!loginRes.ok) {
-          return { error: `test/session failed: ${loginRes.status}` };
-        }
+        return { status: res.status, body: await res.json().catch(() => ({})) };
+      }, BASE_URL);
 
-        // Now get the current session token from supabase-js
-        // It is stored in localStorage as sb-*-auth-token
-        const keys = Object.keys(localStorage).filter((k) => k.includes("-auth-token"));
-        for (const k of keys) {
-          try {
-            const raw = localStorage.getItem(k);
-            if (!raw) continue;
-            const parsed = JSON.parse(raw);
-            // auth-helpers-nextjs stores an object or array of chunks
-            const session =
-              parsed?.currentSession ??
-              parsed?.session ??
-              (Array.isArray(parsed) ? JSON.parse(parsed.join("")) : null);
-            if (session?.access_token) {
-              return {
-                access_token: session.access_token,
-                refresh_token: session.refresh_token,
-                expires_in: session.expires_in ?? 3600,
-              };
-            }
-          } catch {
-            // try next key
-          }
-        }
-        return { error: "No access_token found in localStorage" };
-      },
-      { origin: BASE_URL, em: email, pw: password }
-    );
-
-    if ("error" in result) {
-      console.warn("Could not extract token from localStorage:", result.error);
-      // Still verify the API with a syntactically correct but wrong-project JWT
+      expect(result.status).toBe(200);
+      expect((result.body as { authenticated?: boolean }).authenticated).toBe(true);
+      expect((result.body as { user?: { email?: string } }).user?.email).toBe(email);
+    } finally {
+      await deleteTestUser(userId);
     }
-
-    // Test: POST to /api/auth/session with a REAL token
-    if (!("error" in result) && result.access_token) {
-      const syncResult = await page.evaluate(
-        async ({ origin, at, rt, ei }) => {
-          const res = await fetch(`${origin}/api/auth/session`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ access_token: at, refresh_token: rt, expires_in: ei }),
-          });
-          return { status: res.status, body: await res.json().catch(() => ({})) };
-        },
-        {
-          origin: BASE_URL,
-          at: result.access_token,
-          rt: result.refresh_token,
-          ei: result.expires_in,
-        }
-      );
-      expect(syncResult.status).toBe(200);
-      expect((syncResult.body as { success?: boolean }).success).toBe(true);
-    }
-
-    await deleteTestUser(userId);
   });
 
-  test("1-b: missing tokens → 400", async ({ page }) => {
+  test("1-b: anonymous → 200 + authenticated:false", async ({ page }) => {
+    await page.goto(`${BASE_URL}/auth`, { waitUntil: "domcontentloaded" });
+    await page.context().clearCookies();
+
+    const result = await page.evaluate(async (origin) => {
+      const res = await fetch(`${origin}/api/auth/bootstrap`, {
+        credentials: "include",
+      });
+      return { status: res.status, body: await res.json().catch(() => ({})) };
+    }, BASE_URL);
+
+    expect(result.status).toBe(200);
+    expect((result.body as { authenticated?: boolean }).authenticated).toBe(false);
+  });
+
+  test("1-c: deleted /api/auth/session route stays gone (404)", async ({ page }) => {
     await page.goto(`${BASE_URL}/auth`, { waitUntil: "domcontentloaded" });
     const result = await page.evaluate(async (origin) => {
       const res = await fetch(`${origin}/api/auth/session`, {
@@ -113,54 +69,13 @@ test.describe("1. /api/auth/session — local JWT validation", () => {
       });
       return { status: res.status };
     }, BASE_URL);
-    expect(result.status).toBe(400);
-  });
-
-  test("1-c: wrong-issuer JWT (service role key) → 401", async ({ page }) => {
-    await page.goto(`${BASE_URL}/auth`, { waitUntil: "domcontentloaded" });
-
-    // Service role JWT has iss="supabase" not "/auth/v1" → must be rejected
-    const fakeRefreshToken = "fake-refresh-token-" + Date.now();
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
-
-    if (!serviceRoleKey) {
-      test.skip();
-      return;
-    }
-
-    const result = await page.evaluate(
-      async ({ origin, at, rt }) => {
-        const res = await fetch(`${origin}/api/auth/session`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ access_token: at, refresh_token: rt }),
-        });
-        return { status: res.status };
-      },
-      { origin: BASE_URL, at: serviceRoleKey, rt: fakeRefreshToken }
-    );
-    expect(result.status).toBe(401);
-  });
-
-  test("1-d: malformed JWT (not 3 parts) → 400 or 401", async ({ page }) => {
-    await page.goto(`${BASE_URL}/auth`, { waitUntil: "domcontentloaded" });
-    const result = await page.evaluate(async (origin) => {
-      const res = await fetch(`${origin}/api/auth/session`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ access_token: "not-a-valid-jwt", refresh_token: "some-token" }),
-      });
-      return { status: res.status };
-    }, BASE_URL);
-    // split(".")  gives 1 part → validateSupabaseJwt returns null → 401
-    expect([400, 401]).toContain(result.status);
+    expect(result.status).toBe(404);
   });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 2. Login → Logout → Re-login
-//    Root cause fixed: /api/auth/session no longer makes a remote getUser call
-//    that could timeout. DELETE /api/auth/session properly clears httpOnly cookies.
+//    Logout uses supabase.auth.signOut() directly (no /api/auth/session DELETE).
 // ─────────────────────────────────────────────────────────────────────────────
 test.describe("2. Login → Logout → Re-login (no session sync error)", () => {
   let userId = "";
@@ -247,39 +162,22 @@ test.describe("2. Login → Logout → Re-login (no session sync error)", () => 
     expect(page.url()).toMatch(/\/home/);
   });
 
-  test("2-d: /api/auth/session DELETE properly expires cookies", async ({ page }) => {
-    await page.goto(`${BASE_URL}/auth`, { waitUntil: "domcontentloaded" });
+  test("2-d: logout via UI clears session (no /api/auth/session)", async ({ page }) => {
+    await injectSupabaseSession(page, userEmail, userPassword, BASE_URL);
+    await page.goto(`${BASE_URL}/me`, { waitUntil: "domcontentloaded", timeout: 30_000 });
 
-    // First inject a session (creates cookies)
-    await page.evaluate(
-      async ({ origin, em, pw }) => {
-        await fetch(`${origin}/api/test/session`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ email: em, password: pw }),
-        });
-      },
-      { origin: BASE_URL, em: userEmail, pw: userPassword }
-    );
+    const logoutBtn = page.getByRole("button", { name: /log\s*out|sign\s*out/i }).first();
+    await expect(logoutBtn).toBeVisible({ timeout: 10_000 });
+    await logoutBtn.click();
+    await expect(page).toHaveURL(/\/auth/, { timeout: 20_000 });
 
-    // Now call DELETE /api/auth/session
-    const deleteResult = await page.evaluate(async (origin) => {
-      const res = await fetch(`${origin}/api/auth/session`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      return { status: res.status };
+    // After logout, bootstrap must report anonymous.
+    const bootstrap = await page.evaluate(async (origin) => {
+      const res = await fetch(`${origin}/api/auth/bootstrap`, { credentials: "include" });
+      return { status: res.status, body: await res.json().catch(() => ({})) };
     }, BASE_URL);
-    expect(deleteResult.status).toBe(200);
-
-    // Verify the httpOnly cookies are cleared (maxAge=0 / expires=epoch)
-    const cookies = await page.context().cookies(BASE_URL);
-    const accessToken = cookies.find((c) => c.name === "sb-access-token");
-    const refreshToken = cookies.find((c) => c.name === "sb-refresh-token");
-    // After DELETE, cookies should be absent or empty
-    if (accessToken) expect(accessToken.value).toBe("");
-    if (refreshToken) expect(refreshToken.value).toBe("");
+    expect(bootstrap.status).toBe(200);
+    expect((bootstrap.body as { authenticated?: boolean }).authenticated).toBe(false);
   });
 });
 
