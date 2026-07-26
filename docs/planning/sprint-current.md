@@ -53,6 +53,18 @@
   - pnpm exec playwright test --project=chromium（新增断言全绿；50 例预先存在的无关失败见上方说明与下方新增待办）
 - 批次 7（✅ 已完成）治理层收尾增量校对：`chief-quality.md`（+ `docs/agents/04` 镜像）的"已知门禁盲区"记录更新为"部分补齐"（点名 `tab-stability.spec.ts` 覆盖的四个场景）；`SKILLS_APPLICATION_GUIDE.md` 刷新最后更新日期
 
+### P0 – PR#23 CI 全绿：E2E 6 硬失败 + Vercel 重复项目（2026-07-26）
+
+- Scope:
+  - E2E：`tab-stability` CLS CI 阈值、studio 页 testid 断言（避免 hidden mobile nav）、Report 改导航断言、paywall onboarding 后 session 恢复
+  - Vercel：重复项目 `getfansee` 部署失败 — Dashboard 断开 Git 或查 deploy 日志（代码无法修）
+- Acceptance Criteria:
+  - GitHub Actions `E2E Tests (chromium)` 绿
+  - 用户侧处理 `Vercel – getfansee` 或 branch protection 不要求该 check
+- Required Gates:
+  - pnpm check-all
+  - pnpm exec playwright test --project=chromium（CI）
+
 ### P0 – 修复预先存在的 E2E 测试债务（50 例失败，独立于 UI 体验根治计划）
 
 - Scope（本轮验收时发现，尚未着手修复，需单独排期）：

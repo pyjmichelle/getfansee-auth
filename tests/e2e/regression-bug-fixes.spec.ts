@@ -371,15 +371,14 @@ test.describe("4. Creator page — Share + three-dot menu", () => {
     await expect(page.locator("li[data-sonner-toast]").first()).toBeVisible({ timeout: 7_000 });
   });
 
-  test("4-d: 'Report' triggers info toast", async ({ page }) => {
+  test("4-d: 'Report' navigates to report flow", async ({ page }) => {
     await gotoCreatorMobile(page);
 
     await page.getByTestId("creator-more-btn").click();
-    // Wait for dropdown items to be fully visible before clicking
     await expect(page.getByTestId("creator-report")).toBeVisible({ timeout: 3_000 });
     await page.getByTestId("creator-report").click();
 
-    // Sonner toast: li[data-sonner-toast]
-    await expect(page.locator("li[data-sonner-toast]").first()).toBeVisible({ timeout: 7_000 });
+    // handleReport pushes to /report — no Sonner toast on creator page.
+    await expect(page).toHaveURL(/\/report\?type=creator&id=/, { timeout: 10_000 });
   });
 });
