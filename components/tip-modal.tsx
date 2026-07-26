@@ -10,13 +10,21 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { Loader2 } from "@/lib/icons";
 import { PLATFORM_TIP_FEE_BPS, computeTipPlatformFeeCents } from "@/lib/constants/fees";
 import { DEFAULT_TIP_SETTINGS, type CreatorTipSettings } from "@/lib/tips";
+import { useMediaQuery } from "@/hooks/use-mobile";
+import { formatUsd } from "@/lib/format";
 
 interface TipModalProps {
   open: boolean;
@@ -49,8 +57,27 @@ export function TipModal({
   const [customAmountStr, setCustomAmountStr] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [nonce] = useState(generateNonce);
+  const [nonce, setNonce] = useState(generateNonce);
   const [settings, setSettings] = useState<CreatorTipSettings>(DEFAULT_TIP_SETTINGS);
+
+  // This modal is rendered persistently on some pages (creator/[id], posts/[id])
+  // with only `open` toggling — it never unmounts between tips. Without this,
+  // the idempotency nonce from the FIRST tip would be reused on every
+  // subsequent tip: the server correctly treats the repeat as a duplicate and
+  // returns `idempotent: true` without charging again, but the UI still shows
+  // "Tip sent!" — a silent no-op that looks like success. Regenerate on every
+  // open, and reset the form so a stale amount/message doesn't linger.
+  useEffect(() => {
+    if (!open) return;
+    setNonce(generateNonce());
+    setSelectedPreset(null);
+    setCustomAmountStr("");
+    setMessage("");
+  }, [open]);
+  // Mobile: bottom sheet. Desktop: centered dialog — previously this modal
+  // was Dialog-only, so on mobile it lacked the native bottom-sheet feel
+  // used everywhere else in the app (F-004).
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   // Lazy-load the creator's tip panel customization when the modal opens.
   useEffect(() => {
@@ -155,6 +182,155 @@ export function TipModal({
     }
   };
 
+  const titleContent = (
+    <>
+      <span aria-hidden className="text-xl leading-none">
+        {unitEmoji}
+      </span>
+      Buy {creatorName ?? "this creator"} a {unitLabel}
+    </>
+  );
+  const descriptionText = (
+    <>
+      A tip is a voluntary thank-you — not a purchase of any content, service, or reward. Tips are
+      final and non-refundable. The platform retains a {FEE_PERCENT}% service fee; the rest goes to
+      the creator&apos;s pending balance.
+    </>
+  );
+
+  const body = (
+    <>
+      <div className="space-y-4 mt-2">
+        {/* Preset amounts */}
+        <div
+          className={cn(
+            "grid gap-2",
+            presets.length <= 1 && "grid-cols-1",
+            presets.length === 2 && "grid-cols-2",
+            presets.length === 3 && "grid-cols-3",
+            presets.length >= 4 && "grid-cols-4"
+          )}
+        >
+          {presets.map((cents) => (
+            <button
+              key={cents}
+              type="button"
+              onClick={() => handlePreset(cents)}
+              className={cn(
+                "min-h-11 rounded-xl py-2.5 text-small font-semibold border transition-colors duration-100 active:scale-[0.98]",
+                selectedPreset === cents
+                  ? "bg-[var(--premium)]/20 border-[var(--premium)] text-[var(--premium)]"
+                  : "border-border-base text-text-secondary hover:border-[var(--premium)]/50 hover:text-[var(--premium)]"
+              )}
+            >
+              {cents % 100 === 0 ? `$${cents / 100}` : formatUsd(cents)}
+            </button>
+          ))}
+        </div>
+
+        {/* Custom amount */}
+        <div className="relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-small select-none">
+            $
+          </span>
+          <Input
+            type="number"
+            min="1"
+            max="500"
+            step="1"
+            placeholder="Custom amount"
+            value={customAmountStr}
+            onChange={(e) => handleCustomChange(e.target.value)}
+            className="pl-7"
+            aria-label="Custom tip amount in dollars"
+          />
+        </div>
+        {resolvedAmountCents !== null && resolvedAmountCents < 100 && (
+          <p className="text-tiny text-[var(--error-text)] -mt-2">Minimum tip is $1.00</p>
+        )}
+        {resolvedAmountCents !== null && resolvedAmountCents > 50_000 && (
+          <p className="text-tiny text-[var(--error-text)] -mt-2">Maximum tip is $500.00</p>
+        )}
+        {isInsufficient && (
+          <p className="text-tiny text-[var(--error-text)] -mt-2">
+            Insufficient balance.{" "}
+            <Link href="/me/wallet" className="underline hover:no-underline">
+              Add funds
+            </Link>
+          </p>
+        )}
+
+        {/* Optional message */}
+        <Textarea
+          placeholder="Leave a message (optional, max 140 chars)"
+          value={message}
+          onChange={(e) => setMessage(e.target.value.slice(0, 140))}
+          rows={2}
+          className="resize-none text-small"
+          aria-label="Optional message for the creator"
+        />
+        <p className="text-tiny text-text-muted text-right -mt-2">{message.length}/140</p>
+
+        {/* Fee breakdown */}
+        {isValid && resolvedAmountCents !== null && (
+          <div className="rounded-lg bg-surface-raised/60 border border-border-base px-3 py-2 text-tiny text-text-muted space-y-1">
+            <div className="flex justify-between">
+              <span>Your tip</span>
+              <span>{formatUsd(resolvedAmountCents)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Platform service fee ({FEE_PERCENT}%)</span>
+              <span>-{formatUsd(feeCents)}</span>
+            </div>
+            <div className="flex justify-between text-text-secondary font-medium">
+              <span>Creator receives</span>
+              <span>{formatUsd(resolvedAmountCents - feeCents)}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Wallet hint */}
+        {balanceCents !== undefined && (
+          <p className="text-tiny text-text-muted">Wallet balance: {formatUsd(balanceCents)}</p>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-2 pt-1">
+          <Button
+            variant="outline"
+            className="flex-1"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="flex-1 min-h-[44px]"
+            disabled={!isValid || loading}
+            loading={loading}
+            onClick={handleSubmit}
+          >
+            {resolvedAmountCents ? `Tip ${formatUsd(resolvedAmountCents)}` : "Tip"}
+          </Button>
+        </div>
+      </div>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="bottom" className="max-h-[90dvh] overflow-y-auto px-4">
+          <SheetHeader className="px-0">
+            <SheetTitle className="flex items-center gap-2">{titleContent}</SheetTitle>
+            <SheetDescription>{descriptionText}</SheetDescription>
+          </SheetHeader>
+          {body}
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -163,143 +339,13 @@ export function TipModal({
       >
         <DialogHeader>
           <DialogTitle id="tip-modal-title" className="flex items-center gap-2 text-lg">
-            <span aria-hidden className="text-xl leading-none">
-              {unitEmoji}
-            </span>
-            Buy {creatorName ?? "this creator"} a {unitLabel}
+            {titleContent}
           </DialogTitle>
-          <DialogDescription className="text-text-muted text-sm">
-            A tip is a voluntary thank-you — not a purchase of any content, service, or reward. Tips
-            are final and non-refundable. The platform retains a {FEE_PERCENT}% service fee; the
-            rest goes to the creator&apos;s pending balance.
+          <DialogDescription className="text-text-muted text-small">
+            {descriptionText}
           </DialogDescription>
         </DialogHeader>
-
-        <div className="space-y-4 mt-2">
-          {/* Preset amounts */}
-          <div
-            className={cn(
-              "grid gap-2",
-              presets.length <= 1 && "grid-cols-1",
-              presets.length === 2 && "grid-cols-2",
-              presets.length === 3 && "grid-cols-3",
-              presets.length >= 4 && "grid-cols-4"
-            )}
-          >
-            {presets.map((cents) => (
-              <button
-                key={cents}
-                type="button"
-                onClick={() => handlePreset(cents)}
-                className={cn(
-                  "rounded-xl py-2.5 text-sm font-semibold border transition-all duration-100 active:scale-95",
-                  selectedPreset === cents
-                    ? "bg-amber-400/20 border-amber-400 text-amber-400"
-                    : "border-border-base text-text-secondary hover:border-amber-400/50 hover:text-amber-300"
-                )}
-              >
-                ${cents % 100 === 0 ? cents / 100 : (cents / 100).toFixed(2)}
-              </button>
-            ))}
-          </div>
-
-          {/* Custom amount */}
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm select-none">
-              $
-            </span>
-            <Input
-              type="number"
-              min="1"
-              max="500"
-              step="1"
-              placeholder="Custom amount"
-              value={customAmountStr}
-              onChange={(e) => handleCustomChange(e.target.value)}
-              className="pl-7"
-              aria-label="Custom tip amount in dollars"
-            />
-          </div>
-          {resolvedAmountCents !== null && resolvedAmountCents < 100 && (
-            <p className="text-xs text-red-400 -mt-2">Minimum tip is $1.00</p>
-          )}
-          {resolvedAmountCents !== null && resolvedAmountCents > 50_000 && (
-            <p className="text-xs text-red-400 -mt-2">Maximum tip is $500.00</p>
-          )}
-          {isInsufficient && (
-            <p className="text-xs text-red-400 -mt-2">
-              Insufficient balance.{" "}
-              <Link href="/me/wallet" className="underline hover:no-underline">
-                Add funds
-              </Link>
-            </p>
-          )}
-
-          {/* Optional message */}
-          <Textarea
-            placeholder="Leave a message (optional, max 140 chars)"
-            value={message}
-            onChange={(e) => setMessage(e.target.value.slice(0, 140))}
-            rows={2}
-            className="resize-none text-sm"
-            aria-label="Optional message for the creator"
-          />
-          <p className="text-xs text-text-muted text-right -mt-2">{message.length}/140</p>
-
-          {/* Fee breakdown */}
-          {isValid && resolvedAmountCents !== null && (
-            <div className="rounded-lg bg-surface-raised/60 border border-border-base px-3 py-2 text-xs text-text-muted space-y-1">
-              <div className="flex justify-between">
-                <span>Your tip</span>
-                <span>${(resolvedAmountCents / 100).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Platform service fee ({FEE_PERCENT}%)</span>
-                <span>-${(feeCents / 100).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-text-secondary font-medium">
-                <span>Creator receives</span>
-                <span>${((resolvedAmountCents - feeCents) / 100).toFixed(2)}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Wallet hint */}
-          {balanceCents !== undefined && (
-            <p className="text-xs text-text-muted">
-              Wallet balance: ${(balanceCents / 100).toFixed(2)}
-            </p>
-          )}
-
-          {/* Actions */}
-          <div className="flex gap-2 pt-1">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="gold"
-              className="flex-1 min-h-[44px]"
-              disabled={!isValid || loading}
-              onClick={handleSubmit}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="size-4 mr-2 animate-spin" />
-                  Sending…
-                </>
-              ) : resolvedAmountCents ? (
-                `Tip $${(resolvedAmountCents / 100).toFixed(2)}`
-              ) : (
-                "Tip"
-              )}
-            </Button>
-          </div>
-        </div>
+        {body}
       </DialogContent>
     </Dialog>
   );

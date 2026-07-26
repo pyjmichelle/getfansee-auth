@@ -38,8 +38,8 @@ export function EmptyState({
         </GlassIcon>
       )}
       <div className="space-y-1">
-        <p className="text-[13px] font-medium text-text-secondary">{title}</p>
-        {description && <p className="text-[12px] text-text-muted max-w-xs">{description}</p>}
+        <p className="text-small font-medium text-text-secondary">{title}</p>
+        {description && <p className="text-tiny text-text-muted max-w-xs">{description}</p>}
       </div>
       {action &&
         (action.href ? (

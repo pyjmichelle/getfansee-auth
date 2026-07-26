@@ -63,6 +63,26 @@ allowed=(
   "app/api/admin/referrals/[id]/fraud/route.ts"
   # ambassador: admin program settings (requireAdmin)
   "app/api/admin/referral-settings/route.ts"
+  # alpha: admin review of creator external links (requireAdmin)
+  "app/api/admin/creator-links/route.ts"
+  "app/api/admin/creator-links/[id]/route.ts"
+  # alpha: public outbound redirect for APPROVED links only; increments click_count (no PII)
+  "app/api/link/out/route.ts"
+  # alpha: email capture double opt-in; newsletter_subscribers is server-only by design (no RLS policies)
+  "app/api/newsletter/subscribe/route.ts"
+  "app/api/newsletter/confirm/route.ts"
+  # alpha: public follower counts need RLS bypass (aggregate only; auth-gated writes)
+  "app/api/follow/route.ts"
+  # alpha: public directory follower/post counts (aggregates only, no row data returned)
+  "app/api/creators/directory/route.ts"
+  # alpha: Home sidebar suggested-creators, same aggregate-only RPC as the directory route
+  "app/api/creators/suggested/route.ts"
+  # alpha: profile view counter increment via service-role-only RPC (aggregate, no PII)
+  "app/api/creators/[id]/view/route.ts"
+  # alpha: creator studio analytics aggregates (requireCreator; numbers only)
+  "app/api/creator/analytics/route.ts"
+  # crypto side quest: NowPayments IPN webhook (signature-verified, server-side wallet credit)
+  "app/api/webhooks/nowpayments/route.ts"
 )
 
 is_allowed() {

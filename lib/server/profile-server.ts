@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { getSupabaseServerClient } from "./supabase-server";
 
 /**
@@ -29,6 +30,7 @@ export async function updateCreatorProfile(params: {
   display_name?: string;
   bio?: string;
   avatar_url?: string;
+  category?: string | null;
 }): Promise<boolean> {
   try {
     const supabase = await getSupabaseServerClient();
@@ -36,6 +38,7 @@ export async function updateCreatorProfile(params: {
       display_name?: string;
       bio?: string;
       avatar_url?: string;
+      category?: string | null;
     } = {};
 
     if (params.display_name !== undefined) {
@@ -46,6 +49,9 @@ export async function updateCreatorProfile(params: {
     }
     if (params.avatar_url !== undefined) {
       updateData.avatar_url = params.avatar_url;
+    }
+    if (params.category !== undefined) {
+      updateData.category = params.category;
     }
 
     if (Object.keys(updateData).length === 0) {
@@ -67,7 +73,10 @@ export async function updateCreatorProfile(params: {
   }
 }
 
-export async function getProfile(userId: string) {
+// React.cache() dedupes by argument (userId) within a single request — the
+// root layout and a page both calling getProfile(user.id) previously ran two
+// identical `profiles` selects per request (see 2026-07-26 audit).
+async function getProfileUncached(userId: string) {
   try {
     const supabase = await getSupabaseServerClient();
     let { data, error } = await supabase
@@ -111,6 +120,8 @@ export async function getProfile(userId: string) {
     return null;
   }
 }
+
+export const getProfile = cache(getProfileUncached);
 
 export async function updateProfile(
   userId: string,

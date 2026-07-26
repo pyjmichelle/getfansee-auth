@@ -8,6 +8,17 @@
 
 **项目内常用补充（非 release-gate 清单替代项）**：`code-check`（等价于对话里「跑 check-all」）、`planning-with-files`、`agent-browser`、`ui-ux-pro-max`（设计 token/栈对齐）、`feishu-docs`（飞书需求对齐时）。
 
+**UI/布局深度诊断（2026-07-26 补录，此前未索引）**：
+
+- `.cursor/skills/page-ia-review/SKILL.md` — 布局/信息架构/tab 取舍、弹层、≥44px 触控审查
+- `.agents/skills/impeccable/SKILL.md` — UI 打磨实现（配合 shadcn-ui）
+- `.agents/skills/web-quality-audit/SKILL.md` — Lighthouse 式性能/a11y/SEO/CLS 审计
+- `.agents/skills/frontend-design/SKILL.md`（注意：与 `.cursor/skills/frontend-design.skill.md` 是两个不同文件，前者偏视觉/排版直觉判断，后者偏系统化设计模式清单，两者互补而非替代）
+- `.agents/skills/interface-design/SKILL.md` — 仪表盘/后台/工具类界面专用（非营销页）
+- `.cursor/skills/qa-gate/SKILL.md` — 项目专属 QA 门禁流水线（gate-ui/gate-deadclick/audit:full）
+- `.cursor/skills/feature-qa-walkthrough/SKILL.md` — PRD 驱动的双视口双角色全按钮走查
+- `.cursor/skills/release-review-walkthrough/SKILL.md` — 结构化发布走查报告（F-001 编号模板）
+
 **维护类**：ci-auto-fix、audit-website、web-design-guidelines。
 
 ## 项目技术栈概览
@@ -234,24 +245,26 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ## 快速参考：何时使用哪个 Skill
 
-| 任务                | 使用的 Skill                                                        |
-| ------------------- | ------------------------------------------------------------------- |
-| 编写新 React 组件   | react-best-practices                                                |
-| 实现数据获取        | react-best-practices, supabase-postgres-best-practices              |
-| 审查 UI             | web-design-guidelines, frontend-design                              |
-| 优化性能            | react-best-practices, audit-website                                 |
-| 数据库查询          | supabase-postgres-best-practices                                    |
-| 认证实现            | supabase（官方 skill）                                              |
-| 移动端/响应式       | frontend-design, web-design-guidelines                              |
-| 全站审计            | audit-website                                                       |
-| 安全审查            | supabase（官方 skill）、supabase-postgres-best-practices            |
-| 前端自动化测试      | agent-browser                                                       |
-| CI 修复与配置       | ci-auto-fix, ci-pipeline-config, api-test-runner                    |
-| E2E/测试报告        | e2e-test-setup, fixture-generator, test-report-generator            |
-| 发布门禁判定        | e2e-test-setup, test-report-generator, ci-pipeline-config           |
-| 口语「跑一下检查」  | code-check（→ `pnpm check-all`）                                    |
-| 设计系统深度对齐    | ui-ux-pro-max, frontend-design, shadcn-ui                           |
-| 并行多 agent/防冲突 | parallel-agent-orchestration（+ `parallel-agent-coordination.mdc`） |
+| 任务                        | 使用的 Skill                                                        |
+| --------------------------- | ------------------------------------------------------------------- |
+| 编写新 React 组件           | react-best-practices                                                |
+| 实现数据获取                | react-best-practices, supabase-postgres-best-practices              |
+| 审查 UI                     | web-design-guidelines, frontend-design                              |
+| 优化性能                    | react-best-practices, audit-website                                 |
+| 数据库查询                  | supabase-postgres-best-practices                                    |
+| 认证实现                    | supabase（官方 skill）                                              |
+| 移动端/响应式               | frontend-design, web-design-guidelines                              |
+| 全站审计                    | audit-website                                                       |
+| 安全审查                    | supabase（官方 skill）、supabase-postgres-best-practices            |
+| 前端自动化测试              | agent-browser                                                       |
+| CI 修复与配置               | ci-auto-fix, ci-pipeline-config, api-test-runner                    |
+| E2E/测试报告                | e2e-test-setup, fixture-generator, test-report-generator            |
+| 发布门禁判定                | e2e-test-setup, test-report-generator, ci-pipeline-config           |
+| 口语「跑一下检查」          | code-check（→ `pnpm check-all`）                                    |
+| 设计系统深度对齐            | ui-ux-pro-max, frontend-design, shadcn-ui                           |
+| Tab/布局跳变、触控尺寸、CLS | page-ia-review, web-quality-audit, impeccable                       |
+| PRD 全量走查/发布前复核     | feature-qa-walkthrough, release-review-walkthrough, qa-gate         |
+| 并行多 agent/防冲突         | parallel-agent-orchestration（+ `parallel-agent-coordination.mdc`） |
 
 ---
 
@@ -262,4 +275,4 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ---
 
-_最后更新: 2026-06-11_
+_最后更新: 2026-07-26（补录 page-ia-review/impeccable/web-quality-audit/interface-design/qa-gate/feature-qa-walkthrough/release-review-walkthrough 索引；同步 UI 根治三次审查计划涉及的 agent 覆盖面变更；批次7 收尾校对：`tests/e2e/tab-stability.spec.ts` 落地后 e2e-test-setup 覆盖面新增跳变/CLS/触控断言，`chief-quality` 门禁盲区记录同步更新为"部分补齐"）_

@@ -51,8 +51,8 @@ export function SuccessState({
       >
         <CheckCircle className="w-5 h-5 text-success flex-shrink-0" aria-hidden="true" />
         <div className="flex-1">
-          {title && <h3 className="text-sm font-semibold text-text-primary mb-1">{title}</h3>}
-          <p className="text-sm text-text-secondary">{message}</p>
+          {title && <h3 className="text-small font-semibold text-text-primary mb-1">{title}</h3>}
+          <p className="text-small text-text-secondary">{message}</p>
         </div>
         {action &&
           (action.href ? (
@@ -84,7 +84,7 @@ export function SuccessState({
         <CheckCircle className="w-8 h-8 text-success" aria-hidden="true" />
       </div>
       <h3 className="text-lg font-semibold text-text-primary mb-2">{title}</h3>
-      <p className="text-sm text-text-secondary mb-6 max-w-sm">{message}</p>
+      <p className="text-small text-text-secondary mb-6 max-w-sm">{message}</p>
       {action &&
         (action.href ? (
           <Button asChild variant="outline" className="gap-2 rounded-xl min-h-[44px]">

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
-  Users,
   UserCheck,
   Copy,
   Check,
@@ -13,10 +12,6 @@ import {
   CheckCircle,
   Clock,
   Star,
-  DollarSign,
-  Plus,
-  BarChart3,
-  FileText,
   Gift,
   ChevronDown,
   ChevronUp,
@@ -26,6 +21,7 @@ import {
   type LucideIcon,
 } from "@/lib/icons";
 import { PageShell } from "@/components/page-shell";
+import { StudioShell } from "@/components/shells/studio-shell";
 import { StatCard } from "@/components/stat-card";
 import { ShareModal } from "@/components/share-modal";
 import { Button } from "@/components/ui/button";
@@ -33,7 +29,12 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { ErrorState } from "@/components/error-state";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
+import {
+  FOUNDING_BASE_COMMISSION_FREE_MONTHS,
+  MAX_REFERRAL_EXTENSION_MONTHS,
+  getReferralExtensionMonths,
+} from "@/lib/constants/alpha";
 import { useCountUp } from "@/hooks/use-count-up";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -89,30 +90,30 @@ const MILESTONES: Milestone[] = [
   },
   {
     label: "Rising Star",
-    minQualified: 1,
+    minQualified: 5,
     Icon: Star,
-    color: "text-[var(--wine)]",
+    color: "text-wine-text",
     bgColor: "bg-[var(--wine-tint)]",
     borderColor: "border-[var(--wine)]/30",
-    rewardHint: "1+ qualified creator",
+    rewardHint: "5 qualified = +1 month 0% commission in Beta",
   },
   {
     label: "Champion",
-    minQualified: 5,
+    minQualified: 10,
     Icon: Flame,
     color: "text-[var(--premium)]",
     bgColor: "bg-[var(--premium-tint)]",
     borderColor: "border-[var(--premium)]/30",
-    rewardHint: "5+ qualified creators",
+    rewardHint: "10 qualified = +2 months 0% commission in Beta",
   },
   {
     label: "Legend",
-    minQualified: 10,
+    minQualified: 15,
     Icon: Star,
     color: "text-[var(--premium)]",
     bgColor: "bg-[var(--premium-tint)]",
     borderColor: "border-[var(--premium)]/40",
-    rewardHint: "10+ qualified creators",
+    rewardHint: "15 qualified = +3 months 0% commission (max)",
   },
 ];
 
@@ -173,8 +174,8 @@ const STATUS_LABELS: Record<string, string> = {
 
 const STATUS_CLASSES: Record<string, string> = {
   signup_completed: "bg-surface-raised text-text-secondary border-border-base",
-  creator_role_selected: "bg-brand-secondary/10 text-brand-secondary border-transparent",
-  kyc_verified: "bg-brand-primary/10 text-brand-primary border-transparent",
+  creator_role_selected: "bg-brand-secondary/10 text-wine-text border-transparent",
+  kyc_verified: "bg-brand-primary/10 text-wine-text border-transparent",
   qualified: "bg-success/10 text-success border-transparent",
   revenue_eligible: "bg-success/20 text-success border-transparent",
   rejected: "bg-error/10 text-error border-transparent",
@@ -185,7 +186,7 @@ function StatusBadge({ status }: { status: string }) {
   return (
     <Badge
       variant="outline"
-      className={`text-xs font-medium ${STATUS_CLASSES[status] ?? "bg-surface-raised text-text-secondary"}`}
+      className={`text-tiny font-medium ${STATUS_CLASSES[status] ?? "bg-surface-raised text-text-secondary"}`}
     >
       {STATUS_LABELS[status] ?? status}
     </Badge>
@@ -241,6 +242,7 @@ const FAQ_ITEMS = [
 
 export default function AmbassadorPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -264,21 +266,19 @@ export default function AmbassadorPage() {
       setIsLoading(true);
       setError(null);
 
-      const bootstrap = await getAuthBootstrap();
-      if (!bootstrap.authenticated || !bootstrap.user) {
+      if (!auth.authenticated || !auth.user) {
         router.push("/auth");
         return;
       }
-      if (bootstrap.profile?.role !== "creator") {
+      if (auth.profile?.role !== "creator") {
         router.push("/home");
         return;
       }
 
       setCurrentUser({
-        username:
-          bootstrap.profile?.display_name || bootstrap.user.email.split("@")[0] || "creator",
+        username: auth.profile?.display_name || auth.user.email.split("@")[0] || "creator",
         role: "creator",
-        avatar: bootstrap.profile?.avatar_url || undefined,
+        avatar: auth.profile?.avatar_url || undefined,
       });
 
       const res = await fetch("/api/referral/me");
@@ -312,7 +312,7 @@ export default function AmbassadorPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [router]);
+  }, [router, auth.authenticated, auth.user, auth.profile]);
 
   const loadReferrals = useCallback(async () => {
     try {
@@ -403,16 +403,6 @@ export default function AmbassadorPage() {
   const nextMilestone =
     currentMilestoneIdx < MILESTONES.length - 1 ? MILESTONES[currentMilestoneIdx + 1] : null;
 
-  // ── Sidebar nav ───────────────────────────────────────────
-  const navItems = [
-    { href: "/creator/new-post", icon: Plus, label: "Create Post" },
-    { href: "/creator/studio/earnings", icon: DollarSign, label: "Earnings" },
-    { href: "/creator/studio/subscribers", icon: Users, label: "Subscribers" },
-    { href: "/creator/studio/post/list", icon: FileText, label: "Post List" },
-    { href: "/creator/studio/analytics", icon: BarChart3, label: "Analytics" },
-    { href: "/creator/studio/ambassador", icon: Gift, label: "Ambassador" },
-  ];
-
   // ── Loading skeleton ──────────────────────────────────────
   if (isLoading) {
     return (
@@ -449,20 +439,20 @@ export default function AmbassadorPage() {
   if (!data?.enrolled) {
     return (
       <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
-        <div className="pb-24 flex flex-col lg:flex-row gap-8">
-          <main className="flex-1 min-w-0">
+        <div className="pb-24">
+          <StudioShell>
             <div className="mb-8">
               <Link
                 href="/creator/studio"
                 className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors mb-6"
               >
                 <ArrowLeft size={18} />
-                <span className="text-sm">Back to Studio</span>
+                <span className="text-small">Back to Studio</span>
               </Link>
               <h1 className="text-2xl md:text-4xl font-bold tracking-tight mb-3 text-text-primary">
                 Creator Ambassador
               </h1>
-              <p className="text-text-tertiary text-sm md:text-lg">
+              <p className="text-text-tertiary text-small md:text-lg">
                 Invite trusted creators and earn referral rewards when they grow on GetFanSee.
               </p>
             </div>
@@ -471,11 +461,11 @@ export default function AmbassadorPage() {
             <div className="card-block p-8 max-w-lg mx-auto">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-brand-primary/10 rounded-2xl flex items-center justify-center">
-                  <Gift size={28} className="text-brand-primary" />
+                  <Gift size={28} className="text-wine-text" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-text-primary">Join the Program</h2>
-                  <p className="text-xs text-text-tertiary">
+                  <p className="text-tiny text-text-tertiary">
                     Earn referral rewards by inviting creators
                   </p>
                 </div>
@@ -492,18 +482,18 @@ export default function AmbassadorPage() {
                     <div className="w-4 h-4 rounded-full bg-success/10 flex items-center justify-center shrink-0">
                       <Check size={10} className="text-success" />
                     </div>
-                    <p className="text-sm text-text-secondary">{text}</p>
+                    <p className="text-small text-text-secondary">{text}</p>
                   </div>
                 ))}
               </div>
 
               {/* Example calculator */}
               <div className="rounded-xl border border-brand-primary/20 bg-brand-primary/5 px-4 py-3 mb-5">
-                <div className="flex items-center justify-between text-sm mb-1.5">
-                  <span className="text-text-tertiary text-xs uppercase tracking-wide font-semibold">
+                <div className="flex items-center justify-between text-small mb-1.5">
+                  <span className="text-text-tertiary text-tiny uppercase tracking-wide font-semibold">
                     Example
                   </span>
-                  <span className="text-brand-primary font-semibold">$1,000 × 5% = $50</span>
+                  <span className="text-wine-text font-semibold">$1,000 × 5% = $50</span>
                 </div>
                 <p className="text-[10px] text-text-tertiary">
                   Estimated only · not a guarantee of income · subject to admin review
@@ -540,8 +530,7 @@ export default function AmbassadorPage() {
                 {isEnrolling ? "Enrolling…" : "Get My Referral Link"}
               </Button>
             </div>
-          </main>
-          <Sidebar navItems={navItems} activePath="/creator/studio/ambassador" />
+          </StudioShell>
         </div>
       </PageShell>
     );
@@ -550,14 +539,14 @@ export default function AmbassadorPage() {
   // ── Enrolled dashboard ────────────────────────────────────
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
-      <div className="pb-24 flex flex-col lg:flex-row gap-8">
-        <main className="flex-1 min-w-0">
+      <div className="pb-24">
+        <StudioShell>
           {/* Header */}
           <div className="mb-6 md:mb-8">
             <div className="flex items-center gap-4 mb-1">
               <Link
                 href="/creator/studio"
-                className="p-2.5 hover:bg-surface-raised rounded-xl transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                className="p-2.5 hover:bg-surface-raised rounded-xl transition-colors active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-brand-primary"
               >
                 <ArrowLeft size={24} />
               </Link>
@@ -566,18 +555,18 @@ export default function AmbassadorPage() {
                   Creator Ambassador
                 </h1>
                 {data.status === "active" && (
-                  <Badge className="bg-success/10 text-success border-transparent text-xs">
+                  <Badge className="bg-success/10 text-success border-transparent text-tiny">
                     Active
                   </Badge>
                 )}
                 {data.status === "suspended" && (
-                  <Badge className="bg-error/10 text-error border-transparent text-xs">
+                  <Badge className="bg-error/10 text-error border-transparent text-tiny">
                     Suspended
                   </Badge>
                 )}
               </div>
             </div>
-            <p className="text-text-tertiary text-sm md:text-base pl-1">
+            <p className="text-text-tertiary text-small md:text-body-lg pl-1">
               Invite creators and earn estimated referral rewards when they grow
             </p>
           </div>
@@ -588,16 +577,16 @@ export default function AmbassadorPage() {
               <div className="flex items-start gap-3">
                 <Gift size={20} className="text-[var(--success)] shrink-0 mt-0.5" aria-hidden />
                 <div>
-                  <p className="font-semibold text-success text-sm mb-1">
+                  <p className="font-semibold text-success text-small mb-1">
                     First Qualified Referral!
                   </p>
-                  <p className="text-xs text-text-secondary leading-relaxed">
+                  <p className="text-tiny text-text-secondary leading-relaxed">
                     Your first invited creator has completed their creator setup and generated
-                    eligible revenue. You&apos;ve reached Rising Star status — your referral rewards
-                    are now accumulating.
+                    eligible revenue. Your referral rewards are now accumulating — every 5 qualified
+                    creators extends your Beta 0% commission window by 1 month.
                   </p>
                   <button
-                    className="mt-2 text-xs text-success underline underline-offset-2"
+                    className="mt-2 text-tiny text-success underline underline-offset-2"
                     onClick={() => setShowFirstQualifiedCelebration(false)}
                   >
                     Dismiss
@@ -613,11 +602,11 @@ export default function AmbassadorPage() {
               <div>
                 <div className="flex items-center gap-2 mb-0.5">
                   <currentMilestone.Icon size={18} className={currentMilestone.color} aria-hidden />
-                  <span className={`text-base font-bold ${currentMilestone.color}`}>
+                  <span className={`text-body-lg font-bold ${currentMilestone.color}`}>
                     {currentMilestone.label}
                   </span>
                 </div>
-                <p className="text-xs text-text-tertiary pl-0.5">
+                <p className="text-tiny text-text-tertiary pl-0.5">
                   {qualifiedCount} qualified creator{qualifiedCount !== 1 ? "s" : ""}
                   {nextMilestone
                     ? ` · ${progressInfo.next - qualifiedCount} more to ${nextMilestone.label}`
@@ -625,7 +614,7 @@ export default function AmbassadorPage() {
                 </p>
               </div>
               <div
-                className={`px-3 py-1.5 rounded-lg border text-xs font-semibold ${currentMilestone.bgColor} ${currentMilestone.borderColor} ${currentMilestone.color}`}
+                className={`px-3 py-1.5 rounded-lg border text-tiny font-semibold ${currentMilestone.bgColor} ${currentMilestone.borderColor} ${currentMilestone.color}`}
               >
                 {currentMilestone.label}
               </div>
@@ -700,15 +689,50 @@ export default function AmbassadorPage() {
             </div>
           </div>
 
+          {/* Beta 0% commission window (Founding Creator non-cash incentive) */}
+          <div
+            className="card-block p-5 mb-6 border border-[var(--premium)]/20"
+            data-testid="commission-window-card"
+          >
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Star size={16} className="text-[var(--premium)]" aria-hidden />
+                  <h2 className="font-semibold text-text-primary text-small">
+                    Beta 0% Commission Window
+                  </h2>
+                </div>
+                <p className="text-tiny text-text-tertiary leading-relaxed max-w-md">
+                  Founding Creators start Beta with {FOUNDING_BASE_COMMISSION_FREE_MONTHS} months of
+                  0% platform commission. Every 5 qualified referrals adds 1 more month, up to +
+                  {MAX_REFERRAL_EXTENSION_MONTHS} months.
+                </p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-2xl font-bold text-[var(--premium)]">
+                  {FOUNDING_BASE_COMMISSION_FREE_MONTHS +
+                    getReferralExtensionMonths(qualifiedCount)}{" "}
+                  <span className="text-small font-medium">months</span>
+                </p>
+                <p className="text-[10px] text-text-tertiary">
+                  {FOUNDING_BASE_COMMISSION_FREE_MONTHS} base +{" "}
+                  {getReferralExtensionMonths(qualifiedCount)} earned
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Referral Link Card */}
           <div className="card-block p-6 mb-6" data-testid="referral-link-card">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-brand-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                <Share2 size={20} className="text-brand-primary" />
+                <Share2 size={20} className="text-wine-text" />
               </div>
               <div>
                 <h2 className="font-semibold text-text-primary">Your Referral Link</h2>
-                <p className="text-xs text-text-tertiary">Share with creators you want to invite</p>
+                <p className="text-tiny text-text-tertiary">
+                  Share with creators you want to invite
+                </p>
               </div>
             </div>
 
@@ -717,7 +741,7 @@ export default function AmbassadorPage() {
                 type="text"
                 readOnly
                 value={data.link ?? ""}
-                className="flex-1 bg-surface-raised border border-border-base rounded-xl px-4 py-3 text-sm text-text-secondary font-mono focus:outline-none focus:ring-2 focus:ring-brand-primary min-w-0"
+                className="flex-1 bg-surface-raised border border-border-base rounded-xl px-4 py-3 text-small text-text-secondary font-mono focus:outline-none focus:ring-2 focus:ring-brand-primary min-w-0"
                 onFocus={(e) => e.target.select()}
                 aria-label="Your referral link"
               />
@@ -730,18 +754,18 @@ export default function AmbassadorPage() {
                 {copied ? (
                   <>
                     <Check size={16} className="text-success" />
-                    <span className="text-success text-sm">Copied!</span>
+                    <span className="text-success text-small">Copied!</span>
                   </>
                 ) : (
                   <>
                     <Copy size={16} />
-                    <span className="text-sm">Copy</span>
+                    <span className="text-small">Copy</span>
                   </>
                 )}
               </Button>
             </div>
 
-            <p className="text-xs text-text-tertiary mb-3">
+            <p className="text-tiny text-text-tertiary mb-3">
               Code: <span className="font-mono text-text-secondary font-medium">{data.code}</span>
             </p>
 
@@ -750,7 +774,7 @@ export default function AmbassadorPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 text-xs bg-surface-raised border-border-base hover:bg-surface-overlay"
+                className="gap-2 text-tiny bg-surface-raised border-border-base hover:bg-surface-overlay"
                 onClick={() => setShareModalOpen(true)}
               >
                 <Share2 size={14} />
@@ -800,29 +824,29 @@ export default function AmbassadorPage() {
             <div className="card-block p-5">
               <div className="flex items-center gap-2 mb-1">
                 <Clock size={14} className="text-text-tertiary" />
-                <div className="text-xs font-semibold text-text-tertiary uppercase tracking-wide">
+                <div className="text-tiny font-semibold text-text-tertiary uppercase tracking-wide">
                   Estimated Pending
                 </div>
               </div>
               <div className="text-3xl font-bold text-text-primary mb-1">
                 ${animatedPending.toFixed(2)}
               </div>
-              <div className="text-xs text-text-tertiary">Under review · Not withdrawable</div>
+              <div className="text-tiny text-text-tertiary">Under review · Not withdrawable</div>
             </div>
             <div className="card-block p-5">
               <div className="flex items-center gap-2 mb-1">
                 <Star size={14} className="text-text-tertiary" />
-                <div className="text-xs font-semibold text-text-tertiary uppercase tracking-wide">
+                <div className="text-tiny font-semibold text-text-tertiary uppercase tracking-wide">
                   Approved Credit
                 </div>
               </div>
               <div className="text-3xl font-bold text-text-primary mb-1">
                 ${animatedApproved.toFixed(2)}
               </div>
-              <div className="text-xs text-text-tertiary">Reviewed · Not withdrawable in MVP</div>
+              <div className="text-tiny text-text-tertiary">Reviewed · Not withdrawable in MVP</div>
             </div>
           </div>
-          <p className="text-xs text-text-tertiary mb-6 px-1 leading-relaxed">
+          <p className="text-tiny text-text-tertiary mb-6 px-1 leading-relaxed">
             Referral rewards are internal estimated records. They are not withdrawable and do not
             represent a guaranteed payout until the platform&apos;s payout system is ready.
           </p>
@@ -833,12 +857,12 @@ export default function AmbassadorPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-bold text-text-primary">Invited Creators</h3>
-                  <p className="text-xs text-text-tertiary mt-0.5">
+                  <p className="text-tiny text-text-tertiary mt-0.5">
                     Onboarding status only — no earnings or private data shown
                   </p>
                 </div>
                 {referrals.length > 0 && (
-                  <div className="hidden md:flex items-center gap-1 text-xs text-text-tertiary">
+                  <div className="hidden md:flex items-center gap-1 text-tiny text-text-tertiary">
                     {FUNNEL_STEPS.map((step, i) => (
                       <div key={step.key} className="flex items-center gap-1">
                         <span>{step.label}</span>
@@ -866,12 +890,12 @@ export default function AmbassadorPage() {
             ) : referrals.length === 0 ? (
               <div className="p-8 text-center">
                 <div className="w-14 h-14 bg-surface-raised rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Sparkles size={24} className="text-brand-primary/60" />
+                  <Sparkles size={24} className="text-wine-text/60" />
                 </div>
-                <p className="font-semibold text-text-primary text-sm mb-2">
+                <p className="font-semibold text-text-primary text-small mb-2">
                   Your network starts here
                 </p>
-                <p className="text-xs text-text-tertiary mb-5 max-w-xs mx-auto leading-relaxed">
+                <p className="text-tiny text-text-tertiary mb-5 max-w-xs mx-auto leading-relaxed">
                   Share your link with fellow creators. You&apos;ll track their progress from signup
                   to first earning right here.
                 </p>
@@ -898,15 +922,15 @@ export default function AmbassadorPage() {
                       <div className="flex items-center gap-3 mb-3">
                         <Avatar className="w-9 h-9 shrink-0">
                           <AvatarImage src={r.avatar_url ?? undefined} alt={r.display_name} />
-                          <AvatarFallback className="bg-brand-primary/10 text-brand-primary text-xs font-semibold">
+                          <AvatarFallback className="bg-brand-primary/10 text-wine-text text-tiny font-semibold">
                             {r.display_name.slice(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-text-primary text-sm truncate">
+                          <div className="font-medium text-text-primary text-small truncate">
                             {r.display_name}
                           </div>
-                          <div className="text-xs text-text-tertiary">
+                          <div className="text-tiny text-text-tertiary">
                             Joined {format(new Date(r.created_at), "MMM d, yyyy")}
                             {r.qualified_at && (
                               <span className="ml-2 text-success">
@@ -938,7 +962,7 @@ export default function AmbassadorPage() {
                                   <span
                                     className={`text-[9px] mt-1 truncate w-full text-center ${
                                       isCurrent
-                                        ? "text-brand-primary font-semibold"
+                                        ? "text-wine-text font-semibold"
                                         : isReached
                                           ? "text-text-secondary"
                                           : "text-text-tertiary"
@@ -964,10 +988,10 @@ export default function AmbassadorPage() {
           <div className="card-block overflow-hidden" data-testid="ambassador-faq">
             <div className="p-6 border-b border-border-base">
               <div className="flex items-center gap-2">
-                <Star size={16} className="text-brand-primary" />
+                <Star size={16} className="text-wine-text" />
                 <h3 className="text-lg font-bold text-text-primary">Program Rules &amp; FAQ</h3>
               </div>
-              <p className="text-xs text-text-tertiary mt-1">
+              <p className="text-tiny text-text-tertiary mt-1">
                 How rewards are calculated, qualified, and reviewed
               </p>
             </div>
@@ -979,7 +1003,7 @@ export default function AmbassadorPage() {
                     onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
                     aria-expanded={openFaq === idx}
                   >
-                    <span className="text-sm font-medium text-text-primary">{item.q}</span>
+                    <span className="text-small font-medium text-text-primary">{item.q}</span>
                     {openFaq === idx ? (
                       <ChevronUp size={16} className="text-text-tertiary shrink-0" />
                     ) : (
@@ -987,7 +1011,7 @@ export default function AmbassadorPage() {
                     )}
                   </button>
                   {openFaq === idx && (
-                    <div className="px-4 md:px-6 pb-4 md:pb-6 text-sm text-text-secondary leading-relaxed">
+                    <div className="px-4 md:px-6 pb-4 md:pb-6 text-small text-text-secondary leading-relaxed">
                       {item.a}
                     </div>
                   )}
@@ -995,10 +1019,7 @@ export default function AmbassadorPage() {
               ))}
             </div>
           </div>
-        </main>
-
-        {/* Sidebar */}
-        <Sidebar navItems={navItems} activePath="/creator/studio/ambassador" />
+        </StudioShell>
       </div>
 
       {/* Social share modal — opened when creator clicks Share */}
@@ -1011,46 +1032,5 @@ export default function AmbassadorPage() {
         sheetTitle="Share your referral link"
       />
     </PageShell>
-  );
-}
-
-// ─── Sidebar component ────────────────────────────────────
-
-interface NavItem {
-  href: string;
-  icon: React.FC<{ size?: number }>;
-  label: string;
-}
-
-function Sidebar({ navItems, activePath }: { navItems: NavItem[]; activePath: string }) {
-  return (
-    <aside className="w-full lg:w-72 shrink-0">
-      <div className="sticky top-24 space-y-4">
-        <div className="card-block p-4">
-          <h2 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">
-            Studio
-          </h2>
-          <nav className="space-y-1" aria-label="Studio navigation">
-            {navItems.map(({ href, icon: Icon, label }) => {
-              const isActive = href === activePath;
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary ${
-                    isActive
-                      ? "bg-brand-primary/10 text-brand-primary"
-                      : "text-text-secondary hover:bg-surface-raised hover:text-text-primary"
-                  }`}
-                >
-                  <Icon size={16} />
-                  {label}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-      </div>
-    </aside>
   );
 }

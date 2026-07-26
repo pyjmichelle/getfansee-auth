@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCountUp } from "@/hooks/use-count-up";
 import { Coins } from "@/lib/icons";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
 
 type Purchase = {
@@ -32,6 +32,7 @@ type Purchase = {
 
 export default function PurchasesPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -49,8 +50,7 @@ export default function PurchasesPage() {
       setIsLoading(true);
       setLoadError(null);
       try {
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
+        if (!auth.authenticated || !auth.user) {
           if (isTestMode) {
             setCurrentUser({
               username: "test-user",
@@ -65,9 +65,9 @@ export default function PurchasesPage() {
         }
 
         setCurrentUser({
-          username: bootstrap.profile?.display_name || bootstrap.user.email.split("@")[0] || "user",
-          role: (bootstrap.profile?.role || "fan") as "fan" | "creator",
-          avatar: bootstrap.profile?.avatar_url || undefined,
+          username: auth.profile?.display_name || auth.user.email.split("@")[0] || "user",
+          role: (auth.profile?.role || "fan") as "fan" | "creator",
+          avatar: auth.profile?.avatar_url || undefined,
         });
 
         const purchasesResponse = await fetch("/api/purchases", { cache: "no-store" });
@@ -206,7 +206,7 @@ export default function PurchasesPage() {
     };
 
     loadData();
-  }, [router, reloadKey, isTestMode]);
+  }, [router, reloadKey, isTestMode, auth.authenticated, auth.user, auth.profile]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -257,9 +257,9 @@ export default function PurchasesPage() {
         {/* Hero Banner */}
         <div className="card-block bg-gradient-subtle p-6 md:p-8 mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">Your Purchases</h1>
-          <p className="text-text-tertiary text-sm md:text-base">
+          <p className="text-text-tertiary text-small md:text-body-lg">
             You&apos;ve unlocked{" "}
-            <span className="font-bold text-brand-primary">{animatedPurchaseCount.toFixed(0)}</span>{" "}
+            <span className="font-bold text-wine-text">{animatedPurchaseCount.toFixed(0)}</span>{" "}
             exclusive pieces of content.
           </p>
         </div>
@@ -302,7 +302,7 @@ export default function PurchasesPage() {
                         <p className="text-lg font-bold text-brand-accent">
                           ${(purchase.paid_amount_cents / 100).toFixed(2)}
                         </p>
-                        <p className="text-xs text-text-quaternary">
+                        <p className="text-tiny text-text-quaternary">
                           {formatDate(purchase.created_at)}
                         </p>
                       </div>
@@ -313,7 +313,7 @@ export default function PurchasesPage() {
                         {purchase.post.title}
                       </h3>
                     )}
-                    <p className="text-text-secondary text-sm mb-4 line-clamp-2">
+                    <p className="text-text-secondary text-small mb-4 line-clamp-2">
                       {purchase.post?.content}
                     </p>
 
@@ -330,20 +330,18 @@ export default function PurchasesPage() {
           <aside className="w-full lg:w-64 lg:shrink-0">
             <div className="sticky top-24 space-y-4">
               <div className="card-block p-5">
-                <h2 className="text-sm font-semibold text-text-primary mb-4">Summary</h2>
+                <h2 className="text-small font-semibold text-text-primary mb-4">Summary</h2>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-tertiary">Total Purchases</span>
+                    <span className="text-small text-text-tertiary">Total Purchases</span>
                     <span className="font-bold text-text-primary">
                       {animatedPurchaseCount.toFixed(0)}
                     </span>
                   </div>
                   <div className="h-px bg-border-base" />
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-tertiary">Total Spent</span>
-                    <span className="font-bold text-gradient-primary">
-                      ${animatedSpent.toFixed(2)}
-                    </span>
+                    <span className="text-small text-text-tertiary">Total Spent</span>
+                    <span className="font-bold text-text-primary">${animatedSpent.toFixed(2)}</span>
                   </div>
                 </div>
               </div>

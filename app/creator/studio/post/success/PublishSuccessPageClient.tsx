@@ -1,43 +1,40 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle, Eye, ArrowLeft, Share2, Copy, Clock, ImageIcon } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PageShell } from "@/components/page-shell";
-import { DEFAULT_AVATAR_CREATOR, CREATOR_AVATAR_LEGACY } from "@/lib/image-fallbacks";
+import { ShareModal } from "@/components/share-modal";
+import { DEFAULT_AVATAR_CREATOR } from "@/lib/image-fallbacks";
+import { useAuth } from "@/contexts/auth-context";
 
 type PublishSuccessPageClientProps = {
   postType: "free" | "subscribers" | "ppv";
   price: string;
+  postId?: string;
 };
 
 export default function PublishSuccessPageClient({
   postType,
   price,
+  postId,
 }: PublishSuccessPageClientProps) {
   const router = useRouter();
+  const auth = useAuth();
   const [copied, setCopied] = useState(false);
-  const [postId, setPostId] = useState<string | null>(null);
-  const currentUser = {
-    username: "sophia_creative",
-    role: "creator" as const,
-    avatar: CREATOR_AVATAR_LEGACY,
-  };
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
-  const resolvedPostId = postId ?? "demo-post";
+  const username = auth.profile?.display_name || auth.user?.email?.split("@")[0] || "you";
+  const avatar = auth.profile?.avatar_url || DEFAULT_AVATAR_CREATOR;
+  const currentUser = { username, role: "creator" as const, avatar };
+
   const baseUrl =
     typeof window !== "undefined"
       ? window.location.origin
       : process.env.NEXT_PUBLIC_SITE_URL || "https://getfansee.com";
-  const postUrl = `${baseUrl}/posts/${resolvedPostId}`;
-
-  useEffect(() => {
-    setPostId(`demo-post-${Date.now()}`);
-    const timer = setTimeout(() => {}, 3000);
-    return () => clearTimeout(timer);
-  }, []);
+  const postUrl = postId ? `${baseUrl}/posts/${postId}` : `${baseUrl}/creator/studio`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(postUrl);
@@ -76,10 +73,8 @@ export default function PublishSuccessPageClient({
                 />
               </div>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-3 text-text-primary">
-              Post Published!
-            </h1>
-            <p className="text-text-secondary text-base md:text-lg">
+            <h1 className="text-h1 mb-3 text-text-primary">Post Published!</h1>
+            <p className="text-text-secondary text-body">
               Your {getPostTypeLabel().toLowerCase()} is now live and visible to your audience
             </p>
           </div>
@@ -98,13 +93,13 @@ export default function PublishSuccessPageClient({
                 </div>
                 <div>
                   <p className="font-semibold text-text-primary">{currentUser.username}</p>
-                  <p className="text-xs text-text-tertiary flex items-center gap-1">
+                  <p className="text-tiny text-text-tertiary flex items-center gap-1">
                     <Clock size={10} aria-hidden="true" />
                     Just now
                   </p>
                 </div>
               </div>
-              <p className="text-text-secondary text-sm line-clamp-2 mb-4">
+              <p className="text-text-secondary text-small line-clamp-2 mb-4">
                 Your new {getPostTypeLabel().toLowerCase()} has been published successfully…
               </p>
               <div className="aspect-video bg-surface-raised rounded-xl flex items-center justify-center border border-border-base">
@@ -115,8 +110,8 @@ export default function PublishSuccessPageClient({
             {/* Share Section */}
             <div className="card-block p-5" role="region" aria-label="Share your post">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-9 h-9 bg-brand-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                  <Share2 size={16} className="text-brand-primary" aria-hidden="true" />
+                <div className="w-9 h-9 bg-[var(--wine-tint)] rounded-xl flex items-center justify-center shrink-0">
+                  <Share2 size={16} className="text-wine-text" aria-hidden="true" />
                 </div>
                 <h2 className="font-bold text-text-primary">Share your post</h2>
               </div>
@@ -127,14 +122,14 @@ export default function PublishSuccessPageClient({
                   type="text"
                   value={postUrl}
                   readOnly
-                  className="flex-1 px-3 py-2 bg-surface-raised border border-border-base rounded-xl text-xs text-text-primary truncate focus:outline-none focus:border-brand-primary/50"
+                  className="flex-1 px-3 py-2 bg-surface-raised border border-border-base rounded-xl text-tiny text-text-primary truncate focus:outline-none focus:border-[var(--wine)]/50"
                   aria-label="Post URL"
                 />
                 <Button
                   onClick={handleCopyLink}
                   type="button"
                   size="sm"
-                  className="px-4 py-2 bg-brand-primary text-white text-sm shadow-glow min-h-[40px] flex items-center gap-1.5"
+                  className="min-h-[40px] flex items-center gap-1.5"
                   aria-label={copied ? "Link copied to clipboard" : "Copy post link to clipboard"}
                 >
                   {copied ? (
@@ -152,46 +147,30 @@ export default function PublishSuccessPageClient({
               </div>
 
               {/* Social Share */}
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="py-2.5 text-sm min-h-[44px] flex items-center justify-center gap-1.5"
-                  aria-label="Share on Twitter"
-                >
-                  <Share2 size={14} aria-hidden="true" />
-                  Twitter
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="py-2.5 bg-surface-raised border-border-base text-text-primary text-sm min-h-[44px] flex items-center justify-center gap-1.5 hover:bg-surface-overlay"
-                  aria-label="Share post via other apps"
-                >
-                  <Share2 size={14} aria-hidden="true" />
-                  Share
-                </Button>
-              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full py-2.5 text-small min-h-[44px] flex items-center justify-center gap-1.5"
+                onClick={() => setShareModalOpen(true)}
+                aria-label="Share your post"
+              >
+                <Share2 size={14} aria-hidden="true" />
+                Share to social
+              </Button>
             </div>
           </div>
 
           {/* Action Buttons — Mobile: full-width stacked; Desktop: side-by-side */}
           <div className="flex flex-col sm:flex-row gap-3 mb-5">
             <Button
-              onClick={() =>
-                router.push(`/creator/${currentUser.username}?viewAs=fan&postId=${resolvedPostId}`)
-              }
-              className="flex-1 min-h-[48px] bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-primary/90 transition-all shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+              onClick={() => router.push(postId ? `/posts/${postId}` : "/creator/studio")}
+              className="flex-1 min-h-[48px]"
               aria-label="View your published post"
             >
               <Eye className="w-5 h-5 mr-2" aria-hidden="true" />
               View Post
             </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="flex-1 min-h-[48px] bg-surface-base border border-border-base rounded-xl font-semibold hover:bg-surface-raised transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
-            >
+            <Button asChild variant="outline" className="flex-1 min-h-[48px]">
               <Link href="/creator/new-post" aria-label="Create another post">
                 Create Another
               </Link>
@@ -202,7 +181,7 @@ export default function PublishSuccessPageClient({
           <div className="text-center">
             <Link
               href="/creator/studio"
-              className="text-text-tertiary hover:text-brand-primary transition-colors inline-flex items-center gap-1.5 text-sm focus-visible:outline-2 focus-visible:outline-brand-primary"
+              className="text-text-tertiary hover:text-wine-text transition-colors inline-flex items-center gap-1.5 text-small focus-visible:outline-2 focus-visible:outline-[var(--wine)]"
               aria-label="Return to Creator Studio dashboard"
             >
               <ArrowLeft size={14} aria-hidden="true" />
@@ -211,6 +190,14 @@ export default function PublishSuccessPageClient({
           </div>
         </div>
       </div>
+
+      <ShareModal
+        open={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        url={postUrl}
+        title="Check out my new post on GetFanSee"
+        sheetTitle="Share your post"
+      />
     </PageShell>
   );
 }

@@ -55,6 +55,19 @@ export const AnalyticsEvents = {
   SEARCH_PERFORMED: "search_performed",
   FEED_SCROLLED: "feed_scrolled",
   TAG_CLICKED: "tag_clicked",
+  DIRECTORY_TAG_FILTERED: "directory_tag_filtered",
+  DIRECTORY_CREATOR_CLICKED: "directory_creator_clicked",
+  PREFERENCE_QUIZ_COMPLETED: "preference_quiz_completed",
+  PREFERENCE_QUIZ_DISMISSED: "preference_quiz_dismissed",
+
+  // Alpha 漏斗（发现 → 关注/收藏 → 邮箱 → 外链/crypto 付费意图）
+  CREATOR_FOLLOWED: "creator_followed",
+  CREATOR_SAVED: "creator_saved",
+  EXTERNAL_LINK_CLICKED: "external_link_clicked",
+  EMAIL_CAPTURED: "email_captured",
+  PAYWALL_VARIANT_SHOWN: "paywall_variant_shown",
+  CRYPTO_TOPUP_STARTED: "crypto_topup_started",
+  CRYPTO_TOPUP_COMPLETED: "crypto_topup_completed",
 
   // 管理员操作（审计日志）
   ADMIN_KYC_REVIEWED: "admin_kyc_reviewed",
@@ -273,6 +286,48 @@ export const Analytics = {
 
   tagClicked(tag: string) {
     Analytics.track(AnalyticsEvents.TAG_CLICKED, { tag });
+  },
+
+  // ============================================================
+  // Alpha 漏斗
+  // ============================================================
+
+  creatorFollowed(creatorId: string) {
+    Analytics.track(AnalyticsEvents.CREATOR_FOLLOWED, { creator_id: creatorId });
+  },
+
+  creatorSaved(creatorId: string) {
+    Analytics.track(AnalyticsEvents.CREATOR_SAVED, { creator_id: creatorId });
+  },
+
+  externalLinkClicked(creatorId: string, linkId: string, context: "profile" | "paywall") {
+    Analytics.track(AnalyticsEvents.EXTERNAL_LINK_CLICKED, {
+      creator_id: creatorId,
+      link_id: linkId,
+      context,
+    });
+  },
+
+  emailCaptured(source: string) {
+    Analytics.track(AnalyticsEvents.EMAIL_CAPTURED, { source });
+  },
+
+  /**
+   * 付费墙变体展示（A/B 数据：钱包路径 vs 外链路径）
+   */
+  paywallVariantShown(postId: string | undefined, variant: "wallet" | "external_alpha") {
+    Analytics.track(AnalyticsEvents.PAYWALL_VARIANT_SHOWN, {
+      post_id: postId,
+      variant,
+    });
+  },
+
+  cryptoTopUpStarted(amountCents: number) {
+    Analytics.track(AnalyticsEvents.CRYPTO_TOPUP_STARTED, { amount_cents: amountCents });
+  },
+
+  cryptoTopUpCompleted(amountCents: number) {
+    Analytics.track(AnalyticsEvents.CRYPTO_TOPUP_COMPLETED, { amount_cents: amountCents });
   },
 
   // ============================================================

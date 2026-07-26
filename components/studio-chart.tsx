@@ -18,38 +18,41 @@ export function StudioChart({ data }: StudioChartProps) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <AreaChart data={data}>
+        {/* Revenue = wine, subscribers = premium gold — matches the brand
+            palette instead of the previous ad-hoc pink/purple/crimson mix
+            (whose gradient fill didn't even match its own line stroke). */}
         <defs>
           <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#C41E3A" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#C41E3A" stopOpacity={0} />
+            <stop offset="5%" stopColor="var(--wine)" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="var(--wine)" stopOpacity={0} />
           </linearGradient>
           <linearGradient id="colorSubscribers" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#D4AF37" stopOpacity={0} />
+            <stop offset="5%" stopColor="var(--premium)" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="var(--premium)" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" />
-        <XAxis dataKey="date" stroke="#999999" />
-        <YAxis stroke="#999999" />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
+        <XAxis dataKey="date" stroke="var(--text-muted)" />
+        <YAxis stroke="var(--text-muted)" />
         <Tooltip
           contentStyle={{
-            backgroundColor: "#0D0D0D",
-            border: "1px solid #1F1F1F",
+            backgroundColor: "var(--bg-raised)",
+            border: "1px solid var(--border-default)",
             borderRadius: "12px",
-            color: "#E5E5E5",
+            color: "var(--text-primary)",
           }}
         />
         <Area
           type="monotone"
           dataKey="revenue"
-          stroke="#F48FB1"
+          stroke="var(--wine-hover)"
           fillOpacity={1}
           fill="url(#colorRevenue)"
         />
         <Area
           type="monotone"
           dataKey="subscribers"
-          stroke="#9C27B0"
+          stroke="var(--premium)"
           fillOpacity={1}
           fill="url(#colorSubscribers)"
         />

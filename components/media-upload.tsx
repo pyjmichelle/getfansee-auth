@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Upload, X, Loader2 } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { uploadFile, type UploadProgress } from "@/lib/storage";
@@ -26,6 +26,16 @@ export function MediaUpload({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+    };
+  }, []);
 
   const handleFile = useCallback(
     async (file: File) => {
@@ -51,7 +61,7 @@ export function MediaUpload({
 
         // 上传文件（注意：Supabase Storage 不支持实时进度，这里模拟进度）
         // 模拟上传进度（实际进度需要等待上传完成）
-        const progressInterval = setInterval(() => {
+        progressIntervalRef.current = setInterval(() => {
           setUploadProgress((prev) => {
             if (!prev) return { loaded: 0, total: file.size, percentage: 0 };
             const newPercentage = Math.min(prev.percentage + 10, 90);
@@ -65,8 +75,6 @@ export function MediaUpload({
 
         const mediaFile = await uploadFile(file);
 
-        clearInterval(progressInterval);
-
         setUploadedUrl(mediaFile.url);
         onUploadComplete(mediaFile.url);
         setUploadProgress(null);
@@ -77,6 +85,12 @@ export function MediaUpload({
         setPreviewUrl(null);
         setUploadProgress(null);
       } finally {
+        // Previously only cleared on success — a failed uploadFile() call
+        // (network error) left this ticking forever.
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+          progressIntervalRef.current = null;
+        }
         setIsUploading(false);
       }
     },
@@ -148,10 +162,10 @@ export function MediaUpload({
           {isUploading ? (
             <>
               <Loader2
-                className="w-12 h-12 mx-auto mb-4 animate-spin text-brand-primary"
+                className="w-12 h-12 mx-auto mb-4 animate-spin text-wine-text"
                 aria-hidden="true"
               />
-              <p className="text-sm text-text-tertiary mb-2">Uploading…</p>
+              <p className="text-small text-text-tertiary mb-2">Uploading…</p>
               {uploadProgress && (
                 <div className="w-full max-w-xs mx-auto">
                   <div className="h-2 bg-surface-raised rounded-full overflow-hidden">
@@ -164,7 +178,7 @@ export function MediaUpload({
                       aria-valuemax={100}
                     />
                   </div>
-                  <p className="text-xs text-text-tertiary mt-1">
+                  <p className="text-tiny text-text-tertiary mt-1">
                     {uploadProgress.percentage.toFixed(0)}%
                   </p>
                 </div>
@@ -173,10 +187,10 @@ export function MediaUpload({
           ) : (
             <>
               <Upload className="w-12 h-12 mx-auto mb-4 text-text-tertiary" aria-hidden="true" />
-              <p className="text-sm font-medium mb-1 text-text-primary">
+              <p className="text-small font-medium mb-1 text-text-primary">
                 Click or drag files here to upload
               </p>
-              <p className="text-xs text-text-tertiary">
+              <p className="text-tiny text-text-tertiary">
                 Supports images and videos (images max 10MB, videos max 200MB)
               </p>
             </>
@@ -198,7 +212,7 @@ export function MediaUpload({
               <Button
                 variant="destructive"
                 size="icon"
-                className="absolute top-2 right-2 min-h-[44px] min-w-[44px] active:scale-95"
+                className="absolute top-2 right-2 min-h-[44px] min-w-[44px] active:scale-[0.98]"
                 onClick={handleRemove}
                 aria-label="Remove uploaded file"
               >
@@ -220,9 +234,9 @@ export function MediaUpload({
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                   <div className="text-center text-white">
                     <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin" aria-hidden="true" />
-                    <p className="text-sm">Uploading…</p>
+                    <p className="text-small">Uploading…</p>
                     {uploadProgress && (
-                      <p className="text-xs mt-1">{uploadProgress.percentage.toFixed(0)}%</p>
+                      <p className="text-tiny mt-1">{uploadProgress.percentage.toFixed(0)}%</p>
                     )}
                   </div>
                 </div>
@@ -230,7 +244,7 @@ export function MediaUpload({
               <Button
                 variant="destructive"
                 size="icon"
-                className="absolute top-2 right-2 min-h-[44px] min-w-[44px] active:scale-95"
+                className="absolute top-2 right-2 min-h-[44px] min-w-[44px] active:scale-[0.98]"
                 onClick={handleRemove}
                 disabled={isUploading}
                 aria-label="Remove file"

@@ -45,7 +45,7 @@ export function PostLikeButton({
           isLiked && "fill-[var(--color-pink-500)] text-[var(--color-pink-500)]"
         )}
       />
-      {likesCount > 0 && <span className="text-sm">{likesCount}</span>}
+      {likesCount > 0 && <span className="text-small">{likesCount}</span>}
       <span className="hidden sm:inline">Like</span>
     </Button>
   );

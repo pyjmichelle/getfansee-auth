@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -21,7 +20,44 @@ type AuthPageClientProps = {
   initialMode?: "login" | "signup";
   isInvited?: boolean;
   refName?: string;
+  /** Deep-link target from middleware's `?redirect=`; falls back to /home. */
+  redirectTo?: string;
 };
+
+/**
+ * Only ever navigate to a same-origin, relative path — `redirectTo` is
+ * attacker-controlled query-string input echoed back into a client-side
+ * navigation, so reject anything that isn't a plain in-app path (blocks
+ * protocol-relative `//evil.com`, absolute URLs, and redirect-back-to-/auth
+ * loops).
+ */
+function sanitizeRedirectTarget(path: string | undefined): string {
+  if (!path || !path.startsWith("/") || path.startsWith("//")) return "/home";
+  if (path.startsWith("/auth")) return "/home";
+  return path;
+}
+
+/**
+ * Navigate after a successful sign-in/sign-up.
+ *
+ * `router.refresh()` immediately followed by `router.push()` is a known race
+ * in the App Router: `refresh()` only *schedules* a server re-fetch to
+ * invalidate the client router cache, it doesn't block until that lands. If
+ * `push()` runs in the same tick, it can navigate using the STALE cached
+ * root layout — which still holds the pre-login `initialAuth` — so `/home`
+ * briefly (or, depending on cache timing, not-so-briefly) renders as if
+ * logged out, and NavHeader/redirect guards on the destination page can
+ * bounce the user right back to /auth even though sign-in succeeded.
+ *
+ * A full navigation sidesteps the client router cache entirely: the browser
+ * requests `target` fresh, the server reads the just-set auth cookie, and
+ * every layout down the tree renders with correct auth state on the very
+ * first paint. Auth transitions are infrequent enough that losing the SPA
+ * transition here is the right trade for eliminating this whole race class.
+ */
+function navigateAfterAuth(target: string) {
+  window.location.href = target;
+}
 
 const devLog = (...args: unknown[]) => {
   if (process.env.NODE_ENV === "development") {
@@ -36,10 +72,11 @@ export default function AuthPageClient({
   initialMode = "login",
   isInvited = false,
   refName,
+  redirectTo,
 }: AuthPageClientProps) {
   const supabase = getSupabaseBrowserClient();
-  const router = useRouter();
   const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === "true";
+  const postAuthTarget = sanitizeRedirectTarget(redirectTo);
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -157,11 +194,8 @@ export default function AuthPageClient({
       Analytics.identify(data.user.id);
       Analytics.userLoggedIn("email");
 
-      devLog("[auth] Navigating to /home");
-      // router.refresh() re-renders the layout (AuthProvider) with the new
-      // server-side auth state before navigating.
-      router.refresh();
-      router.push("/home");
+      devLog("[auth] Navigating to", postAuthTarget);
+      navigateAfterAuth(postAuthTarget);
     } catch (err) {
       devLog("[auth] Login error:", err);
       console.error("[auth] Full error stack:", err);
@@ -207,8 +241,7 @@ export default function AuthPageClient({
           console.warn("[auth] ensureProfile failed:", err);
         });
 
-        router.refresh();
-        router.push("/home");
+        navigateAfterAuth(postAuthTarget);
         return;
       }
 
@@ -233,8 +266,7 @@ export default function AuthPageClient({
         console.warn("[auth] ensureProfile failed:", err);
       });
 
-      router.refresh();
-      router.push("/home");
+      navigateAfterAuth(postAuthTarget);
     } catch (err) {
       setError(getErrorMessage(err));
       setIsLoading(false);
@@ -265,7 +297,7 @@ export default function AuthPageClient({
       style={{ touchAction: "manipulation", overscrollBehaviorY: "contain" }}
     >
       {/* ── PC Hero Side (left 45%) ─────────────────────── */}
-      <aside className="auth-hero relative overflow-hidden bg-[#0E0B0C]">
+      <aside className="auth-hero relative overflow-hidden bg-[var(--bg-base)]">
         {/* Hero background photo (required by design spec) */}
         <Image
           src="/images/auth/hero-pc.jpg"
@@ -314,7 +346,7 @@ export default function AuthPageClient({
           {/* Top branding */}
           <div className="flex items-center gap-3">
             <div className="size-12 rounded-[var(--radius-sm)] bg-[var(--wine)]/15 border border-[var(--wine)]/30 flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-[var(--wine)]" aria-hidden="true" />
+              <Sparkles className="w-6 h-6 text-wine-text" aria-hidden="true" />
             </div>
             <span className="font-bold text-[22px] text-white tracking-tight">GetFanSee</span>
           </div>
@@ -330,7 +362,7 @@ export default function AuthPageClient({
               {
                 Icon: Lock,
                 text: "Exclusive content for your subscribers",
-                color: "text-[var(--wine)]",
+                color: "text-wine-text",
               },
               { Icon: Globe, text: "Reach fans all around the world", color: "text-[var(--info)]" },
             ].map((f) => (
@@ -353,7 +385,7 @@ export default function AuthPageClient({
             <p className="font-display text-5xl font-bold text-[var(--text-primary)] leading-tight mb-3">
               Where Creators
               <br />
-              <span className="text-[var(--wine)]">Get Paid.</span>
+              <span className="text-wine-text">Get Paid.</span>
             </p>
             <p className="text-[1.0625rem] text-[var(--text-muted)] leading-relaxed">
               The premium content platform
@@ -370,7 +402,7 @@ export default function AuthPageClient({
           {/* Logo (mobile only — desktop logo is in hero) */}
           <div className="flex items-center gap-2 mb-6 lg:hidden">
             <div className="size-8 rounded-[var(--radius-sm)] bg-[var(--wine)] flex items-center justify-center">
-              <span className="text-[#F5F0EE] font-bold text-[0.75rem]">G</span>
+              <span className="text-text-primary font-bold text-[0.75rem]">G</span>
             </div>
             <span className="font-bold text-[1rem] text-[var(--text-primary)]">GetFanSee</span>
           </div>
@@ -470,7 +502,7 @@ export default function AuthPageClient({
                 <div className="flex justify-end">
                   <Link
                     href="/auth/forgot-password"
-                    className="text-[0.75rem] text-[var(--wine)] hover:text-[var(--wine-hover)] transition-colors"
+                    className="text-[0.75rem] text-wine-text hover:text-[var(--wine-hover)] transition-colors"
                   >
                     Forgot password?
                   </Link>
@@ -482,6 +514,7 @@ export default function AuthPageClient({
                   size="lg"
                   className="w-full"
                   disabled={isLoading}
+                  loading={isLoading}
                   data-testid="auth-submit"
                 >
                   Sign In
@@ -539,12 +572,12 @@ export default function AuthPageClient({
               {isInvited && (
                 <div className="mb-4 rounded-[var(--radius-lg)] border border-[var(--wine)]/25 bg-[var(--wine-tint)] px-4 py-3">
                   <div className="flex items-center gap-2.5">
-                    <Sparkles size={16} className="text-[var(--wine)] shrink-0" aria-hidden />
+                    <Sparkles size={16} className="text-wine-text shrink-0" aria-hidden />
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-semibold text-text-primary">
+                      <p className="text-small font-semibold text-text-primary">
                         {refName ? `Invited by ${refName}` : "You were invited"}
                       </p>
-                      <p className="text-[11px] text-text-secondary mt-0.5">
+                      <p className="text-tiny text-text-secondary mt-0.5">
                         Create exclusive content and earn on your terms.{" "}
                         <a
                           href="/privacy"
@@ -617,21 +650,21 @@ export default function AuthPageClient({
                   />
                   <label
                     htmlFor="age-confirm"
-                    className="text-[12px] text-text-muted leading-relaxed cursor-pointer"
+                    className="text-tiny text-text-muted leading-relaxed cursor-pointer"
                   >
                     I confirm I am 18 years or older and agree to the{" "}
-                    <Link href="/terms" className="text-[var(--wine)] hover:underline">
+                    <Link href="/terms" className="text-wine-text hover:underline">
                       Terms of Service
                     </Link>{" "}
                     and{" "}
-                    <Link href="/privacy" className="text-[var(--wine)] hover:underline">
+                    <Link href="/privacy" className="text-wine-text hover:underline">
                       Privacy Policy
                     </Link>
                   </label>
                 </div>
 
                 {!ageConfirmed && (
-                  <p className="text-[11px] text-text-muted" data-testid="auth-age-hint">
+                  <p className="text-tiny text-text-muted" data-testid="auth-age-hint">
                     You must confirm you are 18+ to create an account.
                   </p>
                 )}
@@ -642,6 +675,7 @@ export default function AuthPageClient({
                   size="lg"
                   className="w-full"
                   disabled={isLoading || !ageConfirmed}
+                  loading={isLoading}
                   data-testid="auth-submit"
                 >
                   Create Account
@@ -700,7 +734,7 @@ export default function AuthPageClient({
             items={["Secure & Encrypted", "24/7 Support", "Private & Discreet"]}
           />
 
-          <p className="mt-4 text-center text-[11px] text-text-disabled">
+          <p className="mt-4 text-center text-tiny text-text-disabled">
             © 2026 GetFanSee. All rights reserved.
           </p>
         </div>

@@ -16,10 +16,10 @@ const sizeMap = {
 };
 
 const glowMap: Record<string, string> = {
-  violet: "shadow-[0_0_16px_rgba(139,92,246,0.40)] border-violet-500/25",
-  rose: "shadow-[0_0_16px_rgba(139,92,246,0.40)] border-violet-500/25",
-  gold: "shadow-[0_0_16px_rgba(245,158,11,0.40)] border-amber-500/25",
-  purple: "shadow-[0_0_16px_rgba(99,102,241,0.40)] border-indigo-500/25",
+  violet: "shadow-none border-[var(--wine)]/25",
+  rose: "shadow-none border-[var(--wine)]/25",
+  gold: "shadow-none border-[var(--premium)]/25",
+  purple: "shadow-none border-[var(--wine)]/25",
   none: "border-white/8",
 };
 

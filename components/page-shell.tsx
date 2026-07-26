@@ -19,7 +19,6 @@ interface PageShellProps {
   className?: string;
   mainClassName?: string;
   noPadding?: boolean;
-  meshBg?: boolean;
   /** When the page has its own fixed bottom action bar, suppress the shared BottomNavigation on mobile */
   hideBottomNav?: boolean;
 }
@@ -45,22 +44,15 @@ export function PageShell({
   className,
   mainClassName,
   noPadding = false,
-  meshBg = false,
   hideBottomNav = false,
 }: PageShellProps) {
   return (
-    <div
-      className={cn(
-        "min-h-dvh bg-bg-base flex flex-col overflow-x-hidden",
-        meshBg && "mesh-bg",
-        className
-      )}
-    >
+    <div className={cn("min-h-dvh bg-[var(--bg-base)] flex flex-col overflow-x-hidden", className)}>
       <NavHeader user={user ?? undefined} notificationCount={notificationCount} />
       <main
         className={cn(
-          "flex-1 pt-4 md:pt-6 lg:pb-8 overflow-x-hidden",
-          hideBottomNav ? "pb-6" : "pb-24 lg:pb-8",
+          "flex-1 pt-4 md:pt-6 overflow-x-hidden",
+          hideBottomNav ? "pb-6 lg:pb-8" : "pb-28 lg:pb-8",
           !noPadding && [maxWidthMap[maxWidth], "mx-auto px-4 md:px-6"],
           mainClassName
         )}

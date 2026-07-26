@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Check, X, Calendar, Globe, FileText } from "@/lib/icons";
 import { KycStatusBadge } from "@/components/kyc/kyc-status-badge";
 import type { KycStatus } from "@/lib/kyc/kyc-status";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Analytics } from "@/lib/analytics";
@@ -50,13 +50,9 @@ interface Verification {
 
 export default function CreatorVerificationsPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [verifications, setVerifications] = useState<Verification[]>([]);
-  const [_currentUser, setCurrentUser] = useState<{
-    username: string;
-    role: "fan" | "creator";
-    avatar?: string;
-  } | null>(null);
   const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [isReviewing, setIsReviewing] = useState(false);
@@ -66,22 +62,16 @@ export default function CreatorVerificationsPage() {
       try {
         setIsLoading(true);
 
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
+        if (!auth.authenticated || !auth.user) {
           router.push("/auth");
           return;
         }
 
-        if (bootstrap.profile) {
-          if (bootstrap.profile.role !== "admin") {
+        if (auth.profile) {
+          if (auth.profile.role !== "admin") {
             router.push("/home");
             return;
           }
-          setCurrentUser({
-            username: bootstrap.profile.display_name || "user",
-            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
-            avatar: bootstrap.profile.avatar_url || undefined,
-          });
         }
 
         // 加载待审核列表（通过安全的 API Route）
@@ -98,7 +88,7 @@ export default function CreatorVerificationsPage() {
     };
 
     loadData();
-  }, [router]);
+  }, [router, auth.authenticated, auth.user, auth.profile]);
 
   const handleReview = async (verificationId: string, approve: boolean) => {
     try {
@@ -140,223 +130,218 @@ export default function CreatorVerificationsPage() {
 
   if (isLoading) {
     return (
-      <div className="p-8">
-        <div className="animate-pulse space-y-4 max-w-4xl">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-48 bg-surface-raised rounded-2xl"></div>
-          ))}
-        </div>
+      <div className="animate-pulse space-y-4 max-w-4xl">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-48 bg-surface-raised rounded-2xl"></div>
+        ))}
       </div>
     );
   }
 
   return (
-    <div className="p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-text-primary mb-2">Creator Verifications</h1>
-          <p className="text-text-tertiary">Review and approve creator identity verifications</p>
+    <div className="max-w-4xl">
+      <div className="mb-8">
+        <h1 className="text-h1 text-text-primary mb-2">Creator Verifications</h1>
+        <p className="text-text-tertiary">Review and approve creator identity verifications</p>
+      </div>
+      <div className="bento-grid mb-6">
+        <div className="bento-2x1 card-block p-5">
+          <p className="text-small text-text-tertiary">Pending</p>
+          <p className="text-h2 text-wine-text">{verifications.length}</p>
         </div>
-        <div className="bento-grid mb-6">
-          <div className="bento-2x1 card-block p-5">
-            <p className="text-sm text-text-tertiary">Pending</p>
-            <p className="text-3xl font-bold text-brand-secondary">{verifications.length}</p>
-          </div>
-          <div className="card-block p-5">
-            <p className="text-sm text-text-tertiary">Approved</p>
-            <p className="text-3xl font-bold text-success">0</p>
-          </div>
-          <div className="card-block p-5">
-            <p className="text-sm text-text-tertiary">Rejected</p>
-            <p className="text-3xl font-bold text-error">0</p>
-          </div>
+        <div className="card-block p-5">
+          <p className="text-small text-text-tertiary">Approved</p>
+          <p className="text-h2 text-success">0</p>
         </div>
+        <div className="card-block p-5">
+          <p className="text-small text-text-tertiary">Rejected</p>
+          <p className="text-h2 text-error">0</p>
+        </div>
+      </div>
 
-        {verifications.length === 0 ? (
-          <div className="card-block p-12 text-center">
-            <p className="text-text-tertiary">No pending verifications</p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {verifications.map((verification) => (
-              <div key={verification.id} className="card-block p-6">
-                <div className="flex items-start gap-6">
-                  <Avatar className="w-16 h-16">
-                    <AvatarImage src={verification.user?.avatar_url || DEFAULT_AVATAR_FAN} />
-                    <AvatarFallback className="bg-brand-primary-alpha-10 text-brand-primary">
-                      {verification.user?.display_name?.[0]?.toUpperCase() || "U"}
-                    </AvatarFallback>
-                  </Avatar>
+      {verifications.length === 0 ? (
+        <div className="card-block p-12 text-center">
+          <p className="text-text-tertiary">No pending verifications</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {verifications.map((verification) => (
+            <div key={verification.id} className="card-block p-6">
+              <div className="flex items-start gap-6">
+                <Avatar className="w-16 h-16">
+                  <AvatarImage src={verification.user?.avatar_url || DEFAULT_AVATAR_FAN} />
+                  <AvatarFallback className="bg-[var(--wine-tint)] text-wine-text">
+                    {verification.user?.display_name?.[0]?.toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
 
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-4">
-                      <h3 className="text-lg font-semibold text-text-primary">
-                        {verification.user?.display_name ||
-                          `User ${verification.user_id.slice(0, 8)}`}
-                      </h3>
-                      <KycStatusBadge status={verification.status as KycStatus} />
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-4">
+                    <h3 className="text-lg font-semibold text-text-primary">
+                      {verification.user?.display_name ||
+                        `User ${verification.user_id.slice(0, 8)}`}
+                    </h3>
+                    <KycStatusBadge status={verification.status as KycStatus} />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="flex items-center gap-2 text-small text-text-tertiary">
+                      <FileText className="w-4 h-4" />
+                      <span>Name: {verification.real_name}</span>
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-text-tertiary">
-                        <FileText className="w-4 h-4" />
-                        <span>Name: {verification.real_name}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-text-tertiary">
-                        <Calendar className="w-4 h-4" />
-                        <span>
-                          Birth Date: {format(new Date(verification.birth_date), "MMM d, yyyy")}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-text-tertiary">
-                        <Globe className="w-4 h-4" />
-                        <span>Country: {verification.country}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-text-tertiary">
-                        <Calendar className="w-4 h-4" />
-                        <span>
-                          Submitted: {format(new Date(verification.created_at), "MMM d, yyyy")}
-                        </span>
-                      </div>
+                    <div className="flex items-center gap-2 text-small text-text-tertiary">
+                      <Calendar className="w-4 h-4" />
+                      <span>
+                        Birth Date: {format(new Date(verification.birth_date), "MMM d, yyyy")}
+                      </span>
                     </div>
+                    <div className="flex items-center gap-2 text-small text-text-tertiary">
+                      <Globe className="w-4 h-4" />
+                      <span>Country: {verification.country}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-small text-text-tertiary">
+                      <Calendar className="w-4 h-4" />
+                      <span>
+                        Submitted: {format(new Date(verification.created_at), "MMM d, yyyy")}
+                      </span>
+                    </div>
+                  </div>
 
-                    {/* ID Documents (legacy manual uploads) */}
-                    {verification.id_doc_urls &&
-                      verification.id_doc_urls.length > 0 &&
-                      verification.id_doc_urls[0] !== "" && (
-                        <div className="mb-4">
-                          <Label className="text-sm text-text-tertiary mb-2 block">
-                            ID Documents:
-                          </Label>
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                            {verification.id_doc_urls.map((url, index) => (
-                              <a
-                                key={index}
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="relative aspect-video bg-surface-raised rounded-xl overflow-hidden hover:opacity-80 transition-opacity"
-                              >
-                                <img
-                                  src={url}
-                                  alt={`ID Document ${index + 1}`}
-                                  className="w-full h-full object-cover"
-                                />
-                              </a>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                    {/* Didit KYC Metadata */}
-                    {verification.kyc_provider === "didit" && (
-                      <div className="mb-4 p-3 bg-surface-raised rounded-xl">
-                        <Label className="text-sm text-text-tertiary mb-2 block">
-                          Didit Verification
+                  {/* ID Documents (legacy manual uploads) */}
+                  {verification.id_doc_urls &&
+                    verification.id_doc_urls.length > 0 &&
+                    verification.id_doc_urls[0] !== "" && (
+                      <div className="mb-4">
+                        <Label className="text-small text-text-tertiary mb-2 block">
+                          ID Documents:
                         </Label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                          {verification.kyc_session_id && (
-                            <div className="text-text-tertiary">
-                              <span className="text-text-secondary">Session:</span>{" "}
-                              <code className="text-xs bg-surface-base px-1 py-0.5 rounded">
-                                {verification.kyc_session_id.slice(0, 12)}...
-                              </code>
-                            </div>
-                          )}
-                          {verification.kyc_external_status && (
-                            <div className="text-text-tertiary">
-                              <span className="text-text-secondary">External Status:</span>{" "}
-                              {verification.kyc_external_status}
-                            </div>
-                          )}
-                          {verification.kyc_started_at && (
-                            <div className="text-text-tertiary">
-                              <span className="text-text-secondary">Started:</span>{" "}
-                              {format(new Date(verification.kyc_started_at), "MMM d, yyyy HH:mm")}
-                            </div>
-                          )}
-                          {verification.kyc_decided_at && (
-                            <div className="text-text-tertiary">
-                              <span className="text-text-secondary">Decided:</span>{" "}
-                              {format(new Date(verification.kyc_decided_at), "MMM d, yyyy HH:mm")}
-                            </div>
-                          )}
-                          {verification.kyc_last_error && (
-                            <div className="text-error text-xs col-span-2">
-                              Error: {verification.kyc_last_error}
-                            </div>
-                          )}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {verification.id_doc_urls.map((url, index) => (
+                            <a
+                              key={index}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="relative aspect-video bg-surface-raised rounded-xl overflow-hidden hover:opacity-80 transition-opacity"
+                            >
+                              <img
+                                src={url}
+                                alt={`ID Document ${index + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                            </a>
+                          ))}
                         </div>
                       </div>
                     )}
 
-                    {/* Actions */}
-                    <div className="flex gap-3 pt-4 border-t border-border-base">
-                      <Button
-                        onClick={() => handleReview(verification.id, true)}
-                        disabled={isReviewing}
-                        variant="gradient"
-                        className="flex-1 rounded-xl"
-                      >
-                        <Check className="w-4 h-4 mr-2" />
-                        Approve
-                      </Button>
-                      <Button
-                        onClick={() => setReviewingId(verification.id)}
-                        disabled={isReviewing}
-                        variant="outline"
-                        className="flex-1 border-error text-error hover:bg-error/10 rounded-xl"
-                      >
-                        <X className="w-4 h-4 mr-2" />
-                        Reject
-                      </Button>
+                  {/* Didit KYC Metadata */}
+                  {verification.kyc_provider === "didit" && (
+                    <div className="mb-4 p-3 bg-surface-raised rounded-xl">
+                      <Label className="text-small text-text-tertiary mb-2 block">
+                        Didit Verification
+                      </Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-small">
+                        {verification.kyc_session_id && (
+                          <div className="text-text-tertiary">
+                            <span className="text-text-secondary">Session:</span>{" "}
+                            <code className="text-tiny bg-surface-base px-1 py-0.5 rounded">
+                              {verification.kyc_session_id.slice(0, 12)}...
+                            </code>
+                          </div>
+                        )}
+                        {verification.kyc_external_status && (
+                          <div className="text-text-tertiary">
+                            <span className="text-text-secondary">External Status:</span>{" "}
+                            {verification.kyc_external_status}
+                          </div>
+                        )}
+                        {verification.kyc_started_at && (
+                          <div className="text-text-tertiary">
+                            <span className="text-text-secondary">Started:</span>{" "}
+                            {format(new Date(verification.kyc_started_at), "MMM d, yyyy HH:mm")}
+                          </div>
+                        )}
+                        {verification.kyc_decided_at && (
+                          <div className="text-text-tertiary">
+                            <span className="text-text-secondary">Decided:</span>{" "}
+                            {format(new Date(verification.kyc_decided_at), "MMM d, yyyy HH:mm")}
+                          </div>
+                        )}
+                        {verification.kyc_last_error && (
+                          <div className="text-error text-tiny col-span-2">
+                            Error: {verification.kyc_last_error}
+                          </div>
+                        )}
+                      </div>
                     </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex gap-3 pt-4 border-t border-border-base">
+                    <Button
+                      onClick={() => handleReview(verification.id, true)}
+                      disabled={isReviewing}
+                      className="flex-1 rounded-xl"
+                    >
+                      <Check className="w-4 h-4 mr-2" />
+                      Approve
+                    </Button>
+                    <Button
+                      onClick={() => setReviewingId(verification.id)}
+                      disabled={isReviewing}
+                      variant="outline"
+                      className="flex-1 border-error text-error hover:bg-error/10 rounded-xl"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Reject
+                    </Button>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-
-        {/* Rejection Dialog */}
-        <AlertDialog
-          open={reviewingId !== null}
-          onOpenChange={(open) => !open && setReviewingId(null)}
-        >
-          <AlertDialogContent className="bg-surface-base border-border-base rounded-2xl">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="text-text-primary">Reject Verification</AlertDialogTitle>
-              <AlertDialogDescription className="text-text-tertiary">
-                Please provide a reason for rejection (optional but recommended).
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="rejection_reason">Rejection Reason</Label>
-                <Textarea
-                  id="rejection_reason"
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                  placeholder="e.g., ID photos are unclear, information doesn't match, etc."
-                  className="bg-surface-base border-border-base rounded-xl"
-                  rows={4}
-                />
-              </div>
             </div>
-            <AlertDialogFooter>
-              <AlertDialogCancel className="border-border-base bg-surface-base hover:bg-surface-raised rounded-xl">
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => reviewingId && handleReview(reviewingId, false)}
-                className="bg-error hover:bg-error/90 rounded-xl"
-              >
-                Reject
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
+          ))}
+        </div>
+      )}
+
+      {/* Rejection Dialog */}
+      <AlertDialog
+        open={reviewingId !== null}
+        onOpenChange={(open) => !open && setReviewingId(null)}
+      >
+        <AlertDialogContent className="bg-surface-base border-border-base rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-text-primary">Reject Verification</AlertDialogTitle>
+            <AlertDialogDescription className="text-text-tertiary">
+              Please provide a reason for rejection (optional but recommended).
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="rejection_reason">Rejection Reason</Label>
+              <Textarea
+                id="rejection_reason"
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="e.g., ID photos are unclear, information doesn't match, etc."
+                className="bg-surface-base border-border-base rounded-xl"
+                rows={4}
+              />
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-border-base bg-surface-base hover:bg-surface-raised rounded-xl">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => reviewingId && handleReview(reviewingId, false)}
+              className="bg-error hover:bg-error/90 rounded-xl"
+            >
+              Reject
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

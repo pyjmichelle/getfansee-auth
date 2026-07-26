@@ -18,10 +18,10 @@ interface CreatorAvatarLinkProps {
 }
 
 const sizeMap: Record<AvatarSize, string> = {
-  xs: "w-7 h-7 text-xs",
-  sm: "w-9 h-9 text-sm",
-  md: "w-12 h-12 text-sm",
-  lg: "w-16 h-16 text-base",
+  xs: "w-7 h-7 text-tiny",
+  sm: "w-9 h-9 text-small",
+  md: "w-12 h-12 text-small",
+  lg: "w-16 h-16 text-body-lg",
   xl: "w-24 h-24 text-xl",
 };
 
@@ -56,16 +56,16 @@ export function CreatorAvatarLink({
           alt={name || "Creator"}
           className="object-cover"
         />
-        <AvatarFallback className="bg-brand-primary-alpha-10 text-brand-primary font-semibold">
+        <AvatarFallback className="bg-brand-primary-alpha-10 text-wine-text font-semibold">
           {name?.[0]?.toUpperCase() || "C"}
         </AvatarFallback>
       </Avatar>
       {showName && (
         <div className="min-w-0">
-          <p className="font-semibold text-text-primary group-hover:text-brand-primary transition-colors truncate text-sm">
+          <p className="font-semibold text-text-primary group-hover:text-wine-text transition-colors truncate text-small">
             {name || "Creator"}
           </p>
-          {subtitle && <p className="text-xs text-text-tertiary truncate">{subtitle}</p>}
+          {subtitle && <p className="text-tiny text-text-tertiary truncate">{subtitle}</p>}
         </div>
       )}
     </Link>

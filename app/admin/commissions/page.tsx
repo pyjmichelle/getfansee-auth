@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { DollarSign, CheckCircle, Clock, XCircle, RefreshCw } from "@/lib/icons";
 
 interface Commission {
@@ -71,6 +71,7 @@ const REJECT_REASONS = [
 
 export default function AdminCommissionsPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<Commission[]>([]);
   const [total, setTotal] = useState(0);
@@ -100,14 +101,12 @@ export default function AdminCommissionsPage() {
   }, [statusFilter]);
 
   useEffect(() => {
-    getAuthBootstrap().then((b) => {
-      if (!b.authenticated || b.profile?.role !== "admin") {
-        router.push("/auth");
-      } else {
-        load();
-      }
-    });
-  }, [router, load]);
+    if (!auth.authenticated || auth.profile?.role !== "admin") {
+      router.push("/auth");
+    } else {
+      load();
+    }
+  }, [router, load, auth.authenticated, auth.profile]);
 
   const openApprove = (id: string) => {
     setActionId(id);
@@ -170,12 +169,12 @@ export default function AdminCommissionsPage() {
     .reduce((s, i) => s + (i.approved_commission_amount_cents ?? 0), 0);
 
   return (
-    <div className="p-6 md:p-8">
+    <div>
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary mb-1">Commission Review</h1>
-          <p className="text-xs text-text-tertiary">
+          <h1 className="text-h1 text-text-primary mb-1">Commission Review</h1>
+          <p className="text-tiny text-text-tertiary">
             Estimated pending rewards only. Not withdrawable in MVP.
           </p>
         </div>
@@ -219,9 +218,9 @@ export default function AdminCommissionsPage() {
               <Icon size={20} className="text-text-tertiary" />
             </div>
             <div>
-              <div className="text-xs text-text-tertiary">{label}</div>
+              <div className="text-tiny text-text-tertiary">{label}</div>
               <div className="text-2xl font-bold text-text-primary">{value}</div>
-              {secondary && <div className="text-xs text-text-tertiary mt-0.5">{secondary}</div>}
+              {secondary && <div className="text-tiny text-text-tertiary mt-0.5">{secondary}</div>}
             </div>
           </div>
         ))}
@@ -233,9 +232,9 @@ export default function AdminCommissionsPage() {
           <button
             key={s || "all"}
             onClick={() => setStatusFilter(s)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`min-h-11 px-3 py-1.5 rounded-lg text-tiny font-medium transition-colors ${
               statusFilter === s
-                ? "bg-brand-primary text-white"
+                ? "bg-[var(--wine)] text-white"
                 : "bg-surface-raised text-text-secondary hover:bg-surface-overlay"
             }`}
           >
@@ -253,7 +252,7 @@ export default function AdminCommissionsPage() {
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="p-12 text-center text-text-tertiary text-sm">No commissions found</div>
+          <div className="p-12 text-center text-text-tertiary text-small">No commissions found</div>
         ) : (
           <div className="divide-y divide-border-subtle">
             {items.map((item) => (
@@ -261,22 +260,22 @@ export default function AdminCommissionsPage() {
                 <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center gap-3 flex-wrap">
-                      <span className="text-sm font-medium text-text-primary">
+                      <span className="text-small font-medium text-text-primary">
                         {formatCents(item.estimated_commission_amount_cents)}
-                        <span className="text-xs font-normal text-text-tertiary ml-1">
+                        <span className="text-tiny font-normal text-text-tertiary ml-1">
                           estimated
                         </span>
                       </span>
                       {item.approved_commission_amount_cents != null && (
-                        <span className="text-sm font-medium text-success">
+                        <span className="text-small font-medium text-success">
                           {formatCents(item.approved_commission_amount_cents)}
-                          <span className="text-xs font-normal text-text-tertiary ml-1">
+                          <span className="text-tiny font-normal text-text-tertiary ml-1">
                             approved
                           </span>
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-text-tertiary flex-wrap">
+                    <div className="flex items-center gap-2 text-tiny text-text-tertiary flex-wrap">
                       <span>
                         Basis: {formatCents(item.basis_revenue_cents)} × {item.commission_percent}%
                       </span>
@@ -289,7 +288,7 @@ export default function AdminCommissionsPage() {
                       </span>
                     </div>
                     {item.review_note && (
-                      <div className="text-xs text-text-tertiary italic">
+                      <div className="text-tiny text-text-tertiary italic">
                         Note: {item.review_note}
                       </div>
                     )}
@@ -298,7 +297,7 @@ export default function AdminCommissionsPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <Badge
                       variant="outline"
-                      className={`text-xs ${STATUS_COLORS[item.status] ?? "bg-surface-raised text-text-secondary"}`}
+                      className={`text-tiny ${STATUS_COLORS[item.status] ?? "bg-surface-raised text-text-secondary"}`}
                     >
                       {item.status}
                     </Badge>
@@ -307,7 +306,7 @@ export default function AdminCommissionsPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-xs border-success/30 text-success hover:bg-success/10"
+                          className="text-tiny border-success/30 text-success hover:bg-success/10"
                           onClick={() => openApprove(item.id)}
                         >
                           Approve
@@ -315,7 +314,7 @@ export default function AdminCommissionsPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-xs border-error/30 text-error hover:bg-error/10"
+                          className="text-tiny border-error/30 text-error hover:bg-error/10"
                           onClick={() => openReject(item.id)}
                         >
                           Reject

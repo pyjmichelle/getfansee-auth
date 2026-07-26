@@ -141,10 +141,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
           {/* Loading */}
           {isSearching && (
             <div className="flex items-center justify-center py-8 col-span-2">
-              <Loader2
-                className="h-6 w-6 animate-spin text-brand-primary"
-                aria-label="Searching…"
-              />
+              <Loader2 className="h-6 w-6 animate-spin text-wine-text" aria-label="Searching…" />
             </div>
           )}
 
@@ -153,8 +150,8 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
             <CommandEmpty className="py-12 col-span-2">
               <div className="flex flex-col items-center gap-3">
                 <Search className="h-10 w-10 text-text-tertiary" aria-hidden="true" />
-                <p className="text-sm font-medium text-text-primary">No results found</p>
-                <p className="text-xs text-text-tertiary text-center max-w-sm">
+                <p className="text-small font-medium text-text-primary">No results found</p>
+                <p className="text-tiny text-text-tertiary text-center max-w-sm">
                   No results for &quot;{query}&quot;. Try a different term or browse creators.
                 </p>
               </div>
@@ -166,10 +163,10 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
             <CommandEmpty className="py-12 col-span-2">
               <div className="flex flex-col items-center gap-3">
                 <Search className="h-10 w-10 text-text-tertiary" aria-hidden="true" />
-                <p className="text-sm font-medium text-text-primary">Start searching</p>
-                <p className="text-xs text-text-tertiary text-center max-w-sm">
+                <p className="text-small font-medium text-text-primary">Start searching</p>
+                <p className="text-tiny text-text-tertiary text-center max-w-sm">
                   Type at least 2 characters. Use{" "}
-                  <kbd className="px-1.5 py-0.5 text-xs font-semibold bg-surface-raised rounded border border-border-base">
+                  <kbd className="px-1.5 py-0.5 text-tiny font-semibold bg-surface-raised rounded border border-border-base">
                     #
                   </kbd>{" "}
                   to search tags.
@@ -196,7 +193,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                   </div>
                   <Badge
                     variant="secondary"
-                    className="text-xs ml-2 bg-surface-raised text-text-tertiary"
+                    className="text-tiny ml-2 bg-surface-raised text-text-tertiary"
                   >
                     {tag.category}
                   </Badge>
@@ -224,7 +221,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                           src={creator.avatar_url || undefined}
                           alt={creator.display_name}
                         />
-                        <AvatarFallback className="bg-brand-primary/10 text-brand-primary text-xs">
+                        <AvatarFallback className="bg-brand-primary/10 text-wine-text text-tiny">
                           {creator.display_name?.[0]?.toUpperCase() || "C"}
                         </AvatarFallback>
                       </Avatar>
@@ -234,12 +231,12 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                         {creator.display_name}
                       </p>
                       {creator.bio && (
-                        <p className="text-xs text-text-tertiary truncate">{creator.bio}</p>
+                        <p className="text-tiny text-text-tertiary truncate">{creator.bio}</p>
                       )}
                     </div>
                     <Badge
                       variant="secondary"
-                      className="text-xs ml-2 shrink-0 bg-surface-raised text-text-tertiary"
+                      className="text-tiny ml-2 shrink-0 bg-surface-raised text-text-tertiary"
                     >
                       <Users className="h-3 w-3 mr-1" aria-hidden="true" />
                       Creator
@@ -269,7 +266,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                     <p className="font-medium truncate text-text-primary">
                       {post.title || post.content.substring(0, 50)}
                     </p>
-                    <p className="text-xs text-text-tertiary truncate">
+                    <p className="text-tiny text-text-tertiary truncate">
                       by {post.profiles?.display_name || "Creator"}
                     </p>
                   </div>
@@ -284,7 +281,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
               <CommandItem
                 value="view-all"
                 onSelect={handleViewAll}
-                className="cursor-pointer justify-center text-brand-primary hover:bg-brand-primary/5 active:scale-[0.98] transition-all rounded-lg"
+                className="cursor-pointer justify-center text-wine-text hover:bg-brand-primary/5 active:scale-[0.98] transition-all rounded-lg"
                 aria-label={`View all results for ${query}`}
               >
                 <Search className="h-4 w-4 mr-2" aria-hidden="true" />

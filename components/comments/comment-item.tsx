@@ -51,18 +51,18 @@ export function CommentItem({
         {comment.user.avatar_url && (
           <AvatarImage src={comment.user.avatar_url} alt={comment.user.display_name} />
         )}
-        <AvatarFallback className="bg-brand-primary/10 text-brand-primary text-sm">
+        <AvatarFallback className="bg-brand-primary/10 text-wine-text text-small">
           {initials}
         </AvatarFallback>
       </Avatar>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-semibold text-sm">{comment.user.display_name}</span>
-          <span className="text-xs text-text-tertiary">{formatDate(comment.created_at)}</span>
+          <span className="font-semibold text-small">{comment.user.display_name}</span>
+          <span className="text-tiny text-text-tertiary">{formatDate(comment.created_at)}</span>
         </div>
 
-        <p className="mt-1 text-sm text-text-primary break-words whitespace-pre-wrap">
+        <p className="mt-1 text-small text-text-primary break-words whitespace-pre-wrap">
           {comment.content}
         </p>
       </div>
@@ -76,7 +76,7 @@ export function CommentItem({
           className={cn(
             "opacity-0 group-hover:opacity-100 transition-[opacity] motion-safe:transition-[opacity] motion-reduce:transition-none",
             "h-8 w-8 p-0 flex-shrink-0 min-h-[32px] min-w-[32px]",
-            "hover:bg-error/10 hover:text-error active:scale-95 focus-visible:ring-2 focus-visible:ring-error"
+            "hover:bg-error/10 hover:text-error active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-error"
           )}
           aria-label="Delete comment"
           onKeyDown={(e) => {

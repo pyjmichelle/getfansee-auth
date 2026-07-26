@@ -23,7 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
 
 interface Report {
@@ -43,6 +43,7 @@ interface Report {
 
 export default function ReportsPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [reports, setReports] = useState<Report[]>([]);
   const [resolvingId, setResolvingId] = useState<string | null>(null);
@@ -57,12 +58,11 @@ export default function ReportsPage() {
       try {
         setIsLoading(true);
 
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
+        if (!auth.authenticated || !auth.user) {
           router.push("/auth");
           return;
         }
-        if (bootstrap.profile?.role !== "admin") {
+        if (auth.profile?.role !== "admin") {
           router.push("/home");
           return;
         }
@@ -81,7 +81,7 @@ export default function ReportsPage() {
     };
 
     loadData();
-  }, [router]);
+  }, [router, auth.authenticated, auth.user, auth.profile]);
 
   const handleResolve = async (reportId: string, action: "delete" | "ban" | "no_violation") => {
     try {
@@ -145,206 +145,203 @@ export default function ReportsPage() {
 
   if (isLoading) {
     return (
-      <div className="p-8">
-        <div className="animate-pulse space-y-4 max-w-4xl">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-48 bg-surface-raised rounded-2xl"></div>
-          ))}
-        </div>
+      <div className="animate-pulse space-y-4 max-w-4xl">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-48 bg-surface-raised rounded-2xl"></div>
+        ))}
       </div>
     );
   }
 
   return (
-    <div className="p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-text-primary mb-2">Reports</h1>
-          <p className="text-text-tertiary">Review and resolve user reports</p>
+    <div className="max-w-4xl">
+      <div className="mb-8">
+        <h1 className="text-h1 text-text-primary mb-2">Reports</h1>
+        <p className="text-text-tertiary">Review and resolve user reports</p>
+      </div>
+      <div className="bento-grid mb-6">
+        <div className="bento-2x1 card-block p-5">
+          <p className="text-small text-text-tertiary">Pending</p>
+          <p className="text-h2 text-wine-text">{reports.length}</p>
         </div>
-        <div className="bento-grid mb-6">
-          <div className="bento-2x1 card-block p-5">
-            <p className="text-sm text-text-tertiary">Pending</p>
-            <p className="text-3xl font-bold text-brand-secondary">{reports.length}</p>
-          </div>
-          <div className="card-block p-5">
-            <p className="text-sm text-text-tertiary">Resolved</p>
-            <p className="text-3xl font-bold text-success">0</p>
-          </div>
-          <div className="card-block p-5">
-            <p className="text-sm text-text-tertiary">High Risk</p>
-            <p className="text-3xl font-bold text-error">0</p>
-          </div>
+        <div className="card-block p-5">
+          <p className="text-small text-text-tertiary">Resolved</p>
+          <p className="text-h2 text-success">0</p>
         </div>
+        <div className="card-block p-5">
+          <p className="text-small text-text-tertiary">High Risk</p>
+          <p className="text-h2 text-error">0</p>
+        </div>
+      </div>
 
-        {reports.length === 0 ? (
-          <div className="card-block p-12 text-center">
-            <p className="text-text-tertiary">No pending reports</p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {reports.map((report) => (
-              <div key={report.id} className="card-block p-6">
-                <div className="flex items-start gap-6">
-                  <Avatar className="w-12 h-12">
-                    <AvatarImage src={report.reporter?.avatar_url || DEFAULT_AVATAR_FAN} />
-                    <AvatarFallback className="bg-brand-primary-alpha-10 text-brand-primary">
-                      {report.reporter?.display_name?.[0]?.toUpperCase() || "R"}
-                    </AvatarFallback>
-                  </Avatar>
+      {reports.length === 0 ? (
+        <div className="card-block p-12 text-center">
+          <p className="text-text-tertiary">No pending reports</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {reports.map((report) => (
+            <div key={report.id} className="card-block p-6">
+              <div className="flex items-start gap-6">
+                <Avatar className="w-12 h-12">
+                  <AvatarImage src={report.reporter?.avatar_url || DEFAULT_AVATAR_FAN} />
+                  <AvatarFallback className="bg-[var(--wine-tint)] text-wine-text">
+                    {report.reporter?.display_name?.[0]?.toUpperCase() || "R"}
+                  </AvatarFallback>
+                </Avatar>
 
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="flex items-center gap-2">
-                        {getReportTypeIcon(report.reported_type)}
-                        <span className="font-semibold text-text-primary">
-                          {getReportTypeLabel(report.reported_type)}
-                        </span>
-                      </div>
-                      <Badge className="bg-brand-secondary/10 text-brand-secondary border-brand-secondary/20 rounded-lg">
-                        Pending
-                      </Badge>
-                      <span className="text-xs text-text-tertiary flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        {formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center gap-2">
+                      {getReportTypeIcon(report.reported_type)}
+                      <span className="font-semibold text-text-primary">
+                        {getReportTypeLabel(report.reported_type)}
                       </span>
                     </div>
+                    <Badge className="bg-brand-secondary/10 text-wine-text border-brand-secondary/20 rounded-lg">
+                      Pending
+                    </Badge>
+                    <span className="text-tiny text-text-tertiary flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      {formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}
+                    </span>
+                  </div>
 
-                    <div className="space-y-2 mb-4">
+                  <div className="space-y-2 mb-4">
+                    <div>
+                      <span className="text-small font-medium text-text-primary">Reason: </span>
+                      <span className="text-small text-text-tertiary">{report.reason}</span>
+                    </div>
+                    {report.description && (
                       <div>
-                        <span className="text-sm font-medium text-text-primary">Reason: </span>
-                        <span className="text-sm text-text-tertiary">{report.reason}</span>
-                      </div>
-                      {report.description && (
-                        <div>
-                          <span className="text-sm font-medium text-text-primary">
-                            Description:{" "}
-                          </span>
-                          <span className="text-sm text-text-tertiary">{report.description}</span>
-                        </div>
-                      )}
-                      <div>
-                        <span className="text-sm font-medium text-text-primary">Reported by: </span>
-                        <span className="text-sm text-text-tertiary">
-                          {report.reporter?.display_name ||
-                            `User ${report.reporter_id.slice(0, 8)}`}
+                        <span className="text-small font-medium text-text-primary">
+                          Description:{" "}
                         </span>
+                        <span className="text-small text-text-tertiary">{report.description}</span>
                       </div>
+                    )}
+                    <div>
+                      <span className="text-small font-medium text-text-primary">
+                        Reported by:{" "}
+                      </span>
+                      <span className="text-small text-text-tertiary">
+                        {report.reporter?.display_name || `User ${report.reporter_id.slice(0, 8)}`}
+                      </span>
                     </div>
+                  </div>
 
-                    {/* Actions */}
-                    <div className="flex gap-3 pt-4 border-t border-border-base">
-                      {report.reported_type === "post" && (
-                        <Button
-                          asChild
-                          variant="outline"
-                          size="sm"
-                          className="border-border-base bg-surface-base hover:bg-surface-raised rounded-xl"
-                        >
-                          <Link href={`/posts/${report.reported_id}`}>View Post</Link>
-                        </Button>
-                      )}
-                      {report.reported_type === "user" && (
-                        <Button
-                          asChild
-                          variant="outline"
-                          size="sm"
-                          className="border-border-base bg-surface-base hover:bg-surface-raised rounded-xl"
-                        >
-                          <Link href={`/creator/${report.reported_id}`}>View User</Link>
-                        </Button>
-                      )}
+                  {/* Actions */}
+                  <div className="flex gap-3 pt-4 border-t border-border-base">
+                    {report.reported_type === "post" && (
                       <Button
-                        onClick={() => {
-                          setResolvingId(report.id);
-                          setResolutionAction("delete");
-                        }}
+                        asChild
                         variant="outline"
                         size="sm"
-                        className="border-error text-error hover:bg-error/10 rounded-xl"
+                        className="border-border-base bg-surface-base hover:bg-surface-raised rounded-xl"
                       >
-                        {report.reported_type === "post" ? "Delete Content" : "Ban User"}
+                        <Link href={`/posts/${report.reported_id}`}>View Post</Link>
                       </Button>
+                    )}
+                    {report.reported_type === "user" && (
                       <Button
-                        onClick={() => {
-                          setResolvingId(report.id);
-                          setResolutionAction("no_violation");
-                        }}
+                        asChild
                         variant="outline"
                         size="sm"
-                        className="border-success text-success hover:bg-success/10 rounded-xl"
+                        className="border-border-base bg-surface-base hover:bg-surface-raised rounded-xl"
                       >
-                        No Violation
+                        <Link href={`/creator/${report.reported_id}`}>View User</Link>
                       </Button>
-                    </div>
+                    )}
+                    <Button
+                      onClick={() => {
+                        setResolvingId(report.id);
+                        setResolutionAction("delete");
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="border-error text-error hover:bg-error/10 rounded-xl"
+                    >
+                      {report.reported_type === "post" ? "Delete Content" : "Ban User"}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setResolvingId(report.id);
+                        setResolutionAction("no_violation");
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="border-success text-success hover:bg-success/10 rounded-xl"
+                    >
+                      No Violation
+                    </Button>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-
-        {/* Resolution Dialog */}
-        <AlertDialog
-          open={resolvingId !== null && resolutionAction !== null}
-          onOpenChange={(open) => {
-            if (!open) {
-              setResolvingId(null);
-              setResolutionAction(null);
-              setResolutionNotes("");
-            }
-          }}
-        >
-          <AlertDialogContent className="bg-surface-base border-border-base rounded-2xl">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="text-text-primary">
-                {resolutionAction === "delete"
-                  ? "Delete Content"
-                  : resolutionAction === "ban"
-                    ? "Ban User"
-                    : "Mark as No Violation"}
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-text-tertiary">
-                {resolutionAction === "delete"
-                  ? "This will delete the reported content. This action cannot be undone."
-                  : resolutionAction === "ban"
-                    ? "This will ban the reported user. They will not be able to access the platform."
-                    : "This will mark the report as resolved with no violation found."}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="resolution_notes">Resolution Notes (Optional)</Label>
-                <Textarea
-                  id="resolution_notes"
-                  value={resolutionNotes}
-                  onChange={(e) => setResolutionNotes(e.target.value)}
-                  placeholder="Add any notes about this resolution..."
-                  className="bg-surface-base border-border-base rounded-xl"
-                  rows={3}
-                />
-              </div>
             </div>
-            <AlertDialogFooter>
-              <AlertDialogCancel className="border-border-base bg-surface-base hover:bg-surface-raised rounded-xl">
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() =>
-                  resolvingId && resolutionAction && handleResolve(resolvingId, resolutionAction)
-                }
-                className={`rounded-xl ${
-                  resolutionAction === "no_violation"
-                    ? "bg-green-500 hover:bg-green-500/90"
-                    : "bg-error hover:bg-error/90"
-                }`}
-              >
-                Confirm
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
+          ))}
+        </div>
+      )}
+
+      {/* Resolution Dialog */}
+      <AlertDialog
+        open={resolvingId !== null && resolutionAction !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setResolvingId(null);
+            setResolutionAction(null);
+            setResolutionNotes("");
+          }
+        }}
+      >
+        <AlertDialogContent className="bg-surface-base border-border-base rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-text-primary">
+              {resolutionAction === "delete"
+                ? "Delete Content"
+                : resolutionAction === "ban"
+                  ? "Ban User"
+                  : "Mark as No Violation"}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-text-tertiary">
+              {resolutionAction === "delete"
+                ? "This will delete the reported content. This action cannot be undone."
+                : resolutionAction === "ban"
+                  ? "This will ban the reported user. They will not be able to access the platform."
+                  : "This will mark the report as resolved with no violation found."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="resolution_notes">Resolution Notes (Optional)</Label>
+              <Textarea
+                id="resolution_notes"
+                value={resolutionNotes}
+                onChange={(e) => setResolutionNotes(e.target.value)}
+                placeholder="Add any notes about this resolution..."
+                className="bg-surface-base border-border-base rounded-xl"
+                rows={3}
+              />
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-border-base bg-surface-base hover:bg-surface-raised rounded-xl">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() =>
+                resolvingId && resolutionAction && handleResolve(resolvingId, resolutionAction)
+              }
+              className={`rounded-xl ${
+                resolutionAction === "no_violation"
+                  ? "bg-success hover:bg-success/90"
+                  : "bg-error hover:bg-error/90"
+              }`}
+            >
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -31,6 +31,8 @@ export const env = createEnv({
     PLAYWRIGHT_TEST_MODE: z.string().optional(),
     E2E_ALLOW_ANY_HOST: z.string().optional(),
     TEST_ROUTE_SECRET: z.string().optional(),
+    /** Pre-Payment Alpha 阶段开关，见 lib/constants/alpha.ts。未设置=Alpha */
+    ALPHA_PHASE: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_SUPABASE_URL: z.string().min(1, "NEXT_PUBLIC_SUPABASE_URL is required"),
@@ -42,6 +44,8 @@ export const env = createEnv({
     NEXT_PUBLIC_USE_MOCK_DATA: z.string().optional(),
     NEXT_PUBLIC_BASE_URL: z.string().optional(),
     NEXT_PUBLIC_APP_URL: z.string().optional(),
+    /** crypto 充值上线后设为 "true"，重新开放付费墙钱包路径。见 lib/constants/alpha.ts */
+    NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED: z.string().optional(),
   },
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
@@ -61,6 +65,7 @@ export const env = createEnv({
     PLAYWRIGHT_TEST_MODE: process.env.PLAYWRIGHT_TEST_MODE,
     E2E_ALLOW_ANY_HOST: process.env.E2E_ALLOW_ANY_HOST,
     TEST_ROUTE_SECRET: process.env.TEST_ROUTE_SECRET,
+    ALPHA_PHASE: process.env.ALPHA_PHASE,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
@@ -70,5 +75,6 @@ export const env = createEnv({
     NEXT_PUBLIC_USE_MOCK_DATA: process.env.NEXT_PUBLIC_USE_MOCK_DATA,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED: process.env.NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED,
   },
 });

@@ -13,13 +13,13 @@ export function SuggestedCard({ name, handle, avatarUrl }: SuggestedCardProps) {
       <div className="flex items-center gap-3">
         <Avatar className="h-10 w-10">
           <AvatarImage src={avatarUrl} alt={name} />
-          <AvatarFallback className="bg-brand-primary/20 text-brand-primary">
+          <AvatarFallback className="bg-brand-primary/20 text-wine-text">
             {name[0]?.toUpperCase() || "C"}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-text-primary">{name}</p>
-          <p className="truncate text-xs text-text-tertiary">@{handle}</p>
+          <p className="truncate text-small font-semibold text-text-primary">{name}</p>
+          <p className="truncate text-tiny text-text-tertiary">@{handle}</p>
         </div>
         <Button variant="outline" size="sm">
           Follow

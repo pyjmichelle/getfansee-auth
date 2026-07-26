@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Camera, LogOut, Loader2 } from "@/lib/icons";
+import Link from "next/link";
+import { Camera, LogOut, Loader2, Bookmark } from "@/lib/icons";
 import { PageShell } from "@/components/page-shell";
 // Card components no longer needed - using Figma div-based layout
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,13 +22,15 @@ import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
 import { ProfileBanner } from "@/components/profile-banner";
 import { SettingsTabs } from "@/components/settings-tabs";
 import { GlassCard } from "@/components/glass-card";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
 
 const supabase = getSupabaseBrowserClient();
 
 export default function ProfilePage() {
   const router = useRouter();
+  // SSR-injected via AuthProvider — synchronously available on first render (P-1).
+  const auth = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isCreatingCreator, setIsCreatingCreator] = useState(false);
@@ -51,6 +54,18 @@ export default function ProfilePage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [activeTab, setActiveTab] = useState("profile");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [savedCreators, setSavedCreators] = useState<
+    | {
+        id: string;
+        display_name: string | null;
+        avatar_url: string | null;
+        bio: string | null;
+        is_verified?: boolean;
+        is_founding_creator?: boolean;
+        category?: string | null;
+      }[]
+    | null
+  >(null);
   useSkeletonMetric("me_page", isLoading);
   const creatorSocialCount = useCountUp(currentUser?.role === "creator" ? 1284 : 1283, {
     duration: 900,
@@ -62,24 +77,23 @@ export default function ProfilePage() {
       setIsLoading(true);
       setLoadError(null);
       try {
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
+        if (!auth.authenticated || !auth.user) {
           router.push("/auth");
           return;
         }
 
-        setCurrentUserId(bootstrap.user.id);
-        setEmail(bootstrap.user.email || "");
+        setCurrentUserId(auth.user.id);
+        setEmail(auth.user.email || "");
 
         // Seed from the SSR-injected snapshot so the page renders immediately
         // even if the /api/profile fetch is slow or fails.
-        if (bootstrap.profile) {
-          setUsername(bootstrap.profile.display_name || "");
-          setAvatar(bootstrap.profile.avatar_url || "");
+        if (auth.profile) {
+          setUsername(auth.profile.display_name || "");
+          setAvatar(auth.profile.avatar_url || "");
           setCurrentUser({
-            username: bootstrap.profile.display_name || "user",
-            role: bootstrap.profile.role === "creator" ? "creator" : "fan",
-            avatar: bootstrap.profile.avatar_url || undefined,
+            username: auth.profile.display_name || "user",
+            role: auth.profile.role === "creator" ? "creator" : "fan",
+            avatar: auth.profile.avatar_url || undefined,
           });
         }
 
@@ -98,7 +112,7 @@ export default function ProfilePage() {
               avatar: profile.avatar_url || undefined,
             });
           }
-        } else if (!bootstrap.profile) {
+        } else if (!auth.profile) {
           setLoadError("Failed to load your profile. Please try again.");
         }
       } catch (err) {
@@ -110,7 +124,16 @@ export default function ProfilePage() {
     };
 
     loadProfile();
-  }, [router, reloadKey]);
+  }, [router, reloadKey, auth.authenticated, auth.user, auth.profile]);
+
+  // Lazy-load saved creators the first time the Saved tab opens.
+  useEffect(() => {
+    if (activeTab !== "saved" || savedCreators !== null) return;
+    fetch("/api/save/creator")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => setSavedCreators(json?.creators ?? []))
+      .catch(() => setSavedCreators([]));
+  }, [activeTab, savedCreators]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -182,7 +205,7 @@ export default function ProfilePage() {
       toast.success("Profile updated successfully");
     } catch (err) {
       console.error("[me] handleSave error:", err);
-      alert("Failed to save, please try again");
+      toast.error("Failed to save, please try again");
     } finally {
       setIsSaving(false);
     }
@@ -221,7 +244,7 @@ export default function ProfilePage() {
       toast.success("Creator profile created successfully!");
     } catch (err) {
       console.error("[me] handleCreateCreator error:", err);
-      alert("Failed to create, please try again");
+      toast.error("Failed to create, please try again");
     } finally {
       setIsCreatingCreator(false);
     }
@@ -235,13 +258,13 @@ export default function ProfilePage() {
       // 检查是否为 creator（通过 API）
       const profileResponse = await fetch("/api/profile");
       if (!profileResponse.ok) {
-        alert("Please create a creator profile first");
+        toast.error("Please create a creator profile first");
         return;
       }
       const profileData = await profileResponse.json();
       const profile = profileData.profile;
       if (!profile || profile.role !== "creator") {
-        alert("Please create a creator profile first");
+        toast.error("Please create a creator profile first");
         return;
       }
 
@@ -273,14 +296,14 @@ export default function ProfilePage() {
 
       if (error) {
         console.error("[me] seed posts error:", error);
-        alert("Failed to create demo posts, please try again");
+        toast.error("Failed to create demo posts, please try again");
         return;
       }
 
-      alert("Demo posts created successfully!");
+      toast.success("Demo posts created successfully!");
     } catch (err) {
       console.error("[me] handleSeedPosts error:", err);
-      alert("Failed to create, please try again");
+      toast.error("Failed to create, please try again");
     } finally {
       setIsSeeding(false);
     }
@@ -289,7 +312,10 @@ export default function ProfilePage() {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await fetch("/api/auth/session", { method: "DELETE" });
+      // `supabase.auth.signOut()` clears the session cookie directly — no
+      // separate endpoint call needed (the old /api/auth/session route this
+      // used to hit was removed in the SSR auth rewrite; this fetch was a
+      // silent 404 on every logout, P-6).
       await signOut();
       router.push("/auth");
     } catch {
@@ -402,6 +428,7 @@ export default function ProfilePage() {
 
   const settingsTabs = [
     { value: "profile", label: "Profile" },
+    { value: "saved", label: "Saved" },
     { value: "account", label: "Account" },
     { value: "security", label: "Security" },
   ];
@@ -436,10 +463,10 @@ export default function ProfilePage() {
               <button
                 key={tab.value}
                 onClick={() => setActiveTab(tab.value)}
-                className={`w-full text-left px-4 py-2.5 rounded-[var(--radius-sm)] text-[13px] font-medium transition-all ${
+                className={`w-full text-left px-4 py-2.5 rounded-[var(--radius-sm)] border text-small font-medium transition-[background-color,color,border-color] ${
                   activeTab === tab.value
-                    ? "bg-violet-500/15 text-violet-400 border border-violet-500/20"
-                    : "text-text-muted hover:text-white hover:bg-white/6"
+                    ? "bg-[var(--wine)]/15 text-wine-text border-[var(--wine)]/20"
+                    : "border-transparent text-text-muted hover:text-white hover:bg-white/6"
                 }`}
               >
                 {tab.label}
@@ -450,7 +477,7 @@ export default function ProfilePage() {
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="w-full text-left px-4 py-2.5 rounded-[var(--radius-sm)] text-[13px] font-medium text-red-400 hover:bg-red-500/8 transition-all disabled:opacity-50 flex items-center gap-2"
+                className="w-full text-left px-4 py-2.5 rounded-[var(--radius-sm)] text-small font-medium text-[var(--error-text)] hover:bg-[var(--error)]/8 transition-all disabled:opacity-50 flex items-center gap-2"
               >
                 {isLoggingOut ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                 {isLoggingOut ? "Logging out..." : "Log Out"}
@@ -467,7 +494,7 @@ export default function ProfilePage() {
                     <div className="relative group">
                       <Avatar className="w-24 h-24">
                         <AvatarImage src={avatar || DEFAULT_AVATAR_FAN} alt="Profile picture" />
-                        <AvatarFallback className="text-2xl bg-brand-primary-alpha-10 text-brand-primary">
+                        <AvatarFallback className="text-2xl bg-brand-primary-alpha-10 text-wine-text">
                           {username[0]?.toUpperCase() || email[0]?.toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
@@ -491,7 +518,7 @@ export default function ProfilePage() {
                       ) : null}
                     </div>
                     <div>
-                      <p className="text-sm text-text-secondary">
+                      <p className="text-small text-text-secondary">
                         Upload a new profile picture (recommended 400x400).
                       </p>
                     </div>
@@ -501,7 +528,7 @@ export default function ProfilePage() {
                     <div>
                       <Label
                         htmlFor="username"
-                        className="mb-2 block text-sm font-medium text-text-secondary"
+                        className="mb-2 block text-small font-medium text-text-secondary"
                       >
                         Display Name
                       </Label>
@@ -517,7 +544,7 @@ export default function ProfilePage() {
                     <div>
                       <Label
                         htmlFor="bio"
-                        className="mb-2 block text-sm font-medium text-text-secondary"
+                        className="mb-2 block text-small font-medium text-text-secondary"
                       >
                         Bio
                       </Label>
@@ -530,9 +557,67 @@ export default function ProfilePage() {
                         className="min-h-[96px] rounded-xl bg-white/8"
                         maxLength={200}
                       />
-                      <p className="mt-1 text-xs text-text-tertiary">{bio.length}/200</p>
+                      <p className="mt-1 text-tiny text-text-tertiary">{bio.length}/200</p>
                     </div>
                   </div>
+                </GlassCard>
+              </TabsContent>
+
+              <TabsContent value="saved" className="mt-4">
+                <GlassCard className="p-6" data-testid="saved-creators-panel">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Bookmark className="w-4 h-4 text-wine-text" aria-hidden="true" />
+                    <h3 className="font-semibold text-text-primary">Saved Creators</h3>
+                  </div>
+                  {savedCreators === null ? (
+                    <div className="space-y-3 animate-pulse">
+                      {[0, 1, 2].map((i) => (
+                        <div key={i} className="h-16 bg-white/5 rounded-xl" />
+                      ))}
+                    </div>
+                  ) : savedCreators.length === 0 ? (
+                    <div className="py-10 text-center">
+                      <p className="text-small text-text-tertiary mb-3">
+                        You haven&apos;t saved any creators yet.
+                      </p>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href="/creators">Discover creators</Link>
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {savedCreators.map((creator) => (
+                        <Link
+                          key={creator.id}
+                          href={`/creator/${creator.id}`}
+                          className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/6 transition-colors"
+                        >
+                          <Avatar className="w-12 h-12 shrink-0">
+                            <AvatarImage
+                              src={creator.avatar_url || DEFAULT_AVATAR_FAN}
+                              alt={creator.display_name || "Creator"}
+                            />
+                            <AvatarFallback className="bg-brand-primary-alpha-10 text-wine-text">
+                              {creator.display_name?.[0]?.toUpperCase() || "C"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-small text-text-primary truncate">
+                              {creator.display_name || "Creator"}
+                            </p>
+                            {creator.bio && (
+                              <p className="text-tiny text-text-tertiary truncate">{creator.bio}</p>
+                            )}
+                          </div>
+                          {creator.category && (
+                            <span className="text-tiny px-2 py-0.5 rounded-full bg-white/5 text-text-tertiary shrink-0">
+                              {creator.category}
+                            </span>
+                          )}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </GlassCard>
               </TabsContent>
 
@@ -541,7 +626,7 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium text-text-primary">Email Address</p>
-                      <p className="text-sm text-text-tertiary">{email}</p>
+                      <p className="text-small text-text-tertiary">{email}</p>
                     </div>
                     <Button variant="outline" size="sm" disabled>
                       Change
@@ -550,7 +635,7 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between border-t border-border-subtle pt-4">
                     <div>
                       <p className="font-medium text-text-primary">Account Type</p>
-                      <p className="text-sm text-text-tertiary capitalize">{currentUser.role}</p>
+                      <p className="text-small text-text-tertiary capitalize">{currentUser.role}</p>
                     </div>
                     {currentUser.role === "fan" ? (
                       <Button
@@ -564,9 +649,9 @@ export default function ProfilePage() {
                     ) : null}
                   </div>
                   <div className="rounded-xl border border-border-base bg-gradient-subtle p-4">
-                    <p className="text-sm text-text-secondary">
+                    <p className="text-small text-text-secondary">
                       Join{" "}
-                      <span className="font-bold text-brand-primary">
+                      <span className="font-bold text-wine-text">
                         {creatorSocialCount.toFixed(0)}
                       </span>{" "}
                       creators already earning on GetFanSee.
@@ -590,7 +675,7 @@ export default function ProfilePage() {
                   <div>
                     <Label
                       htmlFor="oldPassword"
-                      className="mb-2 block text-sm font-medium text-text-secondary"
+                      className="mb-2 block text-small font-medium text-text-secondary"
                     >
                       Current Password
                     </Label>
@@ -607,7 +692,7 @@ export default function ProfilePage() {
                   <div>
                     <Label
                       htmlFor="newPassword"
-                      className="mb-2 block text-sm font-medium text-text-secondary"
+                      className="mb-2 block text-small font-medium text-text-secondary"
                     >
                       New Password
                     </Label>
@@ -624,7 +709,7 @@ export default function ProfilePage() {
                   <div>
                     <Label
                       htmlFor="confirmPassword"
-                      className="mb-2 block text-sm font-medium text-text-secondary"
+                      className="mb-2 block text-small font-medium text-text-secondary"
                     >
                       Confirm New Password
                     </Label>
@@ -654,7 +739,7 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-text-primary">Log Out</p>
-                  <p className="text-sm text-text-tertiary">Sign out of your account</p>
+                  <p className="text-small text-text-tertiary">Sign out of your account</p>
                 </div>
                 <Button
                   variant="outline"

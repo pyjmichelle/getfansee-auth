@@ -16,20 +16,24 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default: "bg-white/8 text-white/70 border-white/6 [a&]:hover:bg-white/12",
-        rose: "bg-violet-500/15 text-violet-400 border-violet-500/20 [a&]:hover:bg-violet-500/25",
-        gold: "bg-amber-500/15 text-amber-400 border-amber-500/20 [a&]:hover:bg-amber-500/25",
-        purple: "bg-violet-500/15 text-violet-400 border-violet-500/20 [a&]:hover:bg-violet-500/25",
+        rose: "bg-[var(--wine)]/15 text-wine-text border-[var(--wine)]/20 [a&]:hover:bg-[var(--wine)]/25",
+        gold: "bg-[var(--premium)]/15 text-[var(--premium)] border-[var(--premium)]/20 [a&]:hover:bg-[var(--premium)]/25",
+        purple:
+          "bg-[var(--wine)]/15 text-wine-text border-[var(--wine)]/20 [a&]:hover:bg-[var(--wine)]/25",
         success:
-          "bg-emerald-500/15 text-emerald-400 border-emerald-500/20 [a&]:hover:bg-emerald-500/25",
-        warning: "bg-amber-500/15 text-amber-400 border-amber-500/20 [a&]:hover:bg-amber-500/25",
-        destructive: "bg-red-500/15 text-red-400 border-red-500/20 [a&]:hover:bg-red-500/25",
+          "bg-[var(--success)]/15 text-[var(--success)] border-[var(--success)]/20 [a&]:hover:bg-[var(--success)]/25",
+        warning:
+          "bg-[var(--warning)]/15 text-[var(--warning)] border-[var(--warning)]/20 [a&]:hover:bg-[var(--warning)]/25",
+        destructive:
+          "bg-[var(--error)]/15 text-[var(--error-text)] border-[var(--error)]/20 [a&]:hover:bg-[var(--error)]/25",
         outline: "bg-transparent border-white/15 text-white/60 [a&]:hover:bg-white/5",
         secondary: "bg-white/6 text-text-secondary border-transparent [a&]:hover:bg-white/10",
         /* Legacy compat */
-        info: "bg-blue-500/15 text-blue-400 border-blue-500/20",
-        premium: "bg-gradient-premium text-white border-transparent shadow-sm",
-        ppv: "bg-gradient-gold text-black border-transparent shadow-sm font-semibold",
-        subscribe: "bg-violet-500/15 text-violet-400 border-violet-500/20",
+        info: "bg-[var(--info)]/15 text-[var(--info)] border-[var(--info)]/20",
+        premium:
+          "bg-[var(--premium-tint)] text-[var(--premium)] border-[var(--premium)]/40 shadow-none font-semibold",
+        ppv: "bg-[var(--premium-tint)] text-[var(--premium)] border-[var(--premium)]/40 shadow-none font-semibold",
+        subscribe: "bg-[var(--wine)]/15 text-wine-text border-[var(--wine)]/20",
       },
     },
     defaultVariants: {

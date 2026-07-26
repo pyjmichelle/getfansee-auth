@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { Check, Copy } from "@/lib/icons";
 import { toast } from "sonner";
+import { useMediaQuery } from "@/hooks/use-mobile";
 
 interface ShareModalProps {
   open: boolean;
@@ -187,6 +189,10 @@ export function ShareModal({
   sheetTitle = "Share this post",
 }: ShareModalProps) {
   const [copiedPlatform, setCopiedPlatform] = useState<string | null>(null);
+  // Mobile: bottom sheet. Desktop: centered dialog — previously this modal
+  // only had a mobile Sheet implementation, so on PC it rendered as a
+  // full-width bar pinned to the bottom of the entire viewport (F-004).
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   const handlePlatformClick = async (platform: SharePlatform) => {
     const action = platform.getAction(url, title);
@@ -218,81 +224,100 @@ export function ShareModal({
     }
   };
 
-  return (
-    <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent
-        side="bottom"
-        className="h-auto max-h-[90vh] rounded-t-2xl bg-surface-base border-t border-border-base p-0 overflow-hidden"
-      >
-        {/* Handle */}
-        <div className="flex justify-center py-3" aria-hidden="true">
-          <div className="w-10 h-1 rounded-full bg-border-strong" />
-        </div>
-
-        {/* Header */}
-        <SheetHeader className="px-4 pb-4">
-          <SheetTitle className="text-[15px] font-semibold text-text-primary">
-            {sheetTitle}
-          </SheetTitle>
-        </SheetHeader>
-
-        {/* Platform grid */}
-        <div className="px-4 pb-2">
-          <div className="grid grid-cols-4 gap-3 mb-5">
-            {PLATFORMS.map((platform) => {
-              const Icon = platform.icon;
-              const isCopied = copiedPlatform === platform.id;
-              return (
-                <button
-                  key={platform.id}
-                  onClick={() => handlePlatformClick(platform)}
-                  className="flex flex-col items-center gap-2 cursor-pointer focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:rounded-xl"
-                  aria-label={`Share to ${platform.label}`}
-                >
-                  <div
-                    className={cn(
-                      "w-12 h-12 rounded-2xl flex items-center justify-center transition-transform active:scale-90",
-                      platform.bgColor,
-                      platform.color
-                    )}
-                  >
-                    {isCopied ? (
-                      <Check className="w-5 h-5" aria-hidden="true" />
-                    ) : (
-                      <Icon className="w-5 h-5" />
-                    )}
-                  </div>
-                  <span className="text-[11px] text-text-muted text-center leading-tight whitespace-nowrap">
-                    {platform.id === "x" ? "X" : platform.label.split(" ")[0]}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Copy link row */}
+  const platformGrid = (
+    <div className="grid grid-cols-4 gap-3 mb-5">
+      {PLATFORMS.map((platform) => {
+        const Icon = platform.icon;
+        const isCopied = copiedPlatform === platform.id;
+        return (
           <button
-            onClick={handleCopyLink}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-raised hover:bg-surface-overlay transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-violet-500"
+            key={platform.id}
+            onClick={() => handlePlatformClick(platform)}
+            className="flex flex-col items-center gap-2 cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--wine)] focus-visible:rounded-xl"
+            aria-label={`Share to ${platform.label}`}
           >
-            <div className="w-10 h-10 rounded-xl bg-white/8 flex items-center justify-center shrink-0">
-              {copiedPlatform === "copy" ? (
-                <Check className="w-4 h-4 text-emerald-400" aria-hidden="true" />
+            <div
+              className={cn(
+                "w-12 h-12 rounded-2xl flex items-center justify-center transition-transform active:scale-90",
+                platform.bgColor,
+                platform.color
+              )}
+            >
+              {isCopied ? (
+                <Check className="w-5 h-5" aria-hidden="true" />
               ) : (
-                <Copy className="w-4 h-4 text-text-secondary" aria-hidden="true" />
+                <Icon className="w-5 h-5" />
               )}
             </div>
-            <div className="flex-1 text-left">
-              <p className="text-[13px] font-medium text-text-primary">
-                {copiedPlatform === "copy" ? "Copied!" : "Copy Link"}
-              </p>
-              <p className="text-[11px] text-text-muted truncate">{url}</p>
-            </div>
+            <span className="text-tiny text-text-muted text-center leading-tight whitespace-nowrap">
+              {platform.id === "x" ? "X" : platform.label.split(" ")[0]}
+            </span>
           </button>
-        </div>
+        );
+      })}
+    </div>
+  );
 
-        <div className="h-5 safe-area-bottom" />
-      </SheetContent>
-    </Sheet>
+  const copyLinkRow = (
+    <button
+      onClick={handleCopyLink}
+      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-raised hover:bg-surface-overlay transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--wine)]"
+    >
+      <div className="w-10 h-10 rounded-xl bg-white/8 flex items-center justify-center shrink-0">
+        {copiedPlatform === "copy" ? (
+          <Check className="w-4 h-4 text-[var(--success)]" aria-hidden="true" />
+        ) : (
+          <Copy className="w-4 h-4 text-text-secondary" aria-hidden="true" />
+        )}
+      </div>
+      <div className="flex-1 text-left min-w-0">
+        <p className="text-small font-medium text-text-primary">
+          {copiedPlatform === "copy" ? "Copied!" : "Copy Link"}
+        </p>
+        <p className="text-tiny text-text-muted truncate">{url}</p>
+      </div>
+    </button>
+  );
+
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
+        <SheetContent
+          side="bottom"
+          className="h-auto max-h-[90vh] rounded-t-2xl bg-surface-base border-t border-border-base p-0 overflow-hidden"
+        >
+          <div className="flex justify-center py-3" aria-hidden="true">
+            <div className="w-10 h-1 rounded-full bg-border-strong" />
+          </div>
+
+          <SheetHeader className="px-4 pb-4">
+            <SheetTitle className="text-body font-semibold text-text-primary">
+              {sheetTitle}
+            </SheetTitle>
+          </SheetHeader>
+
+          <div className="px-4 pb-2">
+            {platformGrid}
+            {copyLinkRow}
+          </div>
+
+          <div className="h-5 safe-area-bottom" />
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="sm:max-w-sm p-5">
+        <DialogHeader>
+          <DialogTitle className="text-body font-semibold text-text-primary">
+            {sheetTitle}
+          </DialogTitle>
+        </DialogHeader>
+        {platformGrid}
+        {copyLinkRow}
+      </DialogContent>
+    </Dialog>
   );
 }

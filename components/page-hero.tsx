@@ -19,7 +19,7 @@ export function PageHero({ title, subtitle, compact = false, className }: PageHe
       <div className="mx-auto max-w-5xl px-4 md:px-6 text-center">
         <h1 className="text-2xl md:text-3xl font-bold text-text-primary">{title}</h1>
         {subtitle ? (
-          <p className="mt-2 text-sm md:text-base text-text-secondary">{subtitle}</p>
+          <p className="mt-2 text-small md:text-body-lg text-text-secondary">{subtitle}</p>
         ) : null}
       </div>
     </section>

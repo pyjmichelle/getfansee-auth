@@ -29,8 +29,9 @@ PROJECT-SPECIFIC COVERAGE (MUST CHECK):
 - Creator/Fan critical flows: `app/creator/`（含 `upgrade/`）, `app/me/`（含 `wallet/`）, `app/posts/`, `app/search/`, `app/home/`
 - Trust & safety surfaces: `app/report/`, `app/support/`, `app/api/report/`, `app/api/support/`
 - Admin surfaces: `app/admin/content-review/`, `app/admin/creator-verifications/`, `app/admin/reports/`
-- Money & subscriptions APIs: `app/api/wallet/`, `app/api/payments/`, `app/api/webhooks/stripe/`, `app/api/unlock/`, `app/api/subscriptions/`
-- Reliability-sensitive APIs: `app/api/**`, migrations `032`–`038`（新 PR 必须点名相关迁移）
+- Money & subscriptions APIs: `app/api/wallet/`, `app/api/payments/`, `app/api/payments/nowpayments/`, `app/api/webhooks/stripe/`, `app/api/webhooks/nowpayments/`, `app/api/unlock/`, `app/api/tip/`, `app/api/subscribe/`, `app/api/subscriptions/`
+- Reliability-sensitive APIs: `app/api/**`, migrations `032`–`042`（新 PR 必须点名相关迁移）
+- 门禁盲区已部分补齐：`qa:gate` 本身仍测不出布局跳变/CLS/触控尺寸回归，但 `tests/e2e/tab-stability.spec.ts` 现已覆盖 Home/`/me`/creator 详情/Studio Analytics 四处 tab 切换的跳变/触控/CLS/状态一致性断言，详见 `.cursor/agents/chief-quality.md`；新场景的 UI 布局类改动仍需补同类断言
 
 REQUIRED SKILLS (MANDATORY):
 

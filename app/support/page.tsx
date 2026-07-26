@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { HelpCircle, CreditCard, User, AlertTriangle, Send, Loader2 } from "@/lib/icons";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { SUPPORT_CONTACT_EMAIL } from "@/lib/constants/legal";
 
 const CONTACT_REASONS = [
@@ -34,6 +34,7 @@ const CONTACT_REASONS = [
 ];
 
 export default function SupportPage() {
+  const auth = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [currentUser, setCurrentUser] = useState<{
@@ -52,25 +53,20 @@ export default function SupportPage() {
   });
 
   useEffect(() => {
-    const loadUser = async () => {
-      const bootstrap = await getAuthBootstrap();
-      if (bootstrap.authenticated && bootstrap.user && bootstrap.profile) {
-        setCurrentUser({
-          username: bootstrap.profile.display_name || "user",
-          role: (bootstrap.profile.role || "fan") as "fan" | "creator",
-          avatar: bootstrap.profile.avatar_url || undefined,
-          email: bootstrap.user.email,
-          id: bootstrap.user.id,
-        });
-        setFormData((prev) => ({
-          ...prev,
-          email: bootstrap.user!.email || "",
-        }));
-      }
-    };
-
-    loadUser();
-  }, []);
+    if (auth.authenticated && auth.user && auth.profile) {
+      setCurrentUser({
+        username: auth.profile.display_name || "user",
+        role: (auth.profile.role || "fan") as "fan" | "creator",
+        avatar: auth.profile.avatar_url || undefined,
+        email: auth.user.email,
+        id: auth.user.id,
+      });
+      setFormData((prev) => ({
+        ...prev,
+        email: auth.user!.email || "",
+      }));
+    }
+  }, [auth.authenticated, auth.user, auth.profile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,8 +79,7 @@ export default function SupportPage() {
     setIsSubmitting(true);
 
     try {
-      const bootstrap = await getAuthBootstrap();
-      const userId = bootstrap.authenticated ? bootstrap.user?.id : null;
+      const userId = auth.authenticated ? auth.user?.id : null;
 
       const response = await fetch("/api/support", {
         method: "POST",
@@ -131,8 +126,8 @@ export default function SupportPage() {
       icon: User,
       title: "Account Issues",
       description: "Login problems, password reset, or profile settings",
-      color: "text-brand-primary",
-      bg: "bg-brand-primary-alpha-10",
+      color: "text-wine-text",
+      bg: "bg-[var(--wine-tint)]",
     },
     {
       icon: AlertTriangle,
@@ -153,8 +148,8 @@ export default function SupportPage() {
         {/* Hero Banner */}
         <div className="card-block bg-gradient-subtle p-6 md:p-8 mb-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-brand-primary-alpha-10 rounded-xl flex items-center justify-center">
-              <HelpCircle className="w-5 h-5 text-brand-primary" aria-hidden="true" />
+            <div className="w-10 h-10 bg-[var(--wine)]-alpha-10 rounded-xl flex items-center justify-center">
+              <HelpCircle className="w-5 h-5 text-wine-text" aria-hidden="true" />
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-text-primary">Contact Support</h1>
           </div>
@@ -166,8 +161,8 @@ export default function SupportPage() {
 
         {submitted ? (
           <div className="card-block p-8 text-center">
-            <div className="w-14 h-14 bg-brand-primary-alpha-10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Send className="w-6 h-6 text-brand-primary" />
+            <div className="w-14 h-14 bg-[var(--wine)]-alpha-10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Send className="w-6 h-6 text-wine-text" />
             </div>
             <h2 className="text-xl font-bold text-text-primary mb-2">Ticket Submitted!</h2>
             <p className="text-text-secondary mb-6">
@@ -178,7 +173,7 @@ export default function SupportPage() {
               <Button
                 variant="default"
                 onClick={() => (window.location.href = "/home")}
-                className="bg-brand-primary text-white"
+                className="bg-[var(--wine)] text-white"
               >
                 Back to Home
               </Button>
@@ -208,9 +203,9 @@ export default function SupportPage() {
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="your@email.com"
                       required
-                      className="bg-surface-raised border-border-base rounded-xl focus-visible:ring-brand-primary"
+                      className="bg-surface-raised border-border-base rounded-xl focus-visible:ring-[var(--wine)]"
                     />
-                    <p className="text-xs text-text-tertiary">
+                    <p className="text-tiny text-text-tertiary">
                       We&apos;ll send our response to this email address
                     </p>
                   </div>
@@ -225,7 +220,7 @@ export default function SupportPage() {
                     >
                       <SelectTrigger
                         id="reason"
-                        className="w-full bg-surface-raised border-border-base rounded-xl focus:ring-brand-primary"
+                        className="w-full bg-surface-raised border-border-base rounded-xl focus:ring-[var(--wine)]"
                       >
                         <SelectValue placeholder="Select a reason..." />
                       </SelectTrigger>
@@ -250,7 +245,7 @@ export default function SupportPage() {
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                       placeholder="Brief description of your issue"
                       required
-                      className="bg-surface-raised border-border-base rounded-xl focus-visible:ring-brand-primary"
+                      className="bg-surface-raised border-border-base rounded-xl focus-visible:ring-[var(--wine)]"
                     />
                   </div>
 
@@ -265,14 +260,14 @@ export default function SupportPage() {
                       placeholder="Please provide details about your issue..."
                       rows={8}
                       required
-                      className="bg-surface-raised border-border-base rounded-xl resize-none focus-visible:ring-brand-primary"
+                      className="bg-surface-raised border-border-base rounded-xl resize-none focus-visible:ring-[var(--wine)]"
                     />
                   </div>
 
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full min-h-[52px] bg-brand-primary text-white font-bold rounded-xl hover-bold shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full min-h-[52px] bg-[var(--wine)] text-white font-bold rounded-xl hover-bold :scale-95 focus-visible:ring-2 focus-visible:ring-[var(--wine)] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? (
                       <>
@@ -287,12 +282,12 @@ export default function SupportPage() {
                     )}
                   </Button>
 
-                  <p className="text-xs text-text-tertiary text-center">
+                  <p className="text-tiny text-text-tertiary text-center">
                     For billing disputes, please include your transaction date and amount.
                     Alternatively, email us directly at{" "}
                     <a
                       href={`mailto:${SUPPORT_CONTACT_EMAIL}`}
-                      className="text-brand-primary hover:underline"
+                      className="text-wine-text hover:underline"
                     >
                       {SUPPORT_CONTACT_EMAIL}
                     </a>
@@ -304,7 +299,7 @@ export default function SupportPage() {
             {/* Sidebar: FAQ */}
             <aside className="w-full lg:w-72 shrink-0">
               <div className="sticky top-24 space-y-3">
-                <h2 className="text-base font-semibold text-text-primary px-1">Common Issues</h2>
+                <h2 className="text-body-lg font-semibold text-text-primary px-1">Common Issues</h2>
                 {faqItems.map((item) => {
                   const Icon = item.icon;
                   return (
@@ -316,10 +311,10 @@ export default function SupportPage() {
                           <Icon className={`w-5 h-5 ${item.color}`} aria-hidden="true" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-text-primary text-sm mb-0.5">
+                          <h3 className="font-semibold text-text-primary text-small mb-0.5">
                             {item.title}
                           </h3>
-                          <p className="text-xs text-text-tertiary leading-relaxed">
+                          <p className="text-tiny text-text-tertiary leading-relaxed">
                             {item.description}
                           </p>
                         </div>
@@ -327,20 +322,20 @@ export default function SupportPage() {
                     </div>
                   );
                 })}
-                <div className="card-block p-4 bg-brand-primary-alpha-10 border-brand-primary/20">
-                  <p className="text-xs text-text-secondary leading-relaxed">
-                    <span className="font-semibold text-brand-primary">Response time:</span> Usually
+                <div className="card-block p-4 bg-[var(--wine)]-alpha-10 border-[var(--border-wine)]/20">
+                  <p className="text-tiny text-text-secondary leading-relaxed">
+                    <span className="font-semibold text-wine-text">Response time:</span> Usually
                     within 24 hours on weekdays.
                   </p>
                 </div>
                 <div className="card-block p-4">
-                  <p className="text-xs text-text-tertiary leading-relaxed">
+                  <p className="text-tiny text-text-tertiary leading-relaxed">
                     See our{" "}
-                    <a href="/faq" className="text-brand-primary hover:underline">
+                    <a href="/faq" className="text-wine-text hover:underline">
                       FAQ
                     </a>{" "}
                     for quick answers, or our{" "}
-                    <a href="/refund" className="text-brand-primary hover:underline">
+                    <a href="/refund" className="text-wine-text hover:underline">
                       Refund Policy
                     </a>{" "}
                     for billing questions.

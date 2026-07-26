@@ -10,13 +10,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { KycStatusCard } from "@/components/kyc/kyc-status-card";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { toast } from "sonner";
 import { LoadingState } from "@/components/loading-state";
 import { DEFAULT_AVATAR_CREATOR, PLACEHOLDER_GENERIC } from "@/lib/image-fallbacks";
 
 export default function CreatorOnboardingPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,8 +39,7 @@ export default function CreatorOnboardingPage() {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
+        if (!auth.authenticated || !auth.user) {
           router.push("/auth");
           return;
         }
@@ -74,7 +74,7 @@ export default function CreatorOnboardingPage() {
     };
 
     loadProfile();
-  }, [router]);
+  }, [router, auth.authenticated, auth.user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,11 +178,11 @@ export default function CreatorOnboardingPage() {
                 (currentStep === "profile" && index === 0) || (currentStep === "kyc" && index >= 1);
               return (
                 <div key={label} className="flex-1">
-                  <div className="text-xs text-text-tertiary mb-1">{label}</div>
+                  <div className="text-tiny text-text-tertiary mb-1">{label}</div>
                   <div className="h-1.5 rounded-full bg-surface-raised overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
-                        isActive ? "w-full bg-brand-primary" : "w-0 bg-brand-primary"
+                        isActive ? "w-full bg-[var(--wine)]" : "w-0 bg-[var(--wine)]"
                       }`}
                     />
                   </div>
@@ -195,7 +195,7 @@ export default function CreatorOnboardingPage() {
         {error && (
           <div className="bg-error/10 border border-error/20 rounded-xl p-4 mb-6">
             <p className="text-error font-medium">Error</p>
-            <p className="text-sm text-text-tertiary mt-1">{error}</p>
+            <p className="text-small text-text-tertiary mt-1">{error}</p>
           </div>
         )}
 
@@ -210,7 +210,7 @@ export default function CreatorOnboardingPage() {
                     {formData.display_name[0]?.toUpperCase() || "U"}
                   </AvatarFallback>
                 </Avatar>
-                <Label htmlFor="avatar_url" className="text-sm text-text-tertiary">
+                <Label htmlFor="avatar_url" className="text-small text-text-tertiary">
                   Avatar URL (Optional)
                 </Label>
                 <Input
@@ -261,7 +261,7 @@ export default function CreatorOnboardingPage() {
                   variant="outline"
                   onClick={() => router.push("/home")}
                   disabled={isSaving}
-                  className="flex-1 border-border-base bg-surface-base hover:bg-surface-raised rounded-xl active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                  className="flex-1 border-border-base bg-surface-base hover:bg-surface-raised rounded-xl active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-[var(--wine)]"
                 >
                   Cancel
                 </Button>
@@ -269,7 +269,7 @@ export default function CreatorOnboardingPage() {
                   type="submit"
                   disabled={isSaving}
                   variant="gradient"
-                  className="flex-1 rounded-xl shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50 disabled:shadow-none"
+                  className="flex-1 rounded-xl :scale-95 focus-visible:ring-2 focus-visible:ring-[var(--wine)] disabled:opacity-50 disabled:shadow-none"
                 >
                   {isSaving ? "Saving…" : "Next"}
                 </Button>
@@ -291,7 +291,7 @@ export default function CreatorOnboardingPage() {
                   type="button"
                   variant="outline"
                   onClick={() => setCurrentStep("profile")}
-                  className="flex-1 border-border-base bg-surface-base hover:bg-surface-raised rounded-xl active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                  className="flex-1 border-border-base bg-surface-base hover:bg-surface-raised rounded-xl active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-[var(--wine)]"
                 >
                   Previous
                 </Button>

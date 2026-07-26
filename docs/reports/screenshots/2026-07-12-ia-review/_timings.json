@@ -1,0 +1,306 @@
+[
+  {
+    "page": "auth",
+    "role": "guest",
+    "vp": "mb",
+    "dclMs": 161,
+    "skeletonGoneMs": 21,
+    "idleMs": 1028
+  },
+  {
+    "page": "share-landing",
+    "role": "guest",
+    "vp": "mb",
+    "dclMs": 744,
+    "skeletonGoneMs": 30,
+    "idleMs": 1496
+  },
+  {
+    "page": "auth",
+    "role": "guest",
+    "vp": "pc",
+    "dclMs": 298,
+    "skeletonGoneMs": 20,
+    "idleMs": 1393
+  },
+  {
+    "page": "share-landing",
+    "role": "guest",
+    "vp": "pc",
+    "dclMs": 1200,
+    "skeletonGoneMs": 41,
+    "idleMs": 2069
+  },
+  {
+    "page": "home",
+    "role": "fan",
+    "vp": "mb",
+    "dclMs": 6834,
+    "skeletonGoneMs": 72,
+    "idleMs": 9024
+  },
+  {
+    "page": "me",
+    "role": "fan",
+    "vp": "mb",
+    "dclMs": 1294,
+    "skeletonGoneMs": 1994,
+    "idleMs": 3662
+  },
+  {
+    "page": "creator-other",
+    "role": "fan",
+    "vp": "mb",
+    "dclMs": 2295,
+    "skeletonGoneMs": 95,
+    "idleMs": 10279
+  },
+  {
+    "page": "post-locked",
+    "role": "fan",
+    "vp": "mb",
+    "dclMs": 1090,
+    "skeletonGoneMs": 40,
+    "idleMs": 10171
+  },
+  {
+    "page": "post-free",
+    "role": "fan",
+    "vp": "mb",
+    "dclMs": 1165,
+    "skeletonGoneMs": 21,
+    "idleMs": 8595
+  },
+  {
+    "page": "search",
+    "role": "fan",
+    "vp": "mb",
+    "dclMs": 2580,
+    "skeletonGoneMs": 61,
+    "idleMs": 5925
+  },
+  {
+    "page": "wallet",
+    "role": "fan",
+    "vp": "mb",
+    "dclMs": 1382,
+    "skeletonGoneMs": 334,
+    "idleMs": 10335
+  },
+  {
+    "page": "subscriptions",
+    "role": "fan",
+    "vp": "mb",
+    "dclMs": 1066,
+    "skeletonGoneMs": 2892,
+    "idleMs": 4344
+  },
+  {
+    "page": "purchases",
+    "role": "fan",
+    "vp": "mb",
+    "dclMs": 1767,
+    "skeletonGoneMs": 26,
+    "idleMs": 4425
+  },
+  {
+    "page": "home",
+    "role": "fan",
+    "vp": "pc",
+    "dclMs": 4593,
+    "skeletonGoneMs": 58,
+    "idleMs": 6364
+  },
+  {
+    "page": "me",
+    "role": "fan",
+    "vp": "pc",
+    "dclMs": 3394,
+    "skeletonGoneMs": 1664,
+    "idleMs": 5511
+  },
+  {
+    "page": "creator-other",
+    "role": "fan",
+    "vp": "pc",
+    "dclMs": 3901,
+    "skeletonGoneMs": 164,
+    "idleMs": 15799
+  },
+  {
+    "page": "post-locked",
+    "role": "fan",
+    "vp": "pc",
+    "dclMs": 1067,
+    "skeletonGoneMs": 35,
+    "idleMs": 8605
+  },
+  {
+    "page": "post-free",
+    "role": "fan",
+    "vp": "pc",
+    "dclMs": 2287,
+    "skeletonGoneMs": 83,
+    "idleMs": 22377
+  },
+  {
+    "page": "search",
+    "role": "fan",
+    "vp": "pc",
+    "dclMs": 3146,
+    "skeletonGoneMs": 44,
+    "idleMs": 5292
+  },
+  {
+    "page": "wallet",
+    "role": "fan",
+    "vp": "pc",
+    "dclMs": 2197,
+    "skeletonGoneMs": 382,
+    "idleMs": 6942
+  },
+  {
+    "page": "subscriptions",
+    "role": "fan",
+    "vp": "pc",
+    "dclMs": 3105,
+    "skeletonGoneMs": 2693,
+    "idleMs": 6195
+  },
+  {
+    "page": "purchases",
+    "role": "fan",
+    "vp": "pc",
+    "dclMs": 2830,
+    "skeletonGoneMs": 1478,
+    "idleMs": 4747
+  },
+  {
+    "page": "home",
+    "role": "creator",
+    "vp": "mb",
+    "dclMs": 5420,
+    "skeletonGoneMs": 60,
+    "idleMs": 7276
+  },
+  {
+    "page": "me",
+    "role": "creator",
+    "vp": "mb",
+    "dclMs": 1796,
+    "skeletonGoneMs": 1774,
+    "idleMs": 4048
+  },
+  {
+    "page": "creator-self",
+    "role": "creator",
+    "vp": "mb",
+    "dclMs": 1488,
+    "skeletonGoneMs": 140,
+    "idleMs": 7567
+  },
+  {
+    "page": "post-author",
+    "role": "creator",
+    "vp": "mb",
+    "dclMs": 2261,
+    "skeletonGoneMs": 23,
+    "idleMs": 8283
+  },
+  {
+    "page": "wallet",
+    "role": "creator",
+    "vp": "mb",
+    "dclMs": 1141,
+    "skeletonGoneMs": 253,
+    "idleMs": 7272
+  },
+  {
+    "page": "studio",
+    "role": "creator",
+    "vp": "mb",
+    "dclMs": 4115,
+    "skeletonGoneMs": 8855,
+    "idleMs": 18000
+  },
+  {
+    "page": "new-post",
+    "role": "creator",
+    "vp": "mb",
+    "dclMs": 1453,
+    "skeletonGoneMs": 260,
+    "idleMs": 5140
+  },
+  {
+    "page": "ambassador",
+    "role": "creator",
+    "vp": "mb",
+    "dclMs": 1297,
+    "skeletonGoneMs": 4880,
+    "idleMs": 6614
+  },
+  {
+    "page": "home",
+    "role": "creator",
+    "vp": "pc",
+    "dclMs": 7654,
+    "skeletonGoneMs": 83,
+    "idleMs": 9652
+  },
+  {
+    "page": "me",
+    "role": "creator",
+    "vp": "pc",
+    "dclMs": 1073,
+    "skeletonGoneMs": 22,
+    "idleMs": 3306
+  },
+  {
+    "page": "creator-self",
+    "role": "creator",
+    "vp": "pc",
+    "dclMs": 1383,
+    "skeletonGoneMs": 19,
+    "idleMs": 8421
+  },
+  {
+    "page": "post-author",
+    "role": "creator",
+    "vp": "pc",
+    "dclMs": 3144,
+    "skeletonGoneMs": 191,
+    "idleMs": 11535
+  },
+  {
+    "page": "wallet",
+    "role": "creator",
+    "vp": "pc",
+    "dclMs": 1581,
+    "skeletonGoneMs": 259,
+    "idleMs": 3707
+  },
+  {
+    "page": "studio",
+    "role": "creator",
+    "vp": "pc",
+    "dclMs": 4229,
+    "skeletonGoneMs": 5822,
+    "idleMs": 14730
+  },
+  {
+    "page": "new-post",
+    "role": "creator",
+    "vp": "pc",
+    "dclMs": 5409,
+    "skeletonGoneMs": 446,
+    "idleMs": 9606
+  },
+  {
+    "page": "ambassador",
+    "role": "creator",
+    "vp": "pc",
+    "dclMs": 1078,
+    "skeletonGoneMs": 6618,
+    "idleMs": 8042
+  }
+]

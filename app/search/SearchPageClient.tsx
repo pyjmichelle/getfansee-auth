@@ -19,7 +19,7 @@ import { DEFAULT_AVATAR_CREATOR, DEFAULT_AVATAR_FAN } from "@/lib/image-fallback
 import { type Creator } from "@/lib/types";
 import { MOCK_CREATORS } from "@/lib/mock-data";
 import { PageShell } from "@/components/page-shell";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
 
 type Category = "all" | "trending" | "new" | "top";
@@ -93,6 +93,7 @@ function mapApiCreator(creator: Creator, index: number): ExploreCreator {
 export default function SearchPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const auth = useAuth();
   const initialQuery = searchParams?.get("q") || "";
 
   const [query, setQuery] = useState(initialQuery);
@@ -101,6 +102,7 @@ export default function SearchPageClient() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchAbortRef = useRef<AbortController | null>(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [creators, setCreators] = useState<ExploreCreator[]>([]);
   const [currentUser, setCurrentUser] = useState<{
@@ -111,35 +113,23 @@ export default function SearchPageClient() {
   useSkeletonMetric("search_page", isUserLoading);
 
   useEffect(() => {
-    const initUser = async () => {
-      try {
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
-          setCurrentUser({
-            username: "guest",
-            avatar: DEFAULT_AVATAR_FAN,
-            role: "fan",
-          });
-          return;
-        }
+    if (!auth.authenticated || !auth.user) {
+      setCurrentUser({
+        username: "guest",
+        avatar: DEFAULT_AVATAR_FAN,
+        role: "fan",
+      });
+      setIsUserLoading(false);
+      return;
+    }
 
-        setCurrentUser({
-          username: bootstrap.profile?.display_name || bootstrap.user.email.split("@")[0] || "user",
-          avatar: bootstrap.profile?.avatar_url || DEFAULT_AVATAR_FAN,
-          role: (bootstrap.profile?.role || "fan") as "fan" | "creator",
-        });
-      } catch {
-        setCurrentUser({
-          username: "guest",
-          avatar: DEFAULT_AVATAR_FAN,
-          role: "fan",
-        });
-      } finally {
-        setIsUserLoading(false);
-      }
-    };
-    initUser();
-  }, []);
+    setCurrentUser({
+      username: auth.profile?.display_name || auth.user.email.split("@")[0] || "user",
+      avatar: auth.profile?.avatar_url || DEFAULT_AVATAR_FAN,
+      role: (auth.profile?.role || "fan") as "fan" | "creator",
+    });
+    setIsUserLoading(false);
+  }, [auth.authenticated, auth.user, auth.profile]);
 
   const localSearchCreators = (value: string): ExploreCreator[] => {
     const normalized = value.trim().toLowerCase();
@@ -155,15 +145,25 @@ export default function SearchPageClient() {
 
   const performSearch = async (value: string) => {
     const normalized = value.trim();
+
+    // Cancel any in-flight request before starting a new one — without this,
+    // a slow earlier keystroke's response could resolve after a faster later
+    // one and overwrite the results with stale data (classic type-ahead race).
+    searchAbortRef.current?.abort();
+
     if (!normalized || normalized.length < 2) {
       setIsSearching(false);
       setCreators([]);
       return;
     }
+    const controller = new AbortController();
+    searchAbortRef.current = controller;
     const localMatches = localSearchCreators(normalized);
     setIsSearching(true);
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(normalized)}&type=creators`);
+      const res = await fetch(`/api/search?q=${encodeURIComponent(normalized)}&type=creators`, {
+        signal: controller.signal,
+      });
       const data = await res.json();
       if (data?.success && Array.isArray(data.creators)) {
         const apiCreators = data.creators.map(mapApiCreator);
@@ -175,10 +175,13 @@ export default function SearchPageClient() {
       } else {
         setCreators(localMatches);
       }
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       setCreators(localMatches);
     } finally {
-      setIsSearching(false);
+      if (searchAbortRef.current === controller) {
+        setIsSearching(false);
+      }
     }
   };
 
@@ -186,6 +189,9 @@ export default function SearchPageClient() {
     if (initialQuery) {
       performSearch(initialQuery);
     }
+    return () => {
+      searchAbortRef.current?.abort();
+    };
   }, [initialQuery]);
 
   const hasSearchQuery = query.trim().length >= 2;
@@ -203,16 +209,20 @@ export default function SearchPageClient() {
   const featured = displayedCreators.slice(0, 3);
 
   if (isUserLoading || !currentUser) {
-    return <div className="min-h-screen bg-bg-base" />;
+    return <div className="min-h-dvh bg-bg-base" />;
   }
 
   return (
-    <PageShell user={currentUser}>
-      <div className="max-w-7xl mx-auto px-3 md:px-5 pb-16" data-testid="search-page">
+    // noPadding: this page owns its own max-w-7xl + padding below — the
+    // PageShell default (max-w-4xl + px-4/6) was silently capping it to 896px
+    // and double-padding it, so the 3-column featured grid never got the
+    // width it was actually designed for.
+    <PageShell user={currentUser} noPadding>
+      <div className="max-w-7xl mx-auto px-3 md:px-5" data-testid="search-page">
         {/* Hero search section */}
         <section className="py-8 md:py-12 text-center">
           <h1 className="font-serif text-h1 md:text-[32px] text-white mb-2">Discover Creators</h1>
-          <p className="text-[13px] text-text-muted mb-6 max-w-md mx-auto">
+          <p className="text-small text-text-muted mb-6 max-w-md mx-auto">
             Explore exclusive content from talented creators around the world
           </p>
 
@@ -240,11 +250,11 @@ export default function SearchPageClient() {
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
               placeholder={isSearchFocused ? "" : "Search creators by nickname..."}
-              className="glass-input w-full h-10 pl-9 pr-4 text-[13px] text-white placeholder:text-text-muted"
+              className="glass-input w-full h-10 pl-9 pr-4 text-small text-white placeholder:text-text-muted"
             />
           </form>
 
-          {isSearching && <p className="mt-2 text-[11px] text-text-muted">Searching...</p>}
+          {isSearching && <p className="mt-2 text-tiny text-text-muted">Searching...</p>}
         </section>
 
         {/* Featured creators hero (shown when no search) */}
@@ -265,7 +275,7 @@ export default function SearchPageClient() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/80" />
                 {c.verified && (
-                  <div className="absolute top-2.5 right-2.5 size-6 rounded-full bg-violet-500 flex items-center justify-center shadow-glow-violet">
+                  <div className="absolute top-2.5 right-2.5 size-6 rounded-full bg-[var(--wine)] flex items-center justify-center ">
                     <CheckCircle2 className="size-[12px] text-white" />
                   </div>
                 )}
@@ -276,12 +286,12 @@ export default function SearchPageClient() {
                       <AvatarFallback>{c.name[0]}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="text-[14px] font-bold text-white">{c.name}</p>
-                      <p className="text-[11px] text-white/60">@{c.username}</p>
+                      <p className="text-small font-bold text-white">{c.name}</p>
+                      <p className="text-tiny text-white/60">@{c.username}</p>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-white/60">
+                    <span className="text-tiny text-white/60">
                       {formatCount(c.subscriberCount)} subscribers
                     </span>
                     <button
@@ -289,7 +299,7 @@ export default function SearchPageClient() {
                         e.stopPropagation();
                         router.push(`/creator/${c.id}`);
                       }}
-                      className="h-7 px-3 rounded-full bg-violet-500/90 text-white text-[11px] font-bold hover:bg-violet-500 transition-colors shadow-glow-violet"
+                      className="h-7 px-3 rounded-full bg-[var(--wine)]/90 text-white text-tiny font-bold hover:bg-[var(--wine)] transition-colors "
                     >
                       ${c.price.toFixed(2)}/mo
                     </button>
@@ -309,10 +319,10 @@ export default function SearchPageClient() {
                 <button
                   key={cat.id}
                   onClick={() => setCategory(cat.id)}
-                  className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-[12px] font-medium transition-all ${
+                  className={`inline-flex items-center gap-1.5 min-h-11 px-3 rounded-full border text-tiny font-medium transition-[background-color,color,border-color] ${
                     active
-                      ? "bg-violet-500 text-white shadow-glow-violet"
-                      : "bg-white/5 border border-white/8 text-text-muted hover:text-white hover:border-violet-500/40"
+                      ? "bg-[var(--wine)] text-white border-transparent"
+                      : "bg-white/5 border-white/8 text-text-muted hover:text-white hover:border-[var(--wine)]/40"
                   }`}
                 >
                   {cat.icon}
@@ -324,13 +334,17 @@ export default function SearchPageClient() {
           <div className="flex items-center gap-1 p-1 rounded-lg bg-white/5 border border-white/8">
             <button
               onClick={() => setViewMode("grid")}
-              className={`size-7 flex items-center justify-center rounded-md transition-all ${viewMode === "grid" ? "bg-violet-500 text-white" : "text-text-muted hover:text-white"}`}
+              aria-label="Grid view"
+              aria-pressed={viewMode === "grid"}
+              className={`size-11 flex items-center justify-center rounded-md transition-colors ${viewMode === "grid" ? "bg-[var(--wine)] text-white" : "text-text-muted hover:text-white"}`}
             >
               <Grid3X3 className="size-[13px]" />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`size-7 flex items-center justify-center rounded-md transition-all ${viewMode === "list" ? "bg-violet-500 text-white" : "text-text-muted hover:text-white"}`}
+              aria-label="List view"
+              aria-pressed={viewMode === "list"}
+              className={`size-11 flex items-center justify-center rounded-md transition-colors ${viewMode === "list" ? "bg-[var(--wine)] text-white" : "text-text-muted hover:text-white"}`}
             >
               <Rows3 className="size-[13px]" />
             </button>
@@ -347,7 +361,7 @@ export default function SearchPageClient() {
               <Search className="size-7 text-text-muted" />
             </div>
             <p className="text-[15px] font-semibold text-white mb-1">No creators found</p>
-            <p className="text-[13px] text-text-muted max-w-xs">
+            <p className="text-small text-text-muted max-w-xs">
               Try a different nickname to find creators you love.
             </p>
           </div>
@@ -367,7 +381,7 @@ export default function SearchPageClient() {
               viewMode === "grid" ? (
                 <article
                   key={`${category}-${c.id}`}
-                  className="glass-card rounded-[var(--radius-md)] overflow-hidden cursor-pointer hover:border-violet-500/30 transition-all group card-interactive"
+                  className="glass-card rounded-[var(--radius-md)] overflow-hidden cursor-pointer hover:border-[var(--wine)]/30 transition-all group card-interactive"
                   onClick={() => router.push(`/creator/${c.id}`)}
                 >
                   <div className="relative h-36 overflow-hidden">
@@ -380,7 +394,7 @@ export default function SearchPageClient() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/40" />
                     {c.verified && (
-                      <div className="absolute top-2 right-2 size-5 rounded-full bg-violet-500 flex items-center justify-center">
+                      <div className="absolute top-2 right-2 size-5 rounded-full bg-[var(--wine)] flex items-center justify-center">
                         <CheckCircle2 className="size-[10px] text-white" />
                       </div>
                     )}
@@ -392,7 +406,7 @@ export default function SearchPageClient() {
                         <AvatarFallback className="text-[10px]">{c.name[0]}</AvatarFallback>
                       </Avatar>
                     </div>
-                    <p className="text-[12px] font-semibold text-white truncate">{c.name}</p>
+                    <p className="text-tiny font-semibold text-white truncate">{c.name}</p>
                     <p className="text-[10px] text-text-muted mb-1">@{c.username}</p>
                     <p className="text-[10px] text-text-secondary line-clamp-2 mb-2.5">{c.bio}</p>
                     <div className="flex items-center justify-between text-[10px] text-text-muted mb-2.5">
@@ -415,22 +429,22 @@ export default function SearchPageClient() {
               ) : (
                 <article
                   key={`${category}-${c.id}`}
-                  className="glass-card rounded-[var(--radius-md)] overflow-hidden flex gap-3 p-3 cursor-pointer hover:border-violet-500/30 transition-all"
+                  className="glass-card rounded-[var(--radius-md)] overflow-hidden flex gap-3 p-3 cursor-pointer hover:border-[var(--wine)]/30 transition-all"
                   onClick={() => router.push(`/creator/${c.id}`)}
                 >
-                  <Avatar className="size-10 shrink-0 ring-1 ring-violet-500/20">
+                  <Avatar className="size-10 shrink-0 ring-1 ring-[var(--wine)]/20">
                     <AvatarImage src={c.avatar} />
                     <AvatarFallback>{c.name[0]}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-0.5">
-                      <p className="text-[13px] font-semibold text-white truncate">{c.name}</p>
+                      <p className="text-small font-semibold text-white truncate">{c.name}</p>
                       {c.verified && (
-                        <CheckCircle2 className="size-[12px] text-violet-500 shrink-0" />
+                        <CheckCircle2 className="size-[12px] text-wine-text shrink-0" />
                       )}
                     </div>
-                    <p className="text-[11px] text-text-muted mb-1">@{c.username}</p>
-                    <p className="text-[11px] text-text-secondary line-clamp-1">{c.bio}</p>
+                    <p className="text-tiny text-text-muted mb-1">@{c.username}</p>
+                    <p className="text-tiny text-text-secondary line-clamp-1">{c.bio}</p>
                     <p className="text-[10px] text-text-muted mt-1">
                       {formatCount(c.subscriberCount)} subscribers · {c.postCount} posts
                     </p>

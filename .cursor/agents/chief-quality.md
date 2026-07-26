@@ -36,8 +36,9 @@ PROJECT-SPECIFIC COVERAGE (MUST CHECK):
 - Creator/Fan critical flows: `app/creator/`（含 `upgrade/`）, `app/me/`（含 `wallet/`）, `app/posts/`, `app/search/`, `app/home/`
 - Trust & safety surfaces: `app/report/`, `app/support/`, `app/api/report/`, `app/api/support/`
 - Admin surfaces: `app/admin/content-review/`, `app/admin/creator-verifications/`, `app/admin/reports/`
-- Money & subscriptions APIs: `app/api/wallet/`, `app/api/payments/`, `app/api/webhooks/stripe/`, `app/api/unlock/`, `app/api/subscriptions/`
-- Reliability-sensitive APIs: `app/api/**`, migrations `032`–`038`（新 PR 必须点名相关迁移）
+- Money & subscriptions APIs: `app/api/wallet/`, `app/api/payments/`, `app/api/payments/nowpayments/`, `app/api/webhooks/stripe/`, `app/api/webhooks/nowpayments/`, `app/api/unlock/`, `app/api/tip/`, `app/api/subscribe/`, `app/api/subscriptions/`
+- Reliability-sensitive APIs: `app/api/**`, migrations `032`–`042`（新 PR 必须点名相关迁移）
+- 门禁盲区已部分补齐（2026-07-26 三次审查验收）：`pnpm qa:gate` 仍然只验选择器存在与死点击，但新增 `tests/e2e/tab-stability.spec.ts` 覆盖了 tab 切换布局跳变类回归——Home/` /me`/creator 详情/Studio Analytics 四处的 `boundingBox()` 跳变比较、MB 触控 ≥44px、scoped `layout-shift` 累计值（`<0.02`）、active/inactive 状态的 border-width/font-weight 一致性（未用像素 `toHaveScreenshot`：本地 darwin 生成的基线与 CI 的 Linux runner 不匹配会导致首跑必炸，且 Docker 在此环境不可用以生成匹配基线，改用确定性更高的 computed-style 断言）。**新的** UI 布局类修复如果不落在这四个已覆盖场景内，仍需按同样四类断言（跳变/触控/CLS/状态一致性）补充用例，否则视为未完成验收
 
 REQUIRED SKILLS (MANDATORY):
 

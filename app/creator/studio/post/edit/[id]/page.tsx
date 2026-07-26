@@ -13,10 +13,11 @@ import { toast } from "sonner";
 import { MultiMediaUpload } from "@/components/multi-media-upload";
 import { type MediaFile } from "@/lib/storage";
 import { Lock } from "@/lib/icons";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function EditPostPage() {
   const router = useRouter();
+  const auth = useAuth();
   const params = useParams();
   const postId = (params?.id as string) || "";
 
@@ -43,22 +44,21 @@ export default function EditPostPage() {
         setIsLoading(true);
         setError(null);
 
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
+        if (!auth.authenticated || !auth.user) {
           router.push("/auth");
           return;
         }
 
-        setCurrentUserId(bootstrap.user.id);
+        setCurrentUserId(auth.user.id);
 
-        if (bootstrap.profile) {
+        if (auth.profile) {
           setCurrentUser({
-            username: bootstrap.profile.display_name || "user",
-            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
-            avatar: bootstrap.profile.avatar_url || undefined,
+            username: auth.profile.display_name || "user",
+            role: (auth.profile.role || "fan") as "fan" | "creator",
+            avatar: auth.profile.avatar_url || undefined,
           });
 
-          if (bootstrap.profile.role !== "creator") {
+          if (auth.profile.role !== "creator") {
             router.push("/home");
             return;
           }
@@ -103,7 +103,7 @@ export default function EditPostPage() {
     if (postId) {
       loadData();
     }
-  }, [postId, router]);
+  }, [postId, router, auth.authenticated, auth.user, auth.profile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,7 +193,7 @@ export default function EditPostPage() {
         {error && (
           <div className="bg-error/10 border border-error/20 rounded-2xl p-6 mb-8">
             <p className="text-error font-medium">Error</p>
-            <p className="text-sm text-text-secondary mt-1">{error}</p>
+            <p className="text-small text-text-secondary mt-1">{error}</p>
           </div>
         )}
 
@@ -203,7 +203,7 @@ export default function EditPostPage() {
             <div className="bg-surface-raised border border-border-base rounded-xl p-4 space-y-3">
               <div className="flex items-center gap-2 text-text-tertiary">
                 <Lock className="w-4 h-4" />
-                <span className="text-sm font-medium">
+                <span className="text-small font-medium">
                   Price and visibility are locked (cannot be modified)
                 </span>
               </div>
@@ -213,8 +213,8 @@ export default function EditPostPage() {
                     post.visibility === "free"
                       ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 rounded-lg"
                       : post.visibility === "subscribers"
-                        ? "bg-brand-primary/10 text-brand-primary border-brand-primary/20 rounded-lg"
-                        : "glass bg-[var(--bg-purple-500-10)] text-[var(--color-purple-400)] border-[var(--border-purple-500-20)] rounded-lg"
+                        ? "bg-brand-primary/10 text-wine-text border-brand-primary/20 rounded-lg"
+                        : "bg-[var(--premium-tint)] text-[var(--premium)] border-[var(--premium)]/20 rounded-lg"
                   }
                 >
                   {post.visibility === "free"
@@ -224,7 +224,7 @@ export default function EditPostPage() {
                       : `Premium $${((post.price_cents || 0) / 100).toFixed(2)}`}
                 </Badge>
                 {post.visibility === "ppv" && (
-                  <span className="text-sm text-text-tertiary">
+                  <span className="text-small text-text-tertiary">
                     Price: ${((post.price_cents || 0) / 100).toFixed(2)}
                   </span>
                 )}
@@ -268,12 +268,12 @@ export default function EditPostPage() {
               </Label>
               {post.media && post.media.length > 0 && (
                 <div className="mb-3 p-3 bg-surface-raised rounded-lg">
-                  <p className="text-xs text-text-tertiary mb-2">
+                  <p className="text-tiny text-text-tertiary mb-2">
                     Existing media ({post.media.length} file{post.media.length > 1 ? "s" : ""})
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {post.media.map((media) => (
-                      <div key={media.id} className="text-xs text-text-tertiary">
+                      <div key={media.id} className="text-tiny text-text-tertiary">
                         {media.media_type === "image" ? "🖼️" : "🎥"} {media.file_name || "media"}
                       </div>
                     ))}
@@ -292,7 +292,7 @@ export default function EditPostPage() {
                 maxFiles={10}
               />
               {mediaFiles.length > 0 && (
-                <p className="text-xs text-text-tertiary mt-2">
+                <p className="text-tiny text-text-tertiary mt-2">
                   {mediaFiles.length} new file{mediaFiles.length > 1 ? "s" : ""} uploaded (will be
                   appended to existing media)
                 </p>
@@ -310,12 +310,7 @@ export default function EditPostPage() {
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                variant="gradient"
-                disabled={isSaving}
-                className="flex-1 rounded-xl shadow-glow hover-bold"
-              >
+              <Button type="submit" variant="default" disabled={isSaving} className="flex-1">
                 {isSaving ? "Saving..." : "Save Changes"}
               </Button>
             </div>

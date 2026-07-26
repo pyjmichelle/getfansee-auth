@@ -11,18 +11,11 @@ import { CommentList } from "@/components/comments/comment-list";
 import { MediaDisplay } from "@/components/media-display";
 import { PaywallModal } from "@/components/paywall-modal";
 import { PageShell } from "@/components/page-shell";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { DetailPageHeader } from "@/components/shells/detail-page-header";
+import { useAuth } from "@/contexts/auth-context";
 import { type Post } from "@/lib/types";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  Share2,
-  Lock,
-  MessageCircle,
-  MoreVertical,
-  CheckCircle2,
-  Heart,
-} from "@/lib/icons";
+import { Share2, Lock, MessageCircle, CheckCircle2, Heart } from "@/lib/icons";
 import { ShareModal } from "@/components/share-modal";
 import { TipModal } from "@/components/tip-modal";
 import { formatDistanceToNow } from "date-fns";
@@ -30,6 +23,14 @@ import { Analytics } from "@/lib/analytics";
 import { useCountUp } from "@/hooks/use-count-up";
 import { DEFAULT_AVATAR_CREATOR } from "@/lib/image-fallbacks";
 import { MOCK_POSTS as MOCK_POSTS_DATA, MOCK_CREATORS } from "@/lib/mock-data";
+import { formatUsd } from "@/lib/format";
+
+// Alpha: mirrors PaywallModal — no wallet top-up path exists in production,
+// so CTAs must not promise instant paid unlock/tip (server also 403s
+// /api/tip and /api/subscribe as a backstop).
+const WALLET_PATH_ACTIVE =
+  process.env.NEXT_PUBLIC_TEST_MODE === "true" ||
+  process.env.NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED === "true";
 
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
@@ -136,6 +137,10 @@ export default function PostDetailPage() {
   const router = useRouter();
   const params = useParams();
   const postId = params?.id as string;
+  // SSR-injected via AuthProvider — synchronously available on first render,
+  // so this never gates loading state the way an async bootstrap fetch did (P-1).
+  const auth = useAuth();
+  const viewerId = auth.authenticated && auth.user ? auth.user.id : null;
 
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -178,15 +183,12 @@ export default function PostDetailPage() {
 
         // Public page: guests can view the post (paid content shows the paywall).
         // Do NOT redirect to /auth — only authenticated viewers get a currentUser.
-        const bootstrap = await getAuthBootstrap();
-        const viewerId = bootstrap.authenticated && bootstrap.user ? bootstrap.user.id : null;
-
-        if (bootstrap.user && bootstrap.profile) {
+        if (auth.user && auth.profile) {
           setCurrentUser({
-            id: bootstrap.user.id,
-            username: bootstrap.profile.display_name || "user",
-            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
-            avatar: bootstrap.profile.avatar_url || undefined,
+            id: auth.user.id,
+            username: auth.profile.display_name || "user",
+            role: (auth.profile.role || "fan") as "fan" | "creator",
+            avatar: auth.profile.avatar_url || undefined,
           });
         }
 
@@ -260,7 +262,7 @@ export default function PostDetailPage() {
     };
 
     loadData();
-  }, [postId, router]);
+  }, [postId, router, viewerId, auth.profile]);
 
   const handleShare = () => {
     setShowShareModal(true);
@@ -281,11 +283,7 @@ export default function PostDetailPage() {
     return (
       <PageShell user={currentUser} notificationCount={0} noPadding>
         <div data-testid="post-detail-page">
-          <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-border-base md:hidden">
-            <div className="flex items-center justify-center px-4 h-14">
-              <h1 className="font-semibold text-text-primary">Post</h1>
-            </div>
-          </header>
+          <DetailPageHeader title="Post" className="max-w-6xl mx-auto px-4 md:px-6 md:pt-4" />
           <PostDetailSkeleton />
         </div>
       </PageShell>
@@ -296,20 +294,8 @@ export default function PostDetailPage() {
     return (
       <PageShell user={currentUser} notificationCount={0} noPadding>
         <div data-testid="post-page-error">
-          <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-border-base md:hidden">
-            <div className="flex items-center px-4 h-14">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => router.back()}
-                aria-label="Go back"
-                className="text-text-primary active:scale-95"
-              >
-                <ArrowLeft className="w-5 h-5" aria-hidden="true" />
-              </Button>
-            </div>
-          </header>
-          <div className="pt-20 px-4 text-center py-16">
+          <DetailPageHeader title="Post" className="max-w-6xl mx-auto px-4 md:px-6 md:pt-4" />
+          <div className="pt-20 md:pt-4 px-4 text-center py-16">
             <p className="text-text-tertiary">{error || "Post not found"}</p>
             <Button className="mt-4" onClick={() => router.back()}>
               Go Back
@@ -328,67 +314,22 @@ export default function PostDetailPage() {
     <PageShell user={currentUser} notificationCount={0} noPadding>
       <div data-testid="post-page">
         <div data-testid="page-ready">
-          {/* Mobile-only Fixed Header */}
-          <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-white/6 md:hidden">
-            <div className="flex items-center justify-between px-4 h-14 max-w-3xl mx-auto">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => router.back()}
-                aria-label="Go back"
-                className="text-white active:scale-95"
-              >
-                <ArrowLeft className="w-5 h-5" aria-hidden="true" />
-              </Button>
-              <h1 className="font-semibold text-white">Post</h1>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={handleShare}
-                aria-label="More options"
-                className="text-white active:scale-95"
-              >
-                <MoreVertical className="w-5 h-5" aria-hidden="true" />
-              </Button>
-            </div>
-          </header>
-
           {/* Single-column content */}
           <div className="pt-14 md:pt-4 max-w-3xl mx-auto px-4 md:px-6 pb-28">
-            {/* Desktop inline back row */}
-            <div className="hidden md:flex items-center gap-3 mb-3">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => router.back()}
-                aria-label="Go back"
-                className="text-white/70 hover:text-white active:scale-95"
-              >
-                <ArrowLeft className="w-5 h-5" aria-hidden="true" />
-              </Button>
-              <span className="text-[14px] text-text-muted">Back</span>
-              <div className="ml-auto">
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={handleShare}
-                  aria-label="Share"
-                  className="text-white/70 hover:text-white active:scale-95"
-                >
-                  <MoreVertical className="w-5 h-5" aria-hidden="true" />
-                </Button>
-              </div>
-            </div>
+            <DetailPageHeader
+              title="Post"
+              rightAction={{ icon: Share2, label: "Share", onClick: handleShare }}
+            />
             <article className="py-4">
               {/* Creator Info Row */}
               <div className="flex items-center gap-3 mb-4">
                 <Link href={`/creator/${post.creator_id}`} className="shrink-0">
-                  <Avatar className="w-10 h-10 cursor-pointer ring-2 ring-transparent hover:ring-violet-500/30 transition-all">
+                  <Avatar className="w-10 h-10 cursor-pointer ring-2 ring-transparent hover:ring-[var(--wine)]/30 transition-all">
                     <AvatarImage
                       src={post.creator?.avatar_url || DEFAULT_AVATAR_CREATOR}
                       alt={post.creator?.display_name || "Creator"}
                     />
-                    <AvatarFallback className="bg-violet-500/20 text-violet-300 text-sm font-semibold">
+                    <AvatarFallback className="bg-[var(--wine)]/20 text-wine-text text-small font-semibold">
                       {post.creator?.display_name?.[0]?.toUpperCase() || "C"}
                     </AvatarFallback>
                   </Avatar>
@@ -396,13 +337,13 @@ export default function PostDetailPage() {
                 <div className="flex-1 min-w-0">
                   <Link href={`/creator/${post.creator_id}`}>
                     <span className="inline-flex items-center gap-1.5">
-                      <span className="font-semibold text-white text-[14px] hover:text-violet-300 transition-colors">
+                      <span className="font-semibold text-text-primary text-small hover:text-wine-text transition-colors">
                         {post.creator?.display_name || "Creator"}
                       </span>
-                      <CheckCircle2 size={13} className="text-violet-400" aria-hidden="true" />
+                      <CheckCircle2 size={13} className="text-wine-text" aria-hidden="true" />
                     </span>
                   </Link>
-                  <p className="text-[12px] text-text-muted">
+                  <p className="text-tiny text-text-muted">
                     {creatorUsername}
                     {post.created_at && (
                       <>
@@ -417,16 +358,15 @@ export default function PostDetailPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="rounded-full h-7 px-3.5 text-[12px] shrink-0 border-violet-500/40 text-violet-300"
+                      className="rounded-full h-7 px-3.5 text-tiny shrink-0 border-[var(--wine)]/40 text-wine-text"
                       disabled
                     >
                       ✓ Subscribed
                     </Button>
                   ) : (
                     <Button
-                      variant="violet"
                       size="sm"
-                      className="rounded-full h-7 px-3.5 text-[12px] shrink-0"
+                      className="rounded-full h-7 px-3.5 text-tiny shrink-0"
                       onClick={() => setShowPaywallModal(true)}
                     >
                       Subscribe
@@ -437,7 +377,7 @@ export default function PostDetailPage() {
               {/* Text Content */}
               {post.content && canView && (
                 <p
-                  className="text-[14px] text-text-secondary leading-relaxed whitespace-pre-wrap mb-4"
+                  className="text-small text-text-secondary leading-relaxed whitespace-pre-wrap mb-4"
                   data-testid="post-content"
                 >
                   {post.content}
@@ -462,23 +402,26 @@ export default function PostDetailPage() {
                   className="glass-card rounded-[var(--radius-md)] px-6 py-10 text-center mb-4"
                   data-testid="post-locked-overlay"
                 >
-                  <div className="size-16 mx-auto mb-4 bg-violet-500/10 rounded-full flex items-center justify-center border border-violet-500/20 shadow-glow-violet">
-                    <Lock size={28} className="text-violet-400" aria-hidden="true" />
+                  <div className="size-16 mx-auto mb-4 bg-[var(--wine)]/10 rounded-full flex items-center justify-center border border-[var(--wine)]/20 ">
+                    <Lock size={28} className="text-wine-text" aria-hidden="true" />
                   </div>
-                  <h3 className="text-[16px] font-semibold mb-2 text-white">Premium Content</h3>
-                  <p className="text-[13px] text-text-muted mb-2 max-w-sm mx-auto">
+                  <h3 className="text-h3 mb-2 text-text-primary">Premium Content</h3>
+                  <p className="text-small text-text-muted mb-2 max-w-sm mx-auto">
                     {post.visibility === "subscribers"
                       ? "This exclusive content is available for subscribers only"
-                      : `Unlock this content for $${((post.price_cents || 0) / 100).toFixed(2)}`}
+                      : WALLET_PATH_ACTIVE
+                        ? `Unlock this content for ${formatUsd(post.price_cents || 0)}`
+                        : "This exclusive content requires unlocking"}
                   </p>
-                  <p className="text-[12px] text-text-secondary mb-6">
-                    <span className="font-bold text-amber-400">{socialUnlockCount.toFixed(0)}</span>{" "}
+                  <p className="text-tiny text-text-secondary mb-6">
+                    <span className="font-bold text-[var(--premium)]">
+                      {socialUnlockCount.toFixed(0)}
+                    </span>{" "}
                     people already unlocked this content.
                   </p>
                   <Button
-                    variant={post.visibility === "subscribers" ? "violet" : "gold"}
                     size="lg"
-                    className="px-8 shadow-glow-violet active:scale-95"
+                    className="px-8 active:scale-[0.98]"
                     data-testid={
                       post.visibility === "subscribers"
                         ? "post-subscribe-button"
@@ -487,13 +430,17 @@ export default function PostDetailPage() {
                     onClick={() => setShowPaywallModal(true)}
                   >
                     <Lock size={16} className="mr-1.5" />
-                    {post.visibility === "subscribers" ? "Subscribe to Unlock" : "Unlock Now"}
+                    {WALLET_PATH_ACTIVE
+                      ? post.visibility === "subscribers"
+                        ? "Subscribe to Unlock"
+                        : "Unlock Now"
+                      : "View Options"}
                   </Button>
                 </div>
               )}
 
               {/* Actions Bar */}
-              <div className="flex items-center gap-3 py-2 border-t border-white/6 mb-1">
+              <div className="flex items-center gap-3 py-2 border-t border-border-subtle mb-1">
                 {currentUser && (
                   <PostLikeButton
                     postId={post.id}
@@ -502,7 +449,7 @@ export default function PostDetailPage() {
                   />
                 )}
                 <button
-                  className="flex items-center gap-1.5 text-text-muted hover:text-white transition-colors text-[13px] cursor-pointer focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:rounded"
+                  className="flex items-center gap-1.5 text-text-muted hover:text-text-primary transition-colors text-small cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--wine)] focus-visible:rounded"
                   onClick={() => {
                     document
                       .getElementById("comment-section")
@@ -514,16 +461,16 @@ export default function PostDetailPage() {
                   <span>{post.comments_count || 0}</span>
                 </button>
                 <button
-                  className="flex items-center gap-1.5 text-text-muted hover:text-white transition-colors text-[13px] cursor-pointer focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:rounded"
+                  className="flex items-center gap-1.5 text-text-muted hover:text-text-primary transition-colors text-small cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--wine)] focus-visible:rounded"
                   onClick={handleShare}
                   aria-label="Share"
                 >
                   <Share2 size={18} aria-hidden="true" />
                 </button>
-                {/* Tip — only on viewable posts that aren't the creator's own */}
-                {!isCreator && canView && (
+                {/* Tip — only on viewable posts that aren't the creator's own (wallet-based) */}
+                {WALLET_PATH_ACTIVE && !isCreator && canView && (
                   <button
-                    className="ml-auto flex items-center gap-1.5 text-amber-400 hover:text-amber-300 transition-colors text-[13px] font-medium cursor-pointer focus-visible:outline-2 focus-visible:outline-amber-400 focus-visible:rounded"
+                    className="ml-auto flex items-center gap-1.5 text-[var(--premium)] hover:text-[var(--premium)] transition-colors text-small font-medium cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--premium)] focus-visible:rounded"
                     onClick={() => setShowTipModal(true)}
                     aria-label="Send a tip"
                     data-testid="post-tip-button"
@@ -535,12 +482,12 @@ export default function PostDetailPage() {
               </div>
 
               {/* Like count */}
-              <p className="text-[13px] font-semibold text-white mb-3">
+              <p className="text-small font-semibold text-text-primary mb-3">
                 {post.likes_count || 0} likes
               </p>
 
               {/* Comments Section */}
-              <div id="comment-section" className="border-t border-white/6 pt-3">
+              <div id="comment-section" className="border-t border-border-subtle pt-3">
                 {currentUser && (
                   <CommentList
                     postId={postId}
@@ -552,8 +499,8 @@ export default function PostDetailPage() {
 
               {/* More from creator */}
               {relatedPosts.length > 0 && (
-                <div className="mt-8 border-t border-white/6 pt-6">
-                  <h3 className="text-[14px] font-semibold text-white mb-3">
+                <div className="mt-8 border-t border-border-subtle pt-6">
+                  <h3 className="text-small font-semibold text-text-primary mb-3">
                     More from {creatorUsername}
                   </h3>
                   <div className="grid grid-cols-3 gap-0.5">

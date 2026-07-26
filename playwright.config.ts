@@ -115,7 +115,14 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_SKIP_SERVER
     ? undefined
     : {
-        command: `PLAYWRIGHT_TEST_MODE=true E2E=1 PORT=${serverPort} pnpm build && bash -lc 'PORT=${serverPort} E2E=1 PLAYWRIGHT_TEST_MODE=true pnpm start > .next/e2e-server.log 2>&1'`,
+        // NEXT_PUBLIC_TEST_MODE is a client-bundle-time constant (baked in at
+        // `pnpm build`), unlike E2E/PLAYWRIGHT_TEST_MODE which routes read
+        // live from process.env. It must be hardcoded here — relying on the
+        // ambient shell env is fragile because .env.local ships with
+        // NEXT_PUBLIC_TEST_MODE=false (a deliberate prod-safety default) and
+        // Next's env loader does not reliably let an inherited process.env
+        // value win over it across every Next/Turbopack version.
+        command: `NEXT_PUBLIC_TEST_MODE=true PLAYWRIGHT_TEST_MODE=true E2E=1 PORT=${serverPort} pnpm build && bash -lc 'PORT=${serverPort} E2E=1 PLAYWRIGHT_TEST_MODE=true NEXT_PUBLIC_TEST_MODE=true pnpm start > .next/e2e-server.log 2>&1'`,
         url: `${defaultBaseUrl}/api/health`,
         reuseExistingServer: true,
         timeout: 180 * 1000,

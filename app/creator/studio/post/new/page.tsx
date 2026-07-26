@@ -11,8 +11,8 @@ export default function StudioNewPostRedirect() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <p className="text-sm text-text-tertiary">Redirecting to the latest publisher...</p>
+    <div className="min-h-dvh bg-background flex items-center justify-center">
+      <p className="text-small text-text-tertiary">Redirecting to the latest publisher...</p>
     </div>
   );
 }

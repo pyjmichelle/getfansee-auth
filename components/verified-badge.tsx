@@ -23,7 +23,7 @@ export function VerifiedBadge({
       <CheckCircle2
         aria-hidden
         style={{ width: size, height: size }}
-        className={cn("text-amber-400", className)}
+        className={cn("text-[var(--premium)]", className)}
       />
     </span>
   );

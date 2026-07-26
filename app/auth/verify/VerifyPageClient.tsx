@@ -6,6 +6,7 @@ import { CheckCircle2, XCircle, Loader2, Mail } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { ensureProfile } from "@/lib/auth";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { AuthShell } from "@/components/shells/auth-shell";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -332,68 +333,58 @@ export default function VerifyPageClient({ query }: VerifyPageClientProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-12 bg-background relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-primary/20 rounded-full blur-[128px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-accent/20 rounded-full blur-[128px]" />
-      </div>
+    <AuthShell>
+      <div className="text-center">
+        {status === "loading" && (
+          <>
+            <div className="w-20 h-20 rounded-full bg-[var(--wine)] flex items-center justify-center mx-auto mb-6 animate-pulse">
+              <Loader2 className="w-10 h-10 text-text-primary animate-spin" />
+            </div>
+            <h1 className="text-h1 text-text-primary mb-3">Verifying...</h1>
+            <p className="text-text-secondary">Please wait while we verify your account.</p>
+          </>
+        )}
 
-      <div className="w-full max-w-md relative z-10">
-        <div className="glass-strong rounded-3xl p-8 text-center shadow-xl">
-          {status === "loading" && (
-            <>
-              <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-6 shadow-glow animate-pulse">
-                <Loader2 className="w-10 h-10 text-white animate-spin" />
-              </div>
-              <h1 className="text-2xl font-bold text-text-primary mb-3">Verifying...</h1>
-              <p className="text-text-secondary">Please wait while we verify your account.</p>
-            </>
-          )}
+        {status === "success" && (
+          <>
+            <div className="w-20 h-20 rounded-full bg-[var(--success)]/20 flex items-center justify-center mx-auto mb-6 ring-4 ring-[var(--success)]/30">
+              <CheckCircle2 className="w-10 h-10 text-[var(--success)]" />
+            </div>
+            <h1 className="text-h1 text-text-primary mb-3">Verification Successful!</h1>
+            <p className="text-text-secondary mb-6">{message}</p>
+          </>
+        )}
 
-          {status === "success" && (
-            <>
-              <div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-6 ring-4 ring-success/30">
-                <CheckCircle2 className="w-10 h-10 text-success" />
-              </div>
-              <h1 className="text-2xl font-bold text-text-primary mb-3">
-                Verification Successful!
-              </h1>
-              <p className="text-text-secondary mb-6">{message}</p>
-            </>
-          )}
-
-          {status === "error" && (
-            <>
-              <div className="w-20 h-20 rounded-full bg-error/20 flex items-center justify-center mx-auto mb-6 ring-4 ring-error/30">
-                <XCircle className="w-10 h-10 text-error" />
-              </div>
-              <h1 className="text-2xl font-bold text-text-primary mb-3">Verification Failed</h1>
-              <p className="text-text-secondary mb-6">{message}</p>
-              <div className="space-y-3">
-                {canResend && (
-                  <Button
-                    onClick={handleResend}
-                    className="w-full min-h-[48px] bg-gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
-                    aria-label="Resend confirmation email"
-                  >
-                    <Mail className="w-4 h-4 mr-2" aria-hidden="true" />
-                    Resend Confirmation Email
-                  </Button>
-                )}
+        {status === "error" && (
+          <>
+            <div className="w-20 h-20 rounded-full bg-[var(--error)]/15 flex items-center justify-center mx-auto mb-6 ring-4 ring-[var(--error)]/25">
+              <XCircle className="w-10 h-10 text-[var(--error-text)]" />
+            </div>
+            <h1 className="text-h1 text-text-primary mb-3">Verification Failed</h1>
+            <p className="text-text-secondary mb-6">{message}</p>
+            <div className="space-y-3">
+              {canResend && (
                 <Button
-                  onClick={() => router.push("/auth")}
-                  variant="outline"
-                  className="w-full min-h-[48px] bg-surface-base border border-border-base rounded-xl font-semibold hover:bg-surface-raised transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
-                  aria-label="Go to login page"
+                  onClick={handleResend}
+                  className="w-full"
+                  aria-label="Resend confirmation email"
                 >
-                  Go to Login
+                  <Mail className="w-4 h-4 mr-2" aria-hidden="true" />
+                  Resend Confirmation Email
                 </Button>
-              </div>
-            </>
-          )}
-        </div>
+              )}
+              <Button
+                onClick={() => router.push("/auth")}
+                variant="outline"
+                className="w-full"
+                aria-label="Go to login page"
+              >
+                Go to Login
+              </Button>
+            </div>
+          </>
+        )}
       </div>
-    </div>
+    </AuthShell>
   );
 }

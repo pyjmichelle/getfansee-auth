@@ -30,22 +30,25 @@ All agent definitions live in [`.cursor/agents/`](.cursor/agents/). Mirror docs 
 
 ---
 
-## Project Context (2026-06-07)
+## Project Context (2026-07-26)
 
-**Stack**: Next.js 16 + React 19 + Supabase + Stripe + Didit KYC + Playwright + Vitest
+**Stack**: Next.js 16 + React 19 + Supabase + Stripe + NowPayments (crypto) + Didit KYC + Playwright + Vitest
 
 **Active business domains**:
 
 - Auth (`app/auth/*`, `lib/server/auth-server.ts`)
-- Content / Feed (`app/home/`, `app/posts/`)
-- Creator Studio (`app/creator/studio/`)
-- Ambassador / Referral Program — NEW (`app/creator/studio/ambassador/`, `app/api/referral/*`, `app/r/[code]/`)
-- Wallet / Payments (`app/me/wallet/`, `app/api/wallet/`, Stripe webhooks)
+- Content / Feed (`app/home/`, `app/posts/`, `app/tags/[tag]/`)
+- Creator Discovery — NEW (`app/creators/`, `app/api/creators/directory/`)
+- Creator Studio (`app/creator/studio/`, incl. `links/` — NEW)
+- Ambassador / Referral Program (`app/creator/studio/ambassador/`, `app/api/referral/*`, `app/r/[code]/`)
+- Wallet / Payments (`app/me/wallet/`, `app/api/wallet/`, Stripe webhooks, NowPayments webhooks — NEW, see payments-risk agent for known idempotency defects)
 - KYC (`lib/kyc/kyc-service.ts`, `app/api/kyc/`)
-- Legal pages (`app/2257/`, `app/privacy/`, `app/dmca/`, `app/about/`, `app/acceptable-use/`)
-- Admin (`app/admin/*`)
+- Legal pages (`app/2257/`, `app/privacy/`, `app/dmca/`, `app/about/`, `app/acceptable-use/`, `app/beta-terms/`, `app/creator-rules/`)
+- Admin (`app/admin/*`, incl. `creator-links/` — NEW)
 
-**Latest migration**: `042_creator_ambassador_program.sql`
+**Known systemic UI defect (2026-07-26 third-pass audit, not yet fixed)**: tab/segment switching causes layout jump on both PC and mobile via a 5-layer root cause chain (missing `scrollbar-gutter`, panel unmount/remount, skeleton height mismatch, active/inactive border+font-weight asymmetry, `transition-all` perceived jank) — see `.cursor/plans/ui根治三次审查修订_*.plan.md` and `chief-frontend-architect` agent notes before touching any tab-like control.
+
+**Latest migration**: `049_creator_aggregate_counts.sql`
 
 ---
 
@@ -74,17 +77,21 @@ For repair / refactor / pre-merge, dispatch agents in this order:
 
 ## Key Skills Index
 
-| Skill                              | Trigger                                                  |
-| ---------------------------------- | -------------------------------------------------------- |
-| `supabase`                         | Any Supabase Auth / DB / RLS / SSR work                  |
-| `supabase-postgres-best-practices` | Schema design, query optimization, RLS                   |
-| `next-best-practices`              | Next.js 16 App Router patterns                           |
-| `creator-ambassador-referral`      | Ambassador / referral program feature                    |
-| `qa-gate`                          | QA gate pipeline (gate-ui + gate-deadclick + audit:full) |
-| `release-gate`                     | Pre-merge gate sequence                                  |
-| `release-review-walkthrough`       | Structured UI release review                             |
-| `code-check`                       | Run `pnpm check-all`                                     |
-| `find-skills`                      | Discover new skills via `npx skills find`                |
+| Skill                                   | Trigger                                                     |
+| --------------------------------------- | ----------------------------------------------------------- |
+| `supabase`                              | Any Supabase Auth / DB / RLS / SSR work                     |
+| `supabase-postgres-best-practices`      | Schema design, query optimization, RLS                      |
+| `next-best-practices`                   | Next.js 16 App Router patterns                              |
+| `creator-ambassador-referral`           | Ambassador / referral program feature                       |
+| `qa-gate`                               | QA gate pipeline (gate-ui + gate-deadclick + audit:full)    |
+| `release-gate`                          | Pre-merge gate sequence                                     |
+| `release-review-walkthrough`            | Structured UI release review                                |
+| `feature-qa-walkthrough`                | PRD-driven dual-viewport, all-roles, all-button walkthrough |
+| `page-ia-review` (`.cursor/skills/`)    | Layout/IA/tab tradeoffs, overlays, ≥44px touch targets      |
+| `impeccable` (`.agents/skills/`)        | UI polish implementation pass                               |
+| `web-quality-audit` (`.agents/skills/`) | Performance/a11y/SEO/CLS audit                              |
+| `code-check`                            | Run `pnpm check-all`                                        |
+| `find-skills`                           | Discover new skills via `npx skills find`                   |
 
 Full index: [`.cursor/skills/SKILLS_APPLICATION_GUIDE.md`](.cursor/skills/SKILLS_APPLICATION_GUIDE.md)
 

@@ -84,7 +84,7 @@ export function CommentForm({ postId, onCommentCreated, className }: CommentForm
         <div
           id="comment-char-count"
           className={cn(
-            "absolute bottom-2 right-2 text-xs",
+            "absolute bottom-2 right-2 text-tiny",
             isOverLimit ? "text-error" : "text-text-tertiary"
           )}
           aria-live="polite"

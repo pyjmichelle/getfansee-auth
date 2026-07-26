@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Upload, X, Video, Loader2 } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { uploadFiles, validateFile, type MediaFile } from "@/lib/storage";
@@ -27,6 +27,19 @@ export function MultiMediaUpload({
   >(new Map());
   const [uploadedFiles, setUploadedFiles] = useState<MediaFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Clear the fake-progress interval on unmount too — without this, navigating
+  // away mid-upload (e.g. via back button) left the interval running forever
+  // since it was previously only cleared on the try/success path.
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+    };
+  }, []);
 
   const handleFiles = useCallback(
     async (files: FileList | File[]) => {
@@ -62,7 +75,7 @@ export function MultiMediaUpload({
         setUploadProgress(progressMap);
 
         // 模拟进度更新
-        const progressInterval = setInterval(() => {
+        progressIntervalRef.current = setInterval(() => {
           setUploadProgress((prev) => {
             const newMap = new Map(prev);
             prev.forEach((progress, index) => {
@@ -91,8 +104,6 @@ export function MultiMediaUpload({
           }
         );
 
-        clearInterval(progressInterval);
-
         // 更新已上传文件列表
         const newFiles = [...uploadedFiles, ...results];
         setUploadedFiles(newFiles);
@@ -104,6 +115,12 @@ export function MultiMediaUpload({
         onUploadError?.(message);
         setUploadProgress(new Map());
       } finally {
+        // Previously only cleared on the success path — a failed uploadFiles()
+        // call (network error, validation) left this ticking forever.
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+          progressIntervalRef.current = null;
+        }
         setIsUploading(false);
         onUploadStateChange?.(false);
       }
@@ -182,13 +199,13 @@ export function MultiMediaUpload({
           />
 
           <Upload className="w-12 h-12 mx-auto mb-4 text-text-tertiary" aria-hidden="true" />
-          <p className="text-sm font-medium mb-1 text-text-primary">
+          <p className="text-small font-medium mb-1 text-text-primary">
             Click or drag files here to upload
           </p>
-          <p className="text-xs text-text-tertiary">
+          <p className="text-tiny text-text-tertiary">
             Supports images (jpg, png, webp) and videos (mp4, mov)
           </p>
-          <p className="text-xs text-text-tertiary mt-1">
+          <p className="text-tiny text-text-tertiary mt-1">
             Images max 20MB, videos max 2GB, up to {maxFiles} files
           </p>
         </div>
@@ -220,13 +237,13 @@ export function MultiMediaUpload({
 
               {isUploading ? (
                 <div className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-brand-primary" aria-hidden="true" />
-                  <span className="text-sm text-text-tertiary">Uploading...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-wine-text" aria-hidden="true" />
+                  <span className="text-small text-text-tertiary">Uploading...</span>
                 </div>
               ) : (
                 <div className="flex items-center justify-center gap-2">
                   <Upload className="w-4 h-4 text-text-tertiary" aria-hidden="true" />
-                  <span className="text-sm text-text-tertiary">Add more files</span>
+                  <span className="text-small text-text-tertiary">Add more files</span>
                 </div>
               )}
             </div>
@@ -259,7 +276,7 @@ export function MultiMediaUpload({
                           className="w-6 h-6 mb-2 animate-spin text-white"
                           aria-hidden="true"
                         />
-                        <p className="text-xs text-white mb-2">
+                        <p className="text-tiny text-white mb-2">
                           {progress?.percentage.toFixed(0)}%
                         </p>
                         <div className="absolute bottom-0 left-0 right-0 h-1 bg-surface-base">
@@ -278,7 +295,7 @@ export function MultiMediaUpload({
                     <Button
                       variant="destructive"
                       size="icon"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 active:opacity-100 focus-visible:opacity-100 transition-opacity min-h-[44px] min-w-[44px] active:scale-95"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 active:opacity-100 focus-visible:opacity-100 transition-opacity min-h-[44px] min-w-[44px] active:scale-[0.98]"
                       onClick={() => handleRemove(index)}
                       disabled={!!isUploadingFile}
                       aria-label={`Remove ${file.fileName}`}
@@ -287,8 +304,10 @@ export function MultiMediaUpload({
                     </Button>
                   </div>
 
-                  <div className="mt-1 text-xs text-text-secondary truncate">{file.fileName}</div>
-                  <div className="text-xs text-text-tertiary">{formatFileSize(file.fileSize)}</div>
+                  <div className="mt-1 text-tiny text-text-secondary truncate">{file.fileName}</div>
+                  <div className="text-tiny text-text-tertiary">
+                    {formatFileSize(file.fileSize)}
+                  </div>
                 </div>
               );
             })}

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { computeTipPlatformFeeCents, computeTipCreatorNetCents } from "@/lib/constants/fees";
+import { isInAppPaymentsEnabled } from "@/lib/constants/alpha";
 
 // UUID v4 regex for simple validation (same pattern as paywall.ts)
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -37,6 +38,18 @@ const MAX_TIP_CENTS = 50_000; // $500.00
  */
 export async function POST(request: NextRequest) {
   try {
+    // Pre-Payment Alpha: no wallet top-up path exists in production, so tipping
+    // (which spends wallet balance) is disabled outside test/dev environments.
+    if (!isInAppPaymentsEnabled()) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Tipping is not available during the Alpha. Coming soon.",
+        },
+        { status: 403 }
+      );
+    }
+
     // 1. Auth
     const user = await getCurrentUser();
     if (!user) {

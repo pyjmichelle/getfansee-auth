@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Shield, CheckCircle, AlertCircle, Lock, FileText } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { PageShell } from "@/components/page-shell";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 
 type ReportType = "post" | "comment" | "user";
 
@@ -53,6 +53,7 @@ export default function ReportPageClient({
   creatorId,
 }: ReportPageClientProps) {
   const router = useRouter();
+  const auth = useAuth();
   const [selectedReason, setSelectedReason] = useState<string>("");
   const [details, setDetails] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,22 +67,15 @@ export default function ReportPageClient({
   } | null>(null);
 
   useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const bootstrap = await getAuthBootstrap();
-        if (bootstrap.authenticated && bootstrap.user && bootstrap.profile) {
-          setCurrentUser({
-            username: bootstrap.profile.display_name || "user",
-            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
-            avatar: bootstrap.profile.avatar_url || undefined,
-          });
-        }
-      } finally {
-        setIsLoadingAuth(false);
-      }
-    };
-    loadUser();
-  }, []);
+    if (auth.authenticated && auth.user && auth.profile) {
+      setCurrentUser({
+        username: auth.profile.display_name || "user",
+        role: (auth.profile.role || "fan") as "fan" | "creator",
+        avatar: auth.profile.avatar_url || undefined,
+      });
+    }
+    setIsLoadingAuth(false);
+  }, [auth.authenticated, auth.user, auth.profile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,13 +141,13 @@ export default function ReportPageClient({
               <CheckCircle className="w-8 h-8 text-success" aria-hidden="true" />
             </div>
             <h2 className="text-xl font-bold mb-2 text-text-primary">Report Submitted</h2>
-            <p className="text-text-secondary text-sm mb-6">
+            <p className="text-text-secondary text-small mb-6">
               Thank you for helping keep GetFanSee safe. Our moderation team will review your report
               within 24–48 hours.
             </p>
             <Button
               variant="subscribe-gradient"
-              className="w-full min-h-[44px] shadow-glow active:scale-95"
+              className="w-full min-h-[44px] shadow-glow active:scale-[0.98]"
               onClick={() => router.back()}
               aria-label="Return to previous page"
             >
@@ -175,7 +169,7 @@ export default function ReportPageClient({
             </div>
             <div>
               <h1 className="text-2xl font-bold text-text-primary">Report Content</h1>
-              <p className="text-sm text-text-tertiary">Help us maintain a safe community</p>
+              <p className="text-small text-text-tertiary">Help us maintain a safe community</p>
             </div>
           </div>
           <Alert variant="destructive" role="alert">
@@ -205,7 +199,7 @@ export default function ReportPageClient({
           </div>
           <div>
             <h1 className="text-2xl font-bold text-text-primary">Report Content</h1>
-            <p className="text-sm text-text-tertiary">Help us maintain a safe community</p>
+            <p className="text-small text-text-tertiary">Help us maintain a safe community</p>
           </div>
         </div>
 
@@ -222,7 +216,7 @@ export default function ReportPageClient({
           <form onSubmit={handleSubmit} aria-label="Report content form">
             {/* Reason Selection */}
             <div className="card-block p-5 mb-4">
-              <Label className="text-sm font-semibold text-text-primary mb-3 block">
+              <Label className="text-small font-semibold text-text-primary mb-3 block">
                 Reason for Report <span className="text-error">*</span>
               </Label>
               <fieldset>
@@ -253,13 +247,13 @@ export default function ReportPageClient({
                         <div>
                           <p
                             className={cn(
-                              "text-sm font-medium",
-                              isSelected ? "text-brand-primary" : "text-text-primary"
+                              "text-small font-medium",
+                              isSelected ? "text-wine-text" : "text-text-primary"
                             )}
                           >
                             {reason.label}
                           </p>
-                          <p className="text-xs text-text-tertiary">{reason.description}</p>
+                          <p className="text-tiny text-text-tertiary">{reason.description}</p>
                         </div>
                       </label>
                     );
@@ -272,7 +266,7 @@ export default function ReportPageClient({
             <div className="card-block p-5 mb-4">
               <Label
                 htmlFor="report-details"
-                className="text-sm font-semibold text-text-primary mb-2 block"
+                className="text-small font-semibold text-text-primary mb-2 block"
               >
                 Additional Details{" "}
                 <span className="text-text-tertiary font-normal">(optional)</span>
@@ -285,7 +279,9 @@ export default function ReportPageClient({
                 className="min-h-[100px] resize-none bg-surface-raised border-border-base text-text-primary placeholder:text-text-tertiary focus:border-brand-primary/50 transition-colors"
                 maxLength={1000}
               />
-              <p className="text-xs text-text-tertiary mt-1.5 text-right">{details.length}/1000</p>
+              <p className="text-tiny text-text-tertiary mt-1.5 text-right">
+                {details.length}/1000
+              </p>
             </div>
 
             {/* Action Buttons */}
@@ -293,7 +289,7 @@ export default function ReportPageClient({
               <Button
                 type="button"
                 variant="outline"
-                className="sm:flex-1 min-h-[44px] active:scale-95 hover:bg-surface-raised focus-visible:ring-2 focus-visible:ring-brand-primary"
+                className="sm:flex-1 min-h-[44px] active:scale-[0.98] hover:bg-surface-raised focus-visible:ring-2 focus-visible:ring-brand-primary"
                 onClick={() => router.back()}
                 aria-label="Cancel and go back"
               >
@@ -303,7 +299,7 @@ export default function ReportPageClient({
                 type="submit"
                 variant="subscribe-gradient"
                 disabled={!selectedReason || isSubmitting}
-                className="sm:flex-1 min-h-[44px] shadow-glow active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                className="sm:flex-1 min-h-[44px] shadow-glow active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
                 aria-label={isSubmitting ? "Submitting report…" : "Submit report"}
               >
                 {isSubmitting ? "Submitting…" : "Submit Report"}
@@ -319,10 +315,10 @@ export default function ReportPageClient({
             {/* Anonymous */}
             <div className="card-block p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Lock className="w-4 h-4 text-brand-primary" aria-hidden="true" />
-                <h2 className="text-sm font-semibold text-text-primary">Anonymous Report</h2>
+                <Lock className="w-4 h-4 text-wine-text" aria-hidden="true" />
+                <h2 className="text-small font-semibold text-text-primary">Anonymous Report</h2>
               </div>
-              <p className="text-xs text-text-tertiary">
+              <p className="text-tiny text-text-tertiary">
                 Your identity is kept confidential. The reported user will not know who submitted
                 this report.
               </p>
@@ -332,7 +328,7 @@ export default function ReportPageClient({
             <div className="card-block p-4">
               <div className="flex items-center gap-2 mb-3">
                 <FileText className="w-4 h-4 text-brand-accent" aria-hidden="true" />
-                <h2 className="text-sm font-semibold text-text-primary">Review Process</h2>
+                <h2 className="text-small font-semibold text-text-primary">Review Process</h2>
               </div>
               <ol className="space-y-2">
                 {[
@@ -341,8 +337,8 @@ export default function ReportPageClient({
                   "Content is actioned if it violates our guidelines",
                   "You may receive a follow-up if needed",
                 ].map((step, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-text-tertiary">
-                    <span className="flex-shrink-0 w-4 h-4 rounded-full bg-brand-primary/10 text-brand-primary text-[10px] font-bold flex items-center justify-center mt-0.5">
+                  <li key={i} className="flex items-start gap-2 text-tiny text-text-tertiary">
+                    <span className="flex-shrink-0 w-4 h-4 rounded-full bg-brand-primary/10 text-wine-text text-[10px] font-bold flex items-center justify-center mt-0.5">
                       {i + 1}
                     </span>
                     {step}

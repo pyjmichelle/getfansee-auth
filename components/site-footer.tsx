@@ -2,6 +2,8 @@ import Link from "next/link";
 
 const legalLinks = [
   { href: "/terms", label: "Terms of Service" },
+  { href: "/beta-terms", label: "Beta Program Terms" },
+  { href: "/creator-rules", label: "Creator Rules" },
   { href: "/privacy", label: "Privacy Policy" },
   { href: "/refund", label: "Refund Policy" },
   { href: "/acceptable-use", label: "Acceptable Use" },
@@ -21,13 +23,13 @@ export function SiteFooter() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-xs text-text-tertiary hover:text-text-secondary transition-colors"
+              className="text-tiny text-text-tertiary hover:text-text-secondary transition-colors"
             >
               {link.label}
             </Link>
           ))}
         </nav>
-        <p className="text-xs text-text-disabled text-center">
+        <p className="text-tiny text-text-disabled text-center">
           © {new Date().getFullYear()} GetFanSee. All rights reserved. This site contains
           age-restricted content intended for adults 18+.
         </p>

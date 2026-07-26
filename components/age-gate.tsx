@@ -55,6 +55,10 @@ export function AgeGate({ children }: AgeGateProps) {
   const handleConfirmAge = () => {
     localStorage.setItem(AGE_VERIFIED_KEY, AGE_VERIFIED_VALUE);
     setIsVerified(true);
+    // Storage events don't fire in the same tab that wrote them, so other
+    // gated UI (e.g. CookieConsent) listens for this custom event instead to
+    // avoid rendering on top of the age gate (F-003 popup layering rule).
+    window.dispatchEvent(new CustomEvent("gfs:age-verified"));
     // Log age gate confirmation for compliance audit (non-blocking, fire-and-forget)
     try {
       let sessionId = localStorage.getItem("getfansee_session_id");
@@ -88,15 +92,15 @@ export function AgeGate({ children }: AgeGateProps) {
           className="max-w-sm w-full text-center glass-panel rounded-[var(--radius-lg)] p-8 space-y-4"
           data-testid="age-denied-message"
         >
-          <div className="size-14 mx-auto rounded-full bg-red-500/10 flex items-center justify-center">
-            <ShieldAlert className="size-6 text-red-400" aria-hidden="true" />
+          <div className="size-14 mx-auto rounded-full bg-[var(--error)]/10 flex items-center justify-center">
+            <ShieldAlert className="size-6 text-[var(--error-text)]" aria-hidden="true" />
           </div>
-          <h1 className="text-[18px] font-semibold text-white">Access Denied</h1>
-          <p className="text-[13px] text-text-muted">
+          <h1 className="text-h3 font-semibold text-text-primary">Access Denied</h1>
+          <p className="text-small text-text-muted">
             You must be 18 years or older to access this website. This site contains adult content
             that is not suitable for minors.
           </p>
-          <p className="text-[12px] text-text-disabled">
+          <p className="text-tiny text-text-disabled">
             If you believe you received this message in error, please close this browser window and
             try again.
           </p>
@@ -129,17 +133,17 @@ export function AgeGate({ children }: AgeGateProps) {
           <div className="min-h-dvh bg-bg-base" aria-hidden="true" />
         ) : (
           <div
-            className="glass-panel rounded-[var(--radius-lg)] border border-white/10 p-6 max-w-sm w-full"
+            className="glass-panel rounded-[var(--radius-lg)] border border-border-default p-6 max-w-sm w-full"
             data-testid="age-gate-modal"
           >
             <div className="flex flex-col items-center text-center mb-5">
-              <div className="size-12 rounded-full bg-violet-500/15 border border-violet-500/20 flex items-center justify-center mb-3 shadow-glow-violet">
-                <ShieldAlert className="size-5 text-violet-400" aria-hidden="true" />
+              <div className="size-12 rounded-full bg-[var(--wine)]/15 border border-[var(--wine)]/20 flex items-center justify-center mb-3">
+                <ShieldAlert className="size-5 text-wine-text" aria-hidden="true" />
               </div>
-              <h2 className="text-[18px] font-semibold text-white mb-1">
+              <h2 className="text-h3 font-semibold text-text-primary mb-1">
                 Age Verification Required
               </h2>
-              <p className="text-[13px] text-text-muted">
+              <p className="text-small text-text-muted">
                 This website contains age-restricted content. By entering, you confirm you are 18
                 years or older.
               </p>
@@ -147,7 +151,6 @@ export function AgeGate({ children }: AgeGateProps) {
 
             <div className="flex flex-col gap-2">
               <Button
-                variant="violet"
                 size="lg"
                 className="w-full"
                 onClick={handleConfirmAge}
@@ -168,7 +171,7 @@ export function AgeGate({ children }: AgeGateProps) {
               </Button>
             </div>
 
-            <p className="text-[11px] text-text-disabled mt-4 text-center">
+            <p className="text-tiny text-text-disabled mt-4 text-center">
               By continuing you agree to our{" "}
               <a href="/terms" className="underline hover:text-text-muted transition-colors">
                 Terms of Service

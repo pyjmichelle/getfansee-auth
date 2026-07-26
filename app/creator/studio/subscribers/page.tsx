@@ -2,18 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  Search,
-  Calendar,
-  MoreVertical,
-  Users,
-  Plus,
-  DollarSign,
-  BarChart3,
-  FileText,
-} from "@/lib/icons";
+import { ArrowLeft, Search, Calendar, Users } from "@/lib/icons";
 import { PageShell } from "@/components/page-shell";
+import { StudioShell } from "@/components/shells/studio-shell";
 import { StatCard } from "@/components/stat-card";
 import { EmptyState } from "@/components/empty-state";
 import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
@@ -21,17 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 // listSubscribers 通过 API 调用，不直接导入
 import Link from "next/link";
 import { format } from "date-fns";
 import { useCountUp } from "@/hooks/use-count-up";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
 
 interface Subscriber {
@@ -48,6 +33,7 @@ interface Subscriber {
 
 export default function SubscribersPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,19 +50,18 @@ export default function SubscribersPage() {
       try {
         setIsLoading(true);
 
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
+        if (!auth.authenticated || !auth.user) {
           router.push("/auth");
           return;
         }
-        if (bootstrap.profile?.role !== "creator") {
+        if (auth.profile?.role !== "creator") {
           router.push("/home");
           return;
         }
         setCurrentUser({
-          username: bootstrap.profile?.display_name || bootstrap.user.email.split("@")[0] || "user",
+          username: auth.profile?.display_name || auth.user.email.split("@")[0] || "user",
           role: "creator",
-          avatar: bootstrap.profile?.avatar_url || undefined,
+          avatar: auth.profile?.avatar_url || undefined,
         });
 
         // 加载订阅者列表（通过 API）
@@ -95,7 +80,7 @@ export default function SubscribersPage() {
     };
 
     loadData();
-  }, [router]);
+  }, [router, auth.authenticated, auth.user, auth.profile]);
 
   const getSubscriberStatus = (sub: Subscriber): "active" | "will_cancel" | "canceled" => {
     if (sub.status === "canceled" || sub.cancelled_at) {
@@ -174,213 +159,160 @@ export default function SubscribersPage() {
 
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
-      <div className="py-8 flex flex-col lg:flex-row gap-8">
-        <main className="flex-1 min-w-0" data-testid="subscribers-list">
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="mb-6 border-border-base bg-surface-base hover:bg-surface-raised rounded-xl active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
-          >
-            <Link href="/creator/studio">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Studio
-            </Link>
-          </Button>
+      <div className="py-8">
+        <StudioShell>
+          <div data-testid="subscribers-list">
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="mb-6 border-border-base bg-surface-base hover:bg-surface-raised rounded-xl active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-[var(--wine)]"
+            >
+              <Link href="/creator/studio">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Studio
+              </Link>
+            </Button>
 
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-text-primary mb-2">My Subscribers</h1>
-            <p className="text-text-tertiary">Manage your fanbase and track subscriber activity</p>
-          </div>
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-text-primary mb-2">My Subscribers</h1>
+              <p className="text-text-tertiary">
+                Manage your fanbase and track subscriber activity
+              </p>
+            </div>
 
-          {/* Stats Overview - StatCard */}
-          <div className="bento-grid mb-8">
-            <StatCard
-              title="Total Subscribers"
-              value={animatedTotal.toFixed(0)}
-              icon={<Users className="w-5 h-5" />}
-              className="bento-2x1"
-            />
-            <StatCard
-              title="Active"
-              value={animatedActive.toFixed(0)}
-              valueClassName="text-success"
-              icon={<Users className="w-5 h-5" />}
-            />
-            <StatCard
-              title="Expiring Soon"
-              value={animatedExpiring.toFixed(0)}
-              valueClassName="text-brand-secondary"
-              icon={<Calendar className="w-5 h-5" />}
-            />
-          </div>
-
-          {/* Search and Filter */}
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
-              <Input
-                placeholder="Search subscribers..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 h-11 bg-surface-base border-border-base rounded-xl"
+            {/* Stats Overview - StatCard */}
+            <div className="bento-grid mb-8">
+              <StatCard
+                title="Total Subscribers"
+                value={animatedTotal.toFixed(0)}
+                icon={<Users className="w-5 h-5" />}
+                className="bento-2x1"
+              />
+              <StatCard
+                title="Active"
+                value={animatedActive.toFixed(0)}
+                valueClassName="text-success"
+                icon={<Users className="w-5 h-5" />}
+              />
+              <StatCard
+                title="Expiring Soon"
+                value={animatedExpiring.toFixed(0)}
+                valueClassName="text-wine-text"
+                icon={<Calendar className="w-5 h-5" />}
               />
             </div>
-            <div className="snap-row">
-              {(["all", "active", "will_cancel", "canceled"] as const).map((f) => (
-                <Button
-                  key={f}
-                  variant={filter === f ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setFilter(f)}
-                  className={`rounded-xl active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary ${
-                    filter === f
-                      ? "bg-brand-primary text-white"
-                      : "border-border-base bg-surface-base hover:bg-surface-raised"
-                  }`}
-                >
-                  {f === "all"
-                    ? "All"
-                    : f === "active"
-                      ? "Active"
-                      : f === "will_cancel"
-                        ? "Expiring"
-                        : "Cancelled"}
-                </Button>
-              ))}
-            </div>
-          </div>
 
-          {/* Subscribers List */}
-          {filteredSubscribers.length === 0 ? (
-            <EmptyState
-              icon={<Users className="w-8 h-8 text-text-tertiary" />}
-              title="No subscribers found"
-              description={
-                searchQuery || filter !== "all"
-                  ? "Try a different search or filter."
-                  : "When fans subscribe to you they will appear here."
-              }
-              action={{ label: "Back to Studio", href: "/creator/studio" }}
-              className="card-block p-12"
-            />
-          ) : (
-            <div className="space-y-3">
-              {filteredSubscribers.map((subscriber, index) => {
-                const status = getSubscriberStatus(subscriber);
-                const displayName =
-                  subscriber.fan_display_name || `User ${subscriber.fan_id.slice(0, 8)}`;
-
-                return (
-                  <div
-                    key={subscriber.id}
-                    className="card-block p-4 md:p-6 animate-profile-reveal"
-                    style={{ animationDelay: `${index * 80}ms` }}
+            {/* Search and Filter */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
+                <Input
+                  placeholder="Search subscribers..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 h-11 bg-surface-base border-border-base rounded-xl"
+                />
+              </div>
+              <div className="snap-row">
+                {(["all", "active", "will_cancel", "canceled"] as const).map((f) => (
+                  <Button
+                    key={f}
+                    variant={filter === f ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setFilter(f)}
+                    className={`rounded-xl active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-[var(--wine)] ${
+                      filter === f
+                        ? "bg-[var(--wine)] text-white"
+                        : "border-border-base bg-surface-base hover:bg-surface-raised"
+                    }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <Avatar className="w-12 h-12">
-                        <AvatarImage src={subscriber.fan_avatar_url || DEFAULT_AVATAR_FAN} />
-                        <AvatarFallback className="bg-brand-primary-alpha-10 text-brand-primary">
-                          {displayName[0]?.toUpperCase() || "U"}
-                        </AvatarFallback>
-                      </Avatar>
+                    {f === "all"
+                      ? "All"
+                      : f === "active"
+                        ? "Active"
+                        : f === "will_cancel"
+                          ? "Expiring"
+                          : "Cancelled"}
+                  </Button>
+                ))}
+              </div>
+            </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-semibold text-text-primary">{displayName}</p>
-                          {getStatusBadge(status)}
-                        </div>
-                        <div className="flex flex-wrap gap-3 text-sm text-text-tertiary">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            Started {formatDate(subscriber.starts_at)}
-                          </span>
-                          {status === "canceled" && subscriber.cancelled_at ? (
-                            <span className="flex items-center gap-1 text-error">
-                              Cancelled on {formatDate(subscriber.cancelled_at)}
-                            </span>
-                          ) : (
+            {/* Subscribers List */}
+            {filteredSubscribers.length === 0 ? (
+              <EmptyState
+                icon={<Users className="w-8 h-8 text-text-tertiary" />}
+                title="No subscribers found"
+                description={
+                  searchQuery || filter !== "all"
+                    ? "Try a different search or filter."
+                    : "When fans subscribe to you they will appear here."
+                }
+                action={{ label: "Back to Studio", href: "/creator/studio" }}
+                className="card-block p-12"
+              />
+            ) : (
+              <div className="space-y-3">
+                {filteredSubscribers.map((subscriber, index) => {
+                  const status = getSubscriberStatus(subscriber);
+                  const displayName =
+                    subscriber.fan_display_name || `User ${subscriber.fan_id.slice(0, 8)}`;
+
+                  return (
+                    <div
+                      key={subscriber.id}
+                      className="card-block p-4 md:p-6 animate-profile-reveal"
+                      style={{ animationDelay: `${index * 80}ms` }}
+                    >
+                      <div className="flex items-center gap-4">
+                        <Avatar className="w-12 h-12">
+                          <AvatarImage src={subscriber.fan_avatar_url || DEFAULT_AVATAR_FAN} />
+                          <AvatarFallback className="bg-[var(--wine-tint)] text-wine-text">
+                            {displayName[0]?.toUpperCase() || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-semibold text-text-primary">{displayName}</p>
+                            {getStatusBadge(status)}
+                          </div>
+                          <div className="flex flex-wrap gap-3 text-small text-text-tertiary">
                             <span className="flex items-center gap-1">
-                              Expires {formatDate(subscriber.ends_at)}
+                              <Calendar className="w-4 h-4" />
+                              Started {formatDate(subscriber.starts_at)}
                             </span>
+                            {status === "canceled" && subscriber.cancelled_at ? (
+                              <span className="flex items-center gap-1 text-error">
+                                Cancelled on {formatDate(subscriber.cancelled_at)}
+                              </span>
+                            ) : (
+                              <span className="flex items-center gap-1">
+                                Expires {formatDate(subscriber.ends_at)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="hidden sm:flex flex-col items-end gap-1">
+                          {status === "canceled" ? (
+                            <p className="text-small text-text-tertiary">Cancelled</p>
+                          ) : (
+                            <p className="text-small text-text-tertiary">
+                              {status === "will_cancel" ? "Expires" : "Renews"}{" "}
+                              {formatDate(subscriber.ends_at)}
+                            </p>
                           )}
                         </div>
                       </div>
-
-                      <div className="hidden sm:flex flex-col items-end gap-1">
-                        {status === "canceled" ? (
-                          <p className="text-sm text-text-tertiary">Cancelled</p>
-                        ) : (
-                          <p className="text-sm text-text-tertiary">
-                            {status === "will_cancel" ? "Expires" : "Renews"}{" "}
-                            {formatDate(subscriber.ends_at)}
-                          </p>
-                        )}
-                      </div>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-xl active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
-                            aria-label="Subscriber options"
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="bg-surface-base border-border-base"
-                        >
-                          <DropdownMenuItem asChild>
-                            <Link href={`/creator/${subscriber.fan_id}`}>View Profile</Link>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </main>
-
-        {/* Sidebar: Studio nav (PC) */}
-        <aside className="w-full lg:w-72 shrink-0">
-          <div className="sticky top-24 space-y-4">
-            <div className="card-block p-4">
-              <h2 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">
-                Studio
-              </h2>
-              <nav className="space-y-1" aria-label="Studio navigation">
-                {[
-                  { href: "/creator/new-post", icon: Plus, label: "Create Post" },
-                  { href: "/creator/studio/earnings", icon: DollarSign, label: "Earnings" },
-                  { href: "/creator/studio/subscribers", icon: Users, label: "Subscribers" },
-                  { href: "/creator/studio/post/list", icon: FileText, label: "Post List" },
-                  { href: "/creator/studio/analytics", icon: BarChart3, label: "Analytics" },
-                ].map(({ href, icon: Icon, label }) => {
-                  const isActive = href === "/creator/studio/subscribers";
-                  return (
-                    <Link
-                      key={href}
-                      href={href}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary ${
-                        isActive
-                          ? "bg-brand-primary/10 text-brand-primary"
-                          : "text-text-secondary hover:bg-surface-raised hover:text-text-primary"
-                      }`}
-                    >
-                      <Icon size={16} />
-                      {label}
-                    </Link>
                   );
                 })}
-              </nav>
-            </div>
+              </div>
+            )}
           </div>
-        </aside>
+        </StudioShell>
       </div>
     </PageShell>
   );

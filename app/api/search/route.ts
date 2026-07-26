@@ -57,32 +57,25 @@ export async function GET(request: NextRequest) {
     }
     const results: SearchResults = { success: true, creators: [], posts: [] };
 
-    if (searchType === "all" || searchType === "creators") {
-      const { data: creators, error: creatorsError } = await supabase
-        .from("public_creator_profiles")
-        .select("id, display_name, username, avatar_url, bio, role")
-        .or(`display_name.ilike.%${query}%,username.ilike.%${query}%,bio.ilike.%${query}%`)
-        .limit(10);
+    const wantsCreators = searchType === "all" || searchType === "creators";
+    const wantsPosts = searchType === "all" || searchType === "posts";
 
-      if (creatorsError) {
-        console.error("[api/search] Creators search error:", creatorsError);
-        results.creators = [];
-      } else {
-        results.creators = creators || [];
-      }
-
-      // If no results and mock data enabled, use mock creators
-      if (results.creators.length === 0 && shouldUseMockData()) {
-        results.creators = searchMockCreators(query);
-      }
-    }
-
-    // Search Posts
-    if (searchType === "all" || searchType === "posts") {
-      const { data: posts, error: postsError } = await supabase
-        .from("posts")
-        .select(
-          `
+    // Creators and posts searches are independent — run them concurrently
+    // instead of sequentially awaiting one, then the other (previously two
+    // full round trips back-to-back for `type=all`, see 2026-07-26 audit).
+    const [creatorsResult, postsResult] = await Promise.all([
+      wantsCreators
+        ? supabase
+            .from("public_creator_profiles")
+            .select("id, display_name, username, avatar_url, bio, role")
+            .or(`display_name.ilike.%${query}%,username.ilike.%${query}%,bio.ilike.%${query}%`)
+            .limit(10)
+        : Promise.resolve(null),
+      wantsPosts
+        ? supabase
+            .from("posts")
+            .select(
+              `
           id,
           creator_id,
           title,
@@ -96,16 +89,33 @@ export async function GET(request: NextRequest) {
             avatar_url
           )
         `
-        )
-        .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
-        .order("created_at", { ascending: false })
-        .limit(20);
+            )
+            .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
+            .order("created_at", { ascending: false })
+            .limit(20)
+        : Promise.resolve(null),
+    ]);
 
-      if (postsError) {
-        console.error("[api/search] Posts search error:", postsError);
+    if (wantsCreators) {
+      if (creatorsResult?.error) {
+        console.error("[api/search] Creators search error:", creatorsResult.error);
+        results.creators = [];
+      } else {
+        results.creators = creatorsResult?.data || [];
+      }
+
+      // If no results and mock data enabled, use mock creators
+      if (results.creators.length === 0 && shouldUseMockData()) {
+        results.creators = searchMockCreators(query);
+      }
+    }
+
+    if (wantsPosts) {
+      if (postsResult?.error) {
+        console.error("[api/search] Posts search error:", postsResult.error);
         results.posts = [];
       } else {
-        results.posts = posts || [];
+        results.posts = postsResult?.data || [];
       }
 
       // If no results and mock data enabled, use mock posts

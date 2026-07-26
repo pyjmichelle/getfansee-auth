@@ -19,7 +19,8 @@ export async function GET() {
       .from("subscriptions")
       .select("creator_id, status, current_period_end")
       .eq("subscriber_id", user.id)
-      .eq("status", "active");
+      .eq("status", "active")
+      .limit(500);
 
     if (error) {
       console.error("[api/subscriptions] query error:", error);

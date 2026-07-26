@@ -31,7 +31,7 @@ export function ProfileBanner({
           </Avatar>
           <div>
             <h1 className="text-[18px] font-semibold text-white">{name}</h1>
-            <p className="text-[12px] text-text-muted">{email}</p>
+            <p className="text-tiny text-text-muted">{email}</p>
             <Badge variant={role === "creator" ? "rose" : "default"} className="mt-1.5 text-[10px]">
               {role === "creator" ? "Creator" : "Fan"}
             </Badge>

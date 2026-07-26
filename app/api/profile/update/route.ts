@@ -6,6 +6,7 @@ type CreatorProfileUpdatePayload = {
   display_name?: string;
   bio?: string;
   avatar_url?: string;
+  category?: string | null;
 };
 
 /**
@@ -20,13 +21,18 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = (await request.json()) as CreatorProfileUpdatePayload;
-    const { display_name, bio, avatar_url } = body;
+    const { display_name, bio, avatar_url, category } = body;
+
+    if (category !== undefined && category !== null && String(category).length > 40) {
+      return NextResponse.json({ error: "Category is too long" }, { status: 400 });
+    }
 
     const success = await updateCreatorProfile({
       userId: user.id,
       display_name,
       bio,
       avatar_url,
+      category,
     });
 
     if (!success) {

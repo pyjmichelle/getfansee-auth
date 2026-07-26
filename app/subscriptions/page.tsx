@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { Calendar, Heart } from "@/lib/icons";
 import { PageShell } from "@/components/page-shell";
 import { CreatorAvatarLink } from "@/components/creator-avatar-link";
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/empty-state";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 // cancelSubscription 通过 API 调用，不直接导入
 import {
   AlertDialog,
@@ -46,6 +47,7 @@ type Subscription = {
 
 export default function SubscriptionsPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -105,22 +107,21 @@ export default function SubscriptionsPage() {
           return;
         }
 
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
+        if (!auth.authenticated || !auth.user) {
           router.push("/auth");
           return;
         }
 
-        if (bootstrap.profile) {
+        if (auth.profile) {
           setCurrentUser({
-            id: bootstrap.user.id,
-            username: bootstrap.profile.display_name || "user",
-            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
-            avatar: bootstrap.profile.avatar_url || undefined,
+            id: auth.user.id,
+            username: auth.profile.display_name || "user",
+            role: (auth.profile.role || "fan") as "fan" | "creator",
+            avatar: auth.profile.avatar_url || undefined,
           });
         } else if (isTestMode) {
           setCurrentUser({
-            username: bootstrap.user.email?.split("@")[0] || "test-user",
+            username: auth.user.email?.split("@")[0] || "test-user",
             role: "fan",
           });
         }
@@ -129,7 +130,7 @@ export default function SubscriptionsPage() {
         const { data: subsData, error } = await supabase
           .from("subscriptions")
           .select("*")
-          .eq("subscriber_id", bootstrap.user.id)
+          .eq("subscriber_id", auth.user.id)
           .order("created_at", { ascending: false });
 
         if (error) {
@@ -184,7 +185,7 @@ export default function SubscriptionsPage() {
     };
 
     loadData();
-  }, [router, reloadKey, isTestMode]);
+  }, [router, reloadKey, isTestMode, auth.authenticated, auth.user, auth.profile]);
 
   const handleCancel = async (subscriptionId: string, creatorId: string) => {
     try {
@@ -232,9 +233,12 @@ export default function SubscriptionsPage() {
           );
           setSubscriptions(subsWithCreators);
         }
+      } else {
+        toast.error(data?.error || "Failed to cancel subscription. Please try again.");
       }
     } catch (err) {
       console.error("[subscriptions] cancel error:", err);
+      toast.error("Failed to cancel subscription. Please try again.");
     } finally {
       setCancellingSubscriptionId(null);
     }
@@ -316,10 +320,10 @@ export default function SubscriptionsPage() {
       {/* Hero Banner */}
       <div className="card-block bg-gradient-subtle p-6 md:p-8 mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">
-          Supporting{" "}
-          <span className="text-gradient-primary">{animatedSupportCount.toFixed(0)}</span> creators
+          Supporting <span className="text-text-primary">{animatedSupportCount.toFixed(0)}</span>{" "}
+          creators
         </h1>
-        <p className="text-text-secondary text-sm md:text-base mb-4">
+        <p className="text-text-secondary text-small md:text-body-lg mb-4">
           Manage and optimize your creator subscriptions.
         </p>
         <Link href="/home">
@@ -340,10 +344,10 @@ export default function SubscriptionsPage() {
             <div className="bg-surface-raised border border-border-base rounded-2xl p-8 text-center">
               <EmptyState
                 data-testid="subscriptions-list"
-                icon={<Heart className="size-6 text-violet-400" />}
+                icon={<Heart className="size-6 text-wine-text" />}
                 title="No subscriptions found"
                 description="Subscribe to your favorite creators to unlock their exclusive content"
-                action={{ label: "Discover Creators", href: "/home" }}
+                action={{ label: "Discover Creators", href: "/creators" }}
               />
             </div>
           ) : (
@@ -372,7 +376,7 @@ export default function SubscriptionsPage() {
                             : "Expired"
                         }
                       />
-                      <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm text-text-tertiary mt-1 ml-0">
+                      <div className="flex flex-wrap items-center gap-2 text-tiny md:text-small text-text-tertiary mt-1 ml-0">
                         <div className="flex items-center gap-1">
                           <Calendar className="w-3.5 h-3.5" />
                           <span>{subscription.plan}</span>
@@ -395,7 +399,7 @@ export default function SubscriptionsPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-text-tertiary hover:text-error hover:bg-error/10 active:scale-95 focus-visible:ring-2 focus-visible:ring-error"
+                          className="text-text-tertiary hover:text-error hover:bg-error/10 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-error"
                           onClick={() => setCancellingSubscriptionId(subscription.id)}
                         >
                           Cancel
@@ -406,7 +410,7 @@ export default function SubscriptionsPage() {
 
                   {subscription.status === "active" && (
                     <div className="mt-3 pt-3 border-t border-border-subtle">
-                      <p className="text-xs text-text-quaternary">
+                      <p className="text-tiny text-text-quaternary">
                         Subscribed since {formatDate(subscription.created_at)} • Renews on{" "}
                         {formatDate(subscription.current_period_end)}
                       </p>
@@ -415,7 +419,7 @@ export default function SubscriptionsPage() {
 
                   {subscription.status === "canceled" && subscription.cancelled_at && (
                     <div className="mt-3 pt-3 border-t border-border-subtle">
-                      <p className="text-xs text-text-quaternary">
+                      <p className="text-tiny text-text-quaternary">
                         Cancelled on {formatDate(subscription.cancelled_at)}
                       </p>
                     </div>
@@ -432,20 +436,20 @@ export default function SubscriptionsPage() {
         <aside className="w-full lg:w-72 lg:shrink-0">
           <div className="sticky top-24 space-y-4">
             <div className="card-block p-5">
-              <h2 className="text-sm font-semibold text-text-primary mb-4">Stats</h2>
+              <h2 className="text-small font-semibold text-text-primary mb-4">Stats</h2>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-text-tertiary">Active</span>
+                  <span className="text-small text-text-tertiary">Active</span>
                   <span className="font-bold text-success">{activeCount}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-text-tertiary">Expiring Soon</span>
+                  <span className="text-small text-text-tertiary">Expiring Soon</span>
                   <span className="font-bold text-warning">{expiringCount}</span>
                 </div>
                 <div className="h-px bg-border-base" />
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-text-tertiary">Monthly Cost</span>
-                  <span className="font-bold text-gradient-primary">
+                  <span className="text-small text-text-tertiary">Monthly Cost</span>
+                  <span className="font-bold text-text-primary">
                     ${animatedMonthlyCost.toFixed(2)}
                   </span>
                 </div>

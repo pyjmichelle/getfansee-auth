@@ -21,7 +21,7 @@ export function PageLayout({
   showNav = true,
 }: PageLayoutProps) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       {showNav && <NavHeader />}
       <main className={cn("py-6 sm:py-8 lg:py-12", className)}>
         <CenteredContainer maxWidth={maxWidth}>
