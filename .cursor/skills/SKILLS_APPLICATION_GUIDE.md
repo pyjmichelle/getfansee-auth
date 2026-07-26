@@ -34,7 +34,7 @@
 
 ## 门禁命令（以 `package.json` 为准）
 
-- **`pnpm check-all`**：`type-check` → `lint` → `format:check` → `check:service-role` → `check:admin-client`。（**不含** `test:unit`、**不含** `build`。）
+- **`pnpm check-all`**：`type-check` → `lint` → `format:check` → `check:service-role` → `check:admin-client` → `check:hardcoded-secrets`。（**不含** `test:unit`、**不含** `build`。）
 - **合并前完整路径（与内核一致）**：`pnpm check-all` → `pnpm build` → `pnpm qa:gate` → `pnpm exec playwright test --project=chromium`（或按变更范围跑 `pnpm test:e2e:smoke` / 定向 spec）。
 - **`pnpm test:e2e:smoke`**：对应 `tests/e2e/smoke.spec.ts`。另有 `tests/e2e/smoke-check.spec.ts`（历史/补充冒烟），以脚本为准优先用 `test:e2e:smoke`。
 - **Pre-push（`.husky/pre-push`）**：`SKIP_QA_GATE=1 pnpm ci:verify` → 当前为 `check:env`、`lint`、`type-check`、`build`；**跳过** `qa:gate` 与 E2E（由 CI 承担）。
@@ -275,4 +275,4 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ---
 
-_最后更新: 2026-07-26（补录 page-ia-review/impeccable/web-quality-audit/interface-design/qa-gate/feature-qa-walkthrough/release-review-walkthrough 索引；同步 UI 根治三次审查计划涉及的 agent 覆盖面变更；批次7 收尾校对：`tests/e2e/tab-stability.spec.ts` 落地后 e2e-test-setup 覆盖面新增跳变/CLS/触控断言，`chief-quality` 门禁盲区记录同步更新为"部分补齐"）_
+_最后更新: 2026-07-26（`check:hardcoded-secrets` 升级为扫描真实密钥值（sbp_\* /Supabase JWT），不再豁免 docs/scripts；修复 5 个文件中真实 SUPABASE*SERVICE_ROLE_KEY 泄露事故；Supabase MCP 改从 .env.local 读取）*

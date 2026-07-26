@@ -76,7 +76,7 @@ grep -A 5 "environment:" .github/workflows/ci.yml
 **示例**:
 
 ```
-✅ 正确: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI...
+✅ 正确: <一整行 JWT，不含引号/换行>
 ❌ 错误: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI..."
 ❌ 错误: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
         eyJpc3MiOiJzdXBhYmFzZSI...

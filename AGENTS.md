@@ -99,8 +99,15 @@ Full index: [`.cursor/skills/SKILLS_APPLICATION_GUIDE.md`](.cursor/skills/SKILLS
 
 ## Supabase MCP
 
-Configured in [`.cursor/mcp.json`](.cursor/mcp.json). Set `SUPABASE_PERSONAL_ACCESS_TOKEN` in your
-environment to enable. Allows agent to query live schema, RLS policies, and run read-only SQL.
+Configured in [`.cursor/mcp.json`](.cursor/mcp.json). **Never put tokens in that file.**
+
+Add to **`.env.local` only** (gitignored):
+
+```bash
+SUPABASE_PERSONAL_ACCESS_TOKEN=your_token_from_supabase_dashboard
+```
+
+The MCP launcher (`scripts/mcp/supabase-mcp.sh`) reads this variable at runtime. Allows agent to query live schema, RLS policies, and run read-only SQL.
 
 ```bash
 # Example: generate TypeScript types from DB schema via MCP

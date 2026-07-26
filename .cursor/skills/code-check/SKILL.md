@@ -24,7 +24,7 @@ description: 运行项目代码质量检查（type-check、lint、format、安�
 pnpm check-all
 ```
 
-包含：`type-check` → `lint` → `format:check` → `check:service-role` → `check:admin-client`。
+包含：`type-check` → `lint` → `format:check` → `check:service-role` → `check:admin-client` → `check:hardcoded-secrets`（禁止 `sbp_*` 等令牌进仓库）。
 
 ### 2. 汇总结果
 

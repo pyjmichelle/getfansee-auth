@@ -41,7 +41,22 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     if (status !== "all") query = query.eq("status", status);
 
-    const { data, count, error } = await query;
+    // Global per-status counts for the summary cards — independent of the
+    // current page/filter so switching status filters doesn't zero out the
+    // other cards (they previously derived from `items`, which only ever
+    // held the currently-filtered page).
+    const countQuery = (s: string) =>
+      supabase
+        .from("creator_external_links")
+        .select("id", { count: "exact", head: true })
+        .eq("status", s);
+
+    const [{ data, count, error }, pendingCount, approvedCount, rejectedCount] = await Promise.all([
+      query,
+      countQuery("pending"),
+      countQuery("approved"),
+      countQuery("rejected"),
+    ]);
     if (error) throw error;
 
     // Attach creator display names for the review UI.
@@ -62,7 +77,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       creator_name: namesById.get(row.creator_id) ?? row.creator_id,
     }));
 
-    return NextResponse.json({ items, total: count ?? 0, page, page_size: pageSize });
+    return NextResponse.json({
+      items,
+      total: count ?? 0,
+      page,
+      page_size: pageSize,
+      counts: {
+        pending: pendingCount.count ?? 0,
+        approved: approvedCount.count ?? 0,
+        rejected: rejectedCount.count ?? 0,
+      },
+    });
   } catch (error) {
     return jsonError(error);
   }

@@ -46,6 +46,7 @@ export default function AdminCreatorLinksPage() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<LinkItem[]>([]);
   const [total, setTotal] = useState(0);
+  const [counts, setCounts] = useState({ pending: 0, approved: 0, rejected: 0 });
   const [statusFilter, setStatusFilter] = useState("pending");
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
@@ -60,6 +61,7 @@ export default function AdminCreatorLinksPage() {
       const json = await res.json();
       setItems(json.items ?? []);
       setTotal(json.total ?? 0);
+      setCounts(json.counts ?? { pending: 0, approved: 0, rejected: 0 });
     } catch {
       toast.error("Failed to load links");
     } finally {
@@ -111,21 +113,9 @@ export default function AdminCreatorLinksPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-8">
         {[
-          {
-            label: "Pending",
-            value: items.filter((i) => i.status === "pending").length,
-            icon: Clock,
-          },
-          {
-            label: "Approved",
-            value: items.filter((i) => i.status === "approved").length,
-            icon: CheckCircle,
-          },
-          {
-            label: "Rejected",
-            value: items.filter((i) => i.status === "rejected").length,
-            icon: X,
-          },
+          { label: "Pending", value: counts.pending, icon: Clock },
+          { label: "Approved", value: counts.approved, icon: CheckCircle },
+          { label: "Rejected", value: counts.rejected, icon: X },
         ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="card-block p-5 flex items-center gap-4">
             <div className="w-10 h-10 bg-surface-raised rounded-xl flex items-center justify-center shrink-0">

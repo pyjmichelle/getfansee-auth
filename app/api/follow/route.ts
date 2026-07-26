@@ -33,19 +33,26 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ success: true, followingIds: [] });
       }
       const supabase = getSupabaseAdminClient();
-      const { data, error } = await supabase
-        .from("follows")
-        .select("creator_id")
-        .eq("follower_id", user.id)
-        .limit(2000);
-      if (error) {
-        console.error("[follow] list error:", error);
-        return NextResponse.json({ success: true, followingIds: [] });
+      // Paginate past PostgREST's implicit row cap so users following more
+      // than one page's worth of creators don't get a silently truncated
+      // Following feed. Hard-capped at MAX_FOLLOWING to bound worst-case cost.
+      const PAGE_SIZE = 1000;
+      const MAX_FOLLOWING = 20_000;
+      const followingIds: string[] = [];
+      for (let from = 0; from < MAX_FOLLOWING; from += PAGE_SIZE) {
+        const { data, error } = await supabase
+          .from("follows")
+          .select("creator_id")
+          .eq("follower_id", user.id)
+          .range(from, from + PAGE_SIZE - 1);
+        if (error) {
+          console.error("[follow] list error:", error);
+          break;
+        }
+        followingIds.push(...(data ?? []).map((row) => row.creator_id));
+        if (!data || data.length < PAGE_SIZE) break;
       }
-      return NextResponse.json({
-        success: true,
-        followingIds: (data ?? []).map((row) => row.creator_id),
-      });
+      return NextResponse.json({ success: true, followingIds });
     }
 
     const user = await getCurrentUser();

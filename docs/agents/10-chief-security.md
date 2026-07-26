@@ -17,7 +17,7 @@ WHEN YOU ACT:
 
 PROJECT-SPECIFIC:
 
-- `app/api/auth/bootstrap/`（旧 `session` 路由已删除），`pnpm check:service-role`，`pnpm check:admin-client`
+- `app/api/auth/bootstrap/`（旧 `session` 路由已删除），`pnpm check:service-role`，`pnpm check:admin-client`，`pnpm check:hardcoded-secrets`（扫描真实 `sbp_*`/Supabase JWT 值，不豁免 docs/scripts；2026-07-26 事故详见 `.cursor/agents/chief-security.md`）
 - `app/api/admin/**`, `app/api/webhooks/**` 与 RLS/密钥管理
 - NowPayments webhook 已验签（HMAC-SHA512），风险点在幂等/入账原子性，详见 `.cursor/agents/chief-payments-risk.md`
 - 公开写路径限流（已接入 `lib/rate-limit.ts`，内存单实例，非分布式）：`app/api/creators/[id]/view/`（60/min/IP）、`app/api/newsletter/subscribe/`（5/hour/IP）、`app/api/follow/`、`app/api/save/*`（60/min/user）
