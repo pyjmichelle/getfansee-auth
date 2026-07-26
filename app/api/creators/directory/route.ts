@@ -184,16 +184,37 @@ export async function GET(request: NextRequest) {
         "[creators/directory] get_creator_directory_counts RPC failed (migration 049?):",
         countsRpcResult.error.message
       );
-      const [followRowsResult, postRowsResult] = await Promise.all([
-        admin.from("follows").select("creator_id").in("creator_id", creatorIds),
-        admin.from("posts").select("creator_id").in("creator_id", creatorIds),
+      // PostgREST applies a default row cap (~1000) per request regardless of
+      // the `in(creator_id, ...)` filter width — a single popular creator can
+      // exceed that on its own, so this must page through results rather
+      // than trust one unranged select() to return everything.
+      const countAllRows = async (table: "follows" | "posts") => {
+        const counts = new Map<string, number>();
+        const PAGE_SIZE = 1000;
+        const MAX_ROWS = 50_000;
+        for (let from = 0; from < MAX_ROWS; from += PAGE_SIZE) {
+          const { data, error } = await admin
+            .from(table)
+            .select("creator_id")
+            .in("creator_id", creatorIds)
+            .range(from, from + PAGE_SIZE - 1);
+          if (error) {
+            console.warn(`[creators/directory] ${table} count fallback page error:`, error.message);
+            break;
+          }
+          for (const row of data ?? []) {
+            counts.set(row.creator_id, (counts.get(row.creator_id) ?? 0) + 1);
+          }
+          if (!data || data.length < PAGE_SIZE) break;
+        }
+        return counts;
+      };
+      const [followCountsFallback, postCountsFallback] = await Promise.all([
+        countAllRows("follows"),
+        countAllRows("posts"),
       ]);
-      for (const row of followRowsResult.data ?? []) {
-        followerCounts.set(row.creator_id, (followerCounts.get(row.creator_id) ?? 0) + 1);
-      }
-      for (const row of postRowsResult.data ?? []) {
-        postCounts.set(row.creator_id, (postCounts.get(row.creator_id) ?? 0) + 1);
-      }
+      for (const [id, n] of followCountsFallback) followerCounts.set(id, n);
+      for (const [id, n] of postCountsFallback) postCounts.set(id, n);
     } else {
       for (const row of countsRpcResult.data ?? []) {
         followerCounts.set(row.creator_id, row.follower_count ?? 0);

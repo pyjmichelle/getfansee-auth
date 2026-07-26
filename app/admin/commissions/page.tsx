@@ -101,8 +101,10 @@ export default function AdminCommissionsPage() {
   }, [statusFilter]);
 
   useEffect(() => {
-    if (!auth.authenticated || auth.profile?.role !== "admin") {
+    if (!auth.authenticated) {
       router.push("/auth");
+    } else if (auth.profile?.role !== "admin") {
+      router.push("/home");
     } else {
       load();
     }
