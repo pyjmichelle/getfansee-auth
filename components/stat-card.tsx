@@ -50,10 +50,10 @@ export function StatCard({
       aria-label={`${title}: ${value}`}
     >
       <div className="flex items-start justify-between mb-2">
-        <p className="text-[12px] font-medium text-text-muted leading-tight">{title}</p>
+        <p className="text-tiny font-medium text-text-muted leading-tight">{title}</p>
         {icon && (
           <GlassIcon size="sm" glow="violet" aria-hidden="true">
-            <span className="text-violet-400">{icon}</span>
+            <span className="text-wine-text">{icon}</span>
           </GlassIcon>
         )}
       </div>
@@ -61,7 +61,7 @@ export function StatCard({
         {value}
       </div>
       {change && (
-        <div className={cn("flex items-center gap-1 mt-1 text-[11px]", trendColor)}>
+        <div className={cn("flex items-center gap-1 mt-1 text-tiny", trendColor)}>
           {trendIcon}
           <span>
             {change.trend === "up" ? "+" : change.trend === "down" ? "-" : ""}
@@ -70,7 +70,7 @@ export function StatCard({
           <span className="text-text-disabled ml-1">vs last period</span>
         </div>
       )}
-      {description && <p className="text-[11px] text-text-muted mt-1.5">{description}</p>}
+      {description && <p className="text-tiny text-text-muted mt-1.5">{description}</p>}
     </div>
   );
 }

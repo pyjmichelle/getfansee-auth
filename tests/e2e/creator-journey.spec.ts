@@ -392,9 +392,8 @@ test.describe("Creator 端完整流程测试", () => {
       // 验证页面加载
       await waitForVisible(page, "main, [role='main']", 5000);
 
-      // 验证订阅者列表容器存在
-      const subscribersList = page.locator("text=/subscriber|follower/i");
-      await expect(subscribersList.first()).toBeVisible({ timeout: 5000 });
+      // Avoid matching hidden mobile studio nav "Subscribers" pill (lg:hidden).
+      await expect(page.getByTestId("subscribers-list")).toBeVisible({ timeout: 5000 });
     });
   });
 
@@ -425,9 +424,7 @@ test.describe("Creator 端完整流程测试", () => {
       // 验证页面加载
       await waitForVisible(page, "main, [role='main']", 5000);
 
-      // 验证 Analytics 相关内容显示
-      const analyticsContent = page.locator("text=/analytics|statistics|stats/i");
-      await expect(analyticsContent.first()).toBeVisible({ timeout: 5000 });
+      await expect(page.getByTestId("analytics-ready")).toBeVisible({ timeout: 10000 });
     });
   });
 });

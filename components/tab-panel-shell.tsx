@@ -40,7 +40,7 @@ export function SectionEmptyState({
         {icon}
       </div>
       <h4 className="font-semibold text-text-primary mb-1">{title}</h4>
-      {description && <p className="text-sm text-text-tertiary max-w-sm">{description}</p>}
+      {description && <p className="text-small text-text-tertiary max-w-sm">{description}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );

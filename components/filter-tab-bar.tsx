@@ -30,11 +30,14 @@ export function FilterTabBar({ items, active, onChange, className }: FilterTabBa
             aria-selected={isActive}
             onClick={() => onChange(item.id)}
             className={cn(
-              "min-w-[120px] flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition-all",
+              "min-w-[120px] min-h-11 flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl border font-semibold text-small whitespace-nowrap transition-[background-color,color,border-color]",
               "active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-brand-primary",
+              // Both states always carry a 1px border — only its color
+              // changes — so toggling never reflows neighboring pills by
+              // the width of a border that used to only exist inactive.
               isActive
-                ? "bg-brand-primary text-white shadow-glow"
-                : "bg-surface-raised text-text-secondary hover:bg-surface-overlay border border-border-base"
+                ? "bg-brand-primary text-white border-transparent"
+                : "bg-surface-raised text-text-secondary hover:bg-surface-overlay border-border-base"
             )}
           >
             {Icon && <Icon className="w-4 h-4" aria-hidden="true" />}
@@ -42,10 +45,8 @@ export function FilterTabBar({ items, active, onChange, className }: FilterTabBa
             {item.count !== undefined && item.count > 0 && (
               <span
                 className={cn(
-                  "px-2 py-0.5 rounded-full text-xs font-bold",
-                  isActive
-                    ? "bg-white/20 text-white"
-                    : "bg-brand-primary-alpha-10 text-brand-primary"
+                  "px-2 py-0.5 rounded-full text-tiny font-bold",
+                  isActive ? "bg-white/20 text-white" : "bg-brand-primary-alpha-10 text-wine-text"
                 )}
               >
                 {item.count}

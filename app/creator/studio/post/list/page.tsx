@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PageShell } from "@/components/page-shell";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { StudioShell } from "@/components/shells/studio-shell";
+import { useAuth } from "@/contexts/auth-context";
 import { type Post } from "@/lib/types";
 import {
   Edit,
@@ -19,8 +20,6 @@ import {
   Lock,
   CheckCircle,
   FileText,
-  BarChart3,
-  Users,
   Download,
 } from "@/lib/icons";
 import { formatDistanceToNow } from "date-fns";
@@ -40,6 +39,7 @@ import { Button } from "@/components/ui/button";
 
 export default function CreatorPostListPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState<Post[]>([]);
   const [currentUser, setCurrentUser] = useState<{
@@ -59,20 +59,19 @@ export default function CreatorPostListPage() {
         setIsLoading(true);
         setError(null);
 
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
+        if (!auth.authenticated || !auth.user) {
           router.push("/auth");
           return;
         }
 
-        if (bootstrap.profile) {
+        if (auth.profile) {
           setCurrentUser({
-            username: bootstrap.profile.display_name || "user",
-            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
-            avatar: bootstrap.profile.avatar_url || undefined,
+            username: auth.profile.display_name || "user",
+            role: (auth.profile.role || "fan") as "fan" | "creator",
+            avatar: auth.profile.avatar_url || undefined,
           });
 
-          if (bootstrap.profile.role !== "creator") {
+          if (auth.profile.role !== "creator") {
             router.push("/home");
             return;
           }
@@ -95,7 +94,7 @@ export default function CreatorPostListPage() {
     };
 
     loadData();
-  }, [router]);
+  }, [router, auth.authenticated, auth.user, auth.profile]);
 
   const handleDelete = async (postId: string) => {
     try {
@@ -139,8 +138,30 @@ export default function CreatorPostListPage() {
   const premiumPosts = posts.filter(
     (p) => p.visibility === "subscribers" || p.visibility === "ppv"
   ).length;
-  const totalRevenue = posts.reduce((sum, p) => sum + (p.price_cents || 0) / 100, 0);
-  const animatedRevenue = useCountUp(totalRevenue, { duration: 900, decimals: 0 });
+  const totalLikes = posts.reduce((sum, p) => sum + (p.likes_count || 0), 0);
+  const animatedLikes = useCountUp(totalLikes, { duration: 900, decimals: 0 });
+
+  const handleExportCsv = () => {
+    const header = ["Title", "Status", "Visibility", "Price (USD)", "Likes", "Created"];
+    const rows = filteredPosts.map((p) => [
+      p.title || p.content?.slice(0, 50) || "Untitled",
+      p.visibility === "draft" ? "draft" : "published",
+      p.visibility || "free",
+      p.price_cents ? (p.price_cents / 100).toFixed(2) : "",
+      String(p.likes_count || 0),
+      p.created_at ? new Date(p.created_at).toISOString() : "",
+    ]);
+    const csv = [header, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `posts-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   if (isLoading) {
     return (
@@ -164,8 +185,8 @@ export default function CreatorPostListPage() {
 
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
-      <div className="pb-24 flex flex-col lg:flex-row gap-8">
-        <main className="flex-1 min-w-0">
+      <div className="pb-24">
+        <StudioShell>
           {/* Header */}
           <div className="mb-4 md:mb-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -173,12 +194,15 @@ export default function CreatorPostListPage() {
                 <h1 className="text-2xl md:text-4xl font-bold tracking-tight mb-1 md:mb-3 text-text-primary">
                   Content Library
                 </h1>
-                <p className="text-text-tertiary text-sm md:text-lg">Manage your posts and media</p>
+                <p className="text-text-tertiary text-small md:text-lg">
+                  Manage your posts and media
+                </p>
               </div>
               <div className="flex gap-3">
                 <Button
                   variant="outline"
                   className="px-5 py-3 bg-surface-raised border-border-base hover:bg-surface-overlay"
+                  onClick={handleExportCsv}
                 >
                   <Download size={18} />
                   Export
@@ -197,16 +221,16 @@ export default function CreatorPostListPage() {
           <div className="bento-grid mb-8">
             <div className="card-block p-6">
               <div className="flex items-center justify-between mb-3">
-                <div className="text-sm text-text-tertiary font-semibold">Total Posts</div>
-                <div className="w-12 h-12 bg-brand-primary/10 rounded-xl flex items-center justify-center">
-                  <FileText size={20} className="text-brand-primary" />
+                <div className="text-small text-text-tertiary font-semibold">Total Posts</div>
+                <div className="w-12 h-12 bg-[var(--wine)]/10 rounded-xl flex items-center justify-center">
+                  <FileText size={20} className="text-wine-text" />
                 </div>
               </div>
               <div className="text-3xl font-bold text-text-primary">{totalPosts}</div>
             </div>
             <div className="card-block p-6">
               <div className="flex items-center justify-between mb-3">
-                <div className="text-sm text-text-tertiary font-semibold">Published</div>
+                <div className="text-small text-text-tertiary font-semibold">Published</div>
                 <div className="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center">
                   <CheckCircle size={20} className="text-success" />
                 </div>
@@ -215,24 +239,21 @@ export default function CreatorPostListPage() {
             </div>
             <div className="card-block p-6">
               <div className="flex items-center justify-between mb-3">
-                <div className="text-sm text-text-tertiary font-semibold">Premium</div>
+                <div className="text-small text-text-tertiary font-semibold">Premium</div>
                 <div className="w-12 h-12 bg-brand-secondary/10 rounded-xl flex items-center justify-center">
-                  <Lock size={20} className="text-brand-secondary" />
+                  <Lock size={20} className="text-wine-text" />
                 </div>
               </div>
               <div className="text-3xl font-bold text-text-primary">{premiumPosts}</div>
             </div>
-            <div className="card-block bg-gradient-subtle p-6 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-success/5 to-transparent" />
-              <div className="relative flex items-center justify-between mb-3">
-                <div className="text-sm text-text-tertiary font-semibold">Total Revenue</div>
-                <div className="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center">
-                  <DollarSign size={20} className="text-success" />
+            <div className="card-block p-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-small text-text-tertiary font-semibold">Total Likes</div>
+                <div className="w-12 h-12 bg-error/10 rounded-xl flex items-center justify-center">
+                  <Heart size={20} className="text-error" />
                 </div>
               </div>
-              <div className="relative text-3xl font-bold text-gradient-primary">
-                ${animatedRevenue.toFixed(0)}
-              </div>
+              <div className="text-3xl font-bold text-text-primary">{animatedLikes.toFixed(0)}</div>
             </div>
           </div>
 
@@ -255,7 +276,7 @@ export default function CreatorPostListPage() {
                 placeholder="Search content..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all placeholder:text-text-tertiary"
+                className="w-full pl-12 pr-4 py-3 bg-surface-raised border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--wine)]/20 focus:border-[var(--border-wine)] transition-all placeholder:text-text-tertiary"
               />
             </div>
 
@@ -269,7 +290,7 @@ export default function CreatorPostListPage() {
                     size="sm"
                     className={`rounded-lg capitalize ${
                       filterStatus === status
-                        ? "bg-brand-primary text-white shadow-md"
+                        ? "bg-[var(--wine)] text-white shadow-md"
                         : "text-text-tertiary hover:text-text-primary hover:bg-surface-overlay"
                     }`}
                   >
@@ -285,7 +306,7 @@ export default function CreatorPostListPage() {
                   size="icon"
                   className={`rounded-lg ${
                     viewMode === "list"
-                      ? "bg-brand-primary text-white shadow-md"
+                      ? "bg-[var(--wine)] text-white shadow-md"
                       : "text-text-tertiary hover:bg-surface-overlay"
                   }`}
                 >
@@ -297,7 +318,7 @@ export default function CreatorPostListPage() {
                   size="icon"
                   className={`rounded-lg ${
                     viewMode === "grid"
-                      ? "bg-brand-primary text-white shadow-md"
+                      ? "bg-[var(--wine)] text-white shadow-md"
                       : "text-text-tertiary hover:bg-surface-overlay"
                   }`}
                 >
@@ -313,7 +334,7 @@ export default function CreatorPostListPage() {
               {filteredPosts.map((post) => (
                 <div
                   key={post.id}
-                  className="bg-surface-base border border-border-base hover:border-brand-primary/30 rounded-2xl p-6 transition-all group hover:shadow-lg"
+                  className="bg-surface-base border border-border-base hover:border-[var(--border-wine)]/30 rounded-2xl p-6 transition-all group hover:shadow-lg"
                   data-testid="creator-post-list-item"
                   data-post-id={post.id}
                 >
@@ -340,7 +361,7 @@ export default function CreatorPostListPage() {
                         </div>
                       )}
                       {(post.visibility === "subscribers" || post.visibility === "ppv") && (
-                        <div className="absolute top-2 left-2 px-2.5 py-1.5 bg-brand-secondary/90 backdrop-blur-sm rounded-lg text-xs font-semibold flex items-center gap-1.5 text-white">
+                        <div className="absolute top-2 left-2 px-2.5 py-1.5 bg-brand-secondary/90 backdrop-blur-sm rounded-lg text-tiny font-semibold flex items-center gap-1.5 text-white">
                           <Lock size={12} />
                           {post.visibility === "ppv"
                             ? `$${((post.price_cents || 0) / 100).toFixed(2)}`
@@ -353,10 +374,10 @@ export default function CreatorPostListPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-4 mb-4">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-lg mb-2 truncate group-hover:text-brand-primary transition-colors text-text-primary">
+                          <h3 className="font-semibold text-lg mb-2 truncate group-hover:text-wine-text transition-colors text-text-primary">
                             {post.title || post.content?.slice(0, 50) || "Untitled Post"}
                           </h3>
-                          <div className="flex items-center gap-4 text-sm text-text-tertiary">
+                          <div className="flex items-center gap-4 text-small text-text-tertiary">
                             <div className="flex items-center gap-2">
                               <Calendar size={14} />
                               {post.created_at
@@ -381,7 +402,7 @@ export default function CreatorPostListPage() {
                         <div className="flex gap-2">
                           <Link
                             href={`/creator/studio/post/edit/${post.id}`}
-                            className="p-2 hover:bg-surface-raised rounded-lg transition-all active:scale-95"
+                            className="p-2 hover:bg-surface-raised rounded-lg transition-all active:scale-[0.98]"
                           >
                             <Edit size={18} className="text-text-tertiary" />
                           </Link>
@@ -397,21 +418,21 @@ export default function CreatorPostListPage() {
                       </div>
 
                       {/* Performance Metrics */}
-                      <div className="flex items-center gap-6 text-sm flex-wrap">
-                        <div className="flex items-center gap-2">
-                          <Eye size={16} className="text-text-tertiary" />
-                          <span className="font-semibold text-text-primary">0</span>
-                          <span className="text-text-tertiary">views</span>
-                        </div>
+                      <div className="flex items-center gap-6 text-small flex-wrap">
                         <div className="flex items-center gap-2">
                           <Heart size={16} className="text-text-tertiary" />
-                          <span className="font-semibold text-text-primary">0</span>
+                          <span className="font-semibold text-text-primary">
+                            {post.likes_count || 0}
+                          </span>
                           <span className="text-text-tertiary">likes</span>
                         </div>
-                        {post.visibility === "ppv" && (
+                        {post.visibility === "ppv" && !!post.price_cents && (
                           <div className="ml-auto flex items-center gap-2 px-4 py-2 bg-success/10 rounded-xl">
                             <DollarSign size={16} className="text-success" />
-                            <span className="font-bold text-success">$0.00</span>
+                            <span className="font-bold text-success">
+                              ${(post.price_cents / 100).toFixed(2)}
+                            </span>
+                            <span className="text-text-tertiary text-tiny">price</span>
                           </div>
                         )}
                       </div>
@@ -453,7 +474,7 @@ export default function CreatorPostListPage() {
                       </div>
                     )}
                     {(post.visibility === "subscribers" || post.visibility === "ppv") && (
-                      <div className="absolute top-3 left-3 px-3 py-2 bg-brand-secondary/90 backdrop-blur-sm rounded-xl text-sm font-semibold flex items-center gap-2 text-white">
+                      <div className="absolute top-3 left-3 px-3 py-2 bg-brand-secondary/90 backdrop-blur-sm rounded-xl text-small font-semibold flex items-center gap-2 text-white">
                         <Lock size={14} />
                         {post.visibility === "ppv"
                           ? `$${((post.price_cents || 0) / 100).toFixed(2)}`
@@ -465,14 +486,14 @@ export default function CreatorPostListPage() {
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                       <Link
                         href={`/posts/${post.id}`}
-                        className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl font-medium hover:bg-white/20 transition-all active:scale-95 flex items-center gap-2"
+                        className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl font-medium hover:bg-white/20 transition-all active:scale-[0.98] flex items-center gap-2"
                       >
                         <Eye size={16} />
                         View
                       </Link>
                       <Link
                         href={`/creator/studio/post/edit/${post.id}`}
-                        className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl font-medium hover:bg-white/20 transition-all active:scale-95 flex items-center gap-2"
+                        className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl font-medium hover:bg-white/20 transition-all active:scale-[0.98] flex items-center gap-2"
                       >
                         <Edit size={16} />
                         Edit
@@ -482,11 +503,11 @@ export default function CreatorPostListPage() {
 
                   {/* Content Info */}
                   <div className="p-5">
-                    <h3 className="font-semibold mb-3 line-clamp-2 group-hover:text-brand-primary transition-colors text-text-primary">
+                    <h3 className="font-semibold mb-3 line-clamp-2 group-hover:text-wine-text transition-colors text-text-primary">
                       {post.title || post.content?.slice(0, 50) || "Untitled Post"}
                     </h3>
 
-                    <div className="flex items-center gap-3 text-xs text-text-tertiary mb-4">
+                    <div className="flex items-center gap-3 text-tiny text-text-tertiary mb-4">
                       <div className="flex items-center gap-2">
                         <div
                           className={`w-2 h-2 rounded-full ${
@@ -505,19 +526,17 @@ export default function CreatorPostListPage() {
                     </div>
 
                     {/* Metrics */}
-                    <div className="flex items-center gap-4 text-sm">
-                      <div className="flex items-center gap-1.5">
-                        <Eye size={14} className="text-text-tertiary" />
-                        <span className="font-semibold text-text-primary">0</span>
-                      </div>
+                    <div className="flex items-center gap-4 text-small">
                       <div className="flex items-center gap-1.5">
                         <Heart size={14} className="text-text-tertiary" />
-                        <span className="font-semibold text-text-primary">0</span>
+                        <span className="font-semibold text-text-primary">
+                          {post.likes_count || 0}
+                        </span>
                       </div>
-                      {post.visibility === "ppv" && (
+                      {post.visibility === "ppv" && !!post.price_cents && (
                         <div className="ml-auto flex items-center gap-1 text-success">
                           <DollarSign size={14} />
-                          <span className="font-bold">$0</span>
+                          <span className="font-bold">${(post.price_cents / 100).toFixed(0)}</span>
                         </div>
                       )}
                     </div>
@@ -574,68 +593,7 @@ export default function CreatorPostListPage() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-        </main>
-
-        {/* Sidebar: Studio nav + publish stats (PC) */}
-        <aside className="w-full lg:w-72 shrink-0">
-          <div className="sticky top-24 space-y-4">
-            <div className="card-block p-4">
-              <h2 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">
-                Studio
-              </h2>
-              <nav className="space-y-1" aria-label="Studio navigation">
-                {[
-                  { href: "/creator/new-post", icon: Plus, label: "Create Post" },
-                  { href: "/creator/studio/earnings", icon: DollarSign, label: "Earnings" },
-                  { href: "/creator/studio/subscribers", icon: Users, label: "Subscribers" },
-                  { href: "/creator/studio/post/list", icon: FileText, label: "Post List" },
-                  { href: "/creator/studio/analytics", icon: BarChart3, label: "Analytics" },
-                ].map(({ href, icon: Icon, label }) => {
-                  const isActive = href === "/creator/studio/post/list";
-                  return (
-                    <Link
-                      key={href}
-                      href={href}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary ${
-                        isActive
-                          ? "bg-brand-primary/10 text-brand-primary"
-                          : "text-text-secondary hover:bg-surface-raised hover:text-text-primary"
-                      }`}
-                    >
-                      <Icon size={16} />
-                      {label}
-                    </Link>
-                  );
-                })}
-              </nav>
-            </div>
-            <div className="card-block p-4">
-              <h2 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">
-                Publish stats
-              </h2>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-text-tertiary">Total posts</span>
-                  <span className="font-bold text-text-primary">{totalPosts}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-text-tertiary">Published</span>
-                  <span className="font-bold text-text-primary">{publishedPosts}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-text-tertiary">Revenue</span>
-                  <span className="font-bold text-success">${animatedRevenue.toFixed(0)}</span>
-                </div>
-              </div>
-              <Button asChild className="mt-4 w-full">
-                <Link href="/creator/new-post">
-                  <Plus size={18} />
-                  Create Post
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </aside>
+        </StudioShell>
       </div>
     </PageShell>
   );

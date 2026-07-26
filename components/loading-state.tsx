@@ -55,7 +55,7 @@ export function LoadingState({
           <div className="loading-dot" />
           <div className="loading-dot" />
         </div>
-        {text && <span className="ml-3 text-text-muted text-[13px]">{text}</span>}
+        {text && <span className="ml-3 text-text-muted text-small">{text}</span>}
       </div>
     );
   }
@@ -67,10 +67,10 @@ export function LoadingState({
       aria-live="polite"
     >
       <Loader2
-        className={cn(sizeClasses[size], "animate-spin text-violet-500")}
+        className={cn(sizeClasses[size], "animate-spin text-wine-text")}
         aria-hidden="true"
       />
-      {text && <p className="text-[13px] text-text-muted">{text}</p>}
+      {text && <p className="text-small text-text-muted">{text}</p>}
       <span className="sr-only">{text || "Loading…"}</span>
     </div>
   );

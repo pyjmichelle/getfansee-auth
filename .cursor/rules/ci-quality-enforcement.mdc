@@ -325,6 +325,8 @@ pnpm check-all
 - **服务角色 / admin 脚本检查通过**
 - **合并前另需：构建、单测与 CI 阶段 E2E/QA Gate 按流水线通过**
 
+> **门红与作者无关（见内核 §1.4）**：只要 `pnpm check-all` 任一步红，就必须修绿——**哪怕不是你本次的改动、是预存格式/白名单债**。最小正确修复（`prettier --write`、核实后加白名单等），严禁靠削弱门禁（抬高 `--max-warnings`、删检查、`--no-verify`）来"变绿"。
+
 ### 3. Git Hook 自动保护
 - `.husky/pre-push` 运行 `SKIP_QA_GATE=1 pnpm ci:verify`（含 `check:env`、lint、type-check、**build**；**跳过** `qa:gate` 与 E2E，由 CI 跑全量）
 - 如果检查失败,推送会被阻止

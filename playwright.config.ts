@@ -44,8 +44,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* CI 下重试 2 次提高稳定性，本地不重试便于快速失败 */
   retries: process.env.CI ? 2 : 0,
-  /* 2 workers：97 用例单 worker 易超 25 分钟，双 worker 约 15–25 分钟跑完 */
-  workers: 2,
+  /* CI 下单 worker 避免双文件并行时 navigation ERR_ABORTED；本地 2 workers 保速度 */
+  workers: process.env.CI ? 1 : 2,
   /* Reporter */
   reporter: process.env.CI ? [["html"], ["github"]] : [["html"], ["list"]],
   /* Global timeout - CI 长流程需更长时间，默认 4 分钟 */
@@ -115,7 +115,14 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_SKIP_SERVER
     ? undefined
     : {
-        command: `PLAYWRIGHT_TEST_MODE=true E2E=1 PORT=${serverPort} pnpm build && bash -lc 'PORT=${serverPort} E2E=1 PLAYWRIGHT_TEST_MODE=true pnpm start > .next/e2e-server.log 2>&1'`,
+        // NEXT_PUBLIC_TEST_MODE is a client-bundle-time constant (baked in at
+        // `pnpm build`), unlike E2E/PLAYWRIGHT_TEST_MODE which routes read
+        // live from process.env. It must be hardcoded here — relying on the
+        // ambient shell env is fragile because .env.local ships with
+        // NEXT_PUBLIC_TEST_MODE=false (a deliberate prod-safety default) and
+        // Next's env loader does not reliably let an inherited process.env
+        // value win over it across every Next/Turbopack version.
+        command: `NEXT_PUBLIC_TEST_MODE=true PLAYWRIGHT_TEST_MODE=true E2E=1 PORT=${serverPort} pnpm build && bash -lc 'PORT=${serverPort} E2E=1 PLAYWRIGHT_TEST_MODE=true NEXT_PUBLIC_TEST_MODE=true pnpm start > .next/e2e-server.log 2>&1'`,
         url: `${defaultBaseUrl}/api/health`,
         reuseExistingServer: true,
         timeout: 180 * 1000,

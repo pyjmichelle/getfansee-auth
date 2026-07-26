@@ -1,5 +1,13 @@
 # Beta Payout Policy
 
+> **Alpha status (current phase)**: In-platform payments are NOT enabled during the Pre-Payment
+> Alpha, so no payouts occur. Creators earn directly through their approved external links
+> (off-platform, not handled by GetFanSee). Founding Creators (Alpha-verified) receive 0% platform
+> commission for 3 months once payments launch in Beta, extendable by +1 month per 5 qualified
+> creator referrals (capped at +3 months). Referral commissions accrued during Alpha are paid out
+> once Beta withdrawals open, subject to KYC and admin review. This document below describes the
+> Beta-phase payout system that activates when payments launch.
+
 ## Overview
 
 During the Beta phase, GetFanSee operates with a simplified payout system. This document outlines the current payout rules, requirements, and processes.

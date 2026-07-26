@@ -71,7 +71,7 @@ export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: T
   };
 
   if (isLoading) {
-    return <p className="text-sm text-text-tertiary">Loading tags...</p>;
+    return <p className="text-small text-text-tertiary">Loading tags...</p>;
   }
 
   return (
@@ -91,7 +91,7 @@ export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: T
                     toggleTag(tagId);
                   }
                 }}
-                className="ml-2 hover:text-error active:scale-95 transition-all min-h-[20px] min-w-[20px] focus-visible:outline-2 focus-visible:outline-brand-primary cursor-pointer"
+                className="ml-2 hover:text-error active:scale-[0.98] transition-all min-h-[20px] min-w-[20px] focus-visible:outline-2 focus-visible:outline-brand-primary cursor-pointer"
                 aria-label={`Remove tag ${getTagName(tagId)}`}
               >
                 <X className="w-3 h-3" aria-hidden="true" />
@@ -121,7 +121,7 @@ export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: T
                 }
               }}
               disabled={selectedTags.length >= maxTags}
-              className="h-8 min-h-[32px] cursor-pointer hover:bg-brand-primary/10 hover:text-brand-primary hover:border-brand-primary/30 active:scale-95 transition-all focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="h-8 min-h-[32px] cursor-pointer hover:bg-brand-primary/10 hover:text-wine-text hover:border-brand-primary/30 active:scale-[0.98] transition-all focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={`Add tag ${tag.name}`}
               aria-disabled={selectedTags.length >= maxTags}
             >
@@ -145,7 +145,7 @@ export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: T
               }
             }}
             placeholder="Add custom tag..."
-            className="h-8 text-[13px] flex-1"
+            className="h-8 text-small flex-1"
             maxLength={30}
           />
           <Button
@@ -163,7 +163,7 @@ export function TagSelector({ category, selectedTags, onChange, maxTags = 5 }: T
       )}
 
       {selectedTags.length >= maxTags && (
-        <p className="text-xs text-text-tertiary">Maximum {maxTags} tags selected</p>
+        <p className="text-tiny text-text-tertiary">Maximum {maxTags} tags selected</p>
       )}
     </div>
   );

@@ -70,9 +70,11 @@ Before calling this skill, ensure the correct chief agent has reviewed the chang
 Load these skills when reviewing the corresponding domain:
 
 **Auth/Identity**: `supabase` (official skill), `supabase-postgres-best-practices`
-**UI/Frontend**: `shadcn-ui`, `react-best-practices`, `frontend-design`
-**E2E/QA**: `e2e-test-setup`, `fixture-generator`, `test-report-generator`
+**UI/Frontend**: `shadcn-ui`, `react-best-practices`, `frontend-design`, `.cursor/skills/page-ia-review` (layout/IA/tab tradeoffs, ≥44px touch targets), `.agents/skills/impeccable` (implementation polish), `.agents/skills/web-quality-audit` (CLS/a11y/perf)
+**E2E/QA**: `e2e-test-setup`, `fixture-generator`, `test-report-generator`, `.cursor/skills/qa-gate`, `.cursor/skills/feature-qa-walkthrough`
 **CI/Infra**: `ci-pipeline-config`, `api-test-runner`
+
+> 已知门禁盲区（2026-07-26）：`qa:gate` 只验选择器存在 + 死点击，测不出布局跳变/CLS/触控尺寸回归。涉及 tab/segment/布局的改动，release gate 前必须额外跑 Playwright `boundingBox()`/`toHaveScreenshot`/layout-shift 断言（不在默认 4 步命令里，需按改动范围单独执行）。
 
 ## Release Blockers (ABSOLUTE)
 

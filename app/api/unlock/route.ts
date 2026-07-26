@@ -5,6 +5,7 @@ import { jsonError } from "@/lib/http-errors";
 import { unlockPost } from "@/lib/paywall";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { sendPPVConfirmation } from "@/lib/email";
+import { isInAppPaymentsEnabled } from "@/lib/constants/alpha";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://getfansee.com";
@@ -16,6 +17,18 @@ type UnlockPayload = {
 
 export async function POST(request: NextRequest) {
   try {
+    // Pre-Payment Alpha: no wallet top-up path exists in production, so PPV
+    // unlocks (which spend wallet balance) are disabled outside test/dev.
+    if (!isInAppPaymentsEnabled()) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "In-app unlocks are not available during the Alpha. Coming soon.",
+        },
+        { status: 403 }
+      );
+    }
+
     // 路由层显式鉴权：未登录直接 401，不依赖下层隐式判断
     const { user } = await requireUser();
 

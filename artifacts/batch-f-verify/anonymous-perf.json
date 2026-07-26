@@ -1,0 +1,131 @@
+{
+  "timestamp": "2026-07-26T06:22:12.970Z",
+  "results": [
+    {
+      "viewport": "mb",
+      "route": "/auth",
+      "status": 200,
+      "ms": 869,
+      "file": "mb_auth.png"
+    },
+    {
+      "viewport": "mb",
+      "route": "/home",
+      "status": 200,
+      "ms": 885,
+      "file": "mb_home.png"
+    },
+    {
+      "viewport": "mb",
+      "route": "/pricing",
+      "status": 200,
+      "ms": 1273,
+      "file": "mb_pricing.png"
+    },
+    {
+      "viewport": "mb",
+      "route": "/terms",
+      "status": 200,
+      "ms": 1269,
+      "file": "mb_terms.png"
+    },
+    {
+      "viewport": "mb",
+      "route": "/privacy",
+      "status": 200,
+      "ms": 1273,
+      "file": "mb_privacy.png"
+    },
+    {
+      "viewport": "mb",
+      "route": "/faq",
+      "status": 200,
+      "ms": 1211,
+      "file": "mb_faq.png"
+    },
+    {
+      "viewport": "mb",
+      "route": "/search",
+      "status": 200,
+      "ms": 1186,
+      "file": "mb_search.png"
+    },
+    {
+      "viewport": "mb",
+      "route": "/creators",
+      "status": 200,
+      "ms": 1173,
+      "file": "mb_creators.png"
+    },
+    {
+      "viewport": "mb",
+      "route": "/support",
+      "status": 200,
+      "ms": 1251,
+      "file": "mb_support.png"
+    },
+    {
+      "viewport": "pc",
+      "route": "/auth",
+      "status": 200,
+      "ms": 873,
+      "file": "pc_auth.png"
+    },
+    {
+      "viewport": "pc",
+      "route": "/home",
+      "status": 200,
+      "ms": 861,
+      "file": "pc_home.png"
+    },
+    {
+      "viewport": "pc",
+      "route": "/pricing",
+      "status": 200,
+      "ms": 879,
+      "file": "pc_pricing.png"
+    },
+    {
+      "viewport": "pc",
+      "route": "/terms",
+      "status": 200,
+      "ms": 888,
+      "file": "pc_terms.png"
+    },
+    {
+      "viewport": "pc",
+      "route": "/privacy",
+      "status": 200,
+      "ms": 901,
+      "file": "pc_privacy.png"
+    },
+    {
+      "viewport": "pc",
+      "route": "/faq",
+      "status": 200,
+      "ms": 886,
+      "file": "pc_faq.png"
+    },
+    {
+      "viewport": "pc",
+      "route": "/search",
+      "status": 200,
+      "ms": 851,
+      "file": "pc_search.png"
+    },
+    {
+      "viewport": "pc",
+      "route": "/creators",
+      "status": 200,
+      "ms": 848,
+      "file": "pc_creators.png"
+    },
+    {
+      "viewport": "pc",
+      "route": "/support",
+      "status": 200,
+      "ms": 859,
+      "file": "pc_support.png"
+    }
+  ]
+}

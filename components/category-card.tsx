@@ -30,7 +30,7 @@ export function CategoryCard({
         "focus-visible:outline-none focus-visible:ring-[1.5px] focus-visible:ring-[var(--wine)]",
         "active:scale-[0.98]",
         active
-          ? "bg-[var(--wine-tint)] border-[var(--wine)] text-[var(--wine)]"
+          ? "bg-[var(--wine-tint)] border-[var(--wine)] text-wine-text"
           : "bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-default)] hover:text-[var(--text-primary)]",
         className
       )}

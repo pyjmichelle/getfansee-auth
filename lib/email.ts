@@ -125,6 +125,66 @@ export async function sendSupportTicketNotification(
   }
 }
 
+export interface NewsletterConfirmationParams {
+  toEmail: string;
+  confirmUrl: string;
+}
+
+/**
+ * Double opt-in confirmation email for newsletter signups (CAN-SPAM/GDPR).
+ *
+ * Returns `true` only if the email was actually handed off to the provider.
+ * Callers MUST check this — the double opt-in flow is only valid if the
+ * confirmation email really goes out; silently reporting success when Resend
+ * is unconfigured (or the send throws) would let users believe they're
+ * subscribed when no confirmation link was ever sent.
+ */
+export async function sendNewsletterConfirmation(
+  params: NewsletterConfirmationParams
+): Promise<boolean> {
+  const resend = getResend();
+  if (!resend) return false;
+
+  const body = `
+    <h2 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#f1f5f9;">Confirm your subscription</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#94a3b8;">
+      You (or someone using this email) asked to receive creator updates from GetFanSee.
+      Confirm below to start receiving them — otherwise no emails will be sent.
+    </p>
+
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center" style="padding:8px 0;">
+          <a href="${params.confirmUrl}" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:8px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;">
+            Confirm Subscription
+          </a>
+        </td>
+      </tr>
+    </table>
+
+    <p style="margin:24px 0 0;font-size:12px;color:#475569;text-align:center;">
+      If you didn't request this, you can safely ignore this email.
+    </p>
+  `;
+
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_ADDRESS,
+      to: params.toEmail,
+      subject: "Confirm your GetFanSee updates subscription",
+      html: baseEmailHtml("Confirm Subscription", body),
+    });
+    if (error) {
+      console.error("[email] Failed to send newsletter confirmation:", error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("[email] Failed to send newsletter confirmation:", err);
+    return false;
+  }
+}
+
 export interface SubscriptionConfirmationParams {
   toEmail: string;
   toName: string;

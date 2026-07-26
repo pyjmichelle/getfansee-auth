@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 // CenteredContainer no longer needed - using Figma max-w layout
@@ -24,7 +25,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { Analytics } from "@/lib/analytics";
 import { useCountUp } from "@/hooks/use-count-up";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
 // EmptyState no longer needed - using inline empty state
 
@@ -45,10 +46,12 @@ interface Transaction {
 
 export default function WalletPage() {
   const router = useRouter();
+  const auth = useAuth();
   const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === "true";
   const [isLoading, setIsLoading] = useState(true);
   // 测试模式下预填 mock 数据，避免异步加载延迟导致截图为空
   const [availableBalance, setAvailableBalance] = useState<number>(0);
+  const [pendingBalance, setPendingBalance] = useState<number>(0);
   const [transactions, setTransactions] = useState<Transaction[]>(
     isTestMode
       ? [
@@ -108,8 +111,7 @@ export default function WalletPage() {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
+        if (!auth.authenticated || !auth.user) {
           if (isTestMode) {
             setCurrentUser({
               username: "test-user",
@@ -124,28 +126,36 @@ export default function WalletPage() {
           return;
         }
 
-        const bootstrapUser = bootstrap.user;
+        const bootstrapUser = auth.user;
         setCurrentUserId(bootstrapUser.id);
         setCurrentUser({
-          username: bootstrap.profile?.display_name || bootstrapUser.email.split("@")[0] || "user",
-          role: (bootstrap.profile?.role || "fan") as "fan" | "creator",
-          avatar: bootstrap.profile?.avatar_url || undefined,
+          username: auth.profile?.display_name || bootstrapUser.email.split("@")[0] || "user",
+          role: (auth.profile?.role || "fan") as "fan" | "creator",
+          avatar: auth.profile?.avatar_url || undefined,
         });
 
         setIsLoading(false);
 
-        // 余额与交易记录异步加载，避免阻塞首屏
+        // 余额与交易记录异步加载，避免阻塞首屏；两者互不依赖，并行请求减少往返延迟。
         void (async () => {
           try {
             const userId = bootstrapUser.id;
-            const balanceData = await getWalletBalance(userId);
+            const [balanceData, transactionsData] = await Promise.all([
+              getWalletBalance(userId),
+              getTransactions(userId),
+            ]);
             if (!mounted) return;
+
             if (balanceData !== null && balanceData.available !== undefined) {
               setAvailableBalance(balanceData.available);
-            } else if (isTestMode) {
+              setPendingBalance(balanceData.pending ?? 0);
+              setTransactions(transactionsData);
+              return;
+            }
+
+            if (isTestMode) {
               // Test mode: no real wallet record found → show $0 balance.
               // E2E tests rely on this to verify zero-balance scenarios.
-              if (!mounted) return;
               setAvailableBalance(0);
               setTransactions([
                 {
@@ -176,8 +186,6 @@ export default function WalletPage() {
               return;
             }
 
-            const transactionsData = await getTransactions(userId);
-            if (!mounted) return;
             setTransactions(transactionsData);
           } catch (loadErr) {
             console.error("[wallet] background load error:", loadErr);
@@ -193,7 +201,7 @@ export default function WalletPage() {
     return () => {
       mounted = false;
     };
-  }, [router, isTestMode]);
+  }, [router, isTestMode, auth.authenticated, auth.user, auth.profile]);
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -211,6 +219,7 @@ export default function WalletPage() {
           getWalletBalance(currentUserId).then((balanceData) => {
             if (balanceData !== null && balanceData.available !== undefined) {
               setAvailableBalance(balanceData.available);
+              setPendingBalance(balanceData.pending ?? 0);
             }
           });
         }
@@ -348,20 +357,22 @@ export default function WalletPage() {
   const activeSubsCount = transactions.filter((t) => t.type === "subscription").length;
   const unlockCount = transactions.filter((t) => t.type === "ppv_purchase").length;
   const animatedBalance = useCountUp(availableBalance, { duration: 900, decimals: 2 });
+  const animatedPending = useCountUp(pendingBalance, { duration: 900, decimals: 2 });
   const animatedMonthlySpending = useCountUp(monthlySpending, { duration: 900, decimals: 2 });
   const animatedUnlocks = useCountUp(unlockCount, { duration: 800, decimals: 0 });
+  const isCreator = currentUser?.role === "creator";
 
   if (isLoading) {
     return (
       <PageShell user={currentUser} notificationCount={0} maxWidth="5xl">
         <div className="animate-pulse space-y-8 py-8">
-          <div className="h-32 bg-white/5 rounded-2xl"></div>
+          <div className="h-32 bg-surface-raised rounded-2xl"></div>
           <div className="grid grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-white/5 rounded-2xl"></div>
+              <div key={i} className="h-24 bg-surface-raised rounded-2xl"></div>
             ))}
           </div>
-          <div className="h-48 bg-white/5 rounded-2xl"></div>
+          <div className="h-48 bg-surface-raised rounded-2xl"></div>
         </div>
       </PageShell>
     );
@@ -370,47 +381,75 @@ export default function WalletPage() {
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
       <div data-testid="wallet-page">
-        {/* Hero Balance Card */}
+        {/* Hero Balance Card — role-aware: creators see withdrawable + pending
+            earnings first (F-005); Add Funds becomes a secondary action since
+            "top up to avoid missing drops" doesn't apply to a creator's own wallet. */}
         <div
           className="card-block bg-gradient-subtle p-6 md:p-8 relative overflow-hidden mb-6"
           data-testid="wallet-balance-section"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/10 to-brand-secondary/10" />
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-            <div>
-              <div className="text-text-tertiary mb-2 font-semibold text-sm">Available Balance</div>
+            <div className="flex-1">
+              <div className="text-text-tertiary mb-2 font-semibold text-small">
+                {isCreator ? "Available to Withdraw" : "Available Balance"}
+              </div>
               <div
-                className="text-4xl md:text-5xl font-bold text-gradient-primary mb-4"
+                className="text-h1 font-bold text-text-primary mb-1"
                 data-testid="wallet-balance-value"
               >
                 ${animatedBalance.toFixed(2)}
               </div>
-              <div className="flex gap-3">
-                <Button
-                  onClick={() => setShowAddFunds(true)}
-                  variant="default"
-                  className="px-5 py-2.5 bg-brand-primary text-white shadow-glow hover-bold flex items-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Funds
-                </Button>
+              {isCreator && (
+                <p className="text-small text-text-secondary mb-4">
+                  ${animatedPending.toFixed(2)} pending clearance
+                </p>
+              )}
+              <div className="flex flex-wrap gap-3 mt-4">
+                {isCreator ? (
+                  <>
+                    <Button asChild variant="default">
+                      <Link href="/creator/studio/earnings" className="flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4" />
+                        View Earnings
+                      </Link>
+                    </Button>
+                    <Button
+                      onClick={() => setShowAddFunds(true)}
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Funds
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    onClick={() => setShowAddFunds(true)}
+                    variant="default"
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Funds
+                  </Button>
+                )}
               </div>
             </div>
             <div className="w-20 h-20 rounded-2xl bg-brand-primary-alpha-10 flex items-center justify-center shrink-0">
-              <Wallet className="w-10 h-10 text-brand-primary" />
+              <Wallet className="w-10 h-10 text-wine-text" />
             </div>
           </div>
         </div>
 
-        {/* Low balance warning */}
-        {availableBalance < 20 && (
-          <div className="card-block p-4 border-warning/30 bg-warning/10 mb-6 flex items-start gap-3">
-            <div className="w-10 h-10 bg-warning/20 rounded-xl flex items-center justify-center shrink-0">
-              <AlertTriangle className="w-5 h-5 text-warning" />
+        {/* Low balance warning — fan-only; a creator's wallet running low isn't
+            a "you'll miss content" problem, so this messaging doesn't apply. */}
+        {!isCreator && availableBalance < 20 && (
+          <div className="card-block p-4 border-[var(--warning)]/30 bg-[var(--warning)]/10 mb-6 flex items-start gap-3">
+            <div className="w-10 h-10 bg-[var(--warning)]/20 rounded-xl flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-5 h-5 text-[var(--warning)]" />
             </div>
             <div className="flex-1">
-              <h4 className="font-bold text-warning mb-0.5">Low Balance</h4>
-              <p className="text-sm text-text-secondary">
+              <h4 className="font-bold text-[var(--warning)] mb-0.5 text-small">Low Balance</h4>
+              <p className="text-small text-text-secondary">
                 ${availableBalance.toFixed(2)} remaining. Top up to avoid missing premium drops.
               </p>
             </div>
@@ -418,7 +457,7 @@ export default function WalletPage() {
               variant="outline"
               size="sm"
               onClick={() => setShowAddFunds(true)}
-              className="border-warning/30 text-warning hover:bg-warning/10 shrink-0 active:scale-95"
+              className="border-[var(--warning)]/30 text-[var(--warning)] hover:bg-[var(--warning)]/10 shrink-0"
             >
               Top Up
             </Button>
@@ -434,19 +473,15 @@ export default function WalletPage() {
               className="card-block overflow-hidden mb-6 min-h-[400px]"
               data-testid="transaction-history"
             >
-              <div className="p-6 border-b border-border-base">
+              <div className="p-6 border-b border-border-default">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <h3 className="text-lg font-bold text-text-primary">Transaction History</h3>
-                  <div className="snap-row bg-surface-raised border border-border-base rounded-xl p-1">
+                  <h3 className="text-h4 font-bold text-text-primary">Transaction History</h3>
+                  <div className="snap-row bg-surface-raised border border-border-default rounded-xl p-1">
                     <Button
                       onClick={() => setFilterType("all")}
                       variant={filterType === "all" ? "default" : "ghost"}
                       size="sm"
-                      className={`rounded-lg ${
-                        filterType === "all"
-                          ? "bg-brand-primary text-white shadow-md"
-                          : "text-text-tertiary hover:bg-surface-overlay hover:text-text-primary"
-                      }`}
+                      className="rounded-lg"
                     >
                       All
                     </Button>
@@ -454,11 +489,7 @@ export default function WalletPage() {
                       onClick={() => setFilterType("added")}
                       variant={filterType === "added" ? "default" : "ghost"}
                       size="sm"
-                      className={`rounded-lg ${
-                        filterType === "added"
-                          ? "bg-brand-primary text-white shadow-md"
-                          : "text-text-tertiary hover:bg-surface-overlay hover:text-text-primary"
-                      }`}
+                      className="rounded-lg"
                     >
                       Added
                     </Button>
@@ -466,11 +497,7 @@ export default function WalletPage() {
                       onClick={() => setFilterType("spent")}
                       variant={filterType === "spent" ? "default" : "ghost"}
                       size="sm"
-                      className={`rounded-lg ${
-                        filterType === "spent"
-                          ? "bg-brand-primary text-white shadow-md"
-                          : "text-text-tertiary hover:bg-surface-overlay hover:text-text-primary"
-                      }`}
+                      className="rounded-lg"
                     >
                       Spent
                     </Button>
@@ -497,14 +524,14 @@ export default function WalletPage() {
                           {getTransactionType(transaction.type) === "recharge" ? (
                             <ArrowDown className="w-5 h-5 text-success" />
                           ) : (
-                            <ArrowUp className="w-5 h-5 text-brand-primary" />
+                            <ArrowUp className="w-5 h-5 text-wine-text" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="font-semibold mb-1 text-text-primary">
                             {getTransactionDescription(transaction)}
                           </div>
-                          <div className="text-sm text-text-tertiary">
+                          <div className="text-small text-text-tertiary">
                             {formatDistanceToNow(new Date(transaction.created_at), {
                               addSuffix: true,
                             })}
@@ -513,7 +540,7 @@ export default function WalletPage() {
                       </div>
                       <div className="text-right">
                         <div
-                          className={`text-lg font-bold ${
+                          className={`text-h4 font-bold ${
                             getTransactionType(transaction.type) === "recharge"
                               ? "text-success"
                               : "text-text-primary"
@@ -522,7 +549,7 @@ export default function WalletPage() {
                           {getTransactionType(transaction.type) === "recharge" ? "+" : "-"}$
                           {(transaction.amount_cents / 100).toFixed(2)}
                         </div>
-                        <div className="text-xs text-text-tertiary capitalize flex items-center gap-1 justify-end">
+                        <div className="text-tiny text-text-tertiary capitalize flex items-center gap-1 justify-end">
                           <CheckCircle className="w-3 h-3 text-success" />
                           {transaction.status}
                         </div>
@@ -538,7 +565,7 @@ export default function WalletPage() {
                     <Wallet className="w-7 h-7 text-text-quaternary" />
                   </div>
                   <h4 className="font-semibold mb-1 text-text-primary">No transactions</h4>
-                  <p className="text-sm text-text-tertiary">
+                  <p className="text-small text-text-tertiary">
                     No {filterType} transactions to display
                   </p>
                 </div>
@@ -547,12 +574,12 @@ export default function WalletPage() {
 
             {/* Checkout Disclaimer */}
             <div data-testid="checkout-disclaimer">
-              <div className="card-block p-5 text-sm text-text-tertiary space-y-2">
+              <div className="card-block p-5 text-small text-text-tertiary space-y-2">
                 <p data-testid="no-refund">
                   Your statement will show:{" "}
                   <strong className="text-text-secondary">GETFANSEE.COM</strong>. Refunds are
                   available in qualifying cases — see our{" "}
-                  <a href="/refund" className="text-brand-primary hover:underline">
+                  <a href="/refund" className="text-wine-text hover:underline">
                     Refund Policy
                   </a>
                   .
@@ -561,7 +588,7 @@ export default function WalletPage() {
                   By adding funds, you agree to our{" "}
                   <a
                     href="/terms"
-                    className="text-brand-primary hover:underline"
+                    className="text-wine-text hover:underline"
                     data-testid="terms-link"
                   >
                     Terms of Service
@@ -569,7 +596,7 @@ export default function WalletPage() {
                   and{" "}
                   <a
                     href="/privacy"
-                    className="text-brand-primary hover:underline"
+                    className="text-wine-text hover:underline"
                     data-testid="privacy-link"
                   >
                     Privacy Policy
@@ -584,10 +611,10 @@ export default function WalletPage() {
           <aside className="w-full lg:w-72 lg:shrink-0">
             <div className="sticky top-24 space-y-4">
               <div className="card-block p-5">
-                <h2 className="text-sm font-semibold text-text-primary mb-4">This Month</h2>
+                <h2 className="text-small font-semibold text-text-primary mb-4">This Month</h2>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-tertiary flex items-center gap-2">
+                    <span className="text-small text-text-tertiary flex items-center gap-2">
                       <TrendingUp className="w-3.5 h-3.5 text-error" />
                       Spending
                     </span>
@@ -596,57 +623,54 @@ export default function WalletPage() {
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-tertiary flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 text-brand-primary" />
+                    <span className="text-small text-text-tertiary flex items-center gap-2">
+                      <Calendar className="w-3.5 h-3.5 text-wine-text" />
                       Active Subs
                     </span>
-                    <span className="font-bold text-brand-primary">{activeSubsCount}</span>
+                    <span className="font-bold text-wine-text">{activeSubsCount}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-tertiary flex items-center gap-2">
-                      <Unlock className="w-3.5 h-3.5 text-brand-secondary" />
+                    <span className="text-small text-text-tertiary flex items-center gap-2">
+                      <Unlock className="w-3.5 h-3.5 text-wine-text" />
                       Unlocks
                     </span>
-                    <span className="font-bold text-brand-secondary">
-                      {animatedUnlocks.toFixed(0)}
-                    </span>
+                    <span className="font-bold text-wine-text">{animatedUnlocks.toFixed(0)}</span>
                   </div>
                   <div className="h-px bg-border-base" />
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-tertiary">Balance</span>
-                    <span className="font-bold text-gradient-primary">
+                    <span className="text-small text-text-tertiary">Balance</span>
+                    <span className="font-bold text-text-primary">
                       ${availableBalance.toFixed(2)}
                     </span>
                   </div>
                 </div>
               </div>
-              <Button
-                onClick={() => setShowAddFunds(true)}
-                className="w-full py-3 bg-brand-primary text-white hover-bold shadow-glow flex items-center justify-center gap-2"
-              >
+              <Button onClick={() => setShowAddFunds(true)} className="w-full">
                 <Plus className="w-4 h-4" />
                 Add Funds
               </Button>
 
               <div className="card-block p-4">
-                <h4 className="text-sm font-semibold text-text-primary mb-2">Why preload funds?</h4>
-                <ul className="space-y-1.5 text-xs text-text-tertiary">
+                <h4 className="text-small font-semibold text-text-primary mb-2">
+                  Why preload funds?
+                </h4>
+                <ul className="space-y-1.5 text-tiny text-text-tertiary">
                   <li className="flex items-start gap-2">
-                    <span className="text-brand-primary mt-0.5 shrink-0">&#10003;</span>
+                    <span className="text-wine-text mt-0.5 shrink-0">&#10003;</span>
                     <span>
                       <strong className="text-text-secondary">Instant access</strong> &mdash; Unlock
                       exclusive content without extra steps
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-brand-primary mt-0.5 shrink-0">&#10003;</span>
+                    <span className="text-wine-text mt-0.5 shrink-0">&#10003;</span>
                     <span>
                       <strong className="text-text-secondary">No interruptions</strong> &mdash; Tip
                       and subscribe without re-entering payment info
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-brand-primary mt-0.5 shrink-0">&#10003;</span>
+                    <span className="text-wine-text mt-0.5 shrink-0">&#10003;</span>
                     <span>
                       <strong className="text-text-secondary">Avoid failed transactions</strong>{" "}
                       &mdash; Prevent declined cards at the wrong moment
@@ -658,11 +682,48 @@ export default function WalletPage() {
           </aside>
         </div>
 
-        {/* Add Funds Modal - Figma Style */}
-        {showAddFunds && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-surface-base border border-border-base rounded-2xl max-w-md w-full shadow-2xl">
-              <div className="p-6 border-b border-border-base flex items-center justify-between">
+        {/* Add Funds Modal - Alpha: top-ups not yet available (mock flow kept for test mode / E2E) */}
+        {showAddFunds && !isTestMode && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[var(--z-modal)] flex items-center justify-center p-4">
+            <div className="bg-surface-base border border-border-default rounded-2xl max-w-md w-full shadow-2xl">
+              <div className="p-6 border-b border-border-default flex items-center justify-between">
+                <h3 className="text-xl font-bold text-text-primary">Add Funds</h3>
+                <Button
+                  onClick={() => setShowAddFunds(false)}
+                  variant="ghost"
+                  size="icon"
+                  className="w-10 h-10 rounded-xl hover:bg-surface-raised"
+                >
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+              <div className="p-6" data-testid="alpha-topup-notice">
+                <div className="w-14 h-14 bg-brand-primary-alpha-10 rounded-2xl flex items-center justify-center mb-4">
+                  <Wallet className="w-7 h-7 text-wine-text" />
+                </div>
+                <h4 className="text-h4 font-bold text-text-primary mb-2">
+                  Wallet top-ups are coming soon
+                </h4>
+                <p className="text-small text-text-secondary mb-4">
+                  During our Alpha, in-platform purchases are not yet enabled. You can still
+                  discover and follow creators for free, and support them directly through the
+                  verified links on their profiles.
+                </p>
+                <p className="text-tiny text-text-tertiary mb-6">
+                  Payments are launching in Beta. Active Alpha members will receive Founding Fan
+                  perks, including wallet credit, when payments go live.
+                </p>
+                <Button onClick={() => setShowAddFunds(false)} className="w-full px-6 py-3.5">
+                  Got it
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+        {showAddFunds && isTestMode && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[var(--z-modal)] flex items-center justify-center p-4">
+            <div className="bg-surface-base border border-border-default rounded-2xl max-w-md w-full shadow-2xl">
+              <div className="p-6 border-b border-border-default flex items-center justify-between">
                 <h3 className="text-xl font-bold text-text-primary">Add Funds</h3>
                 <Button
                   onClick={() => setShowAddFunds(false)}
@@ -676,7 +737,7 @@ export default function WalletPage() {
 
               <div className="p-6">
                 <div className="mb-6">
-                  <label className="block text-sm font-semibold mb-3 text-text-secondary">
+                  <label className="block text-small font-semibold mb-3 text-text-secondary">
                     Select Amount
                   </label>
                   <div className="grid grid-cols-3 gap-3 mb-4">
@@ -688,48 +749,52 @@ export default function WalletPage() {
                         variant="outline"
                         className={`relative w-full h-auto px-4 py-4 rounded-xl border-2 font-semibold ${
                           popular
-                            ? "border-brand-accent bg-brand-accent/10 shadow-glow-gold"
+                            ? "border-[var(--premium)] bg-[var(--premium-tint)]"
                             : selectedAmount === amt
-                              ? "border-brand-primary bg-brand-primary-alpha-10 text-brand-primary"
-                              : "border-border-base hover:border-brand-primary/50 hover:bg-surface-raised"
+                              ? "border-brand-primary bg-brand-primary-alpha-10 text-wine-text"
+                              : "border-border-default hover:border-brand-primary/50 hover:bg-surface-raised"
                         }`}
                       >
                         {popular && (
-                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-brand-accent text-white text-xs font-bold rounded-full whitespace-nowrap">
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-brand-accent text-white text-tiny font-bold rounded-full whitespace-nowrap">
                             POPULAR
                           </div>
                         )}
-                        <div className="text-xl font-bold mb-1">${amt}</div>
+                        <div className="text-h3 font-bold mb-1">${amt}</div>
                         {bonus > 0 && (
-                          <div className="text-xs text-success font-semibold">+${bonus} bonus</div>
+                          <div className="text-tiny text-success font-semibold">
+                            +${bonus} bonus
+                          </div>
                         )}
-                        {bonus === 0 && <div className="text-xs text-text-tertiary">No bonus</div>}
+                        {bonus === 0 && (
+                          <div className="text-tiny text-text-tertiary">No bonus</div>
+                        )}
                       </Button>
                     ))}
                   </div>
                 </div>
 
                 <div className="mb-6 p-4 rounded-xl bg-brand-primary/5 border border-brand-primary/10">
-                  <h4 className="text-sm font-semibold text-text-primary mb-2">
+                  <h4 className="text-small font-semibold text-text-primary mb-2">
                     Why preload funds on your account?
                   </h4>
-                  <ul className="space-y-1.5 text-xs text-text-tertiary">
+                  <ul className="space-y-1.5 text-tiny text-text-tertiary">
                     <li className="flex items-start gap-2">
-                      <span className="text-brand-primary mt-0.5">✓</span>
+                      <span className="text-wine-text mt-0.5">✓</span>
                       <span>
                         <strong className="text-text-secondary">Instant access</strong> — Unlock
                         exclusive content without extra steps
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-brand-primary mt-0.5">✓</span>
+                      <span className="text-wine-text mt-0.5">✓</span>
                       <span>
                         <strong className="text-text-secondary">No interruptions</strong> — Tip and
                         subscribe without re-entering payment info
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-brand-primary mt-0.5">✓</span>
+                      <span className="text-wine-text mt-0.5">✓</span>
                       <span>
                         <strong className="text-text-secondary">Avoid failed transactions</strong> —
                         Prevent declined cards at the wrong moment
@@ -739,7 +804,7 @@ export default function WalletPage() {
                 </div>
 
                 <div className="mb-6">
-                  <label className="block text-sm font-semibold mb-3 text-text-secondary">
+                  <label className="block text-small font-semibold mb-3 text-text-secondary">
                     Payment Method
                   </label>
                   <Button
@@ -751,7 +816,7 @@ export default function WalletPage() {
                     </div>
                     <div className="text-left">
                       <div className="font-semibold text-text-primary">Credit/Debit Card</div>
-                      <div className="text-sm text-text-tertiary">Visa, Mastercard, Amex</div>
+                      <div className="text-small text-text-tertiary">Visa, Mastercard, Amex</div>
                     </div>
                   </Button>
                 </div>
@@ -779,7 +844,8 @@ export default function WalletPage() {
                     disabled={!selectedAmount || isRecharging}
                     onClick={handleRecharge}
                     data-testid="recharge-submit-button"
-                    className="w-full px-6 py-3.5 bg-brand-primary text-white hover:bg-brand-primary-subtle disabled:opacity-50 shadow-lg shadow-brand-primary/25"
+                    className="w-full px-6 py-3.5 disabled:opacity-50"
+                    loading={isRecharging}
                   >
                     {isRecharging
                       ? "Processing..."
@@ -793,7 +859,7 @@ export default function WalletPage() {
                       setShowAddFunds(false);
                       setSelectedAmount(null);
                     }}
-                    className="w-full px-6 py-3.5 bg-surface-raised border-border-base hover:bg-surface-overlay"
+                    className="w-full px-6 py-3.5 bg-surface-raised border-border-default hover:bg-surface-overlay"
                   >
                     Cancel
                   </Button>

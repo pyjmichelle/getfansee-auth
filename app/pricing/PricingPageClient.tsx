@@ -1,0 +1,287 @@
+"use client";
+
+import Link from "next/link";
+import { CheckCircle, Info, CreditCard, Sparkles, Users, Shield } from "@/lib/icons";
+import { Button } from "@/components/ui/button";
+import { PageShell } from "@/components/page-shell";
+import { useAuth } from "@/contexts/auth-context";
+
+const fanFeatures = [
+  "Access all free creator posts",
+  "Follow unlimited creators",
+  "Direct messaging (limited)",
+  "Browse creator profiles",
+];
+
+const subscriberFeatures = [
+  "Full access to a creator's exclusive content",
+  "Unlock all subscriber-only posts & photos",
+  "Unlock all subscriber-only videos",
+  "Priority DMs with your subscribed creators",
+  "Cancel anytime — no hidden fees",
+];
+
+const creatorFeatures = [
+  "Set your own monthly subscription price",
+  "Sell pay-per-view posts & videos",
+  "Keep 80% of all earnings",
+  "Creator analytics dashboard",
+  "Direct messaging with fans",
+  "Payout every month (minimum threshold applies)",
+];
+
+export function PricingPageClient() {
+  const auth = useAuth();
+  const user =
+    auth.authenticated && auth.profile
+      ? {
+          username: auth.profile.display_name || "user",
+          role: (auth.profile.role === "creator" ? "creator" : "fan") as "fan" | "creator",
+          avatar: auth.profile.avatar_url || undefined,
+        }
+      : null;
+
+  return (
+    <PageShell user={user} maxWidth="5xl">
+      {/* Header */}
+      <div className="text-center mb-12">
+        <h1 className="text-display text-text-primary mb-4">Simple, Transparent Pricing</h1>
+        <p className="text-text-secondary text-body max-w-2xl mx-auto">
+          No surprise charges. No hidden fees. You always see exactly what you&apos;ll pay before
+          confirming a purchase — and what will appear on your bank statement.
+        </p>
+      </div>
+
+      {/* Alpha phase notice */}
+      <div className="card-block bg-[var(--wine)]/5 border border-[var(--wine)]/20 rounded-xl p-4 flex gap-3 items-start mb-6">
+        <Sparkles className="w-5 h-5 text-wine-text shrink-0 mt-0.5" />
+        <div>
+          <p className="text-small font-semibold text-wine-text mb-0.5">
+            We&apos;re currently in Alpha
+          </p>
+          <p className="text-small text-text-secondary">
+            In-platform payments are not enabled yet — browsing, following and saving creators is
+            completely free. Creators who join during Alpha become{" "}
+            <strong className="text-text-primary">Founding Creators</strong> and pay{" "}
+            <strong className="text-text-primary">0% platform commission</strong> when payments
+            launch in Beta. Standard pricing below applies from general availability.{" "}
+            <Link href="/beta-terms" className="text-wine-text underline hover:no-underline">
+              Beta Program Terms →
+            </Link>
+          </p>
+        </div>
+      </div>
+
+      {/* Billing Descriptor Notice */}
+      <div className="card-block bg-brand-accent/10 border border-brand-accent/20 rounded-xl p-4 flex gap-3 items-start mb-10">
+        <CreditCard className="w-5 h-5 text-brand-accent shrink-0 mt-0.5" />
+        <div>
+          <p className="text-small font-semibold text-brand-accent mb-0.5">
+            Bank Statement Descriptor
+          </p>
+          <p className="text-small text-text-secondary">
+            All charges from GetFanSee will appear on your bank or credit card statement as{" "}
+            <strong className="text-text-primary font-mono">GETFANSEE.COM</strong>. You will always
+            receive an email receipt after every transaction.
+          </p>
+        </div>
+      </div>
+
+      {/* Fan / Free Tier */}
+      <div className="grid md:grid-cols-2 gap-6 mb-10">
+        {/* Free Fan */}
+        <div className="card-block p-6 rounded-2xl border border-border-base flex flex-col">
+          <div className="mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-raised text-text-secondary text-tiny font-medium mb-3">
+              <Users className="w-3.5 h-3.5" />
+              Fan Account
+            </div>
+            <div className="flex items-end gap-2 mb-1">
+              <span className="text-h1 text-text-primary">Free</span>
+            </div>
+            <p className="text-text-tertiary text-small">No credit card required</p>
+          </div>
+
+          <ul className="space-y-2.5 flex-1 mb-6">
+            {fanFeatures.map((f) => (
+              <li key={f} className="flex items-start gap-2.5 text-small text-text-secondary">
+                <CheckCircle className="w-4 h-4 text-success shrink-0 mt-0.5" />
+                {f}
+              </li>
+            ))}
+          </ul>
+
+          <Link href="/auth">
+            <Button variant="outline" className="w-full">
+              Create Free Account
+            </Button>
+          </Link>
+        </div>
+
+        {/* Creator Subscription (fan side) */}
+        <div className="card-block p-6 rounded-2xl border border-[var(--border-wine)]/40 bg-[var(--wine)]/5 flex flex-col relative overflow-hidden">
+          <div className="absolute top-0 right-0 bg-[var(--wine)] text-white text-tiny font-semibold px-3 py-1 rounded-bl-xl">
+            Most Popular
+          </div>
+          <div className="mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--wine)]/10 text-wine-text text-tiny font-medium mb-3">
+              <Sparkles className="w-3.5 h-3.5" />
+              Creator Subscription
+            </div>
+            <div className="flex items-end gap-2 mb-1">
+              <span className="text-h1 text-text-primary">Creator&apos;s price</span>
+            </div>
+            <p className="text-text-tertiary text-small">
+              Each creator sets their own monthly subscription price. Prices typically range from{" "}
+              <strong className="text-text-secondary">$4.99 – $49.99 / month</strong>.
+            </p>
+          </div>
+
+          <ul className="space-y-2.5 flex-1 mb-6">
+            {subscriberFeatures.map((f) => (
+              <li key={f} className="flex items-start gap-2.5 text-small text-text-secondary">
+                <CheckCircle className="w-4 h-4 text-success shrink-0 mt-0.5" />
+                {f}
+              </li>
+            ))}
+          </ul>
+
+          <div className="bg-surface-raised rounded-lg p-3 mb-4 text-tiny text-text-tertiary">
+            <strong className="text-text-secondary">Recurring billing notice:</strong> Subscriptions
+            renew automatically each month on the date you subscribed. You will be charged the same
+            amount unless you cancel before the renewal date.
+          </div>
+
+          <Link href="/creators">
+            <Button className="w-full">Browse Creators</Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* PPV Section */}
+      <div className="card-block p-6 rounded-2xl border border-border-base mb-10">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 rounded-lg bg-[var(--wine)]/10 flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-wine-text" />
+          </div>
+          <h2 className="text-h3 text-text-primary">Pay-Per-View (PPV)</h2>
+        </div>
+        <p className="text-text-secondary mb-4">
+          Some creators offer individual posts, photos, or videos for a one-time unlock fee. PPV
+          content is in addition to (or instead of) a subscription. Each PPV post clearly displays
+          its price before you unlock it.
+        </p>
+        <div className="grid sm:grid-cols-3 gap-3">
+          {[
+            { label: "Typical PPV range", value: "$1.99 – $49.99" },
+            { label: "Billing", value: "One-time charge" },
+            { label: "Refund eligibility", value: "See Refund Policy" },
+          ].map((item) => (
+            <div key={item.label} className="bg-surface-raised p-3 rounded-lg">
+              <p className="text-tiny text-text-tertiary mb-1">{item.label}</p>
+              <p className="text-small font-semibold text-text-primary">{item.value}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-tiny text-text-tertiary mt-4">
+          PPV purchases are generally non-refundable once content has been accessed. See our{" "}
+          <Link href="/refund" className="text-wine-text underline hover:no-underline">
+            Refund &amp; Cancellation Policy
+          </Link>{" "}
+          for full details.
+        </p>
+      </div>
+
+      {/* Creator Earnings */}
+      <div className="card-block p-6 rounded-2xl border border-border-base mb-10">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
+            <Shield className="w-4 h-4 text-success" />
+          </div>
+          <h2 className="text-h3 text-text-primary">Creator Earnings</h2>
+        </div>
+        <p className="text-text-secondary mb-6">
+          From general availability, creators keep{" "}
+          <strong className="text-text-primary">80%</strong> of all subscription and PPV revenue.
+          GetFanSee retains a <strong className="text-text-primary">20% platform fee</strong> to
+          cover payment processing, infrastructure, moderation, and support.{" "}
+          <strong className="text-text-primary">Founding Creators</strong> (joined during Alpha) pay{" "}
+          <strong className="text-text-primary">0% commission</strong> during their Beta window —
+          see{" "}
+          <Link href="/beta-terms" className="text-wine-text underline hover:no-underline">
+            Beta Program Terms
+          </Link>
+          .
+        </p>
+
+        <div className="grid sm:grid-cols-2 gap-4 mb-6">
+          <div className="bg-surface-raised p-4 rounded-xl">
+            <p className="text-tiny text-text-tertiary mb-2">Creator keeps</p>
+            <p className="text-h2 text-success">80%</p>
+            <p className="text-tiny text-text-tertiary mt-1">of every subscription &amp; PPV</p>
+          </div>
+          <div className="bg-surface-raised p-4 rounded-xl">
+            <p className="text-tiny text-text-tertiary mb-2">Platform fee</p>
+            <p className="text-h2 text-text-secondary">20%</p>
+            <p className="text-tiny text-text-tertiary mt-1">
+              covers payment processing, hosting &amp; support
+            </p>
+          </div>
+        </div>
+
+        <ul className="space-y-2">
+          {creatorFeatures.map((f) => (
+            <li key={f} className="flex items-start gap-2.5 text-small text-text-secondary">
+              <CheckCircle className="w-4 h-4 text-success shrink-0 mt-0.5" />
+              {f}
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-6">
+          <Link href="/creator/upgrade">
+            <Button variant="outline" className="w-full sm:w-auto">
+              Become a Creator →
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Cancellation & FAQ strip */}
+      <div className="card-block bg-surface-raised p-5 rounded-2xl border border-border-base mb-6">
+        <div className="flex gap-3 items-start">
+          <Info className="w-5 h-5 text-text-tertiary shrink-0 mt-0.5" />
+          <div className="space-y-2 text-small text-text-secondary">
+            <p>
+              <strong className="text-text-primary">How to cancel:</strong> Log in → go to{" "}
+              <Link href="/subscriptions" className="text-wine-text underline hover:no-underline">
+                My Subscriptions
+              </Link>{" "}
+              → click Cancel next to any subscription. Cancellation takes effect at the end of your
+              current billing period. You will not be charged again.
+            </p>
+            <p>
+              <strong className="text-text-primary">Refunds:</strong> Subscription charges may be
+              refunded within 14 days under qualifying circumstances. PPV content is generally
+              non-refundable once accessed.{" "}
+              <Link href="/refund" className="text-wine-text underline hover:no-underline">
+                Full Refund Policy →
+              </Link>
+            </p>
+            <p>
+              <strong className="text-text-primary">Questions?</strong>{" "}
+              <Link href="/faq" className="text-wine-text underline hover:no-underline">
+                Read the FAQ
+              </Link>{" "}
+              or{" "}
+              <Link href="/support" className="text-wine-text underline hover:no-underline">
+                contact support
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+      </div>
+    </PageShell>
+  );
+}

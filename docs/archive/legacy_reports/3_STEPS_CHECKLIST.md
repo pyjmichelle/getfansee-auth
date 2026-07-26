@@ -25,9 +25,9 @@
 1. **打开终端** → 在项目目录下
 2. **打开文件** → 运行 `open .env.local`（Mac）或 `notepad .env.local`（Windows）
 3. **检查是否存在** → 查找 `SUPABASE_SERVICE_ROLE_KEY=`
-4. **如果不存在** → 在文件末尾添加一行：
+4. **如果不存在** → 在文件末尾添加一行（值从 Supabase Dashboard → Settings → API → service_role 复制）：
    ```
-   SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZG9ta3lnanB1anh5aXZ3dmlxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDQ4ODQ2NywiZXhwIjoyMDgwMDY0NDY3fQ.aDk8dVJfxCxxoGjejRje7-O-keDq59Bvw9oL7IsPIH4
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
    ```
 5. **保存文件** → `Cmd+S` 或 `Ctrl+S`
 

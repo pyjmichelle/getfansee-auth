@@ -102,9 +102,9 @@ function SheetContent({
             "absolute top-4 right-4",
             "size-6 rounded-[var(--radius-xs)]",
             "flex items-center justify-center",
-            "text-white/40 hover:text-white hover:bg-white/10",
+            "text-text-muted hover:text-text-primary hover:bg-white/10",
             "transition-colors duration-150",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-violet-500/40"
+            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--wine)]/40"
           )}
         >
           <XIcon className="size-3.5" />
@@ -139,7 +139,7 @@ function SheetTitle({ className, ...props }: React.ComponentProps<typeof SheetPr
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
-      className={cn("text-[14px] font-semibold text-white leading-tight", className)}
+      className={cn("text-h4 font-semibold text-text-primary leading-tight", className)}
       {...props}
     />
   );
@@ -152,7 +152,7 @@ function SheetDescription({
   return (
     <SheetPrimitive.Description
       data-slot="sheet-description"
-      className={cn("text-text-muted text-[12px]", className)}
+      className={cn("text-text-muted text-tiny", className)}
       {...props}
     />
   );

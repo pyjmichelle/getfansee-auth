@@ -8,8 +8,33 @@ type RechargePayload = {
   amount: number; // 美元金额
 };
 
+/**
+ * Mock recharge is a TEST/DEV-ONLY facility (used by E2E suites).
+ * During the Pre-Payment Alpha there is no real fiat top-up path, so this
+ * endpoint is hard-disabled in production to avoid presenting a fake
+ * payment flow to real users.
+ */
+function isMockRechargeAllowed(): boolean {
+  return (
+    process.env.E2E === "1" ||
+    process.env.PLAYWRIGHT_TEST_MODE === "true" ||
+    process.env.NEXT_PUBLIC_TEST_MODE === "true" ||
+    process.env.NODE_ENV === "development"
+  );
+}
+
 export async function POST(request: NextRequest) {
   try {
+    if (!isMockRechargeAllowed()) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Wallet top-ups are not available during the Alpha. Coming soon.",
+        },
+        { status: 403 }
+      );
+    }
+
     // 路由层显式鉴权（验证用户身份，后续使用 admin client 避免 auth.uid() 问题）
     const { user } = await requireUser();
 

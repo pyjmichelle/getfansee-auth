@@ -1,0 +1,62 @@
+---
+description: GetFanSee Noir Cabaret v5 Design System Rules — enforced for all UI/component code.
+scope: GLOBAL
+priority: HIGH
+alwaysApply: true
+---
+
+# Design System: Noir Cabaret v5
+
+Source of truth: `DESIGN.md` in repo root.
+v5 palette: `--wine #8B313A`, `--bg-base #0B0B0D`, `--bg-raised #302222`, `--error #C13D26`, text ramp `#B5A9AC/#82767A`.
+
+## Color Rules (MANDATORY)
+
+### Allowed tokens (use ONLY these in className):
+- `var(--wine)` — primary CTA, subscribe, unlock, tip buttons, active states. **FILL/BORDER ONLY on dark bg — never as text color, at any size (2.43:1, fails both the 4.5:1 normal-text and 3:1 large-text WCAG AA floors on `--bg-base`)**
+- `var(--wine-hover)` / `var(--wine-active)` / `var(--wine-tint)` — wine hover/active/tint (also fill/border only — `--wine-hover` is 3.07:1, still short of 4.5:1 for text)
+- `var(--wine-text)` / `text-wine-text` — the ONLY wine token allowed as a text color on dark bg (same hue, lifted lightness, 4.5:1+). Use this everywhere `text-[var(--wine)]`, `text-brand-primary`, or `text-brand-secondary` used to appear as a text-color utility (273 call sites migrated in the 2026-07 UI root-cause pass)
+- `var(--premium)` — verified badge, supporter, paid identity only
+- `var(--premium-hover)` / `var(--premium-tint)` — premium hover/tint
+- `var(--bg-base)` / `var(--bg-surface)` / `var(--bg-raised)` — backgrounds
+- `var(--text-primary)` / `var(--text-secondary)` / `var(--text-muted)` / `var(--text-disabled)`
+- `var(--border-subtle)` / `var(--border-default)` / `var(--border-strong)` / `var(--border-wine)`
+- `var(--success)` / `var(--error)` / `var(--warning)` / `var(--info)` — semantic only
+- `var(--error-text)` — error text on dark bg (`--error` itself is toast/fill bg only for small text)
+
+### FORBIDDEN (will be rejected by CI):
+- ❌ `violet-NNN`, `purple-NNN`, `indigo-NNN` — old Midnight Neon
+- ❌ `amber-NNN` (except `var(--premium)`) — old gold
+- ❌ `shadow-glow-*` — no glow effects
+- ❌ Hardcoded hex colors in className (#8B5CF6, #6366F1, etc.)
+- ❌ Gradient text (use solid color)
+- ❌ `from-violet-*`, `from-purple-*`, `from-indigo-*`, `from-amber-*` gradients
+- ❌ Decorative emojis in TSX (✦ ⭐ 🎉 🚀 ✓ 🏆) — use Lucide icons
+
+## Font Rules
+- Body text: `font-sans` → Hanken Grotesk via `--font-hanken`
+- Display/h1 only: `font-display` → Fraunces via `--font-fraunces`
+- Base font size: 16px (html element)
+- **Typography scale is MANDATORY via utility classes** (globals.css §7): `.text-display/.text-h1/.text-h2/.text-h3/.text-h4/.text-body-lg/.text-body/.text-small/.text-tiny` — each carries responsive MB→PC sizing per DESIGN.md §2
+- **FORBIDDEN**: hand-rolled content font sizes in pages (`text-sm`, `text-lg`, `text-[15px]`, etc.). Tailwind size classes allowed only inside self-contained micro-components (Badge/Button internals)
+
+## Button Rules
+- 3 sizes only: `size="sm"` (32px) / `size="md"` (40px, default) / `size="lg"` (48px)
+- Mobile primary CTA: always `size="lg"`
+- Primary action (Subscribe/Unlock/Tip): `variant="default"` (wine)
+- Premium identity only: `variant="premium"` (champagne gold)
+- No gradient variants: `gradient`, `violet`, `gold`, `rose`, `purple` are all removed
+
+## Layout Rules (Anti-AI)
+- No homogenous card grids (equal-size icon+title+description×N)
+- No fully-centered hero stacks (centered title + centered subtitle + centered button)
+- No ALL-CAPS eyebrow labels (AVAILABLE BALANCE, 01/02/03 numbering)
+- 8pt grid only: use Tailwind's p-2/4/6/8/12/16 (4/8/12/16/24/32px)
+- Container widths: feed=max-w-2xl, studio=max-w-6xl, admin=max-w-6xl, legal=max-w-3xl (single source of truth: every `<PageShell>` call site must pass an explicit `maxWidth` or `noPadding` — never rely on the bare default)
+
+## Interaction States (required for all interactive components)
+- `hover`: color/border transition 150ms, NO translateY or scale
+- `focus-visible`: 1.5px wine ring + 2px offset
+- `active`: `active:scale-[0.98]` (NOT `active:scale-95`)
+- `disabled`: 40% opacity + cursor-not-allowed
+- Touch targets: min 44px height on mobile

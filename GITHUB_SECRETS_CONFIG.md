@@ -2,25 +2,11 @@
 
 ## 📋 你的 Supabase 配置信息
 
-以下是从你的 `.env.local` 文件中提取的配置:
+⚠️ **不要在此文件或任何提交的文件中粘贴真实密钥值** — 只在 GitHub Secrets UI 或本地 `.env.local` 中填写。从 Supabase Dashboard → Settings → API 获取以下三项，直接粘贴到 Step 2 的 GitHub Secrets 表单，不要落盘到仓库文件：
 
-### 1. NEXT_PUBLIC_SUPABASE_URL
-
-```
-https://ordomkygjpujxyivwviq.supabase.co
-```
-
-### 2. NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZG9ta3lnanB1anh5aXZ3dmlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODg0NjcsImV4cCI6MjA4MDA2NDQ2N30.iEWC-l8_s4Vx3wk5Eycp_u1OI36FNvSTKDTL37ReNxo
-```
-
-### 3. SUPABASE_SERVICE_ROLE_KEY
-
-```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZG9ta3lnanB1anh5aXZ3dmlxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDQ4ODQ2NywiZXhwIjoyMDgwMDY0NDY3fQ.aDk8dVJfxCxxoGjejRje7-O-keDq59Bvw9oL7IsPIH4
-```
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
 
 ---
 
@@ -38,10 +24,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZG9ta3l
 
 1. 点击 **"New repository secret"**
 2. Name: `NEXT_PUBLIC_SUPABASE_URL`
-3. Value: 复制粘贴以下内容
-   ```
-   https://ordomkygjpujxyivwviq.supabase.co
-   ```
+3. Value: 从 Supabase Dashboard → Settings → API → Project URL 复制粘贴
 4. 点击 **"Add secret"**
 
 ---
@@ -50,10 +33,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZG9ta3l
 
 1. 点击 **"New repository secret"**
 2. Name: `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-3. Value: 复制粘贴以下内容
-   ```
-   eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZG9ta3lnanB1anh5aXZ3dmlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0ODg0NjcsImV4cCI6MjA4MDA2NDQ2N30.iEWC-l8_s4Vx3wk5Eycp_u1OI36FNvSTKDTL37ReNxo
-   ```
+3. Value: 从 Supabase Dashboard → Settings → API → anon public 复制粘贴
 4. 点击 **"Add secret"**
 
 ---
@@ -62,10 +42,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZG9ta3l
 
 1. 点击 **"New repository secret"**
 2. Name: `SUPABASE_SERVICE_ROLE_KEY`
-3. Value: 复制粘贴以下内容
-   ```
-   eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZG9ta3lnanB1anh5aXZ3dmlxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDQ4ODQ2NywiZXhwIjoyMDgwMDY0NDY3fQ.aDk8dVJfxCxxoGjejRje7-O-keDq59Bvw9oL7IsPIH4
-   ```
+3. Value: 从 Supabase Dashboard → Settings → API → service_role 复制粘贴（⚠️ 最高权限，务必妥善保管）
 4. 点击 **"Add secret"**
 
 ---

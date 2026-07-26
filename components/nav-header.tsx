@@ -16,6 +16,7 @@ import {
   LogOut,
   Wallet,
   X,
+  Users,
 } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -30,8 +31,20 @@ import { AccountPanel } from "@/components/account-panel";
 import { cn } from "@/lib/utils";
 import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
 import { startRouteTransition } from "@/lib/perf-client";
+import { useAuth } from "@/contexts/auth-context";
 
 interface NavHeaderProps {
+  /**
+   * @deprecated Identity (username/role/avatar) now comes straight from
+   * `useAuth()` — the root layout injects `initialAuth` server-side, so it is
+   * available synchronously on first paint. Passing `user` here used to be
+   * the ONLY source of truth, and every page had to re-derive it via its own
+   * client-side effect; that copy always lagged one render behind the
+   * already-resolved auth context, which is why NavHeader would flash
+   * "Sign In" for a frame on ~30 pages even for logged-in users. `user` is
+   * kept only to source `creatorStatus`, which isn't part of the shared auth
+   * context yet.
+   */
   user?: {
     username: string;
     role: "fan" | "creator";
@@ -41,9 +54,19 @@ interface NavHeaderProps {
   notificationCount?: number;
 }
 
-export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
+export function NavHeader({ user: legacyUserProp, notificationCount = 0 }: NavHeaderProps) {
+  const auth = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+
+  const user = auth.authenticated
+    ? {
+        username: auth.profile?.display_name || auth.user?.email?.split("@")[0] || "user",
+        role: (auth.profile?.role === "creator" ? "creator" : "fan") as "fan" | "creator",
+        avatar: auth.profile?.avatar_url || undefined,
+        creatorStatus: legacyUserProp?.creatorStatus,
+      }
+    : undefined;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchActive, setSearchActive] = useState(false);
   const [searchInput, setSearchInput] = useState("");
@@ -74,9 +97,9 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
   const navItemClass = (active: boolean | undefined) =>
     cn(
       "flex items-center gap-3 w-full h-10 px-3 rounded-[var(--radius-sm)]",
-      "text-[13px] font-medium transition-[background-color,color] duration-100",
+      "text-small font-medium transition-[background-color,color] duration-100",
       active
-        ? "bg-violet-500/10 text-white border-l-2 border-violet-500"
+        ? "bg-[var(--wine)]/10 text-white border-l-2 border-[var(--wine)]"
         : "text-text-secondary hover:bg-white/5 hover:text-white"
     );
 
@@ -170,13 +193,13 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
 
   return (
     <header
-      className="sticky top-0 w-full glass-nav"
-      style={{
-        zIndex: "var(--z-nav)" as unknown as number,
-        paddingTop: "env(safe-area-inset-top)",
-      }}
+      className="sticky top-0 w-full glass-nav safe-area-top"
+      style={{ zIndex: "var(--z-nav)" as unknown as number }}
     >
-      <div className="flex h-12 md:h-[52px] items-center justify-between px-3 md:px-5 max-w-[1280px] mx-auto">
+      <div
+        className="flex items-center justify-between px-3 md:px-5 max-w-[1280px] mx-auto"
+        style={{ height: "var(--nav-height)" }}
+      >
         {/* Logo */}
         <Link
           href="/home"
@@ -185,12 +208,26 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
           onTouchStart={() => warmRoute("/home")}
           onClick={() => trackRouteStart("/home")}
         >
-          <div className="w-7 h-7 rounded-[var(--radius-sm)] bg-gradient-to-br from-violet-600 to-violet-400 flex items-center justify-center shadow-glow-violet group-hover:shadow-glow-violet-lg transition-shadow duration-200">
-            <span className="text-white font-bold text-[13px]">G</span>
+          <div className="w-7 h-7 rounded-[var(--radius-sm)] bg-gradient-to-br from-[var(--wine)] to-[var(--wine)] flex items-center justify-center  group-hover: transition-shadow duration-200">
+            <span className="text-white font-bold text-small">G</span>
           </div>
           <span className="font-bold text-[15px] hidden md:inline text-white tracking-tight">
             GetFanSee
           </span>
+        </Link>
+
+        {/* Desktop: creators directory link */}
+        <Link
+          href="/creators"
+          className={cn(
+            "hidden md:inline-flex items-center ml-5 text-small font-medium transition-colors",
+            pathname === "/creators" ? "text-white" : "text-text-muted hover:text-white"
+          )}
+          onMouseEnter={() => warmRoute("/creators")}
+          onClick={() => trackRouteStart("/creators")}
+          data-testid="nav-creators-link"
+        >
+          Creators
         </Link>
 
         {/* Desktop search bar — inline expandable */}
@@ -214,7 +251,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                     }
                   }}
                   placeholder="Search creators, tags..."
-                  className="glass-input w-full h-8 pl-9 pr-8 text-[13px] text-white placeholder:text-text-muted focus:outline-none"
+                  className="glass-input w-full h-8 pl-9 pr-8 text-small text-white placeholder:text-text-muted focus:outline-none"
                   autoFocus
                   aria-label="Search creators"
                   data-testid="search-input"
@@ -229,12 +266,12 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
               </div>
               {/* data-testid matches QA gate selector for search modal */}
               {searchInput.length >= 2 && (
-                <div className="absolute top-full left-0 right-0 mt-1.5 rounded-xl border border-white/8 bg-[#14141e]/96 backdrop-blur-xl shadow-2xl z-[100] overflow-hidden">
+                <div className="absolute top-full left-0 right-0 mt-1.5 rounded-xl border border-white/8 bg-[#14141e]/96 backdrop-blur-xl shadow-2xl z-[var(--z-dropdown)] overflow-hidden">
                   {isSearching && (
-                    <p className="px-4 py-3 text-[13px] text-text-muted">Searching…</p>
+                    <p className="px-4 py-3 text-small text-text-muted">Searching…</p>
                   )}
                   {!isSearching && searchResults.length === 0 && (
-                    <p className="px-4 py-3 text-[13px] text-text-muted">No creators found</p>
+                    <p className="px-4 py-3 text-small text-text-muted">No creators found</p>
                   )}
                   {!isSearching &&
                     searchResults.map((result) => (
@@ -246,19 +283,19 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                       >
                         <Avatar className="size-7 shrink-0">
                           <AvatarImage src={result.avatar} />
-                          <AvatarFallback className="text-[10px] bg-violet-500/20 text-violet-300">
+                          <AvatarFallback className="text-[10px] bg-[var(--wine)]/20 text-wine-text">
                             {result.name[0]}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="text-[13px] text-white font-medium">{result.name}</p>
-                          <p className="text-[11px] text-text-muted">@{result.username}</p>
+                          <p className="text-small text-white font-medium">{result.name}</p>
+                          <p className="text-tiny text-text-muted">@{result.username}</p>
                         </div>
                       </Link>
                     ))}
                   <Link
                     href={`/search?q=${encodeURIComponent(searchInput)}`}
-                    className="flex items-center gap-2 px-4 py-2.5 border-t border-white/6 text-[12px] text-violet-400 hover:bg-white/5 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2.5 border-t border-white/6 text-tiny text-wine-text hover:bg-white/5 transition-colors"
                     onClick={closeSearch}
                   >
                     <Search className="size-[12px]" />
@@ -273,7 +310,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
               className={cn(
                 "w-full flex items-center gap-2 h-8 px-3",
                 "glass-input rounded-[var(--radius-sm)]",
-                "text-[13px] text-white/30",
+                "text-small text-white/30",
                 "hover:border-white/15 hover:text-white/50 transition-[border-color,color] duration-150"
               )}
               aria-label="Search creators, tags..."
@@ -342,7 +379,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                   {notificationCount > 0 && (
                     <Badge
                       variant="purple"
-                      className="absolute -top-0.5 -right-0.5 h-[18px] min-w-[18px] flex items-center justify-center p-0 text-[10px] rounded-full bg-violet-500 text-white border-none"
+                      className="absolute -top-0.5 -right-0.5 h-[18px] min-w-[18px] flex items-center justify-center p-0 text-[10px] rounded-full bg-[var(--wine)] text-white border-none"
                     >
                       {notificationCount > 9 ? "9+" : notificationCount}
                     </Badge>
@@ -378,7 +415,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-[14px] text-white truncate">
+                        <p className="font-semibold text-small text-white truncate">
                           {user.username}
                         </p>
                         <div className="flex items-center gap-1.5 mt-1">
@@ -402,7 +439,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                   </div>
 
                   <nav className="flex flex-col px-4 pb-4 gap-0.5">
-                    <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-1.5 mt-1">
+                    <p className="text-tiny font-semibold text-text-muted uppercase tracking-wider mb-1.5 mt-1">
                       Discover
                     </p>
                     <Link
@@ -418,11 +455,24 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                       <Home className="size-[16px]" />
                       Feed
                     </Link>
+                    <Link
+                      href="/creators"
+                      className={navItemClass(pathname === "/creators")}
+                      onMouseEnter={() => warmRoute("/creators")}
+                      onTouchStart={() => warmRoute("/creators")}
+                      onClick={() => {
+                        trackRouteStart("/creators");
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      <Users className="size-[16px]" />
+                      Creators
+                    </Link>
 
                     {!isCreator && (
                       <>
                         <Separator className="my-2" />
-                        <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-1.5">
+                        <p className="text-tiny font-semibold text-text-muted uppercase tracking-wider mb-1.5">
                           Your Content
                         </p>
                         <Link
@@ -457,7 +507,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                     {isCreator && (
                       <>
                         <Separator className="my-2" />
-                        <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-1.5">
+                        <p className="text-tiny font-semibold text-text-muted uppercase tracking-wider mb-1.5">
                           Creator Studio
                         </p>
                         <Link
@@ -503,7 +553,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                     )}
 
                     <Separator className="my-2" />
-                    <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-1.5">
+                    <p className="text-tiny font-semibold text-text-muted uppercase tracking-wider mb-1.5">
                       Account
                     </p>
                     <Link
@@ -538,7 +588,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
                         <Separator className="my-2" />
                         <Link
                           href="/creator/upgrade"
-                          className="flex items-center gap-2 w-full h-9 px-3 rounded-[var(--radius-sm)] bg-gradient-to-r from-violet-600 to-violet-500 text-white text-[13px] font-medium shadow-glow-violet hover:brightness-110 transition-[filter] duration-150"
+                          className="flex items-center gap-2 w-full h-9 px-3 rounded-[var(--radius-sm)] bg-gradient-to-r from-[var(--wine)] to-[var(--wine)] text-white text-small font-medium  hover:brightness-110 transition-[filter] duration-150"
                           onMouseEnter={() => warmRoute("/creator/upgrade")}
                           onTouchStart={() => warmRoute("/creator/upgrade")}
                           onClick={() => {
@@ -554,7 +604,7 @@ export function NavHeader({ user, notificationCount = 0 }: NavHeaderProps) {
 
                     <Separator className="my-2" />
                     <button
-                      className="flex items-center gap-3 w-full h-10 px-3 rounded-[var(--radius-sm)] text-[13px] font-medium text-red-400 hover:bg-red-500/10 transition-colors duration-100"
+                      className="flex items-center gap-3 w-full h-10 px-3 rounded-[var(--radius-sm)] text-small font-medium text-red-400 hover:bg-red-500/10 transition-colors duration-100"
                       onClick={async () => {
                         setMobileMenuOpen(false);
                         await handleSignOut();

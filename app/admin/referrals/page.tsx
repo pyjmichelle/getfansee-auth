@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { Users, AlertTriangle, CheckCircle, Clock } from "@/lib/icons";
 
 interface Attribution {
@@ -36,8 +36,8 @@ interface Attribution {
 
 const STATUS_COLORS: Record<string, string> = {
   signup_completed: "bg-surface-raised text-text-secondary",
-  creator_role_selected: "bg-brand-secondary/10 text-brand-secondary",
-  kyc_verified: "bg-brand-primary/10 text-brand-primary",
+  creator_role_selected: "bg-brand-secondary/10 text-wine-text",
+  kyc_verified: "bg-[var(--wine)]/10 text-wine-text",
   qualified: "bg-success/10 text-success",
   revenue_eligible: "bg-success/20 text-success",
   rejected: "bg-error/10 text-error",
@@ -46,6 +46,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function AdminReferralsPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<Attribution[]>([]);
   const [total, setTotal] = useState(0);
@@ -72,14 +73,14 @@ export default function AdminReferralsPage() {
   }, [statusFilter]);
 
   useEffect(() => {
-    getAuthBootstrap().then((b) => {
-      if (!b.authenticated || b.profile?.role !== "admin") {
-        router.push("/auth");
-      } else {
-        load();
-      }
-    });
-  }, [router, load]);
+    if (!auth.authenticated) {
+      router.push("/auth");
+    } else if (auth.profile?.role !== "admin") {
+      router.push("/home");
+    } else {
+      load();
+    }
+  }, [router, load, auth.authenticated, auth.profile]);
 
   const handleMarkFraud = async () => {
     if (!fraudId) return;
@@ -113,11 +114,11 @@ export default function AdminReferralsPage() {
   ];
 
   return (
-    <div className="p-6 md:p-8">
+    <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-text-primary mb-1">Referral Attributions</h1>
-        <p className="text-sm text-text-tertiary">{total} total records</p>
+        <h1 className="text-h1 text-text-primary mb-1">Referral Attributions</h1>
+        <p className="text-small text-text-tertiary">{total} total records</p>
       </div>
 
       {/* Stats */}
@@ -145,7 +146,7 @@ export default function AdminReferralsPage() {
               <Icon size={20} className="text-text-tertiary" />
             </div>
             <div>
-              <div className="text-xs text-text-tertiary">{label}</div>
+              <div className="text-tiny text-text-tertiary">{label}</div>
               <div className="text-2xl font-bold text-text-primary">{value}</div>
             </div>
           </div>
@@ -156,9 +157,9 @@ export default function AdminReferralsPage() {
       <div className="flex flex-wrap gap-2 mb-6">
         <button
           onClick={() => setStatusFilter("")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+          className={`min-h-11 px-3 py-1.5 rounded-lg text-tiny font-medium transition-colors ${
             !statusFilter
-              ? "bg-brand-primary text-white"
+              ? "bg-[var(--wine)] text-white"
               : "bg-surface-raised text-text-secondary hover:bg-surface-overlay"
           }`}
         >
@@ -168,9 +169,9 @@ export default function AdminReferralsPage() {
           <button
             key={s}
             onClick={() => setStatusFilter(s)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`min-h-11 px-3 py-1.5 rounded-lg text-tiny font-medium transition-colors ${
               statusFilter === s
-                ? "bg-brand-primary text-white"
+                ? "bg-[var(--wine)] text-white"
                 : "bg-surface-raised text-text-secondary hover:bg-surface-overlay"
             }`}
           >
@@ -188,7 +189,7 @@ export default function AdminReferralsPage() {
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="p-12 text-center text-text-tertiary text-sm">No referrals found</div>
+          <div className="p-12 text-center text-text-tertiary text-small">No referrals found</div>
         ) : (
           <div className="divide-y divide-border-subtle">
             {items.map((item) => (
@@ -196,23 +197,23 @@ export default function AdminReferralsPage() {
                 <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-mono text-text-tertiary truncate max-w-[180px]">
+                      <span className="text-tiny font-mono text-text-tertiary truncate max-w-[180px]">
                         Referrer: {item.referrer_user_id.slice(0, 12)}…
                       </span>
-                      <span className="text-xs text-text-tertiary">→</span>
-                      <span className="text-xs font-mono text-text-tertiary truncate max-w-[180px]">
+                      <span className="text-tiny text-text-tertiary">→</span>
+                      <span className="text-tiny font-mono text-text-tertiary truncate max-w-[180px]">
                         {item.referred_user_id.slice(0, 12)}…
                       </span>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs text-text-tertiary">
+                      <span className="text-tiny text-text-tertiary">
                         Code: <span className="font-mono">{item.referral_code}</span>
                       </span>
-                      <span className="text-xs text-text-tertiary">
+                      <span className="text-tiny text-text-tertiary">
                         {format(new Date(item.created_at), "MMM d, yyyy")}
                       </span>
                       {item.qualified_at && (
-                        <span className="text-xs text-success">
+                        <span className="text-tiny text-success">
                           Qualified {format(new Date(item.qualified_at), "MMM d")}
                         </span>
                       )}
@@ -222,7 +223,7 @@ export default function AdminReferralsPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <Badge
                       variant="outline"
-                      className={`text-xs ${STATUS_COLORS[item.status] ?? "bg-surface-raised text-text-secondary"}`}
+                      className={`text-tiny ${STATUS_COLORS[item.status] ?? "bg-surface-raised text-text-secondary"}`}
                     >
                       {item.status.replace(/_/g, " ")}
                     </Badge>
@@ -230,7 +231,7 @@ export default function AdminReferralsPage() {
                       <Badge
                         key={f}
                         variant="outline"
-                        className="text-xs bg-warning/10 text-warning border-transparent"
+                        className="text-tiny bg-warning/10 text-warning border-transparent"
                       >
                         {f}
                       </Badge>
@@ -238,7 +239,7 @@ export default function AdminReferralsPage() {
                     {item.is_fraud && (
                       <Badge
                         variant="outline"
-                        className="text-xs bg-error/20 text-error border-transparent"
+                        className="text-tiny bg-error/20 text-error border-transparent"
                       >
                         FRAUD
                       </Badge>
@@ -249,7 +250,7 @@ export default function AdminReferralsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="shrink-0 text-xs border-error/30 text-error hover:bg-error/10"
+                      className="shrink-0 text-tiny border-error/30 text-error hover:bg-error/10"
                       onClick={() => setFraudId(item.id)}
                     >
                       Mark Fraud

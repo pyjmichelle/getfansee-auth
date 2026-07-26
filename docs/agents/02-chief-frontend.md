@@ -18,11 +18,13 @@ WHEN YOU ACT:
 PROJECT-SPECIFIC ROUTES (KEEP CURRENT):
 
 - Auth & onboarding: `app/auth/*`
-- Feed & content: `app/home/`, `app/posts/`, `app/search/`
-- Roles: `app/creator/*`（含 `upgrade/`）, `app/me/*`（含 `wallet/`）
+- Feed & content: `app/home/`, `app/posts/`, `app/search/`, `app/tags/[tag]/`
+- Creator discovery: `app/creators/`; Pricing: `app/pricing/`
+- Roles: `app/creator/*`（含 `upgrade/`、`studio/links/`）, `app/me/*`（含 `wallet/`）
 - Trust & help: `app/report/`, `app/support/`
-- Admin UI: `app/admin/*`
+- Admin UI: `app/admin/*`（含 `creator-links/`）
 - AI demo: `app/ai-dashboard/` + `app/api/ai/generate/`
+- 已知系统级 UI 缺陷（未修复前不得假设已解决）：详见 `.cursor/agents/chief-frontend.md` 与最新 UI 根治计划
 - Design QA 任务请同时遵循 `docs/agents/DESIGN_QA_AGENT_AND_SKILLS.md`
 
 TOOLS YOU MAY USE:

@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import Link from "next/link";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { cn } from "@/lib/utils";
 
 const CONTENT_CATEGORIES = [
@@ -31,6 +31,7 @@ const CONTENT_CATEGORIES = [
 ];
 
 export default function CreatorApplicationPage() {
+  const auth = useAuth();
   const [step, setStep] = useState<"form" | "success">("form");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -51,24 +52,20 @@ export default function CreatorApplicationPage() {
   });
 
   useEffect(() => {
-    const loadUser = async () => {
-      const bootstrap = await getAuthBootstrap();
-      if (bootstrap.authenticated && bootstrap.user && bootstrap.profile) {
-        setCurrentUser({
-          username: bootstrap.profile.display_name || bootstrap.user.email?.split("@")[0] || "user",
-          role: (bootstrap.profile.role || "fan") as "fan" | "creator",
-          avatar: bootstrap.profile.avatar_url || undefined,
-        });
-        if (!formData.displayName) {
-          setFormData((prev) => ({
-            ...prev,
-            displayName: bootstrap.profile?.display_name || "",
-          }));
-        }
+    if (auth.authenticated && auth.user && auth.profile) {
+      setCurrentUser({
+        username: auth.profile.display_name || auth.user.email?.split("@")[0] || "user",
+        role: (auth.profile.role || "fan") as "fan" | "creator",
+        avatar: auth.profile.avatar_url || undefined,
+      });
+      if (!formData.displayName) {
+        setFormData((prev) => ({
+          ...prev,
+          displayName: auth.profile?.display_name || "",
+        }));
       }
-    };
-    loadUser();
-  }, []);
+    }
+  }, [auth.authenticated, auth.user, auth.profile]);
 
   const toggleCategory = (cat: string) => {
     setFormData((prev) => ({
@@ -132,8 +129,8 @@ export default function CreatorApplicationPage() {
       <PageShell user={currentUser} notificationCount={3} maxWidth="2xl">
         <div className="section-block py-12">
           <div className="card-block p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6">
-              <Check className="w-8 h-8 text-green-500" />
+            <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
+              <Check className="w-8 h-8 text-success" />
             </div>
             <h1 className="text-3xl font-bold text-text-primary mb-4">Application Submitted!</h1>
             <p className="text-text-secondary mb-8 text-balance">
@@ -141,7 +138,7 @@ export default function CreatorApplicationPage() {
               get back to you within 2-3 business days.
             </p>
             <div className="space-y-3">
-              <p className="text-sm text-text-tertiary">Next Steps:</p>
+              <p className="text-small text-text-tertiary">Next Steps:</p>
               <div className="text-left space-y-2 bg-surface-raised/50 p-4 rounded-lg">
                 {[
                   "We'll review your application",
@@ -150,10 +147,10 @@ export default function CreatorApplicationPage() {
                   "Start creating and earning!",
                 ].map((text, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-sm font-bold flex-shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-[var(--wine)]/10 text-wine-text flex items-center justify-center text-small font-bold flex-shrink-0">
                       {i + 1}
                     </div>
-                    <p className="text-sm text-text-primary">{text}</p>
+                    <p className="text-small text-text-primary">{text}</p>
                   </div>
                 ))}
               </div>
@@ -162,11 +159,7 @@ export default function CreatorApplicationPage() {
               <Button asChild variant="outline" className="flex-1 bg-transparent">
                 <Link href="/home">Back to Home</Link>
               </Button>
-              <Button
-                asChild
-                variant="default"
-                className="flex-1 text-white shadow-glow hover-bold"
-              >
+              <Button asChild variant="default" className="flex-1 text-white ">
                 <Link href="/creator/upgrade/kyc">Start Verification</Link>
               </Button>
             </div>
@@ -196,12 +189,12 @@ export default function CreatorApplicationPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="card-block p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-[var(--wine)]/10 text-wine-text flex items-center justify-center">
                 <User className="w-5 h-5" />
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-text-primary">Basic Information</h2>
-                <p className="text-sm text-text-tertiary">Tell us about your creator profile</p>
+                <p className="text-small text-text-tertiary">Tell us about your creator profile</p>
               </div>
             </div>
 
@@ -228,7 +221,7 @@ export default function CreatorApplicationPage() {
                   required
                   className="min-h-[100px] resize-none"
                 />
-                <p className="text-xs text-text-tertiary">Minimum 50 characters</p>
+                <p className="text-tiny text-text-tertiary">Minimum 50 characters</p>
               </div>
 
               <div className="space-y-2">
@@ -245,10 +238,10 @@ export default function CreatorApplicationPage() {
                         type="button"
                         onClick={() => toggleCategory(cat)}
                         className={cn(
-                          "px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
+                          "px-3 py-1.5 rounded-full text-small font-medium border transition-colors",
                           selected
-                            ? "bg-brand-primary/15 border-brand-primary/40 text-brand-primary"
-                            : "bg-surface-raised border-border-base text-text-secondary hover:border-brand-primary/30"
+                            ? "bg-[var(--wine)]/15 border-[var(--border-wine)]/40 text-wine-text"
+                            : "bg-surface-raised border-border-base text-text-secondary hover:border-[var(--border-wine)]/30"
                         )}
                       >
                         {cat}
@@ -268,7 +261,7 @@ export default function CreatorApplicationPage() {
                         addCustomCategory();
                       }
                     }}
-                    className="h-9 text-sm flex-1"
+                    className="h-9 text-small flex-1"
                   />
                   <Button
                     type="button"
@@ -282,7 +275,7 @@ export default function CreatorApplicationPage() {
                   </Button>
                 </div>
                 {formData.categories.length > 0 && (
-                  <p className="text-xs text-text-tertiary">
+                  <p className="text-tiny text-text-tertiary">
                     Selected: {formData.categories.join(", ")}
                   </p>
                 )}
@@ -292,12 +285,12 @@ export default function CreatorApplicationPage() {
 
           <div className="card-block p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-[var(--wine)]/10 text-wine-text flex items-center justify-center">
                 <FileText className="w-5 h-5" />
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-text-primary">Additional Details</h2>
-                <p className="text-sm text-text-tertiary">Help us understand your goals</p>
+                <p className="text-small text-text-tertiary">Help us understand your goals</p>
               </div>
             </div>
 
@@ -329,17 +322,17 @@ export default function CreatorApplicationPage() {
 
           <div className="card-block p-6 bg-surface-raised/50">
             <h3 className="font-semibold text-text-primary mb-3">What Happens Next?</h3>
-            <ul className="space-y-2 text-sm text-text-secondary">
+            <ul className="space-y-2 text-small text-text-secondary">
               <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-brand-primary mt-0.5 flex-shrink-0" />
+                <Check className="w-4 h-4 text-wine-text mt-0.5 flex-shrink-0" />
                 <span>Your application will be reviewed within 2-3 business days</span>
               </li>
               <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-brand-primary mt-0.5 flex-shrink-0" />
+                <Check className="w-4 h-4 text-wine-text mt-0.5 flex-shrink-0" />
                 <span>You&apos;ll receive an email notification with the decision</span>
               </li>
               <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-brand-primary mt-0.5 flex-shrink-0" />
+                <Check className="w-4 h-4 text-wine-text mt-0.5 flex-shrink-0" />
                 <span>If approved, complete KYC verification to start creating</span>
               </li>
             </ul>
@@ -353,7 +346,7 @@ export default function CreatorApplicationPage() {
               type="submit"
               disabled={isSubmitting}
               variant="default"
-              className="flex-1 text-white shadow-glow hover-bold"
+              className="flex-1 text-white "
             >
               {isSubmitting ? "Submitting..." : "Submit Application"}
             </Button>

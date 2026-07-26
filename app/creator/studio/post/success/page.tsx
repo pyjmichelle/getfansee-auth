@@ -4,6 +4,7 @@ type PublishSuccessPageProps = {
   searchParams: {
     type?: string | string[];
     price?: string | string[];
+    postId?: string | string[];
   };
 };
 
@@ -16,9 +17,10 @@ const isPublishType = (value: string | undefined): value is PublishType => {
 export default function PublishSuccessPage({ searchParams }: PublishSuccessPageProps) {
   const typeParam = typeof searchParams.type === "string" ? searchParams.type : undefined;
   const priceParam = typeof searchParams.price === "string" ? searchParams.price : "0";
+  const postIdParam = typeof searchParams.postId === "string" ? searchParams.postId : undefined;
 
   const postType: PublishType = isPublishType(typeParam) ? typeParam : "subscribers";
   const price = priceParam || "0";
 
-  return <PublishSuccessPageClient postType={postType} price={price} />;
+  return <PublishSuccessPageClient postType={postType} price={price} postId={postIdParam} />;
 }

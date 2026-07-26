@@ -16,15 +16,15 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-dvh bg-bg-base flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center space-y-6">
-        <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
-          <AlertCircle className="w-8 h-8 text-destructive" />
+        <div className="mx-auto w-16 h-16 rounded-full bg-[var(--error)]/10 flex items-center justify-center">
+          <AlertCircle className="w-8 h-8 text-[var(--error-text)]" />
         </div>
 
         <div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">Something went wrong</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-h2 font-bold text-text-primary mb-2">Something went wrong</h1>
+          <p className="text-body text-text-secondary">
             We encountered an unexpected error. Please try again.
           </p>
         </div>
@@ -38,7 +38,7 @@ export default function Error({
           </Button>
         </div>
 
-        {error.digest && <p className="text-xs text-muted-foreground">Error ID: {error.digest}</p>}
+        {error.digest && <p className="text-tiny text-text-tertiary">Error ID: {error.digest}</p>}
       </div>
     </div>
   );

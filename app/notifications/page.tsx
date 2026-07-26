@@ -20,13 +20,14 @@ import type { Notification } from "@/lib/types";
 import { formatDistanceToNow } from "date-fns";
 import { useCountUp } from "@/hooks/use-count-up";
 import { FilterTabBar } from "@/components/filter-tab-bar";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
 
 const supabase = getSupabaseBrowserClient();
 
 export default function NotificationsPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<"all" | "unread">("all");
@@ -43,17 +44,16 @@ export default function NotificationsPage() {
       try {
         setIsLoading(true);
 
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
+        if (!auth.authenticated || !auth.user) {
           router.push("/auth");
           return;
         }
-        const userId = bootstrap.user.id;
+        const userId = auth.user.id;
         setCurrentUserId(userId);
         setCurrentUser({
-          username: bootstrap.profile?.display_name || bootstrap.user.email.split("@")[0] || "user",
-          role: (bootstrap.profile?.role || "fan") as "fan" | "creator",
-          avatar: bootstrap.profile?.avatar_url || undefined,
+          username: auth.profile?.display_name || auth.user.email.split("@")[0] || "user",
+          role: (auth.profile?.role || "fan") as "fan" | "creator",
+          avatar: auth.profile?.avatar_url || undefined,
         });
 
         // 测试模式：设置好用户后立刻显示 Mock 通知（不等 DB 查询完成）
@@ -186,7 +186,7 @@ export default function NotificationsPage() {
     };
 
     loadData();
-  }, [router]);
+  }, [router, auth.authenticated, auth.user, auth.profile]);
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -256,11 +256,11 @@ export default function NotificationsPage() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "new_post":
-        return <Image className="w-4 h-4 text-brand-primary" />;
+        return <Image className="w-4 h-4 text-wine-text" />;
       case "like":
         return <Heart className="w-4 h-4 text-error" />;
       case "comment":
-        return <MessageCircle className="w-4 h-4 text-brand-secondary" />;
+        return <MessageCircle className="w-4 h-4 text-wine-text" />;
       case "purchase":
         return <DollarSign className="w-4 h-4 text-success" />;
       case "new_subscriber":
@@ -418,7 +418,7 @@ export default function NotificationsPage() {
           <div>
             <h1 className="text-3xl font-bold text-text-primary mb-1">Notifications</h1>
             {unreadCount > 0 && (
-              <p className="text-text-tertiary flex items-center gap-2 text-sm">
+              <p className="text-text-tertiary flex items-center gap-2 text-small">
                 <span className="w-2 h-2 bg-brand-primary rounded-full animate-pulse" />
                 {animatedUnreadCount.toFixed(0)} unread
               </p>
@@ -427,7 +427,7 @@ export default function NotificationsPage() {
           {unreadCount > 0 && (
             <button
               onClick={markAllAsRead}
-              className="px-5 py-2.5 text-brand-primary hover:bg-brand-primary-alpha-10 rounded-xl font-semibold transition-all active:scale-95 focus-visible:outline-2 focus-visible:outline-brand-primary flex items-center gap-2 text-sm"
+              className="px-5 py-2.5 text-wine-text hover:bg-brand-primary-alpha-10 rounded-xl font-semibold transition-all active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-brand-primary flex items-center gap-2 text-small"
             >
               <CheckCheck className="w-4 h-4" />
               <span className="hidden sm:inline">Mark all read</span>
@@ -468,7 +468,7 @@ export default function NotificationsPage() {
                 {Object.entries(groupedNotifications).map(([dateGroup, groupNotifications]) => (
                   <div key={dateGroup}>
                     <div className="flex items-center gap-3 mb-3">
-                      <h3 className="font-bold text-text-secondary text-sm">{dateGroup}</h3>
+                      <h3 className="font-bold text-text-secondary text-small">{dateGroup}</h3>
                       <div className="flex-1 h-px bg-border-subtle" />
                     </div>
                     <div className="space-y-2">
@@ -502,17 +502,17 @@ export default function NotificationsPage() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-3 mb-0.5">
-                                  <h4 className="font-bold text-text-primary text-sm">
+                                  <h4 className="font-bold text-text-primary text-small">
                                     {notification.title || notification.message}
                                   </h4>
                                   {!notification.read && (
                                     <div className="w-2.5 h-2.5 bg-brand-primary rounded-full animate-pulse flex-shrink-0 mt-1" />
                                   )}
                                 </div>
-                                <p className="text-text-secondary text-xs mb-1.5 line-clamp-2">
+                                <p className="text-text-secondary text-tiny mb-1.5 line-clamp-2">
                                   {notification.message}
                                 </p>
-                                <p className="text-text-tertiary text-xs flex items-center gap-1.5">
+                                <p className="text-text-tertiary text-tiny flex items-center gap-1.5">
                                   <Clock className="w-3 h-3" />
                                   {notificationDate ? formatDate(notificationDate) : "Unknown date"}
                                 </p>
@@ -532,15 +532,15 @@ export default function NotificationsPage() {
           <aside className="hidden lg:block w-72 shrink-0">
             <div className="sticky top-24 space-y-4">
               <div className="card-block p-5">
-                <h3 className="text-sm font-semibold text-text-primary mb-4">Summary</h3>
-                <div className="space-y-3 text-sm">
+                <h3 className="text-small font-semibold text-text-primary mb-4">Summary</h3>
+                <div className="space-y-3 text-small">
                   <div className="flex items-center justify-between text-text-secondary">
                     <span>Total</span>
                     <span className="font-semibold text-text-primary">{notifications.length}</span>
                   </div>
                   <div className="flex items-center justify-between text-text-secondary">
                     <span>Unread</span>
-                    <span className="font-semibold text-brand-primary">{unreadCount}</span>
+                    <span className="font-semibold text-wine-text">{unreadCount}</span>
                   </div>
                   <div className="flex items-center justify-between text-text-secondary">
                     <span>Read</span>
@@ -552,7 +552,7 @@ export default function NotificationsPage() {
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
-                    className="mt-4 w-full py-2 px-4 bg-brand-primary-alpha-10 text-brand-primary rounded-xl font-semibold text-sm transition-all hover:bg-brand-primary/20 active:scale-95 focus-visible:outline-2 focus-visible:outline-brand-primary flex items-center justify-center gap-2"
+                    className="mt-4 w-full py-2 px-4 bg-brand-primary-alpha-10 text-wine-text rounded-xl font-semibold text-small transition-all hover:bg-brand-primary/20 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-brand-primary flex items-center justify-center gap-2"
                   >
                     <CheckCheck className="w-4 h-4" />
                     Mark All Read
@@ -562,8 +562,8 @@ export default function NotificationsPage() {
 
               {/* Notification categories legend */}
               <div className="card-block p-5">
-                <h3 className="text-sm font-semibold text-text-primary mb-3">Categories</h3>
-                <div className="space-y-2 text-xs text-text-tertiary">
+                <h3 className="text-small font-semibold text-text-primary mb-3">Categories</h3>
+                <div className="space-y-2 text-tiny text-text-tertiary">
                   {[
                     { label: "New Posts", color: "bg-brand-primary-alpha-10" },
                     { label: "Likes", color: "bg-error/10" },

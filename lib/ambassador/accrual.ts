@@ -235,7 +235,7 @@ export async function runAccrual(): Promise<AccrualResult> {
         .eq("attribution_id", attr.id)
         .order("period_end", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       const periodStart = lastComm?.period_end ?? attr.qualified_at;
       const periodEnd = now;

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { AuthShell } from "@/components/shells/auth-shell";
 
 const supabase = getSupabaseBrowserClient();
 
@@ -57,92 +58,81 @@ export default function ResendVerificationPage() {
 
   if (sent) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-        <div className="w-full max-w-md">
-          <div className="card-block p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-brand-primary-alpha-10 flex items-center justify-center mx-auto mb-6">
-              <Mail className="w-8 h-8 text-brand-primary" />
-            </div>
-            <h1 className="text-2xl font-semibold text-text-primary mb-3">Check your email</h1>
-            <p className="text-text-tertiary mb-2">
-              We've sent a verification link to{" "}
-              <strong className="text-text-primary">{email}</strong>
-            </p>
-            <p className="text-sm text-text-tertiary mb-6">
-              Click the link in the email to verify your account. The link will expire in 24 hours.
-            </p>
-            <div className="space-y-3">
-              <Button
-                onClick={() => {
-                  window.open("https://mail.google.com", "_blank");
-                  setTimeout(() => {
-                    router.push("/auth/verify");
-                  }, 1000);
-                }}
-                className="w-full"
-              >
-                Open Gmail / I've confirmed
-              </Button>
-              <Button asChild variant="outline" className="w-full bg-transparent">
-                <Link href="/auth">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Login
-                </Link>
-              </Button>
-            </div>
+      <AuthShell>
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-full bg-brand-primary-alpha-10 flex items-center justify-center mx-auto mb-6">
+            <Mail className="w-8 h-8 text-wine-text" />
+          </div>
+          <h1 className="text-h1 text-text-primary mb-3">Check your email</h1>
+          <p className="text-text-secondary mb-2">
+            We&apos;ve sent a verification link to{" "}
+            <strong className="text-text-primary">{email}</strong>
+          </p>
+          <p className="text-small text-text-muted mb-6">
+            Click the link in the email to verify your account. The link will expire in 24 hours.
+          </p>
+          <div className="space-y-3">
+            <Button
+              onClick={() => {
+                window.open("https://mail.google.com", "_blank");
+                setTimeout(() => {
+                  router.push("/auth/verify");
+                }, 1000);
+              }}
+              className="w-full"
+            >
+              Open Gmail / I&apos;ve confirmed
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/auth">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Login
+              </Link>
+            </Button>
           </div>
         </div>
-      </div>
+      </AuthShell>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <div className="w-full max-w-md">
-        <div className="card-block p-8">
-          <div className="mb-6">
-            <Button asChild variant="ghost" size="sm" className="-ml-3 mb-4">
-              <Link href="/auth">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Link>
-            </Button>
-            <h1 className="text-2xl font-semibold text-text-primary text-balance">
-              Resend Verification Email
-            </h1>
-            <p className="text-text-tertiary mt-2">
-              Enter your email address and we'll send you a new verification link.
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="bg-error/10 border border-error/20 text-error text-sm px-4 py-3 rounded-md">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-text-primary">
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-11"
-                disabled={isLoading}
-              />
-            </div>
-
-            <Button type="submit" className="w-full h-11" disabled={isLoading}>
-              {isLoading ? "Sending..." : "Send Verification Email"}
-            </Button>
-          </form>
-        </div>
+    <AuthShell>
+      <div className="mb-6">
+        <Button asChild variant="ghost" size="sm" className="-ml-3 mb-4">
+          <Link href="/auth">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Link>
+        </Button>
+        <h1 className="text-h1 text-text-primary mb-1.5">Resend Verification Email</h1>
+        <p className="text-small text-text-muted">
+          Enter your email address and we&apos;ll send you a new verification link.
+        </p>
       </div>
-    </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {error && (
+          <div className="bg-error/10 border border-error/20 text-error-text text-small px-4 py-3 rounded-md">
+            {error}
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
+          />
+        </div>
+
+        <Button type="submit" className="w-full" loading={isLoading}>
+          {isLoading ? "Sending..." : "Send Verification Email"}
+        </Button>
+      </form>
+    </AuthShell>
   );
 }

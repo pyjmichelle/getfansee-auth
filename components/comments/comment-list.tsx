@@ -140,7 +140,7 @@ export function CommentList({
       )}
 
       {!canComment && currentUserId && (
-        <div className="p-4 bg-surface-raised/50 rounded-lg text-center text-sm text-text-tertiary">
+        <div className="p-4 bg-surface-raised/50 rounded-lg text-center text-small text-text-tertiary">
           Subscribe or purchase this content to comment
         </div>
       )}
@@ -154,7 +154,7 @@ export function CommentList({
       ) : loadError ? (
         <div className="text-center py-8">
           <MessageSquare className="w-12 h-12 mx-auto mb-2 text-error/50" aria-hidden="true" />
-          <p className="text-sm text-error mb-3">Failed to load comments</p>
+          <p className="text-small text-error mb-3">Failed to load comments</p>
           <Button
             variant="outline"
             size="sm"
@@ -167,7 +167,7 @@ export function CommentList({
       ) : comments.length === 0 ? (
         <div className="text-center py-8 text-text-tertiary">
           <MessageSquare className="w-12 h-12 mx-auto mb-2 opacity-50" aria-hidden="true" />
-          <p className="text-sm">No comments yet. Be the first to comment!</p>
+          <p className="text-small">No comments yet. Be the first to comment!</p>
         </div>
       ) : (
         <div className="space-y-4">

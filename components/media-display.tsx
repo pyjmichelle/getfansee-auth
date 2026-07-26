@@ -106,7 +106,7 @@ function VideoPlayer({
 
       {/* PPV 视频封面左下角 "10s Preview" 渐变标签 */}
       {!canView && post.preview_enabled && post.visibility === "ppv" && (
-        <div className="absolute bottom-4 left-4 px-3 py-1.5 glass bg-accent-gradient/90 rounded-lg text-foreground text-xs font-semibold shadow-lg">
+        <div className="absolute bottom-4 left-4 px-3 py-1.5 glass bg-[var(--wine)]/90 rounded-lg text-text-primary text-tiny font-semibold shadow-lg">
           10s Preview
         </div>
       )}
@@ -278,7 +278,7 @@ export function MediaDisplay({
                         <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20">
                           <Lock className="w-8 h-8 text-white" />
                         </div>
-                        <p className="mb-3 text-sm text-white/80">Preview: First 10 seconds</p>
+                        <p className="mb-3 text-small text-white/80">Preview: First 10 seconds</p>
                         <div className="relative w-full mb-4 rounded-lg overflow-hidden">
                           <video
                             src={media.media_url}
@@ -438,7 +438,7 @@ export function MediaDisplay({
               className="w-full h-auto object-cover max-h-[400px] rounded-3xl"
               loading="lazy"
             />
-            <p className="text-center py-4 text-sm text-text-tertiary">No media available</p>
+            <p className="text-center py-4 text-small text-text-tertiary">No media available</p>
           </div>
         )}
       </div>

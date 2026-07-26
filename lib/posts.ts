@@ -236,6 +236,7 @@ export async function listCreatorPosts(
       price_cents: number | null;
       preview_enabled: boolean;
       watermark_enabled: boolean | null;
+      likes_count: number | null;
       created_at: string;
     }
     const posts = (data || []).map((post: PostData) => ({
@@ -249,6 +250,7 @@ export async function listCreatorPosts(
       price_cents: post.price_cents || null,
       preview_enabled: post.preview_enabled || false,
       watermark_enabled: post.watermark_enabled !== undefined ? post.watermark_enabled : true,
+      likes_count: post.likes_count || 0,
       created_at: post.created_at,
     }));
 
@@ -529,6 +531,20 @@ export async function listFeed(
       }
     }
 
+    // Which of these posts has the current user already liked? Without this,
+    // the like button always renders unliked on load even after a real
+    // like was persisted, and refreshing/reopening the feed silently
+    // "forgets" the user's own likes.
+    const likedPostIds = new Set<string>();
+    if (userId && postIds.length > 0) {
+      const { data: likedRows } = await adminSupabase
+        .from("post_likes")
+        .select("post_id")
+        .eq("user_id", userId)
+        .in("post_id", postIds);
+      (likedRows || []).forEach((row: { post_id: string }) => likedPostIds.add(row.post_id));
+    }
+
     const posts: Post[] = filteredData.map((item: PostWithProfile) => {
       const canView = canViewMap.get(item.id) || false;
       const post: Post = {
@@ -542,6 +558,8 @@ export async function listFeed(
         price_cents: item.price_cents || null,
         preview_enabled: item.preview_enabled || false,
         watermark_enabled: item.watermark_enabled !== undefined ? item.watermark_enabled : true,
+        likes_count: item.likes_count ?? 0,
+        isLikedByCurrentUser: likedPostIds.has(item.id),
         created_at: item.created_at,
         creator: {
           display_name: creatorProfileMap.get(item.creator_id)?.display_name ?? undefined,

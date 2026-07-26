@@ -1,6 +1,7 @@
 import { AlertCircle, ArrowLeft } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { AuthShell } from "@/components/shells/auth-shell";
 
 type AuthErrorPageProps = {
   searchParams: {
@@ -54,29 +55,27 @@ export default function AuthErrorPage({ searchParams }: AuthErrorPageProps) {
   const errorInfo = getErrorMessage(error);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <div className="w-full max-w-md">
-        <div className="card-block p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-6">
-            <AlertCircle className="w-8 h-8 text-error" />
-          </div>
-          <h1 className="text-2xl font-semibold text-text-primary mb-3">{errorInfo.title}</h1>
-          <p className="text-text-tertiary mb-6">{errorInfo.message}</p>
-          <div className="space-y-3">
-            <Button asChild className="w-full">
-              <Link href={errorInfo.action.href}>{errorInfo.action.text}</Link>
+    <AuthShell>
+      <div className="text-center">
+        <div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-6">
+          <AlertCircle className="w-8 h-8 text-error-text" />
+        </div>
+        <h1 className="text-h1 text-text-primary mb-3">{errorInfo.title}</h1>
+        <p className="text-text-secondary mb-6">{errorInfo.message}</p>
+        <div className="space-y-3">
+          <Button asChild className="w-full">
+            <Link href={errorInfo.action.href}>{errorInfo.action.text}</Link>
+          </Button>
+          {error === "account_not_verified" && (
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/auth">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Login
+              </Link>
             </Button>
-            {error === "account_not_verified" && (
-              <Button asChild variant="outline" className="w-full bg-transparent">
-                <Link href="/auth">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Login
-                </Link>
-              </Button>
-            )}
-          </div>
+          )}
         </div>
       </div>
-    </div>
+    </AuthShell>
   );
 }

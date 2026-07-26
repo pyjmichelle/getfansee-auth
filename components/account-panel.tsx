@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
+import { useWalletBalance } from "@/hooks/use-wallet-balance";
+import { formatUsdFromDollars } from "@/lib/format";
 
 interface AccountPanelProps {
   user: {
@@ -34,13 +36,15 @@ interface AccountPanelProps {
     avatar?: string;
     creatorStatus?: "pending" | "approved";
   };
-  balance?: number;
   onSignOut?: () => void;
   className?: string;
 }
 
-export function AccountPanel({ user, balance = 0, onSignOut, className }: AccountPanelProps) {
+export function AccountPanel({ user, onSignOut, className }: AccountPanelProps) {
   const isCreator = user.role === "creator";
+  // Same source of truth as WalletBalancePreview — previously this panel
+  // never fetched a balance at all and silently rendered $0.00.
+  const { balanceDollars, isLoading: isBalanceLoading } = useWalletBalance();
 
   return (
     <DropdownMenu>
@@ -48,18 +52,18 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
         <Button
           variant="ghost"
           className={cn(
-            "flex items-center gap-2 px-3 hover:bg-surface-raised active:scale-95 transition-all min-h-[44px] focus-visible:ring-2 focus-visible:ring-brand-primary",
+            "flex items-center gap-2 px-3 hover:bg-surface-raised active:scale-[0.98] transition-all min-h-[44px] focus-visible:ring-2 focus-visible:ring-brand-primary",
             className
           )}
           aria-label={`Account menu for ${user.username}`}
         >
           <Avatar className="w-8 h-8 ring-2 ring-transparent hover:ring-brand-primary/30 transition-all">
             <AvatarImage src={user.avatar || DEFAULT_AVATAR_FAN} alt={user.username} />
-            <AvatarFallback className="bg-brand-primary/10 text-brand-primary text-sm font-semibold">
+            <AvatarFallback className="bg-brand-primary/10 text-wine-text text-small font-semibold">
               {(user.username?.[0] || "U").toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <span className="font-medium text-sm hidden md:inline text-text-primary">
+          <span className="font-medium text-small hidden md:inline text-text-primary">
             {user.username}
           </span>
         </Button>
@@ -74,14 +78,12 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
           <div className="flex items-center gap-2">
             <Avatar className="w-8 h-8">
               <AvatarImage src={user.avatar || DEFAULT_AVATAR_FAN} alt={user.username} />
-              <AvatarFallback className="bg-brand-primary/10 text-brand-primary font-semibold text-xs">
+              <AvatarFallback className="bg-brand-primary/10 text-wine-text font-semibold text-tiny">
                 {(user.username?.[0] || "U").toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-[13px] text-text-primary truncate">
-                {user.username}
-              </p>
+              <p className="font-semibold text-small text-text-primary truncate">{user.username}</p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                   {isCreator ? "Creator" : "Fan"}
@@ -104,12 +106,16 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
           <div className="flex items-center justify-between px-2.5 py-2 rounded-lg bg-gradient-primary text-white">
             <div>
               <p className="text-white/70 text-[10px]">Balance</p>
-              <p className="text-sm font-bold">${balance.toFixed(2)}</p>
+              {isBalanceLoading ? (
+                <p className="text-small font-bold opacity-60">$--.--</p>
+              ) : (
+                <p className="text-small font-bold">{formatUsdFromDollars(balanceDollars)}</p>
+              )}
             </div>
             <Button
               variant="ghost"
               size="sm"
-              className="text-white hover:bg-white/20 h-7 text-xs px-2"
+              className="text-white hover:bg-white/20 h-7 text-tiny px-2"
               asChild
             >
               <Link href="/me/wallet">Add</Link>
@@ -122,7 +128,7 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
         {/* Navigation Items */}
         <DropdownMenuItem
           asChild
-          className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-[13px]"
+          className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-small"
         >
           <Link href="/me" className="flex items-center gap-2">
             <User className="w-3.5 h-3.5 text-text-tertiary" aria-hidden="true" />
@@ -132,7 +138,7 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
 
         <DropdownMenuItem
           asChild
-          className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-[13px]"
+          className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-small"
         >
           <Link href="/subscriptions" className="flex items-center gap-2">
             <Heart className="w-3.5 h-3.5 text-text-tertiary" aria-hidden="true" />
@@ -142,7 +148,7 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
 
         <DropdownMenuItem
           asChild
-          className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-[13px]"
+          className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-small"
         >
           <Link href="/purchases" className="flex items-center gap-2">
             <ShoppingBag className="w-3.5 h-3.5 text-text-tertiary" aria-hidden="true" />
@@ -152,7 +158,7 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
 
         <DropdownMenuItem
           asChild
-          className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-[13px]"
+          className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-small"
         >
           <Link href="/me/wallet" className="flex items-center gap-2">
             <Wallet className="w-3.5 h-3.5 text-text-tertiary" aria-hidden="true" />
@@ -169,7 +175,7 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
             </DropdownMenuLabel>
             <DropdownMenuItem
               asChild
-              className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-[13px]"
+              className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-small"
             >
               <Link href="/creator/studio" className="flex items-center gap-2">
                 <LayoutDashboard className="w-3.5 h-3.5 text-text-tertiary" aria-hidden="true" />
@@ -178,7 +184,7 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
             </DropdownMenuItem>
             <DropdownMenuItem
               asChild
-              className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-[13px]"
+              className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-small"
             >
               <Link href="/creator/new-post" className="flex items-center gap-2">
                 <FileText className="w-3.5 h-3.5 text-text-tertiary" aria-hidden="true" />
@@ -187,7 +193,7 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
             </DropdownMenuItem>
             <DropdownMenuItem
               asChild
-              className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-[13px]"
+              className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-small"
             >
               <Link href="/creator/studio/earnings" className="flex items-center gap-2">
                 <DollarSign className="w-3.5 h-3.5 text-text-tertiary" aria-hidden="true" />
@@ -203,9 +209,9 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
             <DropdownMenuSeparator className="bg-border-base" />
             <DropdownMenuItem
               asChild
-              className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-[13px]"
+              className="cursor-pointer rounded-md hover:bg-brand-primary/5 min-h-[34px] text-small"
             >
-              <Link href="/creator/upgrade" className="flex items-center gap-2 text-brand-primary">
+              <Link href="/creator/upgrade" className="flex items-center gap-2 text-wine-text">
                 <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
                 <span className="font-medium">Become a Creator</span>
               </Link>
@@ -216,7 +222,7 @@ export function AccountPanel({ user, balance = 0, onSignOut, className }: Accoun
         <DropdownMenuSeparator className="bg-border-base" />
 
         <DropdownMenuItem
-          className="cursor-pointer rounded-md text-error focus:text-error hover:bg-error/5 min-h-[34px] text-[13px]"
+          className="cursor-pointer rounded-md text-error focus:text-error hover:bg-error/5 min-h-[34px] text-small"
           onClick={onSignOut}
           aria-label="Sign out of your account"
         >

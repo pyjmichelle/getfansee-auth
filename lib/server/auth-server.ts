@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import { getSupabaseServerClient } from "./supabase-server";
 import { env } from "@/lib/env";
@@ -55,7 +56,12 @@ async function getUserWithRetries(supabase: Awaited<ReturnType<typeof getSupabas
 const E2E_COOKIE_LOG_WINDOW_MS = 5000;
 let e2eCookieLastLoggedAt = 0;
 
-export async function getCurrentUser(): Promise<AppUser | null> {
+// React.cache() dedupes calls to this function within a single request/render
+// pass (e.g. root layout's getServerAuthState() + a page's own getCurrentUser()
+// call previously ran the auth.getUser() + profiles ban-check query TWICE per
+// request — see 2026-07-26 UI/performance audit). Same-request calls with no
+// arguments always share one in-flight/resolved promise.
+async function getCurrentUserUncached(): Promise<AppUser | null> {
   const supabase = await getSupabaseServerClient();
   const { user, error } = await getUserWithRetries(supabase);
 
@@ -106,16 +112,38 @@ export async function getCurrentUser(): Promise<AppUser | null> {
   }
 
   try {
-    const { data: profile, error: profileError } = await supabase
+    let { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("is_banned, ban_until")
       .eq("id", user.id)
       .maybeSingle();
 
+    // One retry on transient failure before giving up — a single flaky query
+    // used to fail-close the ENTIRE request (see below), which meant a brief
+    // Supabase hiccup logged out every session on the page and every
+    // protected route bounced them to /auth despite a perfectly valid
+    // cookie. Retrying once absorbs most of that noise.
+    if (profileError && isRetryableAuthError(profileError)) {
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      const retry = await supabase
+        .from("profiles")
+        .select("is_banned, ban_until")
+        .eq("id", user.id)
+        .maybeSingle();
+      profile = retry.data;
+      profileError = retry.error;
+    }
+
     if (profileError) {
-      // Fail-closed: if we cannot confirm the user is not banned, deny access.
-      console.error("[auth-server] Ban check query failed, denying access:", profileError.message);
-      return null;
+      // Fail-OPEN on the ban check specifically (mirrors the client-side
+      // behavior in lib/auth.ts): we could not CONFIRM the user is banned,
+      // so we let a real, cookie-verified session through rather than
+      // treating a transient DB error as "logged out". A confirmed ban
+      // (profile.is_banned / ban_until) below still signs the user out.
+      console.error(
+        "[auth-server] Ban check query failed after retry, allowing session through:",
+        profileError.message
+      );
     } else if (profile) {
       const now = new Date();
       const isBanned =
@@ -132,6 +160,8 @@ export async function getCurrentUser(): Promise<AppUser | null> {
 
   return { id: user.id, email: user.email };
 }
+
+export const getCurrentUser = cache(getCurrentUserUncached);
 
 export async function ensureProfile(currentUser?: AppUser | null) {
   const supabase = await getSupabaseServerClient();

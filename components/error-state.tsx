@@ -47,8 +47,8 @@ export function ErrorState({
         <div className="size-12 rounded-full bg-red-500/10 flex items-center justify-center mb-3">
           <AlertCircle className="size-5 text-red-400" aria-hidden="true" />
         </div>
-        <h3 className="text-[14px] font-semibold text-white mb-1">{title}</h3>
-        <p className="text-[13px] text-text-muted mb-5 max-w-xs">{message}</p>
+        <h3 className="text-small font-semibold text-white mb-1">{title}</h3>
+        <p className="text-small text-text-muted mb-5 max-w-xs">{message}</p>
         {retry && (
           <Button onClick={retry} variant="outline" size="sm" className="gap-1.5">
             <RefreshCw className="size-[13px]" aria-hidden="true" />

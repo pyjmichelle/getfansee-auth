@@ -355,12 +355,9 @@ test.describe("UI / 活人感 / Skill 合规", () => {
       timeout: 15_000,
     });
     await waitPageReady(page, undefined);
+    // Scope to page content testids only — text=/Earnings/i matches hidden mobile studio nav pills.
     await expect(
-      page
-        .getByTestId("earnings-balance")
-        .or(page.getByTestId("earnings-history"))
-        .or(page.getByText(/Earnings|Balance/i))
-        .first()
+      page.getByTestId("earnings-balance").or(page.getByTestId("earnings-history")).first()
     ).toBeVisible({ timeout: 25_000 });
     await assertSingleMain(page);
     expect(bad404).toEqual([]);

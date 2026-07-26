@@ -28,7 +28,8 @@ export async function GET() {
       .from("transactions")
       .select("id, user_id, type, amount_cents, status, metadata")
       .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(200);
 
     if (error) {
       console.error("[api/transactions] error:", error);

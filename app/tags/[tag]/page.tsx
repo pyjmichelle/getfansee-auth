@@ -12,11 +12,12 @@ import { ArrowLeft, Tag, FileText } from "@/lib/icons";
 import { formatDistanceToNow } from "date-fns";
 import { useCountUp } from "@/hooks/use-count-up";
 import { DEFAULT_AVATAR_CREATOR } from "@/lib/image-fallbacks";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function TagPage() {
   const params = useParams();
   const router = useRouter();
+  const auth = useAuth();
   const tagName = decodeURIComponent((params?.tag as string) || "");
 
   const [isLoading, setIsLoading] = useState(true);
@@ -34,13 +35,11 @@ export default function TagPage() {
         setIsLoading(true);
 
         // Public tag listing: guests can browse — no /auth redirect.
-        const bootstrap = await getAuthBootstrap();
-
-        if (bootstrap.profile) {
+        if (auth.profile) {
           setCurrentUser({
-            username: bootstrap.profile.display_name || "user",
-            role: (bootstrap.profile.role || "fan") as "fan" | "creator",
-            avatar: bootstrap.profile.avatar_url || undefined,
+            username: auth.profile.display_name || "user",
+            role: (auth.profile.role || "fan") as "fan" | "creator",
+            avatar: auth.profile.avatar_url || undefined,
           });
         }
 
@@ -62,7 +61,7 @@ export default function TagPage() {
     if (tagName) {
       loadData();
     }
-  }, [tagName, router]);
+  }, [tagName, router, auth.profile]);
 
   const animatedPostCount = useCountUp(posts.length, { duration: 700, decimals: 0 });
 
@@ -98,7 +97,7 @@ export default function TagPage() {
         <div className="card-block bg-gradient-subtle p-6 md:p-8 mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-12 h-12 rounded-xl bg-brand-primary/10 flex items-center justify-center">
-              <Tag className="w-6 h-6 text-brand-primary" />
+              <Tag className="w-6 h-6 text-wine-text" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-text-primary">#{tagName}</h1>
@@ -110,7 +109,7 @@ export default function TagPage() {
             </div>
           </div>
           <p className="text-text-secondary mt-2">
-            <span className="font-bold text-brand-primary">{animatedPostCount.toFixed(0)}</span>{" "}
+            <span className="font-bold text-wine-text">{animatedPostCount.toFixed(0)}</span>{" "}
             {posts.length === 1 ? "post" : "posts"} with this tag
           </p>
         </div>
@@ -144,7 +143,7 @@ export default function TagPage() {
                         src={post.creator?.avatar_url || DEFAULT_AVATAR_CREATOR}
                         alt={post.creator?.display_name || "Creator"}
                       />
-                      <AvatarFallback className="bg-brand-primary/10 text-brand-primary">
+                      <AvatarFallback className="bg-brand-primary/10 text-wine-text">
                         {post.creator?.display_name?.[0]?.toUpperCase() || "C"}
                       </AvatarFallback>
                     </Avatar>
@@ -154,7 +153,7 @@ export default function TagPage() {
                         <span className="font-semibold text-text-primary">
                           {post.creator?.display_name || "Creator"}
                         </span>
-                        <span className="text-sm text-text-tertiary">
+                        <span className="text-small text-text-tertiary">
                           {post.created_at
                             ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true })
                             : "Unknown date"}
@@ -162,7 +161,7 @@ export default function TagPage() {
                         {post.visibility !== "free" && (
                           <Badge
                             variant={post.visibility === "ppv" ? "default" : "secondary"}
-                            className="text-xs"
+                            className="text-tiny"
                           >
                             {post.visibility === "ppv"
                               ? `$${((post.price_cents || 0) / 100).toFixed(2)}`

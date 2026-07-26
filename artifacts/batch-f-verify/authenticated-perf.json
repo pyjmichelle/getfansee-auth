@@ -1,0 +1,261 @@
+{
+  "timestamp": "2026-07-26T07:01:13.027Z",
+  "results": [
+    {
+      "role": "fan",
+      "viewport": "mb",
+      "route": "/home",
+      "status": 200,
+      "ms": 1322,
+      "file": "fan-mb_home.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "mb",
+      "route": "/me",
+      "status": 200,
+      "ms": 1303,
+      "file": "fan-mb_me.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "mb",
+      "route": "/me/wallet",
+      "status": 200,
+      "ms": 1283,
+      "file": "fan-mb_me_wallet.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "mb",
+      "route": "/notifications",
+      "status": 200,
+      "ms": 1299,
+      "file": "fan-mb_notifications.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "mb",
+      "route": "/subscriptions",
+      "status": 200,
+      "ms": 1278,
+      "file": "fan-mb_subscriptions.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "mb",
+      "route": "/purchases",
+      "status": 200,
+      "ms": 1263,
+      "file": "fan-mb_purchases.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "mb",
+      "route": "/posts/5b066036-90a3-4527-aac2-8a88d42025df",
+      "status": 200,
+      "ms": 2490,
+      "file": "fan-mb_posts_5b066036-90a3-4527-aac2-8a88d42025df.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "mb",
+      "route": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+      "status": 200,
+      "ms": 2219,
+      "file": "fan-mb_creator_9ed2ac43-e5f4-4f38-903e-a4383f691dab.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "pc",
+      "route": "/home",
+      "status": 200,
+      "ms": 1249,
+      "file": "fan-pc_home.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "pc",
+      "route": "/me",
+      "status": 200,
+      "ms": 1261,
+      "file": "fan-pc_me.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "pc",
+      "route": "/me/wallet",
+      "status": 200,
+      "ms": 1256,
+      "file": "fan-pc_me_wallet.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "pc",
+      "route": "/notifications",
+      "status": 200,
+      "ms": 1263,
+      "file": "fan-pc_notifications.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "pc",
+      "route": "/subscriptions",
+      "status": 200,
+      "ms": 1261,
+      "file": "fan-pc_subscriptions.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "pc",
+      "route": "/purchases",
+      "status": 200,
+      "ms": 1263,
+      "file": "fan-pc_purchases.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "pc",
+      "route": "/posts/5b066036-90a3-4527-aac2-8a88d42025df",
+      "status": 200,
+      "ms": 1276,
+      "file": "fan-pc_posts_5b066036-90a3-4527-aac2-8a88d42025df.png"
+    },
+    {
+      "role": "fan",
+      "viewport": "pc",
+      "route": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+      "status": 200,
+      "ms": 2037,
+      "file": "fan-pc_creator_9ed2ac43-e5f4-4f38-903e-a4383f691dab.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "mb",
+      "route": "/creator/studio",
+      "status": 200,
+      "ms": 1262,
+      "file": "creator-mb_creator_studio.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "mb",
+      "route": "/creator/studio/earnings",
+      "status": 200,
+      "ms": 1286,
+      "file": "creator-mb_creator_studio_earnings.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "mb",
+      "route": "/creator/studio/post/list",
+      "status": 200,
+      "ms": 1515,
+      "file": "creator-mb_creator_studio_post_list.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "mb",
+      "route": "/creator/studio/subscribers",
+      "status": 200,
+      "ms": 1274,
+      "file": "creator-mb_creator_studio_subscribers.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "mb",
+      "route": "/creator/studio/analytics",
+      "status": 200,
+      "ms": 1291,
+      "file": "creator-mb_creator_studio_analytics.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "mb",
+      "route": "/creator/studio/ambassador",
+      "status": 200,
+      "ms": 1306,
+      "file": "creator-mb_creator_studio_ambassador.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "mb",
+      "route": "/creator/new-post",
+      "status": 200,
+      "ms": 1281,
+      "file": "creator-mb_creator_new-post.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "mb",
+      "route": "/creator/studio/links",
+      "status": 200,
+      "ms": 1283,
+      "file": "creator-mb_creator_studio_links.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "pc",
+      "route": "/creator/studio",
+      "status": 200,
+      "ms": 1258,
+      "file": "creator-pc_creator_studio.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "pc",
+      "route": "/creator/studio/earnings",
+      "status": 200,
+      "ms": 1258,
+      "file": "creator-pc_creator_studio_earnings.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "pc",
+      "route": "/creator/studio/post/list",
+      "status": 200,
+      "ms": 1284,
+      "file": "creator-pc_creator_studio_post_list.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "pc",
+      "route": "/creator/studio/subscribers",
+      "status": 200,
+      "ms": 1265,
+      "file": "creator-pc_creator_studio_subscribers.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "pc",
+      "route": "/creator/studio/analytics",
+      "status": 200,
+      "ms": 1266,
+      "file": "creator-pc_creator_studio_analytics.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "pc",
+      "route": "/creator/studio/ambassador",
+      "status": 200,
+      "ms": 1296,
+      "file": "creator-pc_creator_studio_ambassador.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "pc",
+      "route": "/creator/new-post",
+      "status": 200,
+      "ms": 1280,
+      "file": "creator-pc_creator_new-post.png"
+    },
+    {
+      "role": "creator",
+      "viewport": "pc",
+      "route": "/creator/studio/links",
+      "status": 200,
+      "ms": 1267,
+      "file": "creator-pc_creator_studio_links.png"
+    }
+  ]
+}

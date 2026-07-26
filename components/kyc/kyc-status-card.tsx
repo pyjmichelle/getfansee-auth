@@ -50,26 +50,26 @@ const STATUS_ICON_MAP: Record<string, React.ComponentType<{ className?: string }
 };
 
 const STATUS_ICON_COLOR: Record<string, string> = {
-  [KYC_STATUS.NOT_STARTED]: "text-brand-primary",
-  [KYC_STATUS.INITIATED]: "text-amber-400",
-  [KYC_STATUS.IN_PROGRESS]: "text-amber-400",
-  [KYC_STATUS.SUBMITTED]: "text-amber-400",
+  [KYC_STATUS.NOT_STARTED]: "text-wine-text",
+  [KYC_STATUS.INITIATED]: "text-[var(--premium)]",
+  [KYC_STATUS.IN_PROGRESS]: "text-[var(--premium)]",
+  [KYC_STATUS.SUBMITTED]: "text-[var(--premium)]",
   [KYC_STATUS.APPROVED]: "text-emerald-400",
   [KYC_STATUS.DECLINED]: "text-red-400",
-  [KYC_STATUS.EXPIRED]: "text-amber-400",
-  [KYC_STATUS.RESUBMISSION_REQUIRED]: "text-amber-400",
+  [KYC_STATUS.EXPIRED]: "text-[var(--premium)]",
+  [KYC_STATUS.RESUBMISSION_REQUIRED]: "text-[var(--premium)]",
   [KYC_STATUS.ERROR]: "text-red-400",
 };
 
 const STATUS_BG_COLOR: Record<string, string> = {
   [KYC_STATUS.NOT_STARTED]: "bg-brand-primary/10",
-  [KYC_STATUS.INITIATED]: "bg-amber-500/10",
-  [KYC_STATUS.IN_PROGRESS]: "bg-amber-500/10",
-  [KYC_STATUS.SUBMITTED]: "bg-amber-500/10",
+  [KYC_STATUS.INITIATED]: "bg-[var(--premium)]/10",
+  [KYC_STATUS.IN_PROGRESS]: "bg-[var(--premium)]/10",
+  [KYC_STATUS.SUBMITTED]: "bg-[var(--premium)]/10",
   [KYC_STATUS.APPROVED]: "bg-emerald-500/10",
   [KYC_STATUS.DECLINED]: "bg-red-500/10",
-  [KYC_STATUS.EXPIRED]: "bg-amber-500/10",
-  [KYC_STATUS.RESUBMISSION_REQUIRED]: "bg-amber-500/10",
+  [KYC_STATUS.EXPIRED]: "bg-[var(--premium)]/10",
+  [KYC_STATUS.RESUBMISSION_REQUIRED]: "bg-[var(--premium)]/10",
   [KYC_STATUS.ERROR]: "bg-red-500/10",
 };
 
@@ -154,7 +154,7 @@ export function KycStatusCard({ className, onStatusChange, approvedHref }: KycSt
   const status = data?.status ?? KYC_STATUS.NOT_STARTED;
   const meta = getKycStatusMeta(status);
   const IconComponent = STATUS_ICON_MAP[status] ?? Shield;
-  const iconColor = STATUS_ICON_COLOR[status] ?? "text-brand-primary";
+  const iconColor = STATUS_ICON_COLOR[status] ?? "text-wine-text";
   const bgColor = STATUS_BG_COLOR[status] ?? "bg-brand-primary/10";
 
   return (
@@ -179,11 +179,11 @@ export function KycStatusCard({ className, onStatusChange, approvedHref }: KycSt
             >
               <IconComponent className={cn("w-7 h-7", iconColor)} />
             </div>
-            <p className="text-sm text-text-secondary max-w-md leading-relaxed">
+            <p className="text-small text-text-secondary max-w-md leading-relaxed">
               {meta.description}
             </p>
             {status === KYC_STATUS.APPROVED && (
-              <p className="text-xs text-emerald-500 mt-2 font-medium">
+              <p className="text-tiny text-emerald-500 mt-2 font-medium">
                 Your creator account is now active.
               </p>
             )}

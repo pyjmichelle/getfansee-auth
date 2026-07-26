@@ -25,7 +25,7 @@ export function SupporterBadge({
         <Heart
           aria-hidden
           style={{ width: size, height: size }}
-          className={cn("text-amber-400", className)}
+          className={cn("text-[var(--premium)]", className)}
         />
       </span>
     );
@@ -35,7 +35,7 @@ export function SupporterBadge({
     <span
       title={title}
       className={cn(
-        "inline-flex items-center gap-1 rounded-full bg-amber-400/15 text-amber-300 px-2 py-0.5 text-[11px] font-medium shrink-0",
+        "inline-flex items-center gap-1 rounded-full bg-[var(--premium)]/15 text-[var(--premium)] px-2 py-0.5 text-tiny font-medium shrink-0",
         className
       )}
     >

@@ -19,6 +19,7 @@ import {
   getKycStatusMeta,
 } from "./kyc-status";
 import { transitionToKycVerified } from "@/lib/ambassador/bind";
+import { isAlphaPhase } from "@/lib/constants/alpha";
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -313,6 +314,25 @@ export async function processWebhookEvent(
 
     if (profileError) {
       logger.error("[kyc-service] Failed to activate creator profile", profileError, { userId });
+    }
+
+    // Pre-Payment Alpha: creators who complete KYC during Alpha become
+    // Founding Creators (permanent badge + Beta 0% commission window).
+    // Separate best-effort update so environments without migration 046
+    // don't break creator activation.
+    if (isAlphaPhase()) {
+      const { error: foundingError } = await supabase
+        .from("profiles")
+        .update({ is_founding_creator: true })
+        .eq("id", userId);
+      if (foundingError) {
+        logger.warn("[kyc-service] Failed to grant Founding Creator badge (migration 046?)", {
+          userId,
+          error: foundingError.message,
+        });
+      } else {
+        logger.info("[kyc-service] Founding Creator badge granted", { userId });
+      }
     }
 
     // Ensure creators record exists so the user appears in creator listings

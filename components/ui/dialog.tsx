@@ -79,9 +79,9 @@ function DialogContent({
               "absolute top-4 right-4",
               "size-6 rounded-[var(--radius-xs)]",
               "flex items-center justify-center",
-              "text-white/40 hover:text-white hover:bg-white/10",
+              "text-text-muted hover:text-text-primary hover:bg-white/10",
               "transition-colors duration-150",
-              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-violet-500/40"
+              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--wine)]/40"
             )}
           >
             <XIcon className="size-3.5" />
@@ -117,7 +117,7 @@ function DialogTitle({ className, ...props }: React.ComponentProps<typeof Dialog
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("text-[16px] font-semibold text-white leading-tight", className)}
+      className={cn("text-h3 font-semibold text-text-primary leading-tight", className)}
       {...props}
     />
   );
@@ -130,7 +130,7 @@ function DialogDescription({
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className={cn("text-text-muted text-[12px] leading-snug", className)}
+      className={cn("text-text-muted text-tiny leading-snug", className)}
       {...props}
     />
   );

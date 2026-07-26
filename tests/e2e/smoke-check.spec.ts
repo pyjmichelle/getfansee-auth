@@ -45,6 +45,13 @@ test.describe("System Health Check", () => {
       ) {
         return false;
       }
+      // Local/preview CSP often blocks Vercel Analytics debug script; not product-critical.
+      if (
+        error.includes("Content Security Policy") &&
+        (error.includes("va.vercel-scripts.com") || error.includes("vercel-scripts.com"))
+      ) {
+        return false;
+      }
       if (
         error.includes("Failed to load resource: the server responded with a status of 404") &&
         criticalNotFound.length === 0

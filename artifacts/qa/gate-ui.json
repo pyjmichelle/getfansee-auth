@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-04T16:47:28.645Z",
+  "timestamp": "2026-07-26T10:24:23.320Z",
   "summary": {
     "total": 10,
     "passed": 10,
@@ -16,13 +16,13 @@
         {
           "selector": "[data-testid=\"post-card\"]",
           "description": "Post card should be visible",
-          "found": 0,
+          "found": 20,
           "required": 0,
           "passed": true
         }
       ],
       "finalUrl": "http://localhost:3000/home",
-      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/home-posts.png"
+      "screenshot": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/qa/screenshots/home-posts.png"
     },
     {
       "id": "wallet-balance",
@@ -39,7 +39,7 @@
         }
       ],
       "finalUrl": "http://localhost:3000/me/wallet",
-      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/wallet-balance.png"
+      "screenshot": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/qa/screenshots/wallet-balance.png"
     },
     {
       "id": "new-post-form",
@@ -84,7 +84,7 @@
         }
       ],
       "finalUrl": "http://localhost:3000/creator/new-post",
-      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/new-post-form.png"
+      "screenshot": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/qa/screenshots/new-post-form.png"
     },
     {
       "id": "creator-studio",
@@ -108,7 +108,7 @@
         }
       ],
       "finalUrl": "http://localhost:3000/creator/studio",
-      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/creator-studio.png"
+      "screenshot": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/qa/screenshots/creator-studio.png"
     },
     {
       "id": "creator-earnings",
@@ -132,7 +132,7 @@
         }
       ],
       "finalUrl": "http://localhost:3000/creator/studio/earnings",
-      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/creator-earnings.png"
+      "screenshot": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/qa/screenshots/creator-earnings.png"
     },
     {
       "id": "search-modal",
@@ -149,7 +149,7 @@
         }
       ],
       "finalUrl": "http://localhost:3000/home",
-      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/search-modal.png"
+      "screenshot": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/qa/screenshots/search-modal.png"
     },
     {
       "id": "auth-access",
@@ -166,7 +166,7 @@
         }
       ],
       "finalUrl": "http://localhost:3000/auth?mode=login",
-      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/auth-access.png"
+      "screenshot": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/qa/screenshots/auth-access.png"
     },
     {
       "id": "checkout-disclaimer",
@@ -211,7 +211,7 @@
         }
       ],
       "finalUrl": "http://localhost:3000/me/wallet",
-      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/checkout-disclaimer.png"
+      "screenshot": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/qa/screenshots/checkout-disclaimer.png"
     },
     {
       "id": "upload-file-input",
@@ -228,7 +228,7 @@
         }
       ],
       "finalUrl": "http://localhost:3000/creator/new-post",
-      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/upload-file-input.png"
+      "screenshot": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/qa/screenshots/upload-file-input.png"
     },
     {
       "id": "search-modal-opens",
@@ -252,7 +252,7 @@
         }
       ],
       "finalUrl": "http://localhost:3000/home",
-      "screenshot": "/Users/puyijun/Downloads/authentication-flow-design (1)/artifacts/qa/screenshots/search-modal.png"
+      "screenshot": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/qa/screenshots/search-modal.png"
     }
   ]
 }

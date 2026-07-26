@@ -15,9 +15,21 @@ When any condition below is true, update corresponding agent/skill docs in the s
 
 1. New or renamed routes under `app/`.
 2. New migrations under `migrations/` affecting auth, RLS, payments, visibility, or performance.
-3. Changes to verification scripts in `package.json` (`check-*`, `test:*`, `qa:*`, `build`).
+3. Changes to verification scripts in `package.json` (`check-*`, `test:*`, `qa:*`, `build`) or gate scripts under `scripts/ci/**`.
 4. New E2E folders or key scenarios under `tests/e2e/`.
 5. New security/compliance/payment requirements.
+6. **Changes to the rule/governance layer itself** — any edit to `.cursor/rules/**`, `.cursor/agents/**`, `.cursor/skills/**`, or `AGENTS.md`. A rule change MUST be reconciled across the dependent agents/skills/guide in the **same task**, never left to drift.
+
+## How this is enforced (soft rule + hard hook)
+
+This rule is the **soft (judgment) layer**: the agent decides *what* content to update.
+
+The **hard (deterministic) layer** is a `postToolUse` hook
+(`.cursor/hooks/check-rule-sync.py`, registered in `.cursor/hooks.json`): whenever an
+edit touches a governance/gate file (the trigger paths above), it auto-injects a
+sync checklist into the agent context so the trigger is **unmissable**. The hook
+only *reminds*; it never rewrites docs (full auto-rewrite is unsafe — content needs
+judgment). Acting on the injected checklist is mandatory per this rule.
 
 ## Minimum Update Set
 

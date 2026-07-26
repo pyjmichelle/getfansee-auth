@@ -27,16 +27,12 @@
 确保 `.env.local` 包含：
 
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=https://ordomkygjpujxyivwviq.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=你的_anon_key
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZG9ta3lnanB1anh5aXZ3dmlxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDQ4ODQ2NywiZXhwIjoyMDgwMDY0NDY3fQ.aDk8dVJfxCxxoGjejRje7-O-keDq59Bvw9oL7IsPIH4
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
 
-**如果 SERVICE_ROLE_KEY 不存在，手动添加**：
-
-```bash
-echo "SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZG9ta3lnanB1anh5aXZ3dmlxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDQ4ODQ2NywiZXhwIjoyMDgwMDY0NDY3fQ.aDk8dVJfxCxxoGjejRje7-O-keDq59Bvw9oL7IsPIH4" >> .env.local
-```
+**如果 SERVICE_ROLE_KEY 不存在，从 Supabase Dashboard → Settings → API → service_role 复制后手动添加到 `.env.local`**（不要粘贴到对话或提交到仓库）。
 
 ---
 

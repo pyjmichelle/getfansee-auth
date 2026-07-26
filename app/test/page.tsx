@@ -55,8 +55,8 @@ export default function TestPage() {
             <div className="flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-medium text-foreground">Sign up / log in</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-small font-medium text-foreground">Sign up / log in</p>
+                <p className="text-tiny text-muted-foreground">
                   Create a new account or sign in with existing credentials
                 </p>
               </div>
@@ -64,10 +64,10 @@ export default function TestPage() {
             <div className="flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-medium text-foreground">
+                <p className="text-small font-medium text-foreground">
                   Visit /home and open a creator
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-tiny text-muted-foreground">
                   Browse creators list and navigate to a creator profile
                 </p>
               </div>
@@ -75,8 +75,8 @@ export default function TestPage() {
             <div className="flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-medium text-foreground">Subscribe</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-small font-medium text-foreground">Subscribe</p>
+                <p className="text-tiny text-muted-foreground">
                   Subscribe to a creator to unlock subscriber-only content
                 </p>
               </div>
@@ -84,8 +84,8 @@ export default function TestPage() {
             <div className="flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-medium text-foreground">Unlock PPV</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-small font-medium text-foreground">Unlock PPV</p>
+                <p className="text-tiny text-muted-foreground">
                   Purchase and unlock a pay-per-view post
                 </p>
               </div>
@@ -93,10 +93,10 @@ export default function TestPage() {
             <div className="flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-medium text-foreground">
+                <p className="text-small font-medium text-foreground">
                   Check /subscriptions and /purchases
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-tiny text-muted-foreground">
                   Verify that subscriptions and purchases are recorded correctly
                 </p>
               </div>
@@ -104,10 +104,10 @@ export default function TestPage() {
             <div className="flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-medium text-foreground">
+                <p className="text-small font-medium text-foreground">
                   Use /me to create creator profile (if applicable)
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-tiny text-muted-foreground">
                   Convert your account to a creator and set up your profile
                 </p>
               </div>

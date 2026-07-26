@@ -15,13 +15,12 @@ import { canViewPost } from "@/lib/paywall";
 import { HomeFeedClient } from "./components/HomeFeedClient";
 import { MOCK_POSTS, MOCK_CREATORS } from "@/lib/mock-data";
 
-// 使用 React.cache() 进行请求去重（server-cache-react 规则）
-const getCachedUser = cache(getCurrentUser);
-const getCachedProfile = cache(getProfile);
+// listFeed 本地去重（非共享调用点，getCurrentUser/getProfile 已在各自模块内
+// 用 React.cache() 包装，跨 layout/page 共享同一份请求内缓存，此处无需再包一层）。
 const getCachedFeed = cache(listFeed);
 
 export default async function HomePage() {
-  const user = await getCachedUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     redirect("/auth");
@@ -30,8 +29,8 @@ export default async function HomePage() {
   // 使用已解析的 user，避免 ensureProfile 内部重复 getCurrentUser 请求。
   await ensureProfile(user);
 
-  // 3. 获取用户 profile（使用缓存版本）
-  const userProfile = await getCachedProfile(user.id);
+  // 3. 获取用户 profile（已在模块内缓存）
+  const userProfile = await getProfile(user.id);
   if (!userProfile) {
     redirect("/auth");
   }

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 function SearchLoadingFallback() {
   return (
     <div
-      className="min-h-screen bg-background flex items-center justify-center"
+      className="min-h-dvh bg-background flex items-center justify-center"
       role="status"
       aria-live="polite"
       data-testid="search-loading"

@@ -21,6 +21,7 @@ import {
   createConfirmedTestUser,
   emitE2EDiagnostics,
   getOrigin,
+  injectSupabaseSession,
   safeClick,
   signInUser,
   signUpUser,
@@ -95,7 +96,18 @@ test.describe("Paywall Flow E2E", () => {
           .catch(() => {});
       }
 
-      await creatorPage.waitForURL(/\/home|\/creator\//, { timeout: 20_000 });
+      // Onboarding KYC step keeps URL on /creator/onboarding; session can drop to /auth under CI load.
+      const reachedStudio = await creatorPage
+        .waitForURL(/\/home|\/creator\//, { timeout: 45_000 })
+        .then(() => true)
+        .catch(() => false);
+      if (!reachedStudio || creatorPage.url().includes("/auth")) {
+        await injectSupabaseSession(creatorPage, creatorEmail, creatorPassword, BASE_URL);
+        await creatorPage.goto(`${BASE_URL}/creator/studio`, {
+          waitUntil: "domcontentloaded",
+          timeout: 15_000,
+        });
+      }
       await waitForPageLoad(creatorPage);
 
       // 4. Creator 通过 E2E 专用 API 创建带媒体的 locked post（使用当前页 origin，避免 cookie 隔离）

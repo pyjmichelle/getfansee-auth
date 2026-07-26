@@ -41,14 +41,18 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 glass-nav border-t border-white/6 lg:hidden"
+      className="fixed bottom-0 left-0 right-0 bg-[var(--bg-surface)]/95 backdrop-blur-md border-t border-[var(--border-subtle)] lg:hidden safe-area-bottom"
       role="navigation"
       aria-label="Main navigation"
       style={{ zIndex: "var(--z-bottom-nav)" as unknown as number }}
     >
+      {/* The safe-area inset is padding on the OUTER <nav>, added on top of
+          this fixed content height — not squeezed inside it. A border-box
+          height that included the inset used to compress the touch targets
+          down to a sliver on any notched/home-indicator device. */}
       <div
         className="flex items-center justify-around px-1"
-        style={{ height: "60px", paddingBottom: "env(safe-area-inset-bottom)" }}
+        style={{ height: "var(--bottom-nav-height)" }}
       >
         {visibleItems.map((item) => {
           const Icon = item.icon;
@@ -67,9 +71,9 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
                 "relative flex flex-col items-center justify-center gap-0.5",
                 "flex-1 h-full py-2",
                 "transition-[color,transform] duration-150",
-                "focus-visible:outline-none",
-                "active:scale-95",
-                isActive ? "text-violet-500" : "text-text-muted hover:text-text-secondary"
+                "focus-visible:outline-none focus-visible:ring-[1.5px] focus-visible:ring-[var(--wine)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg-surface)] focus-visible:rounded-[var(--radius-sm)]",
+                "active:scale-[0.98]",
+                isActive ? "text-wine-text" : "text-text-muted hover:text-text-secondary"
               )}
               aria-label={item.label}
               aria-current={isActive ? "page" : undefined}
@@ -77,20 +81,14 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
             >
               {/* Active indicator */}
               {isActive && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 h-[2px] w-6 rounded-full bg-violet-500" />
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 h-[2px] w-6 rounded-full bg-[var(--wine)]" />
               )}
 
               <div className="relative">
-                <Icon
-                  className={cn(
-                    "size-[20px]",
-                    isActive && "drop-shadow-[0_0_6px_rgba(139,92,246,0.5)]"
-                  )}
-                  aria-hidden="true"
-                />
+                <Icon className="size-[20px]" aria-hidden="true" />
                 {item.href === "/notifications" && notificationCount > 0 && (
                   <span
-                    className="absolute -top-1.5 -right-2 h-[16px] min-w-[16px] flex items-center justify-center rounded-full bg-violet-500 text-white text-[9px] font-bold px-0.5"
+                    className="absolute -top-1.5 -right-2 h-[16px] min-w-[16px] flex items-center justify-center rounded-full bg-[var(--wine)] text-text-primary text-[0.5625rem] font-bold px-0.5"
                     aria-label={`${notificationCount} unread`}
                   >
                     {notificationCount > 9 ? "9+" : notificationCount}
@@ -98,7 +96,7 @@ export function BottomNavigation({ notificationCount = 0, userRole }: BottomNavi
                 )}
               </div>
 
-              <span className={cn("text-[10px] font-medium", isActive ? "text-violet-500" : "")}>
+              <span className={cn("text-[10px] font-medium", isActive ? "text-wine-text" : "")}>
                 {item.label}
               </span>
             </Link>

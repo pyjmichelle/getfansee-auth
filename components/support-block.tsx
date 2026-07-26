@@ -92,14 +92,14 @@ export function SupportBlock({
             </span>
             Buy {creatorName ?? "this creator"} a {label}
           </h3>
-          <p className="text-[12px] text-text-muted mt-1">
+          <p className="text-tiny text-text-muted mt-1">
             A voluntary thank-you. Not a purchase — final and non-refundable.
           </p>
         </div>
         <Button
           variant="gold"
           size="sm"
-          className="rounded-full px-4 gap-1.5 shrink-0 active:scale-95"
+          className="rounded-full px-4 gap-1.5 shrink-0 active:scale-[0.98]"
           onClick={onTip}
           aria-label="Support this creator with a tip"
         >
@@ -111,7 +111,7 @@ export function SupportBlock({
       {/* Goal progress */}
       {goal && (
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-[12px]">
+          <div className="flex items-center justify-between text-tiny">
             <span className="text-text-secondary font-medium">{goal.title || "Support goal"}</span>
             <span className="text-text-muted">
               ${(goal.raised_cents / 100).toFixed(0)} / ${(goal.target_cents / 100).toFixed(0)}
@@ -119,35 +119,35 @@ export function SupportBlock({
           </div>
           <div className="h-2 rounded-full bg-white/8 overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-amber-400 to-amber-300 transition-all duration-500"
+              className="h-full bg-[var(--premium)] transition-all duration-500"
               style={{ width: `${goalPct}%` }}
             />
           </div>
-          <p className="text-[11px] text-text-muted text-right">{goalPct}% funded</p>
+          <p className="text-tiny text-text-muted text-right">{goalPct}% funded</p>
         </div>
       )}
 
       {/* Recent supporters */}
       {settings.show_supporters && supporters.length > 0 && (
         <div className="space-y-2 pt-1">
-          <p className="text-[12px] font-medium text-text-secondary">Recent supporters</p>
+          <p className="text-tiny font-medium text-text-secondary">Recent supporters</p>
           <ul className="space-y-2">
             {supporters.slice(0, 6).map((s, i) => (
               <li key={`${s.created_at}-${i}`} className="flex items-center gap-2.5">
                 <Avatar className="w-7 h-7 shrink-0">
                   <AvatarImage src={s.avatar_url ?? undefined} alt={s.display_name} />
-                  <AvatarFallback className="text-[10px] bg-amber-500/20 text-amber-300">
+                  <AvatarFallback className="text-[10px] bg-[var(--premium)]/20 text-[var(--premium)]">
                     {s.display_name[0]?.toUpperCase() ?? "S"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[12px] text-white truncate">{s.display_name}</span>
+                    <span className="text-tiny text-white truncate">{s.display_name}</span>
                     <SupporterBadge iconOnly size={11} />
                   </div>
-                  {s.message && <p className="text-[11px] text-text-muted truncate">{s.message}</p>}
+                  {s.message && <p className="text-tiny text-text-muted truncate">{s.message}</p>}
                 </div>
-                <span className="text-[11px] text-text-muted shrink-0">
+                <span className="text-tiny text-text-muted shrink-0">
                   {formatRelative(s.created_at)}
                 </span>
               </li>

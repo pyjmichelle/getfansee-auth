@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { type PostVisibility } from "@/lib/types";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { toast } from "sonner";
 import { MultiMediaUpload } from "@/components/multi-media-upload";
 import { TagSelector } from "@/components/tag-selector";
@@ -44,6 +44,7 @@ import Link from "next/link";
 
 export default function NewPostPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,15 +71,14 @@ export default function NewPostPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
+        if (!auth.authenticated || !auth.user) {
           router.push("/auth");
           return;
         }
 
-        setCurrentUserId(bootstrap.user.id);
+        setCurrentUserId(auth.user.id);
 
-        const profile = bootstrap.profile;
+        const profile = auth.profile;
         if (!profile) {
           setError("Unable to load profile");
           return;
@@ -103,7 +103,7 @@ export default function NewPostPage() {
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, auth.authenticated, auth.user, auth.profile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -168,8 +168,13 @@ export default function NewPostPage() {
         }
 
         toast.success("Post created successfully!");
+        const successParams = new URLSearchParams({
+          postId: result.postId,
+          type: formData.visibility,
+        });
+        if (priceCents) successParams.set("price", (priceCents / 100).toFixed(2));
         setTimeout(() => {
-          router.push("/home");
+          router.push(`/creator/studio/post/success?${successParams.toString()}`);
         }, 500);
       } else {
         const errMsg = result.error || "Failed to create, please try again";
@@ -209,8 +214,8 @@ export default function NewPostPage() {
       <PageShell user={currentUser} notificationCount={0} maxWidth="5xl" hideBottomNav>
         <div className="pb-24">
           <div className="bg-surface-raised border border-border-base rounded-2xl p-8 text-center">
-            <div className="w-16 h-16 bg-brand-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Lock size={32} className="text-brand-primary" />
+            <div className="w-16 h-16 bg-[var(--wine)]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Lock size={32} className="text-wine-text" />
             </div>
             <h1 className="text-2xl font-bold text-text-primary mb-2">Become a Creator</h1>
             <p className="text-text-tertiary mb-6">
@@ -218,7 +223,7 @@ export default function NewPostPage() {
             </p>
             <Button
               onClick={() => router.push("/home")}
-              className="px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-primary/90 transition-all shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+              className="px-6 py-3 bg-[var(--wine)] text-white rounded-xl font-semibold hover:bg-[var(--wine)]/90 transition-all :scale-95 focus-visible:ring-2 focus-visible:ring-[var(--wine)]"
             >
               Back to Home
             </Button>
@@ -241,7 +246,7 @@ export default function NewPostPage() {
       icon: Users,
       label: "Subscribers Only",
       description: "Only your subscribers can view",
-      color: "text-brand-primary",
+      color: "text-wine-text",
     },
     {
       value: "ppv" as const,
@@ -266,14 +271,14 @@ export default function NewPostPage() {
           <div className="flex items-center gap-4">
             <Link
               href="/creator/studio"
-              className="p-2.5 hover:bg-surface-raised rounded-xl transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+              className="p-2.5 hover:bg-surface-raised rounded-xl transition-colors active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-[var(--wine)]"
               aria-label="Back to Studio"
             >
               <ArrowLeft size={24} />
             </Link>
             <div>
               <h1 className="text-3xl font-bold mb-1 text-text-primary">Create New Post</h1>
-              <p className="text-text-tertiary text-sm">Share your content with your audience</p>
+              <p className="text-text-tertiary text-small">Share your content with your audience</p>
             </div>
           </div>
 
@@ -284,7 +289,7 @@ export default function NewPostPage() {
                   type="button"
                   variant="outline"
                   disabled={isSaving}
-                  className="px-5 py-2.5 bg-surface-raised border border-border-base rounded-xl font-semibold hover:bg-surface-overlay transition-all flex items-center gap-2 active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                  className="px-5 py-2.5 bg-surface-raised border border-border-base rounded-xl font-semibold hover:bg-surface-overlay transition-all flex items-center gap-2 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-[var(--wine)]"
                 >
                   Discard & Exit
                 </Button>
@@ -308,7 +313,7 @@ export default function NewPostPage() {
               onClick={handleSubmit}
               disabled={!canPublish || isSaving}
               variant="gradient"
-              className="px-6 py-2.5 text-white rounded-xl font-semibold hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-glow flex items-center gap-2 active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+              className="px-6 py-2.5 text-white rounded-xl font-semibold hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed 2 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-[var(--wine)]"
               data-testid="submit-button"
             >
               {isSaving ? (
@@ -330,7 +335,7 @@ export default function NewPostPage() {
         {error && (
           <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl flex items-center gap-3">
             <Info size={20} className="text-error flex-shrink-0" />
-            <p className="text-sm text-error">{error}</p>
+            <p className="text-small text-error">{error}</p>
           </div>
         )}
 
@@ -342,7 +347,7 @@ export default function NewPostPage() {
               {/* Post Title */}
               <div className="card-block p-6">
                 <label className="font-semibold flex items-center gap-2 mb-4">
-                  <Edit3 size={18} className="text-brand-primary" />
+                  <Edit3 size={18} className="text-wine-text" />
                   Title (optional)
                 </label>
                 <Input
@@ -352,7 +357,7 @@ export default function NewPostPage() {
                   placeholder="Give your post a title..."
                   maxLength={200}
                   disabled={isSaving}
-                  className="w-full px-4 py-3 bg-surface-base border border-border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-all text-text-primary placeholder:text-text-quaternary"
+                  className="w-full px-4 py-3 bg-surface-base border border-border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--wine)]/30 focus:border-[var(--border-wine)] transition-all text-text-primary placeholder:text-text-quaternary"
                   data-testid="post-title"
                 />
               </div>
@@ -361,10 +366,12 @@ export default function NewPostPage() {
               <div className="card-block p-6">
                 <div className="flex items-center justify-between mb-4">
                   <label className="font-semibold flex items-center gap-2">
-                    <Edit3 size={18} className="text-brand-primary" />
+                    <Edit3 size={18} className="text-wine-text" />
                     Post Content
                   </label>
-                  <span className="text-sm text-text-tertiary">{formData.content.length}/5000</span>
+                  <span className="text-small text-text-tertiary">
+                    {formData.content.length}/5000
+                  </span>
                 </div>
                 <Textarea
                   id="content"
@@ -374,10 +381,10 @@ export default function NewPostPage() {
                   rows={10}
                   maxLength={5000}
                   disabled={isSaving}
-                  className="w-full px-4 py-3 bg-surface-base border border-border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-all resize-none text-text-primary placeholder:text-text-quaternary"
+                  className="w-full px-4 py-3 bg-surface-base border border-border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--wine)]/30 focus:border-[var(--border-wine)] transition-all resize-none text-text-primary placeholder:text-text-quaternary"
                   data-testid="post-content"
                 />
-                <div className="flex items-center gap-4 mt-3 text-sm text-text-tertiary">
+                <div className="flex items-center gap-4 mt-3 text-small text-text-tertiary">
                   <div className="flex items-center gap-1.5">
                     <span>Markdown supported</span>
                   </div>
@@ -387,7 +394,7 @@ export default function NewPostPage() {
               {/* Media Upload */}
               <div className="card-block p-6" data-testid="upload-zone">
                 <label className="font-semibold flex items-center gap-2 mb-4">
-                  <Image size={18} className="text-brand-primary" />
+                  <Image size={18} className="text-wine-text" />
                   Media Attachments
                 </label>
                 <MultiMediaUpload
@@ -403,7 +410,7 @@ export default function NewPostPage() {
                   maxFiles={10}
                 />
                 {mediaFiles.length > 0 && (
-                  <p className="text-sm text-text-tertiary mt-3">
+                  <p className="text-small text-text-tertiary mt-3">
                     {mediaFiles.length} file(s) uploaded
                   </p>
                 )}
@@ -413,7 +420,7 @@ export default function NewPostPage() {
               {!isLoading && currentUser?.role === "creator" && (
                 <div className="card-block p-6">
                   <label className="font-semibold flex items-center gap-2 mb-4">
-                    <Hash size={18} className="text-brand-primary" />
+                    <Hash size={18} className="text-wine-text" />
                     Tags
                   </label>
                   <TagSelector
@@ -422,7 +429,7 @@ export default function NewPostPage() {
                     onChange={setSelectedTags}
                     maxTags={5}
                   />
-                  <p className="text-sm text-text-tertiary flex items-center gap-2 mt-3">
+                  <p className="text-small text-text-tertiary flex items-center gap-2 mt-3">
                     <Info size={14} />
                     {selectedTags.length}/5 tags • Add tags to help users discover your content
                   </p>
@@ -435,7 +442,7 @@ export default function NewPostPage() {
               {/* Visibility Settings */}
               <div className="card-block p-6 sticky top-24" data-testid="visibility-toggle">
                 <label className="font-semibold flex items-center gap-2 mb-4">
-                  <Eye size={18} className="text-brand-primary" />
+                  <Eye size={18} className="text-wine-text" />
                   Post Visibility
                 </label>
 
@@ -445,7 +452,7 @@ export default function NewPostPage() {
                       key={option.value}
                       className={`block p-4 rounded-xl border-2 cursor-pointer transition-all ${
                         formData.visibility === option.value
-                          ? "border-brand-primary shadow-glow bg-brand-primary-alpha-10"
+                          ? "border-[var(--border-wine)] 10"
                           : "border-border-subtle hover:border-border-base bg-surface-base"
                       }`}
                     >
@@ -469,17 +476,32 @@ export default function NewPostPage() {
                             <option.icon size={18} className={option.color} />
                             <span className="font-semibold text-text-primary">{option.label}</span>
                           </div>
-                          <p className="text-sm text-text-tertiary">{option.description}</p>
+                          <p className="text-small text-text-tertiary">{option.description}</p>
                         </div>
                       </div>
                     </label>
                   ))}
                 </div>
 
+                {/* Alpha notice: fans can't pay in-app yet for paid visibility */}
+                {(formData.visibility === "subscribers" || formData.visibility === "ppv") && (
+                  <div
+                    className="mt-4 p-3 rounded-xl bg-[var(--wine)]/8 border border-[var(--wine)]/20 flex items-start gap-2"
+                    data-testid="new-post-alpha-notice"
+                  >
+                    <Info size={14} className="text-wine-text mt-0.5 shrink-0" />
+                    <p className="text-tiny text-text-secondary leading-relaxed">
+                      During the Alpha, fans can&apos;t unlock this in-app yet — they&apos;ll see
+                      your external links instead. Pricing is saved now and will activate
+                      automatically once in-app payments launch in Beta.
+                    </p>
+                  </div>
+                )}
+
                 {/* Price Input for PPV */}
                 {formData.visibility === "ppv" && (
                   <div className="mt-4 pt-4 border-t border-border-subtle">
-                    <label className="block mb-2 text-sm font-semibold">Set Price</label>
+                    <label className="block mb-2 text-small font-semibold">Set Price</label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-tertiary font-semibold">
                         $
@@ -493,11 +515,11 @@ export default function NewPostPage() {
                         min="1.00"
                         step="0.01"
                         disabled={isSaving}
-                        className="w-full pl-9 pr-4 py-3 bg-surface-base border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-all"
+                        className="w-full pl-9 pr-4 py-3 bg-surface-base border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--wine)]/30 focus:border-[var(--border-wine)] transition-all"
                         data-testid="price-input"
                       />
                     </div>
-                    <p className="text-xs text-text-tertiary mt-2 flex items-center gap-1">
+                    <p className="text-tiny text-text-tertiary mt-2 flex items-center gap-1">
                       <Info size={12} />
                       Minimum: $1.00 • Platform fee: 20%
                     </p>
@@ -509,7 +531,7 @@ export default function NewPostPage() {
                           key={suggested}
                           type="button"
                           onClick={() => setFormData({ ...formData, price: suggested })}
-                          className="flex-1 px-3 py-2 bg-surface-base border border-border-base rounded-lg text-sm font-semibold hover:bg-brand-primary/10 hover:border-brand-primary/30 transition-all"
+                          className="flex-1 px-3 py-2 bg-surface-base border border-border-base rounded-lg text-small font-semibold hover:bg-[var(--wine)]/10 hover:border-[var(--border-wine)]/30 transition-all"
                         >
                           ${suggested}
                         </button>
@@ -519,7 +541,7 @@ export default function NewPostPage() {
                     {/* Earnings Preview */}
                     {formData.price && parseFloat(formData.price) >= 1.0 && (
                       <div className="mt-4 p-3 bg-success/10 border border-success/20 rounded-xl">
-                        <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center justify-between text-small">
                           <span className="text-text-tertiary">You&apos;ll earn:</span>
                           <span className="font-bold text-success">
                             ${(parseFloat(formData.price) * 0.8).toFixed(2)}
@@ -536,7 +558,7 @@ export default function NewPostPage() {
                 mediaFiles.some((f) => f.type === "image")) && (
                 <div className="card-block p-6">
                   <label className="font-semibold flex items-center gap-2 mb-4">
-                    <Calendar size={18} className="text-brand-primary" />
+                    <Calendar size={18} className="text-wine-text" />
                     Media Options
                   </label>
 
@@ -544,10 +566,10 @@ export default function NewPostPage() {
                   {mediaFiles.some((f) => f.type === "video") && (
                     <div className="flex items-center justify-between p-3 bg-surface-base border border-border-base rounded-xl mb-3">
                       <div className="flex-1">
-                        <Label htmlFor="preview_enabled" className="text-sm font-semibold">
+                        <Label htmlFor="preview_enabled" className="text-small font-semibold">
                           Enable Preview
                         </Label>
-                        <p className="text-xs text-text-tertiary">First 10 seconds teaser</p>
+                        <p className="text-tiny text-text-tertiary">First 10 seconds teaser</p>
                       </div>
                       <Switch
                         id="preview_enabled"
@@ -564,10 +586,10 @@ export default function NewPostPage() {
                   {mediaFiles.some((f) => f.type === "image") && (
                     <div className="flex items-center justify-between p-3 bg-surface-base border border-border-base rounded-xl">
                       <div className="flex-1">
-                        <Label htmlFor="watermark_enabled" className="text-sm font-semibold">
+                        <Label htmlFor="watermark_enabled" className="text-small font-semibold">
                           Enable Watermark
                         </Label>
-                        <p className="text-xs text-text-tertiary">Protect your images</p>
+                        <p className="text-tiny text-text-tertiary">Protect your images</p>
                       </div>
                       <Switch
                         id="watermark_enabled"
@@ -586,14 +608,14 @@ export default function NewPostPage() {
         </form>
 
         {/* Mobile Action Buttons */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-surface-base border-t border-border-base flex gap-3 z-50">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-surface-base border-t border-border-base flex gap-3 z-[var(--z-bottom-nav)]">
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
                 type="button"
                 variant="outline"
                 disabled={isSaving}
-                className="flex-1 py-3 bg-surface-raised border border-border-base rounded-xl font-semibold hover:bg-surface-overlay transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                className="flex-1 py-3 bg-surface-raised border border-border-base rounded-xl font-semibold hover:bg-surface-overlay transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-[var(--wine)]"
               >
                 Discard & Exit
               </Button>
@@ -615,7 +637,7 @@ export default function NewPostPage() {
             onClick={handleSubmit}
             disabled={!canPublish || isSaving}
             variant="gradient"
-            className="flex-1 py-3 text-white rounded-xl font-semibold disabled:opacity-40 shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary disabled:shadow-none"
+            className="flex-1 py-3 text-white rounded-xl font-semibold disabled:opacity-40 :scale-95 focus-visible:ring-2 focus-visible:ring-[var(--wine)] disabled:shadow-none"
             data-testid="submit-button-mobile"
           >
             {isSaving ? "Publishing..." : "Publish"}

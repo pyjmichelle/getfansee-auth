@@ -746,15 +746,12 @@ Scenarios:
 - Batch accrual (`POST /api/admin/commissions/accrue` and/or cron):
   1. Load settings (service role). If `program_enabled=false`, exit.
   2. For each `attribution` with `status IN ('qualified','revenue_eligible')`, `is_fraud=false`,
-     `status NOT IN ('rejected','fraud')`, and `now() <= window_ends_at`:
-     - Sum **eligible** `transactions` for `referred_user_id` (section 8 definition: `type IN
+     `status NOT IN ('rejected','fraud')`, and `now() <= window_ends_at`: - Sum **eligible** `transactions` for `referred_user_id` (section 8 definition: `type IN
 ('ppv_revenue','subscription')`, positive amount, `status='completed'` (exclude
-       `pending`/`failed`/`refunded`), not a self-purchase; documented limitations for chargeback/void/
-       test/internal/risk-flag), `created_at` within `[max(qualified_at, last_accrual_watermark), now()]`.
-     - `estimated = floor(sum * commission_percent / 100)`; apply cap if set.
-     - If `estimated > 0`, upsert one `creator_referral_commissions` row for the period (unique key prevents
-       dupes), status `pending`, writing `estimated_commission_amount_cents` (leave `approved_*`/`payable_*`
-       NULL); set attribution `status='revenue_eligible'`; emit `commission_accrued`.
+     `pending`/`failed`/`refunded`), not a self-purchase; documented limitations for chargeback/void/
+     test/internal/risk-flag), `created_at` within `[max(qualified_at, last_accrual_watermark), now()]`. - `estimated = floor(sum * commission_percent / 100)`; apply cap if set. - If `estimated > 0`, upsert one `creator_referral_commissions` row for the period (unique key prevents
+     dupes), status `pending`, writing `estimated_commission_amount_cents` (leave `approved_*`/`payable_*`
+     NULL); set attribution `status='revenue_eligible'`; emit `commission_accrued`.
   3. Watermark stored on attribution or derived from latest commission `period_end`.
 - **Refund handling**: exclude `status='refunded'` revenue; if a later recompute reduces basis, admin can
   reject/adjust affected pending commissions (MVP: manual). Document as known limitation.

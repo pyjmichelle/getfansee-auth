@@ -15,16 +15,15 @@ import {
   CreditCard,
   ArrowRight,
   Plus,
-  BarChart3,
-  FileText,
 } from "@/lib/icons";
 import { PageShell } from "@/components/page-shell";
+import { StudioShell } from "@/components/shells/studio-shell";
 import { StatCard } from "@/components/stat-card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { format } from "date-fns";
 import { useCountUp } from "@/hooks/use-count-up";
-import { getAuthBootstrap } from "@/lib/auth-bootstrap-client";
+import { useAuth } from "@/contexts/auth-context";
 import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
 
 interface Transaction {
@@ -39,9 +38,10 @@ interface Transaction {
 
 export default function EarningsPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [_timeRange, _setTimeRange] = useState<"7d" | "30d" | "90d" | "all">("30d");
+  const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "all">("all");
   const [currentUser, setCurrentUser] = useState<{
     username: string;
     role: "fan" | "creator";
@@ -54,19 +54,18 @@ export default function EarningsPage() {
       try {
         setIsLoading(true);
 
-        const bootstrap = await getAuthBootstrap();
-        if (!bootstrap.authenticated || !bootstrap.user) {
+        if (!auth.authenticated || !auth.user) {
           router.push("/auth");
           return;
         }
-        if (bootstrap.profile?.role !== "creator") {
+        if (auth.profile?.role !== "creator") {
           router.push("/home");
           return;
         }
         setCurrentUser({
-          username: bootstrap.profile?.display_name || bootstrap.user.email.split("@")[0] || "user",
+          username: auth.profile?.display_name || auth.user.email.split("@")[0] || "user",
           role: "creator",
-          avatar: bootstrap.profile?.avatar_url || undefined,
+          avatar: auth.profile?.avatar_url || undefined,
         });
 
         // 加载收益数据（通过 API）
@@ -85,7 +84,17 @@ export default function EarningsPage() {
     };
 
     loadData();
-  }, [router]);
+  }, [router, auth.authenticated, auth.user, auth.profile]);
+
+  // Filter by selected time range (applies to the breakdown + history list; the
+  // available/pending balance cards always reflect the full lifetime total).
+  const rangeStartMs =
+    timeRange === "all"
+      ? 0
+      : Date.now() - { "7d": 7, "30d": 30, "90d": 90 }[timeRange] * 24 * 60 * 60 * 1000;
+  const filteredTransactions = transactions.filter(
+    (t) => new Date(t.created_at).getTime() >= rangeStartMs
+  );
 
   // 计算统计数据
   const completedTransactions = transactions.filter((t) => t.status === "completed");
@@ -98,9 +107,6 @@ export default function EarningsPage() {
   const completedNonTipCents = sumCents(completedTransactions.filter((t) => t.type !== "tip"));
   const pendingTipCents = sumCents(pendingTransactions.filter((t) => t.type === "tip"));
   const pendingNonTipCents = sumCents(pendingTransactions.filter((t) => t.type !== "tip"));
-
-  const totalEarnings = (completedTipCents + completedNonTipCents) / 100;
-  const pendingEarnings = (pendingTipCents + pendingNonTipCents) / 100;
 
   // 可提金额（已结算的）: tips at true net + non-tip legacy estimate
   const availableBalance = (completedNonTipCents * 0.8 + completedTipCents) / 100;
@@ -137,10 +143,10 @@ export default function EarningsPage() {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case "subscription":
-        return <Users size={20} className="text-brand-primary" />;
+        return <Users size={20} className="text-wine-text" />;
       case "ppv_purchase":
       case "unlock":
-        return <Unlock size={20} className="text-brand-secondary" />;
+        return <Unlock size={20} className="text-wine-text" />;
       case "tip":
         return <Gift size={20} className="text-success" />;
       case "payout":
@@ -166,17 +172,17 @@ export default function EarningsPage() {
     }
   };
 
-  // Revenue breakdown stats
+  // Revenue breakdown stats (respects the selected time range)
   const subscriptionRevenue =
-    transactions
+    filteredTransactions
       .filter((t) => t.type === "subscription" && t.status === "completed")
       .reduce((sum, t) => sum + t.amount_cents, 0) / 100;
   const unlockRevenue =
-    transactions
+    filteredTransactions
       .filter((t) => (t.type === "ppv_purchase" || t.type === "unlock") && t.status === "completed")
       .reduce((sum, t) => sum + t.amount_cents, 0) / 100;
   const tipRevenue =
-    transactions
+    filteredTransactions
       .filter((t) => t.type === "tip" && t.status === "completed")
       .reduce((sum, t) => sum + t.amount_cents, 0) / 100;
 
@@ -189,6 +195,27 @@ export default function EarningsPage() {
   const animatedSubsRevenue = useCountUp(subscriptionRevenue, { duration: 900, decimals: 0 });
   const animatedUnlockRevenue = useCountUp(unlockRevenue, { duration: 900, decimals: 0 });
   const animatedTipRevenue = useCountUp(tipRevenue, { duration: 900, decimals: 0 });
+
+  const handleExportCsv = () => {
+    const header = ["Date", "Type", "Status", "Amount (USD)", "Available On"];
+    const rows = filteredTransactions.map((t) => [
+      formatDate(t.created_at),
+      getTypeLabel(t.type),
+      t.status,
+      (t.amount_cents / 100).toFixed(2),
+      t.available_on ? formatAvailableDate(t.available_on) : "",
+    ]);
+    const csv = [header, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `earnings-${timeRange}-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   if (isLoading) {
     return (
@@ -207,38 +234,72 @@ export default function EarningsPage() {
 
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
-      <div className="pb-24 flex flex-col lg:flex-row gap-8">
-        <main className="flex-1 min-w-0">
+      <div className="pb-24">
+        <StudioShell
+          sidebarExtra={
+            <div className="card-block p-4">
+              <h2 className="text-tiny font-semibold text-text-muted uppercase tracking-wider mb-3">
+                Quick actions
+              </h2>
+              <div className="space-y-2">
+                <Button variant="default" size="md" className="w-full" asChild>
+                  <Link href="/creator/new-post">
+                    <Plus size={16} aria-hidden />
+                    Create Post
+                  </Link>
+                </Button>
+                <Button variant="outline" size="md" className="w-full" asChild>
+                  <Link href="/creator/studio/ambassador">
+                    <ArrowRight size={16} aria-hidden />
+                    Refer Creators
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          }
+        >
           {/* Header */}
           <div className="mb-4 md:mb-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <Link
                   href="/creator/studio"
-                  className="p-2.5 hover:bg-surface-raised rounded-xl transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
+                  className="p-2.5 hover:bg-surface-raised rounded-xl transition-colors active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-brand-primary"
                 >
                   <ArrowLeft size={24} />
                 </Link>
                 <div>
-                  <h1 className="text-2xl md:text-4xl font-bold tracking-tight mb-1 md:mb-3 text-text-primary">
-                    Earnings
-                  </h1>
-                  <p className="text-text-tertiary text-sm md:text-lg">
+                  <h1 className="text-h2 md:text-h1 text-text-primary">Earnings</h1>
+                  <p className="text-text-tertiary text-small md:text-body">
                     Track revenue and manage payouts
                   </p>
                 </div>
               </div>
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="px-5 py-3 bg-surface-raised border-border-base hover:bg-surface-overlay"
+              <div className="flex items-center gap-3">
+                <div
+                  className="inline-flex items-center gap-1 rounded-full bg-surface-raised p-1"
+                  role="group"
+                  aria-label="Time range"
                 >
-                  <Download size={18} />
+                  {(["7d", "30d", "90d", "all"] as const).map((range) => (
+                    <button
+                      key={range}
+                      type="button"
+                      onClick={() => setTimeRange(range)}
+                      aria-pressed={timeRange === range}
+                      className={`min-h-11 px-3 py-1.5 rounded-full text-tiny font-semibold transition-colors ${
+                        timeRange === range
+                          ? "bg-[var(--wine)] text-text-primary"
+                          : "text-text-secondary hover:text-text-primary"
+                      }`}
+                    >
+                      {range === "all" ? "All" : range}
+                    </button>
+                  ))}
+                </div>
+                <Button variant="outline" size="md" onClick={handleExportCsv}>
+                  <Download size={16} aria-hidden />
                   Export
-                </Button>
-                <Button variant="subscribe-gradient" className="px-5 py-3">
-                  <ArrowRight size={18} />
-                  Request Payout
                 </Button>
               </div>
             </div>
@@ -255,26 +316,31 @@ export default function EarningsPage() {
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-6">
                   <div>
-                    <div className="text-sm text-text-tertiary font-semibold mb-2 uppercase tracking-wide">
+                    <div className="text-small text-text-tertiary font-semibold mb-2 uppercase tracking-wide">
                       Available Balance
                     </div>
-                    <div className="text-5xl font-bold tracking-tight mb-2 text-gradient-primary">
+                    <div className="text-5xl font-bold tracking-tight mb-2 tabular-nums">
                       ${animatedAvailable.toFixed(2)}
                     </div>
-                    <div className="text-sm text-text-secondary">Ready to withdraw</div>
+                    <div className="text-small text-text-secondary">Ready to withdraw</div>
                   </div>
                   <div className="w-14 h-14 bg-success/10 rounded-2xl flex items-center justify-center">
                     <DollarSign size={28} className="text-success" />
                   </div>
                 </div>
 
-                <Button
-                  variant="success-gradient"
-                  className="w-full px-6 py-3.5 flex items-center justify-center gap-2"
+                <div
+                  className="rounded-xl border border-border-base bg-surface-raised p-4 text-small text-text-secondary"
+                  data-testid="alpha-payout-policy"
                 >
-                  <ArrowRight size={18} />
-                  Request Payout
-                </Button>
+                  <p className="font-semibold text-text-primary mb-1">Payouts during Alpha</p>
+                  <p>
+                    In-platform payments are not yet enabled, so there is nothing to withdraw yet.
+                    When payments launch in Beta, Founding Creators keep{" "}
+                    <strong className="text-text-primary">100% of their earnings</strong> (0%
+                    platform commission) for the introductory period.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -282,14 +348,14 @@ export default function EarningsPage() {
             <div className="bento-2x1 card-block p-4 md:p-8">
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <div className="text-sm text-text-tertiary font-semibold mb-2 uppercase tracking-wide">
+                  <div className="text-small text-text-tertiary font-semibold mb-2 uppercase tracking-wide">
                     Pending Payout
                   </div>
                   <div className="text-5xl font-bold tracking-tight mb-2 text-text-primary">
                     ${animatedPending.toFixed(2)}
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock size={14} className="text-brand-secondary" />
+                  <div className="flex items-center gap-2 text-small">
+                    <Clock size={14} className="text-wine-text" />
                     <span className="text-text-secondary">
                       {pendingTransactions.length > 0 && pendingTransactions[0].available_on
                         ? `Estimated ${formatAvailableDate(pendingTransactions[0].available_on)}`
@@ -298,13 +364,13 @@ export default function EarningsPage() {
                   </div>
                 </div>
                 <div className="w-14 h-14 bg-brand-secondary/10 rounded-2xl flex items-center justify-center">
-                  <Clock size={28} className="text-brand-secondary" />
+                  <Clock size={28} className="text-wine-text" />
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 text-sm text-text-tertiary">
+              <div className="flex items-center gap-2 text-small text-text-tertiary">
                 <CreditCard size={14} />
-                <span>Bank •••• 4242</span>
+                <span>Payout methods open in Beta</span>
               </div>
             </div>
           </div>
@@ -313,7 +379,7 @@ export default function EarningsPage() {
           <div className="card-block p-4 md:p-8 mb-10">
             <div className="mb-6">
               <h3 className="text-lg font-bold mb-1 text-text-primary">Revenue Breakdown</h3>
-              <p className="text-sm text-text-tertiary">Earnings by source</p>
+              <p className="text-small text-text-tertiary">Earnings by source</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -347,13 +413,13 @@ export default function EarningsPage() {
               <h3 className="text-lg font-bold text-text-primary">Recent Transactions</h3>
             </div>
 
-            {transactions.length === 0 ? (
+            {filteredTransactions.length === 0 ? (
               <div className="p-12 text-center">
                 <p className="text-text-tertiary">No transactions yet</p>
               </div>
             ) : (
               <div className="divide-y divide-border-subtle">
-                {transactions.map((transaction) => {
+                {filteredTransactions.map((transaction) => {
                   const amount = transaction.amount_cents / 100;
                   const _afterFee = amount * 0.8;
                   const isPositive = amount > 0;
@@ -377,7 +443,7 @@ export default function EarningsPage() {
                             <div className="font-semibold mb-1 text-text-primary">
                               {getTypeLabel(transaction.type)}
                             </div>
-                            <div className="text-sm text-text-tertiary">
+                            <div className="text-small text-text-tertiary">
                               {formatDate(transaction.created_at)}
                               {transaction.available_on && transaction.status === "pending" && (
                                 <span className="ml-2">
@@ -396,7 +462,7 @@ export default function EarningsPage() {
                           >
                             {isPositive ? "+" : ""}${Math.abs(amount).toFixed(2)}
                           </div>
-                          <div className="text-xs text-text-tertiary capitalize flex items-center gap-1 justify-end">
+                          <div className="text-tiny text-text-tertiary capitalize flex items-center gap-1 justify-end">
                             {transaction.status === "completed" ? (
                               <>
                                 <CheckCircle size={12} className="text-success" />
@@ -404,7 +470,7 @@ export default function EarningsPage() {
                               </>
                             ) : (
                               <>
-                                <Clock size={12} className="text-brand-secondary" />
+                                <Clock size={12} className="text-wine-text" />
                                 <span>Pending</span>
                               </>
                             )}
@@ -417,66 +483,7 @@ export default function EarningsPage() {
               </div>
             )}
           </div>
-        </main>
-
-        {/* Sidebar: Studio nav + quick actions (PC) */}
-        <aside className="w-full lg:w-72 shrink-0">
-          <div className="sticky top-24 space-y-4">
-            <div className="card-block p-4">
-              <h2 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">
-                Studio
-              </h2>
-              <nav className="space-y-1" aria-label="Studio navigation">
-                {[
-                  { href: "/creator/new-post", icon: Plus, label: "Create Post" },
-                  { href: "/creator/studio/earnings", icon: DollarSign, label: "Earnings" },
-                  { href: "/creator/studio/subscribers", icon: Users, label: "Subscribers" },
-                  { href: "/creator/studio/tips", icon: Gift, label: "Tips" },
-                  { href: "/creator/studio/post/list", icon: FileText, label: "Post List" },
-                  { href: "/creator/studio/analytics", icon: BarChart3, label: "Analytics" },
-                ].map(({ href, icon: Icon, label }) => {
-                  const isActive = href === "/creator/studio/earnings";
-                  return (
-                    <Link
-                      key={href}
-                      href={href}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary ${
-                        isActive
-                          ? "bg-brand-primary/10 text-brand-primary"
-                          : "text-text-secondary hover:bg-surface-raised hover:text-text-primary"
-                      }`}
-                    >
-                      <Icon size={16} />
-                      {label}
-                    </Link>
-                  );
-                })}
-              </nav>
-            </div>
-            <div className="card-block p-4">
-              <h2 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">
-                Quick actions
-              </h2>
-              <div className="space-y-2">
-                <Link
-                  href="/creator/studio/earnings"
-                  className="w-full px-4 py-3 bg-success text-white rounded-xl font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-glow active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-primary"
-                >
-                  <ArrowRight size={18} />
-                  Request Payout
-                </Link>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full px-4 py-3 bg-surface-raised border-border-base hover:bg-surface-overlay flex items-center justify-center gap-2"
-                >
-                  <Download size={18} />
-                  Export
-                </Button>
-              </div>
-            </div>
-          </div>
-        </aside>
+        </StudioShell>
       </div>
     </PageShell>
   );

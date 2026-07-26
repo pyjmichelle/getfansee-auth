@@ -3,6 +3,7 @@ import { subscribe30d } from "@/lib/paywall";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { sendSubscriptionConfirmation } from "@/lib/email";
+import { isInAppPaymentsEnabled } from "@/lib/constants/alpha";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://getfansee.com";
@@ -14,6 +15,21 @@ type SubscribePayload = {
 
 export async function POST(request: NextRequest) {
   try {
+    // Pre-Payment Alpha: no wallet top-up path exists in production. Block
+    // subscriptions entirely here (paid AND price=0 "free" ones) — a $0
+    // subscription would otherwise be a loophole that grants subscriber-only
+    // access without going through the real free-follow system
+    // (/api/follow). Fans should use Follow for free access during Alpha.
+    if (!isInAppPaymentsEnabled()) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "In-app subscriptions are not available during the Alpha. Coming soon.",
+        },
+        { status: 403 }
+      );
+    }
+
     const { creatorId, priceCents } = (await request.json()) as SubscribePayload;
 
     if (!creatorId) {

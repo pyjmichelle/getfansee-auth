@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Lock, Check, X, CreditCard, Loader2 } from "@/lib/icons";
+import { Lock, Check, X, CreditCard, Loader2, ExternalLink } from "@/lib/icons";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,21 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { getWalletBalance } from "@/lib/wallet";
 import { Analytics } from "@/lib/analytics";
+import type { PublicExternalLink } from "@/lib/external-links";
+
+/**
+ * Pre-Payment Alpha paywall policy:
+ * - In-platform payment rails are not live in production, so the paywall
+ *   offers the external-link path ("continue on the creator's page") plus an
+ *   "in-app unlock coming soon" placeholder.
+ * - Test mode (NEXT_PUBLIC_TEST_MODE) keeps the original wallet flow so E2E
+ *   money-flow suites remain valid.
+ * - When the crypto side quest ships (NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED), the
+ *   wallet path re-activates and the paywall becomes truly dual-path.
+ */
+const IS_TEST_MODE = process.env.NEXT_PUBLIC_TEST_MODE === "true";
+const CRYPTO_ENABLED = process.env.NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED === "true";
+const WALLET_PATH_ACTIVE = IS_TEST_MODE || CRYPTO_ENABLED;
 
 interface PaywallModalProps {
   open: boolean;
@@ -24,6 +39,27 @@ interface PaywallModalProps {
   postId?: string; // PPV 解锁需要的 post ID
   creatorId?: string; // 订阅需要的 creator ID
   onSuccess: () => void | Promise<void>;
+}
+
+/** Alpha: fetch the creator's approved external links for the outbound path. */
+function useCreatorExternalLinks(creatorId: string | undefined, open: boolean) {
+  const [links, setLinks] = useState<PublicExternalLink[]>([]);
+
+  useEffect(() => {
+    if (!open || !creatorId || WALLET_PATH_ACTIVE) return;
+    let mounted = true;
+    fetch(`/api/creator/${creatorId}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (mounted) setLinks(json?.creator?.external_links ?? []);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, [creatorId, open]);
+
+  return links;
 }
 
 export function PaywallModal({
@@ -48,8 +84,9 @@ export function PaywallModal({
   const [balanceError, setBalanceError] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const externalLinks = useCreatorExternalLinks(creatorId, open);
 
-  // 当弹窗打开时追踪 paywall 展示事件
+  // 当弹窗打开时追踪 paywall 展示事件 + 变体（钱包 vs Alpha 外链，A/B 漏斗数据）
   useEffect(() => {
     if (open && postId) {
       Analytics.paywallShown(
@@ -57,6 +94,9 @@ export function PaywallModal({
         type === "subscribe" ? "subscription" : "ppv",
         Math.round(price * 100)
       );
+    }
+    if (open) {
+      Analytics.paywallVariantShown(postId, WALLET_PATH_ACTIVE ? "wallet" : "external_alpha");
     }
   }, [open, postId, type, price]);
 
@@ -223,6 +263,108 @@ export function PaywallModal({
     }
   };
 
+  // Alpha production paywall: external-link path + in-app unlock placeholder.
+  const alphaContent = (
+    <div className="flex flex-col" data-testid="paywall-modal">
+      <div className="flex flex-col items-center text-center pb-4 border-b border-white/8">
+        <div className="relative mb-3">
+          {creatorAvatar ? (
+            <div className="relative">
+              <img
+                src={creatorAvatar}
+                alt={creatorName}
+                className="size-14 rounded-full object-cover border-2 border-[var(--wine)]/30"
+              />
+              <div className="absolute -bottom-1 -right-1 size-6 rounded-full bg-bg-elevated border border-white/10 flex items-center justify-center">
+                <Lock className="size-3 text-wine-text" aria-hidden="true" />
+              </div>
+            </div>
+          ) : (
+            <div className="size-14 rounded-full bg-[var(--wine)]/15 backdrop-blur-md flex items-center justify-center border border-[var(--wine)]/20">
+              <Lock className="size-6 text-wine-text" aria-hidden="true" />
+            </div>
+          )}
+        </div>
+        <DialogTitle className="text-[18px] font-semibold text-white mb-1">
+          {type === "subscribe" ? `Support ${creatorName}` : "Exclusive Content"}
+        </DialogTitle>
+        <DialogDescription className="text-text-muted text-tiny">
+          {contentPreview || "This content is reserved for supporters"}
+        </DialogDescription>
+      </div>
+
+      {/* Path A: creator's verified external pages */}
+      {externalLinks.length > 0 && (
+        <div className="py-4 border-b border-white/6">
+          <p className="text-tiny font-semibold text-text-secondary mb-2.5">
+            Continue on {creatorName}&apos;s page:
+          </p>
+          <div className="flex flex-col gap-2">
+            {externalLinks.map((link) => (
+              <a
+                key={link.id}
+                href={`/api/link/out?id=${link.id}`}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                data-testid="paywall-external-link"
+                onClick={() =>
+                  Analytics.track("external_link_clicked", {
+                    creator_id: creatorId,
+                    link_id: link.id,
+                    source: "paywall",
+                  })
+                }
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-[var(--radius-sm)] bg-white/4 border border-white/8 hover:border-[var(--wine)]/40 transition-colors"
+              >
+                <div className="size-8 rounded-lg bg-[var(--wine)]/15 flex items-center justify-center shrink-0">
+                  <ExternalLink className="size-[14px] text-wine-text" aria-hidden="true" />
+                </div>
+                <span className="text-small font-semibold text-text-primary flex-1">
+                  {link.label}
+                </span>
+              </a>
+            ))}
+          </div>
+          <p className="text-[10px] text-text-disabled mt-2">
+            External purchases are handled by the destination site, not GetFanSee.
+          </p>
+        </div>
+      )}
+
+      {/* Path B: in-app unlock placeholder */}
+      <div className="py-4">
+        <div
+          className="flex items-center gap-2.5 px-3 py-2.5 rounded-[var(--radius-sm)] bg-white/3 border border-dashed border-white/10"
+          data-testid="paywall-inapp-placeholder"
+        >
+          <div className="size-8 rounded-lg bg-white/6 flex items-center justify-center shrink-0">
+            <CreditCard className="size-[14px] text-text-muted" aria-hidden="true" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-tiny font-semibold text-text-secondary leading-tight">
+              In-app unlock — coming soon
+            </p>
+            <p className="text-tiny text-text-muted leading-tight">
+              Direct purchases launch in Beta. Follow {creatorName} to get notified.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2 pt-1">
+        <Button
+          variant="ghost"
+          size="default"
+          className="w-full"
+          onClick={handleClose}
+          aria-label="Close"
+        >
+          Maybe later
+        </Button>
+      </div>
+    </div>
+  );
+
   const content = (
     <div className="flex flex-col" data-testid="paywall-modal">
       {/* Header */}
@@ -237,20 +379,20 @@ export function PaywallModal({
               <img
                 src={creatorAvatar}
                 alt={creatorName}
-                className="size-14 rounded-full object-cover border-2 border-violet-500/30 shadow-glow-violet"
+                className="size-14 rounded-full object-cover border-2 border-[var(--wine)]/30 "
               />
               <div className="absolute -bottom-1 -right-1 size-6 rounded-full bg-bg-elevated border border-white/10 flex items-center justify-center">
-                <Lock className="size-3 text-violet-400" aria-hidden="true" />
+                <Lock className="size-3 text-wine-text" aria-hidden="true" />
               </div>
             </div>
           ) : (
-            <div className="size-14 rounded-full bg-violet-500/15 backdrop-blur-md flex items-center justify-center border border-violet-500/20 shadow-glow-violet">
+            <div className="size-14 rounded-full bg-[var(--wine)]/15 backdrop-blur-md flex items-center justify-center border border-[var(--wine)]/20 ">
               {paymentState === "success" ? (
                 <Check className="size-6 text-emerald-400" aria-hidden="true" />
               ) : paymentState === "error" ? (
                 <X className="size-6 text-red-400" aria-hidden="true" />
               ) : (
-                <Lock className="size-6 text-violet-400" aria-hidden="true" />
+                <Lock className="size-6 text-wine-text" aria-hidden="true" />
               )}
             </div>
           )}
@@ -264,7 +406,7 @@ export function PaywallModal({
             >
               Content Unlocked!
             </DialogTitle>
-            <DialogDescription className="text-text-muted text-[12px] text-center">
+            <DialogDescription className="text-text-muted text-tiny text-center">
               Enjoy your exclusive content...
             </DialogDescription>
           </>
@@ -273,7 +415,7 @@ export function PaywallModal({
             <DialogTitle className="text-[18px] font-semibold text-white mb-1">
               Payment Failed
             </DialogTitle>
-            <DialogDescription className="text-text-muted text-[12px]">
+            <DialogDescription className="text-text-muted text-tiny">
               {paymentError ||
                 "Something went wrong. Please check your payment method and try again."}
             </DialogDescription>
@@ -283,7 +425,7 @@ export function PaywallModal({
             <DialogTitle className="text-[18px] font-semibold text-white mb-1">
               {type === "subscribe" ? `Subscribe to ${creatorName}` : "Unlock Exclusive Content"}
             </DialogTitle>
-            <DialogDescription className="text-text-muted text-[12px]">
+            <DialogDescription className="text-text-muted text-tiny">
               {contentPreview || "Get instant access to exclusive content"}
             </DialogDescription>
           </>
@@ -295,38 +437,33 @@ export function PaywallModal({
           {/* Pricing */}
           <div className="py-4 border-b border-white/6 text-center">
             <div className="flex items-baseline justify-center gap-1.5 mb-1">
-              <span
-                className="text-[32px] font-bold text-gradient-primary"
-                data-testid="paywall-price"
-              >
+              <span className="text-[32px] font-bold text-text-primary" data-testid="paywall-price">
                 ${price.toFixed(2)}
               </span>
               {type === "subscribe" && (
-                <span className="text-text-muted text-[13px]" data-testid="paywall-billing-period">
+                <span className="text-text-muted text-small" data-testid="paywall-billing-period">
                   /{billingPeriod}
                 </span>
               )}
             </div>
             {type === "subscribe" && (
-              <p className="text-[12px] text-text-muted">
-                Billed {billingPeriod}ly · Cancel anytime
-              </p>
+              <p className="text-tiny text-text-muted">Billed {billingPeriod}ly · Cancel anytime</p>
             )}
           </div>
 
           {/* Benefits */}
           <div className="py-4">
-            <p className="text-[12px] font-semibold text-text-secondary mb-2.5">
+            <p className="text-tiny font-semibold text-text-secondary mb-2.5">
               {type === "subscribe" ? "What's included:" : "Instant access to:"}
             </p>
             <ul className="space-y-2">
               {benefits.map((benefit, index) => (
                 <li key={index} className="flex items-start gap-2">
                   <Check
-                    className="size-[13px] text-violet-400 shrink-0 mt-0.5"
+                    className="size-[13px] text-wine-text shrink-0 mt-0.5"
                     aria-hidden="true"
                   />
-                  <span className="text-text-secondary text-[13px]">{benefit}</span>
+                  <span className="text-text-secondary text-small">{benefit}</span>
                 </li>
               ))}
             </ul>
@@ -335,14 +472,14 @@ export function PaywallModal({
           {/* Payment method — wallet for PPV, wallet/card for subscribe */}
           <div className="py-3 border-b border-white/6">
             <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-[var(--radius-sm)] bg-white/4 border border-white/8">
-              <div className="size-8 rounded-lg bg-violet-500/15 flex items-center justify-center shrink-0">
-                <CreditCard className="size-[14px] text-violet-400" aria-hidden="true" />
+              <div className="size-8 rounded-lg bg-[var(--wine)]/15 flex items-center justify-center shrink-0">
+                <CreditCard className="size-[14px] text-wine-text" aria-hidden="true" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[12px] font-semibold text-text-primary leading-tight">
+                <p className="text-tiny font-semibold text-text-primary leading-tight">
                   {type === "subscribe" ? "Charged to your account" : "GetFanSee Wallet"}
                 </p>
-                <p className="text-[11px] text-text-muted leading-tight">
+                <p className="text-tiny text-text-muted leading-tight">
                   {type === "subscribe"
                     ? "Billed monthly · Cancel anytime"
                     : "Balance will be deducted at checkout"}
@@ -353,7 +490,7 @@ export function PaywallModal({
 
           {/* Trust indicators */}
           <div className="py-3 border-t border-white/6">
-            <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] text-text-muted">
+            <div className="flex flex-wrap items-center justify-center gap-3 text-tiny text-text-muted">
               <div className="flex items-center gap-1 text-emerald-400">
                 <Lock className="size-[11px]" aria-hidden="true" />
                 <span>Secure &amp; Encrypted</span>
@@ -378,7 +515,7 @@ export function PaywallModal({
           {/* Actions */}
           <div className="flex flex-col gap-2 pt-2">
             {type === "ppv" && (
-              <div className="text-center text-[12px] text-text-muted mb-1">
+              <div className="text-center text-tiny text-text-muted mb-1">
                 {isBalanceLoading ? (
                   <span
                     className="flex items-center justify-center gap-1.5"
@@ -392,7 +529,7 @@ export function PaywallModal({
                     <span data-testid="paywall-balance-value">Balance: ${balance.toFixed(2)}</span>
                     {insufficientBalance && (
                       <span
-                        className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-[var(--radius-xs)] bg-red-500/10 text-red-400 text-[11px] font-medium"
+                        className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-[var(--radius-xs)] bg-red-500/10 text-red-400 text-tiny font-medium"
                         data-testid="paywall-balance-insufficient"
                       >
                         Low balance —{" "}
@@ -416,7 +553,7 @@ export function PaywallModal({
                     {balanceError !== "Please sign in to view balance" && (
                       <button
                         type="button"
-                        className="text-xs underline transition-colors hover:text-red-300"
+                        className="text-tiny underline transition-colors hover:text-red-300"
                         onClick={handleRetryBalance}
                         data-testid="paywall-balance-retry"
                       >
@@ -485,11 +622,11 @@ export function PaywallModal({
           aria-live="polite"
           data-testid="paywall-processing"
         >
-          <div className="size-14 rounded-full bg-violet-500/10 flex items-center justify-center border border-violet-500/20 shadow-glow-violet">
-            <Loader2 className="size-6 text-violet-400 animate-spin" aria-hidden="true" />
+          <div className="size-14 rounded-full bg-[var(--wine)]/10 flex items-center justify-center border border-[var(--wine)]/20 ">
+            <Loader2 className="size-6 text-wine-text animate-spin" aria-hidden="true" />
           </div>
-          <p className="text-text-muted text-[13px] font-medium">Processing payment...</p>
-          <p className="text-text-disabled text-[12px]">Please wait, do not close this window</p>
+          <p className="text-text-muted text-small font-medium">Processing payment...</p>
+          <p className="text-text-disabled text-tiny">Please wait, do not close this window</p>
         </div>
       )}
 
@@ -519,6 +656,8 @@ export function PaywallModal({
     </div>
   );
 
+  const body = WALLET_PATH_ACTIVE ? content : alphaContent;
+
   if (isMobile) {
     return (
       <Sheet
@@ -535,7 +674,7 @@ export function PaywallModal({
           side="bottom"
           className="max-h-[85vh] overflow-y-auto px-5 py-4 rounded-t-[var(--radius-lg)]"
         >
-          {content}
+          {body}
         </SheetContent>
       </Sheet>
     );
@@ -557,7 +696,7 @@ export function PaywallModal({
           }
         }}
       >
-        {content}
+        {body}
       </DialogContent>
     </Dialog>
   );

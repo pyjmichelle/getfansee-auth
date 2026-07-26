@@ -39,7 +39,7 @@ export function PostGridItem({
       onClick={handleUnlockClick}
       className={cn(
         "relative aspect-square overflow-hidden group cursor-pointer block",
-        "focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:outline-offset-1",
+        "focus-visible:outline-2 focus-visible:outline-[var(--wine)] focus-visible:outline-offset-1",
         className
       )}
     >
@@ -66,18 +66,18 @@ export function PostGridItem({
           <Lock size={16} className="text-white/80" aria-hidden="true" />
           {post.visibility === "ppv" && post.price_cents ? (
             <>
-              <span className="text-white text-[11px] font-bold">
+              <span className="text-white text-tiny font-bold">
                 ${(post.price_cents / 100).toFixed(2)}
               </span>
               {onUnlock && (
-                <span className="px-2.5 py-1 rounded-full bg-amber-500 text-black text-[10px] font-bold tracking-wide">
+                <span className="px-2.5 py-1 rounded-full bg-[var(--premium)] text-black text-[10px] font-bold tracking-wide">
                   Unlock
                 </span>
               )}
             </>
           ) : (
             onUnlock && (
-              <span className="px-2.5 py-1 rounded-full bg-violet-600 text-white text-[10px] font-bold tracking-wide">
+              <span className="px-2.5 py-1 rounded-full bg-[var(--wine)] text-white text-[10px] font-bold tracking-wide">
                 Subscribe
               </span>
             )

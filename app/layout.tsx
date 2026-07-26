@@ -1,8 +1,7 @@
 import type React from "react";
-import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Hanken_Grotesk, Fraunces } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { UnlockProvider } from "@/contexts/unlock-context";
 import { AgeGate } from "@/components/age-gate";
@@ -14,26 +13,20 @@ import { getServerAuthState } from "@/lib/server/auth-state";
 import { Suspense } from "react";
 import "./globals.css";
 
-const inter = Inter({
+const hanken = Hanken_Grotesk({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
-  fallback: [
-    "system-ui",
-    "-apple-system",
-    "BlinkMacSystemFont",
-    "Segoe UI",
-    "Roboto",
-    "sans-serif",
-  ],
+  variable: "--font-hanken",
+  weight: ["300", "400", "500", "600", "700"],
+  fallback: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
   adjustFontFallback: true,
 });
 
-const playfair = Playfair_Display({
+const fraunces = Fraunces({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-playfair",
-  weight: ["400", "500", "600", "700"],
+  variable: "--font-fraunces",
+  weight: ["400", "600", "700"],
   fallback: ["Georgia", "Times New Roman", "serif"],
 });
 
@@ -42,7 +35,10 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "GetFanSee - Where fans get closer",
+  title: {
+    default: "GetFanSee - Where fans get closer",
+    template: "%s | GetFanSee",
+  },
   description: "Premium adult creator subscription platform",
   alternates: {
     canonical: "/",
@@ -65,6 +61,16 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#0B0B0D",
+  // Without viewportFit: "cover", iOS Safari never populates
+  // env(safe-area-inset-*), so the bottom nav and sticky bars silently
+  // ignore notch/home-indicator insets on real devices.
+  viewportFit: "cover",
+};
+
 const isTestMode =
   process.env.NEXT_PUBLIC_TEST_MODE === "true" || process.env.PLAYWRIGHT_TEST_MODE === "true";
 
@@ -79,10 +85,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className="dark">
-      <head>
-        <meta name="theme-color" content="#000000" />
-      </head>
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+      <body className={`${hanken.variable} ${fraunces.variable} font-sans antialiased`}>
         <Suspense fallback={null}>
           <PostHogProvider>
             <AuthProvider initialAuth={initialAuth}>
@@ -90,7 +93,6 @@ export default async function RootLayout({
               <UnlockProvider>
                 <AgeGate>{children}</AgeGate>
               </UnlockProvider>
-              <Toaster />
               <SonnerToaster richColors position="top-center" />
               {!isTestMode && <Analytics />}
               {!isTestMode && <CookieConsent />}

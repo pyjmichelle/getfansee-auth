@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "command": "python3 .cursor/hooks/check-file-ownership.py",
+        "matcher": "Write|Delete"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "python3 .cursor/hooks/check-rule-sync.py",
+        "matcher": "Write|StrReplace|MultiEdit|Delete"
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": ".cursor/hooks/audit-edit.sh"
+      }
+    ]
+  }
+}

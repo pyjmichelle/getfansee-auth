@@ -72,7 +72,12 @@ export const Share2 = wrap(Ci.ShareAndroid);
 export const MessageCircle = wrap(Ci.ChatCircle);
 export const MessageSquare = wrap(Ci.Chat);
 export const Flame = wrap(Ci.Sun);
-export const Sparkles = wrap(Ci.Bulb);
+// Coolicons has no dedicated sparkle/magic glyph (443-icon set) — `Bulb`
+// ("idea/tip") was a stand-in that reads as "hint" everywhere it's actually
+// used for premium/brand/exclusive moments (auth logo, "Exclusive" locked
+// badge, "Become a Creator", referral milestones). `Star` is the closest
+// available shape to a sparkle and matches that intent.
+export const Sparkles = wrap(Ci.Star);
 
 // ── User / Auth ──────────────────────────────────────────────────
 export const User = wrap(Ci.User01);
@@ -136,6 +141,9 @@ export const Hash = wrap(Ci.Tag);
 export const Tag = wrap(Ci.Tag);
 export const Flag = wrap(Ci.Flag);
 export const Globe = wrap(Ci.Globe);
+export const ExternalLink = wrap(Ci.ExternalLink);
+export const LinkIcon = wrap(Ci.Link);
+export const Bookmark = wrap(Ci.Bookmark);
 export const Send = wrap(Ci.PaperPlane);
 export const Mail = wrap(Ci.Mail);
 
