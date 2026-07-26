@@ -14,6 +14,37 @@ const BASE_HOSTNAME = new URL(BASE_URL).hostname;
 let lastSessionResponseStatus: number | null = null;
 let lastSessionResponseText: string | null = null;
 
+/** Retry navigation when CI parallel load causes transient ERR_ABORTED / binding abort. */
+async function gotoResilient(
+  page: Page,
+  url: string,
+  options?: Parameters<Page["goto"]>[1]
+): Promise<void> {
+  const maxAttempts = process.env.CI ? 3 : 2;
+  let lastError: unknown;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (page.isClosed()) {
+      throw new Error(`gotoResilient: page closed before navigating to ${url}`);
+    }
+    try {
+      await page.goto(url, options);
+      return;
+    } catch (error) {
+      lastError = error;
+      const msg = String(error);
+      const retriable =
+        msg.includes("ERR_ABORTED") ||
+        msg.includes("NS_BINDING_ABORTED") ||
+        msg.includes("net::ERR_FAILED");
+      if (!retriable || attempt === maxAttempts - 1) {
+        throw error;
+      }
+      await page.waitForTimeout(400 * (attempt + 1));
+    }
+  }
+  throw lastError;
+}
+
 export function getLastSessionResponse(): { status: number | null; text: string | null } {
   return { status: lastSessionResponseStatus, text: lastSessionResponseText };
 }
@@ -514,7 +545,7 @@ export async function injectSupabaseSession(
 
   // 必须先导航到同源页面，否则 fetch credentials 无法正确应用 Set-Cookie。
   // 使用 /auth 避免从 / 被重定向导致的导航竞态（fetch 在 evaluate 时被 abort）。
-  await page.goto(`${baseUrl}/auth`, { waitUntil: "domcontentloaded", timeout: 15_000 });
+  await gotoResilient(page, `${baseUrl}/auth`, { waitUntil: "domcontentloaded", timeout: 15_000 });
   const origin = new URL(page.url()).origin;
   if (!origin || origin === "null") {
     throw new Error(`injectSupabaseSession: invalid origin from page.url()=${page.url()}`);
@@ -572,7 +603,7 @@ export async function injectSupabaseSession(
   let navigatedToHome = false;
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      await page.goto(`${origin}/home`, {
+      await gotoResilient(page, `${origin}/home`, {
         waitUntil: "domcontentloaded",
         timeout: 30_000,
       });
@@ -580,7 +611,7 @@ export async function injectSupabaseSession(
       break;
     } catch (error) {
       if (attempt === 1) throw error;
-      await page.goto(`${origin}/auth?mode=login`, {
+      await gotoResilient(page, `${origin}/auth?mode=login`, {
         waitUntil: "domcontentloaded",
         timeout: 15_000,
       });
@@ -982,7 +1013,7 @@ export async function clearStorage(page: Page): Promise<void> {
   if (page.isClosed()) {
     throw new Error("clearStorage: page already closed, cannot clear storage");
   }
-  await page.goto(BASE_URL, { waitUntil: "domcontentloaded", timeout: 30_000 });
+  await gotoResilient(page, BASE_URL, { waitUntil: "domcontentloaded", timeout: 30_000 });
 
   await page.context().clearCookies();
 
