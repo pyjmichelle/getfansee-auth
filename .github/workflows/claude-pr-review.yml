@@ -1,4 +1,5 @@
-# Claude 语义级 PR 审查（与 pr-auto-review 互补，需配置 ANTHROPIC_API_KEY 后生效）
+# Claude 语义级 PR 审查（与 pr-auto-review 互补，需配置 ANTHROPIC_API_KEY
+# 或安装 Claude Code GitHub App 后生效）。未配置时不得挡合并门禁。
 # 参考: https://github.com/anthropics/claude-code-action/blob/main/docs/solutions.md#automatic-pr-code-review
 name: Claude PR Review
 
@@ -21,8 +22,24 @@ jobs:
         with:
           fetch-depth: 1
 
+      # Secrets cannot be used in job-level `if:`; gate here so a missing
+      # ANTHROPIC_API_KEY / Claude GitHub App does not fail the PR check.
+      - name: Detect Claude review credentials
+        id: gate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -n "$ANTHROPIC_API_KEY" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping Claude Semantic Review — ANTHROPIC_API_KEY is not configured (optional advisory check)."
+          fi
+
       - name: Claude Code Action - PR Review
+        if: steps.gate.outputs.enabled == 'true'
         uses: anthropics/claude-code-action@v1
+        continue-on-error: true
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
