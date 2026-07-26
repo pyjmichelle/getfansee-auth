@@ -48,12 +48,18 @@ function parseOrderId(orderId: string | undefined): { userId: string; amountCent
  * Cross-check the order_id-derived amount against the IPN's own price_amount
  * (USD) so a tampered/mismatched order_id can't credit an arbitrary amount.
  * Allow a small tolerance for rounding between dollars and cents.
+ *
+ * A missing/NaN price_amount is NOT treated as a pass: crediting purely off
+ * the order_id-embedded amount with no independent confirmation from the
+ * IPN would let any signed-but-incomplete IPN credit an unverified amount.
+ * Refusing to credit (see `ignored: true, reason: "missing_price_amount"`
+ * below) requires manual reconciliation instead of silently trusting an
+ * unverifiable number — see route module doc for why under-crediting is the
+ * safer failure mode here.
  */
 function amountMatchesIpn(amountCents: number, priceAmountUsd: number | undefined): boolean {
   if (priceAmountUsd === undefined || priceAmountUsd === null || Number.isNaN(priceAmountUsd)) {
-    // Sandbox/older IPNs may omit price_amount — don't block on absence,
-    // only on an actual mismatch we can prove.
-    return true;
+    return false;
   }
   const expectedCents = Math.round(priceAmountUsd * 100);
   return Math.abs(expectedCents - amountCents) <= 2;
@@ -98,15 +104,25 @@ export async function POST(request: NextRequest) {
   }
 
   if (!amountMatchesIpn(order.amountCents, payload.price_amount)) {
+    const missingPriceAmount =
+      payload.price_amount === undefined ||
+      payload.price_amount === null ||
+      Number.isNaN(payload.price_amount);
     console.error(
-      "[nowpayments-webhook] Amount mismatch: order_id implies",
+      missingPriceAmount
+        ? "[nowpayments-webhook] IPN missing price_amount — refusing to credit unverified amount."
+        : "[nowpayments-webhook] Amount mismatch: order_id implies",
       order.amountCents,
       "cents but IPN price_amount is",
       payload.price_amount,
       "USD — refusing to credit. payment_id:",
       payload.payment_id
     );
-    return NextResponse.json({ received: true, ignored: true, reason: "amount_mismatch" });
+    return NextResponse.json({
+      received: true,
+      ignored: true,
+      reason: missingPriceAmount ? "missing_price_amount" : "amount_mismatch",
+    });
   }
 
   // Single atomic, idempotent credit — see function comment in migration 048.
