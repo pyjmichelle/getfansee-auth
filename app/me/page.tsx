@@ -12,20 +12,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { TabsContent } from "@/components/ui/tabs";
 // CenteredContainer no longer needed - using Figma max-w layout
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { signOut } from "@/lib/auth";
 import { uploadAvatar } from "@/lib/storage";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useCountUp } from "@/hooks/use-count-up";
 import { DEFAULT_AVATAR_FAN } from "@/lib/image-fallbacks";
 import { ProfileBanner } from "@/components/profile-banner";
 import { SettingsTabs } from "@/components/settings-tabs";
 import { GlassCard } from "@/components/glass-card";
 import { useAuth } from "@/contexts/auth-context";
 import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
-
-const supabase = getSupabaseBrowserClient();
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -34,7 +30,6 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isCreatingCreator, setIsCreatingCreator] = useState(false);
-  const [isSeeding, setIsSeeding] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [bio, setBio] = useState("");
@@ -66,11 +61,9 @@ export default function ProfilePage() {
       }[]
     | null
   >(null);
+  const [savedError, setSavedError] = useState(false);
+  const [savedReloadKey, setSavedReloadKey] = useState(0);
   useSkeletonMetric("me_page", isLoading);
-  const creatorSocialCount = useCountUp(currentUser?.role === "creator" ? 1284 : 1283, {
-    duration: 900,
-    decimals: 0,
-  });
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -126,14 +119,25 @@ export default function ProfilePage() {
     loadProfile();
   }, [router, reloadKey, auth.authenticated, auth.user, auth.profile]);
 
-  // Lazy-load saved creators the first time the Saved tab opens.
+  // Lazy-load saved creators the first time the Saved tab opens. An 8s timeout
+  // prevents the loading skeleton from hanging forever if the request never
+  // settles (previously it could sit on a permanent grey skeleton).
   useEffect(() => {
     if (activeTab !== "saved" || savedCreators !== null) return;
-    fetch("/api/save/creator")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json) => setSavedCreators(json?.creators ?? []))
-      .catch(() => setSavedCreators([]));
-  }, [activeTab, savedCreators]);
+    let cancelled = false;
+    setSavedError(false);
+    fetch("/api/save/creator", { signal: AbortSignal.timeout(8000) })
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
+      .then((json) => {
+        if (!cancelled) setSavedCreators(json?.creators ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setSavedError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, savedCreators, savedReloadKey]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -250,65 +254,6 @@ export default function ProfilePage() {
     }
   };
 
-  const handleSeedPosts = async () => {
-    if (!currentUserId || isSeeding) return;
-
-    setIsSeeding(true);
-    try {
-      // 检查是否为 creator（通过 API）
-      const profileResponse = await fetch("/api/profile");
-      if (!profileResponse.ok) {
-        toast.error("Please create a creator profile first");
-        return;
-      }
-      const profileData = await profileResponse.json();
-      const profile = profileData.profile;
-      if (!profile || profile.role !== "creator") {
-        toast.error("Please create a creator profile first");
-        return;
-      }
-
-      const posts = [
-        {
-          creator_id: currentUserId,
-          title: "Subscriber-Only Content",
-          content: "This is exclusive content for subscribers only. Subscribe to unlock!",
-          price_cents: 0, // subscriber-only
-          cover_url: null,
-        },
-        {
-          creator_id: currentUserId,
-          title: "Premium PPV Content - $4.99",
-          content: "This is a premium pay-per-view post. Unlock it for $4.99!",
-          price_cents: 499, // PPV $4.99
-          cover_url: null,
-        },
-        {
-          creator_id: currentUserId,
-          title: "Exclusive PPV Content - $9.99",
-          content: "This is an exclusive premium post. Unlock it for $9.99!",
-          price_cents: 999, // PPV $9.99
-          cover_url: null,
-        },
-      ];
-
-      const { error } = await supabase.from("posts").insert(posts);
-
-      if (error) {
-        console.error("[me] seed posts error:", error);
-        toast.error("Failed to create demo posts, please try again");
-        return;
-      }
-
-      toast.success("Demo posts created successfully!");
-    } catch (err) {
-      console.error("[me] handleSeedPosts error:", err);
-      toast.error("Failed to create, please try again");
-    } finally {
-      setIsSeeding(false);
-    }
-  };
-
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
@@ -331,9 +276,7 @@ export default function ProfilePage() {
           <p className="text-text-secondary max-w-sm">
             {loadError || "Failed to load your profile. Please try again."}
           </p>
-          <Button variant="violet" onClick={() => setReloadKey((k) => k + 1)}>
-            Try again
-          </Button>
+          <Button onClick={() => setReloadKey((k) => k + 1)}>Try again</Button>
         </div>
       </PageShell>
     );
@@ -444,11 +387,11 @@ export default function ProfilePage() {
           avatarUrl={avatar || DEFAULT_AVATAR_FAN}
           action={
             isEditing ? (
-              <Button onClick={handleSave} disabled={isSaving} className="shadow-glow">
+              <Button onClick={handleSave} disabled={isSaving}>
                 {isSaving ? "Saving..." : "Save Changes"}
               </Button>
             ) : (
-              <Button onClick={() => setIsEditing(true)} className="shadow-glow">
+              <Button variant="outline" onClick={() => setIsEditing(true)}>
                 Edit Profile
               </Button>
             )
@@ -569,7 +512,24 @@ export default function ProfilePage() {
                     <Bookmark className="w-4 h-4 text-wine-text" aria-hidden="true" />
                     <h3 className="font-semibold text-text-primary">Saved Creators</h3>
                   </div>
-                  {savedCreators === null ? (
+                  {savedError ? (
+                    <div className="py-10 text-center">
+                      <p className="text-small text-text-tertiary mb-3">
+                        Couldn&apos;t load your saved creators.
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSavedCreators(null);
+                          setSavedError(false);
+                          setSavedReloadKey((k) => k + 1);
+                        }}
+                      >
+                        Try again
+                      </Button>
+                    </div>
+                  ) : savedCreators === null ? (
                     <div className="space-y-3 animate-pulse">
                       {[0, 1, 2].map((i) => (
                         <div key={i} className="h-16 bg-white/5 rounded-xl" />
@@ -645,25 +605,6 @@ export default function ProfilePage() {
                         size="sm"
                       >
                         {isCreatingCreator ? "Creating..." : "Become Creator"}
-                      </Button>
-                    ) : null}
-                  </div>
-                  <div className="rounded-xl border border-border-base bg-gradient-subtle p-4">
-                    <p className="text-small text-text-secondary">
-                      Join{" "}
-                      <span className="font-bold text-wine-text">
-                        {creatorSocialCount.toFixed(0)}
-                      </span>{" "}
-                      creators already earning on GetFanSee.
-                    </p>
-                    {currentUser.role === "creator" ? (
-                      <Button
-                        onClick={handleSeedPosts}
-                        disabled={isSeeding}
-                        variant="outline"
-                        className="mt-3 w-full"
-                      >
-                        {isSeeding ? "Seeding…" : "Seed demo posts"}
                       </Button>
                     ) : null}
                   </div>
