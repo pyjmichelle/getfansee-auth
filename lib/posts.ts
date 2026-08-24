@@ -545,6 +545,27 @@ export async function listFeed(
       (likedRows || []).forEach((row: { post_id: string }) => likedPostIds.add(row.post_id));
     }
 
+    // Load each post's tag names so the home feed's tag-filter chips actually
+    // match against real data. Without this, `post.tags` was always undefined
+    // and selecting any trending tag produced an empty "No posts yet" feed.
+    const postTagsMap = new Map<string, string[]>();
+    if (postIds.length > 0) {
+      const { data: tagRows } = await adminSupabase
+        .from("post_tags")
+        .select("post_id, tags:tag_id ( name )")
+        .in("post_id", postIds);
+      (
+        tagRows as { post_id: string; tags: { name: string } | { name: string }[] | null }[] | null
+      )?.forEach((row) => {
+        const tagObj = Array.isArray(row.tags) ? row.tags[0] : row.tags;
+        const name = tagObj?.name;
+        if (!name) return;
+        const existing = postTagsMap.get(row.post_id) ?? [];
+        existing.push(name);
+        postTagsMap.set(row.post_id, existing);
+      });
+    }
+
     const posts: Post[] = filteredData.map((item: PostWithProfile) => {
       const canView = canViewMap.get(item.id) || false;
       const post: Post = {
@@ -560,6 +581,7 @@ export async function listFeed(
         watermark_enabled: item.watermark_enabled !== undefined ? item.watermark_enabled : true,
         likes_count: item.likes_count ?? 0,
         isLikedByCurrentUser: likedPostIds.has(item.id),
+        tags: postTagsMap.get(item.id) ?? [],
         created_at: item.created_at,
         creator: {
           display_name: creatorProfileMap.get(item.creator_id)?.display_name ?? undefined,

@@ -456,7 +456,7 @@ export function HomeFeedClient({
       ? posts
       : posts.filter((p) => p.creator_id && followingCreatorIds.has(p.creator_id));
   const displayedPosts = selectedTag
-    ? basePosts.filter((p) => p.tags?.includes(selectedTag))
+    ? basePosts.filter((p) => p.tags?.some((t) => t.toLowerCase() === selectedTag.toLowerCase()))
     : basePosts;
 
   const handleTagClick = (tag: string) => {
@@ -665,6 +665,13 @@ export function HomeFeedClient({
                 <p className="text-tiny text-text-disabled">You&apos;re all caught up</p>
               </div>
             </>
+          ) : selectedTag ? (
+            <EmptyState
+              icon={<Sparkles className="size-6" />}
+              title={`No posts tagged #${selectedTag}`}
+              description="Try another tag or clear the filter to see everything."
+              action={{ label: "Clear filter", onClick: () => setSelectedTag(null) }}
+            />
           ) : (
             <EmptyState
               icon={<Sparkles className="size-6" />}
@@ -705,7 +712,7 @@ export function HomeFeedClient({
                         <p className="text-[10px] text-text-muted">@{creator.handle}</p>
                       </div>
                       <Button
-                        variant={followingCreatorIds.has(creator.id) ? "outline" : "violet"}
+                        variant={followingCreatorIds.has(creator.id) ? "outline" : "default"}
                         size="xs"
                         className="shrink-0 text-tiny h-6 px-2.5"
                         onClick={() => handleFollowCreator(creator.id)}
