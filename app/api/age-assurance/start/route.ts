@@ -21,9 +21,6 @@ import {
 } from "@/lib/compliance/age-assurance";
 import type { VendorAssuranceMethod } from "@/lib/compliance/age-assurance";
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://getfansee.com";
-
 const VENDOR_METHODS: readonly string[] = ["age_estimation", "document"];
 
 /**
@@ -79,7 +76,13 @@ export async function POST(request: NextRequest) {
     userAgent: request.headers.get("user-agent"),
     userId: user?.id ?? null,
     next: sanitiseNext(next),
-    siteUrl: SITE_URL,
+    // The claim cookie below is host-only to whatever origin served this
+    // request, so the vendor has to return the visitor to that same origin or
+    // the cookie is never presented and every real pass reads as `invalid`.
+    // Deriving both from the request keeps them equal by construction, instead
+    // of depending on NEXT_PUBLIC_SITE_URL matching the deployment (it does not
+    // on preview URLs or the *.vercel.app host).
+    siteUrl: request.nextUrl.origin,
   });
 
   if ("error" in result) {

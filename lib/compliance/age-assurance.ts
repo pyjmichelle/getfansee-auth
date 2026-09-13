@@ -304,6 +304,11 @@ export async function startVendorAgeCheck(params: {
   userId: string | null;
   /** Path to return the visitor to once verified. Already validated by caller. */
   next: string;
+  /**
+   * Origin to build the vendor callback on. Must be the origin that will set
+   * the claim cookie (i.e. the caller's own request origin) — the cookie is
+   * host-only, so a callback pointed at a different host never receives it.
+   */
   siteUrl: string;
 }): Promise<{ checkId: string; url: string; claimSecret: string } | { error: string }> {
   const workflowId = getAgeWorkflowId(params.method);

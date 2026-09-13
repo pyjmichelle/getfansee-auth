@@ -13,6 +13,7 @@
  */
 
 import { test, expect } from "@playwright/test";
+import { isNavigationAbortError } from "./shared/helpers";
 
 test.describe("anonymous /home", () => {
   test("redirects to auth instead of rendering the error boundary", async ({ page, context }) => {
@@ -30,9 +31,11 @@ test.describe("anonymous /home", () => {
     });
 
     // The client-side rewrite on /auth can abort this navigation mid-flight.
-    // That abort is the redirect working, not a failure, so only the landing
-    // URL below decides the outcome.
-    await page.goto("/home", { waitUntil: "domcontentloaded" }).catch(() => undefined);
+    // That abort is the redirect working, so let the landing URL below decide;
+    // anything else is a genuine failure to load and must still surface.
+    await page.goto("/home", { waitUntil: "domcontentloaded" }).catch((error: unknown) => {
+      if (!isNavigationAbortError(error)) throw error;
+    });
 
     await expect(page).toHaveURL(/\/auth(\?|$)/);
 

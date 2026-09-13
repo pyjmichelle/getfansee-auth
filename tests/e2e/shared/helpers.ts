@@ -14,6 +14,21 @@ const BASE_HOSTNAME = new URL(BASE_URL).hostname;
 let lastSessionResponseStatus: number | null = null;
 let lastSessionResponseText: string | null = null;
 
+/**
+ * A navigation that was cut short rather than genuinely failing — the request
+ * was superseded (usually by a client-side redirect) or dropped under parallel
+ * CI load. Distinguished from real failures so callers can retry or defer to a
+ * readiness check instead of masking a page that never loaded.
+ */
+export function isNavigationAbortError(error: unknown): boolean {
+  const msg = String(error);
+  return (
+    msg.includes("ERR_ABORTED") ||
+    msg.includes("NS_BINDING_ABORTED") ||
+    msg.includes("net::ERR_FAILED")
+  );
+}
+
 /** Retry navigation when CI parallel load causes transient ERR_ABORTED / binding abort. */
 async function gotoResilient(
   page: Page,
@@ -31,12 +46,7 @@ async function gotoResilient(
       return;
     } catch (error) {
       lastError = error;
-      const msg = String(error);
-      const retriable =
-        msg.includes("ERR_ABORTED") ||
-        msg.includes("NS_BINDING_ABORTED") ||
-        msg.includes("net::ERR_FAILED");
-      if (!retriable || attempt === maxAttempts - 1) {
+      if (!isNavigationAbortError(error) || attempt === maxAttempts - 1) {
         throw error;
       }
       await page.waitForTimeout(400 * (attempt + 1));
@@ -658,13 +668,18 @@ export async function waitForPageLoad(page: Page) {
  *
  * `/auth` 水合后会自行改写 URL（补上 `?mode=...`），这次客户端导航会把还在等
  * `domcontentloaded` 的那次 `goto` 打断成 `net::ERR_ABORTED`——页面本身是好的，
- * 只是 `goto` 的 promise 挂了。真正的就绪判据是紧随其后的 `waitForAuthReady`，
- * 所以这里吞掉中断，让它去裁决。
+ * 只是 `goto` 的 promise 挂了。重试仍可能撞上同一个改写，所以重试用尽后只放过
+ * 「被打断」这一类错误，交给紧随其后的 `waitForAuthReady` 裁决页面是否可用；
+ * 其余错误照旧抛出，否则页面压根没加载时会白等它 60 秒超时。
  */
 async function gotoAuth(page: Page, mode: "login" | "signup") {
-  await page
-    .goto(`${BASE_URL}/auth?mode=${mode}`, { waitUntil: "domcontentloaded" })
-    .catch(() => undefined);
+  try {
+    await gotoResilient(page, `${BASE_URL}/auth?mode=${mode}`, {
+      waitUntil: "domcontentloaded",
+    });
+  } catch (error) {
+    if (!isNavigationAbortError(error)) throw error;
+  }
 }
 
 /**
