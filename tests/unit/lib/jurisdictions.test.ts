@@ -97,6 +97,22 @@ describe("resolveJurisdiction — payments and creator eligibility", () => {
     expect(decision.paymentsAllowed).toBe(false);
   });
 
+  // Every US-specific rule keys off `region`, so an unresolved subdivision used
+  // to fall through to self-attestation with payments enabled — handing the most
+  // permissive outcome to precisely the visitors who might be in Tennessee.
+  it("refuses payments from the US when the state cannot be determined", () => {
+    expect(resolveJurisdiction({ country: "US", region: null }).paymentsAllowed).toBe(false);
+  });
+
+  it("applies the strictest US tier when the state cannot be determined", () => {
+    const decision = resolveJurisdiction({ country: "US", region: null });
+    expect(decision.tier).toBe("document");
+    expect(decision.anonymousOptionRequired).toBe(true);
+    expect(decision.reverifyIntervalHours).toBe(24);
+    // Not blocked: a thin edge header is not evidence of an excluded state.
+    expect(decision.blockReason).toBeNull();
+  });
+
   it("lets Indian fans browse but not onboard as creators", () => {
     const decision = resolveJurisdiction({ country: "IN", region: null });
     expect(decision.tier).not.toBe("blocked");

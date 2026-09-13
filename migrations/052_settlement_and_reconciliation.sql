@@ -188,6 +188,18 @@ BEGIN
       v_order.id, 'rev_' || v_order.id::text,
       'Reversal of an already-paid-out earning: ' || COALESCE(p_reason, 'no reason given')
     );
+
+    -- The wallet has to move with the ledger. `creator_ledger_matches_wallets`
+    -- sums pending+available ledger rows against the denormalised wallet
+    -- balances, so booking the debt in the ledger alone leaves that identity
+    -- permanently non-zero — and the first thing it would break is the reversal
+    -- path Soft Beta exists to exercise. The balance is allowed to go negative:
+    -- that IS the debt, and it is what "nets against future earnings" means,
+    -- since the next settlement adds into it.
+    UPDATE public.wallet_accounts
+      SET available_balance_cents = available_balance_cents - v_entry.amount_cents,
+          updated_at = timezone('utc', now())
+      WHERE user_id = v_order.creator_id;
   END IF;
 
   INSERT INTO public.creator_ledger (
@@ -219,6 +231,31 @@ BEGIN
   -- access, or a fan can refund every unlock and keep all of it.
   IF v_order.kind = 'ppv' AND v_order.reference_id IS NOT NULL THEN
     DELETE FROM public.purchases WHERE id = v_order.reference_id;
+  END IF;
+
+  -- The same has to hold for subscriptions, which are the larger amount and were
+  -- previously left `active` through `current_period_end` — a refunded fan kept
+  -- a month of access. Ending the period rather than only flagging `canceled` is
+  -- what actually revokes it, since every read path gates on current_period_end.
+  --
+  -- Guarded on there being no LATER subscription order: reversing an old month
+  -- must not claw back a period the fan has since paid for again.
+  IF v_order.kind = 'subscription' THEN
+    IF NOT EXISTS (
+      SELECT 1 FROM public.consumption_orders co
+      WHERE co.fan_id = v_order.fan_id
+        AND co.creator_id = v_order.creator_id
+        AND co.kind = 'subscription'
+        AND co.reversed_at IS NULL
+        AND co.created_at > v_order.created_at
+    ) THEN
+      UPDATE public.subscriptions
+        SET status = 'canceled',
+            cancelled_at = timezone('utc', now()),
+            current_period_end = LEAST(current_period_end, timezone('utc', now()))
+        WHERE subscriber_id = v_order.fan_id
+          AND creator_id = v_order.creator_id;
+    END IF;
   END IF;
 
   RETURN json_build_object(

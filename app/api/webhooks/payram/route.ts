@@ -69,21 +69,25 @@ export async function POST(request: NextRequest) {
   const isCreditable = PAYRAM_TERMINAL_CREDIT_STATES.includes(state);
   const filledCents = parseUsdToCents(payload.filled_amount_in_usd);
 
-  // A creditable state with no readable amount is the one case where doing
-  // nothing is clearly right: we cannot verify what arrived, and crediting the
-  // requested amount instead would be trusting a number the payload did not
-  // actually confirm. Refuse and reconcile by hand.
+  // A creditable state with no readable amount must not be credited: we cannot
+  // verify what arrived, and substituting the requested amount would be
+  // trusting a number the payload did not confirm.
+  //
+  // It must not be acknowledged either. A 200 tells PayRam the delivery
+  // succeeded, so it stops retrying and a deposit we were told about is never
+  // credited — visible only in a log line nobody is reading. Failing keeps the
+  // delivery in PayRam's retry queue and on its failed-webhook list, which is
+  // where a human will actually see it.
   if (isCreditable && filledCents === null) {
     console.error(
       "[payram-webhook] Terminal state with unreadable filled_amount_in_usd — refusing to credit.",
       payload.reference_id,
       payload.filled_amount_in_usd
     );
-    return NextResponse.json({
-      received: true,
-      ignored: true,
-      reason: "missing_filled_amount",
-    });
+    return NextResponse.json(
+      { error: "Unreadable filled_amount_in_usd", reason: "missing_filled_amount" },
+      { status: 500 }
+    );
   }
 
   const result = await creditPayramDeposit({

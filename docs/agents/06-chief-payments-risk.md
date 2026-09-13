@@ -21,6 +21,10 @@ PROJECT-SPECIFIC SURFACES:
 - APIs: `app/api/wallet/`, `app/api/payments/payram/*`, `app/api/webhooks/payram/`, `app/api/payments/`, `app/api/payments/nowpayments/create-invoice/`, `app/api/webhooks/stripe/`（已禁用）, `app/api/webhooks/nowpayments/`, `app/api/unlock/`, `app/api/tip/`, `app/api/subscribe/`, `app/api/subscriptions/`, `app/api/transactions/`, `app/api/admin/refunds/`, `app/api/cron/financial-audit/`, `app/api/cron/settlement/`
 - **PayRam（MVP 主通道）**: `lib/payram.ts`、`lib/payram-orders.ts`、`app/api/webhooks/payram/route.ts`。钉死 USDC/Base；验签是 raw body 上的 HMAC-SHA256、密钥即项目 API Key（**与 NowPayments 的排序 JSON + SHA512 相反，不可照抄**）；只有 `FILLED`/`OVER_FILLED` 入账；入账取实收额而非请求额。**线上字段名只认官方文档**：回调状态字段是 `status`（不是 `state`）、金额是 JSON 字符串、下单用 `amountInUSD` + 必填 `customerEmail` 且无 `redirectURL`；读错字段是静默失效（永不入账且无报错），状态解析走 `resolvePayramState()`。完整约束见 `.cursor/agents/chief-payments-risk.md`
 - **账本 / 结算 / 退款**: `migrations/051_payment_ledger.sql` 与 `052_settlement_and_reconciliation.sql`。花钱一律走 `spend_wallet*` RPC；退款走 `reverse_consumption_order`；结算走 `settle_matured_earnings`；对账用 `pnpm reconcile:full`，非零差额即停线
+  - 冲正已打款的收益时，创作者可用余额**必须一并扣减、允许为负**（负额即欠款，也正是「对冲未来收入」的实现）；只记账本不动钱包会让 `creator_ledger_matches_wallets` 恒等式在冲正后永久失衡
+  - 冲正必须收回权益：PPV 删 `purchases` 行，订阅把 `current_period_end` 收到当下（只置 `canceled` 无效）；并先确认没有更晚的未冲正订阅单
+  - 订阅扣款幂等键要绑定「所购周期」而非日期（日粒度会让同日二次订阅白拿周期）；扣款失败要按快照精确回滚，不可无条件 `cancelSubscription`
+- **PayRam 两条静默失效**：终态但读不出 `filled_amount_in_usd` 必须回 5xx（回 200 会让 PayRam 停止重试、款项永久丢失）；单据行必须先于 PayRam 会话落库（`openPayramOrder` → 下单 → `attachPayramReference`），反序一旦建行失败就会留下无行可查的活跃收款
 - **Stripe 法币通道默认关闭**（`isStripeFiatEnabled`）：checkout 无门控 + webhook 幂等弱，重开前必须先按 `credit_payram_deposit` 的形状修复
 - **NowPayments（旧，高风险）**: `app/api/webhooks/nowpayments/route.ts` + `lib/nowpayments.ts`。原有的双入账/丢款/非原子缺陷已在 `migrations/048_nowpayments_atomic_credit.sql`（`credit_nowpayments_deposit` RPC + 唯一索引）修复。改动前必须先读该迁移与 route.ts 的完整实现，不得绕开 RPC 直接操作 `wallet_accounts`
 - Tip 幂等：`components/tip-modal.tsx` nonce 生命周期需覆盖 modal 重复打开场景

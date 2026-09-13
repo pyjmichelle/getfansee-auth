@@ -20,7 +20,7 @@ import {
   isValidTopupTier,
   PAYRAM_TOPUP_TIERS_USD,
 } from "@/lib/payram";
-import { openPayramOrder } from "@/lib/payram-orders";
+import { attachPayramReference, openPayramOrder } from "@/lib/payram-orders";
 import { getRequestGeo } from "@/lib/compliance/request-geo";
 import { resolveJurisdiction } from "@/lib/compliance/jurisdictions";
 
@@ -61,19 +61,15 @@ export async function POST(request: NextRequest) {
     // PayRam's reference_id, which is what the webhook is keyed on.
     const invoiceId = `topup_${user.id}_${amountUsd}_${Date.now()}`;
 
-    const payment = await createPayramPayment({
-      amountUsd,
-      invoiceId,
-      customerId: user.id,
-      customerEmail: user.email,
-    });
-
-    // Record intent before returning the URL. An abandoned payment then shows
-    // as an OPEN order rather than leaving no trace, and the webhook has a row
-    // to find when the money arrives.
+    // The order row is written BEFORE asking PayRam for a payment, keyed on our
+    // own invoice id until PayRam's reference exists. Creating the payment first
+    // means a failure here leaves PayRam holding a live payment with no row
+    // behind it: the webhook finds `Unknown order`, 500s on every retry, and a
+    // fan who paid anyway is never credited. This way the worst case is an OPEN
+    // order with no payment, which looks like — and is — an abandoned checkout.
     const opened = await openPayramOrder({
       userId: user.id,
-      referenceId: payment.reference_id,
+      referenceId: invoiceId,
       amountCents: Math.round(amountUsd * 100),
       geo,
       metadata: { invoice_id: invoiceId },
@@ -81,6 +77,25 @@ export async function POST(request: NextRequest) {
 
     if ("error" in opened) {
       return NextResponse.json({ success: false, error: opened.error }, { status: 500 });
+    }
+
+    const payment = await createPayramPayment({
+      amountUsd,
+      invoiceId,
+      customerId: user.id,
+      customerEmail: user.email,
+    });
+
+    // The webhook is keyed on PayRam's reference, so this has to land before the
+    // fan can pay. If it fails we refuse the checkout rather than hand back a
+    // URL whose deposit we could not credit.
+    const attached = await attachPayramReference({
+      orderId: opened.orderId,
+      referenceId: payment.reference_id,
+    });
+
+    if ("error" in attached) {
+      return NextResponse.json({ success: false, error: attached.error }, { status: 500 });
     }
 
     return NextResponse.json({

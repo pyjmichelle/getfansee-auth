@@ -40,11 +40,15 @@ PROJECT-SPECIFIC SURFACES:
   - **只有 `FILLED` / `OVER_FILLED` 入账**。`PARTIALLY_FILLED` 只记录、转人工，代码不得判断「差不多够了」
   - **入账金额取 webhook 实收额，不取下单请求额**。超付属于粉丝，按请求额入账等于把差额悄悄变成平台收入
   - 幂等由 `credit_payram_deposit`（`migrations/051`）的行锁 + `credited_at` 保证；重放是支付方的正常行为，不是异常。改动前必须先跑 `pnpm payram:replay`
+  - **「不入账」必须同时「不确认投递」**：终态却读不出 `filled_amount_in_usd` 时，回 200 等于告诉 PayRam 投递成功、它就不再重试，于是一笔已被告知的入账永久丢失，只剩一行没人看的日志。此路径必须回 5xx，让投递留在 PayRam 的重试队列和失败列表里
+  - **单据行必须先于 PayRam 会话落库**：`openPayramOrder` 用我方 `invoiceId` 先建 OPEN 单，再向 PayRam 下单，最后 `attachPayramReference` 换成 PayRam 的 `reference_id`。反过来（先下单后建行）一旦建行失败，PayRam 那边已有活跃收款而我方无行可查，webhook 永远 `Unknown order` + 500，付了钱的粉丝永不入账
   - 充值档位固定 `$20 / $50 / $100`：onramp 最低约 $20 而 PPV $1.99，逐单刷卡在算术上不可能。onramp 费由粉丝直付第三方，**不进我方成本**，但必须在充值页提前披露
 - **账本与结算（`migrations/051` + `052`）**: `payment_orders`（预收负债）、`consumption_orders`（唯一确认收入的地方）、`creator_ledger`（欠创作者的权威账）、`payout_batches`。
   - 所有花钱路径必须走 `spend_wallet` / `spend_wallet_on_ppv` / `spend_wallet_on_tip`，禁止直接改 `wallet_accounts`
   - 平台费 20%（`PLATFORM_FEE_BPS`），下单时快照进 `consumption_orders.platform_fee_bps`，读历史时永不重算
-  - 退款走 `reverse_consumption_order`：已打款的场景落 `negative_adjustment`（对冲未来收入），不得让创作者余额为负
+  - 退款走 `reverse_consumption_order`：已打款的场景落 `negative_adjustment`（对冲未来收入）。**此处创作者可用余额必须一并扣减、允许为负**——负额就是那笔债本身，也正是「对冲未来收入」的实现方式（下次结算加进这个负数）。曾经只记账本不动钱包，结果 `creator_ledger_matches_wallets` 恒等式在冲正后永久失衡，而冲正恰恰是公测必须演练的路径。任何「不让余额为负」的改动都会重新打破对账，需此 agent 复核
+  - **权益必须跟着钱走**：冲正 PPV 要删 `purchases` 行，冲正订阅要把 `current_period_end` 收到当下（只置 `status='canceled'` 无效，所有读路径都按 `current_period_end` 判权）。冲正订阅前要确认没有更晚的未冲正订阅单，否则会把粉丝后来又付过的周期一起收回
+  - **订阅扣款的幂等键必须绑定「所购周期」，不能只到日粒度**：`subscribe30d` 每次都 upsert 一个新的 30 天窗口，若幂等键只含日期，同日二次订阅会命中 idempotent 分支——周期照发、钱不收。同理，扣款失败时禁止无条件 `cancelSubscription`（会把粉丝此前已付的有效订阅一起作废），必须先快照再精确回滚（`getSubscriptionSnapshot` / `restoreSubscription`）
   - 结算 `settle_matured_earnings`（pending 7 天后转 available），由 `/api/cron/settlement` 驱动，跑完立即验对账等式
   - 对账等式四条：`pnpm reconcile` / `pnpm reconcile:full`。**任何非零差额都不是舍入误差**（账本是整数分），必须逐笔解释，否则不许开公测
 - **NowPayments（加密货币充值，新，高风险）**: `app/api/webhooks/nowpayments/route.ts` + `lib/nowpayments.ts`。2026-07-26 三次审查排查发现的架构缺陷**已通过 `migrations/048_nowpayments_atomic_credit.sql` 修复**：

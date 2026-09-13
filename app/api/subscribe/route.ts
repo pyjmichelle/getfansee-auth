@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { subscribe30d, cancelSubscription } from "@/lib/paywall";
+import {
+  subscribe30d,
+  getSubscriptionSnapshot,
+  restoreSubscription,
+  isActiveSubscriber,
+} from "@/lib/paywall";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { sendSubscriptionConfirmation } from "@/lib/email";
@@ -57,18 +62,27 @@ export async function POST(request: NextRequest) {
 
     // 2. If subscription has a price, charge the wallet.
     if (subscriptionPriceCents > 0) {
+      // Re-subscribing while already inside a paid period must not reach the
+      // charge at all. `subscribe30d` upserts a fresh 30-day window, so without
+      // this guard a second request extends access — and any idempotency key
+      // coarser than the period makes that extension free.
+      if (await isActiveSubscriber(user.id, creatorId)) {
+        return NextResponse.json({ success: true, alreadySubscribed: true });
+      }
+
       // The subscription record is written first because `subscriptions` has a
       // runtime-resolved user column (see resolveSubscriptionUserColumn), which
       // makes it unsafe to write from inside a SQL function the way PPV and
       // tips do. Granting before charging means the worst case is a fan with a
       // subscription we failed to bill, not a fan billed for nothing — and the
-      // charge failure path cancels the grant below.
+      // charge failure path restores the previous state below.
       //
       // This route stays behind `isInAppPaymentsEnabled()` until the
       // subscriptions schema is normalised and this can move into a wrapper
       // alongside spend_wallet_on_ppv / spend_wallet_on_tip.
-      const granted = await subscribe30d(creatorId);
-      if (!granted) {
+      const previous = await getSubscriptionSnapshot(user.id, creatorId);
+      const periodEnd = await subscribe30d(creatorId);
+      if (!periodEnd) {
         return NextResponse.json(
           { success: false, error: "Failed to create subscription" },
           { status: 500 }
@@ -80,14 +94,18 @@ export async function POST(request: NextRequest) {
         creatorId,
         kind: "subscription",
         grossCents: subscriptionPriceCents,
-        // One charge per fan/creator/30-day period.
-        idempotencyKey: `sub_${user.id}_${creatorId}_${new Date().toISOString().slice(0, 10)}`,
+        // Keyed on the period the fan is buying, not on the wall-clock day: a
+        // date-granular key made a same-day re-subscribe look like a duplicate
+        // of the first one and granted the new period without charging. An
+        // explicit Idempotency-Key still wins, so a retried request is safe.
+        idempotencyKey:
+          request.headers.get("Idempotency-Key") ?? `sub_${user.id}_${creatorId}_${periodEnd}`,
         referenceType: "subscription",
         geo: getRequestGeo(request.headers),
       });
 
       if (!spend.success) {
-        await cancelSubscription(creatorId);
+        await restoreSubscription(creatorId, previous);
         if (spend.insufficient) {
           return NextResponse.json(
             {
@@ -104,8 +122,8 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // Free subscription — just create the record
-      const success = await subscribe30d(creatorId);
-      if (!success) {
+      const granted = await subscribe30d(creatorId);
+      if (!granted) {
         return NextResponse.json({ success: false, error: "Failed to subscribe" }, { status: 500 });
       }
     }

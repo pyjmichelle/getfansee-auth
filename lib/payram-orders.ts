@@ -43,6 +43,32 @@ export async function openPayramOrder(params: {
   return { orderId: result.order_id };
 }
 
+/**
+ * Re-keys an order onto PayRam's own reference once the hosted payment exists.
+ *
+ * The order is opened first, under our invoice id, because the reverse order
+ * leaves PayRam holding a live payment for which we have no row: the webhook
+ * then finds `Unknown order`, 500s on every retry, and a fan who paid is never
+ * credited. Opening first means the only failure left is an order with no
+ * payment attached, which is indistinguishable from an abandoned checkout.
+ */
+export async function attachPayramReference(params: {
+  orderId: string;
+  referenceId: string;
+}): Promise<{ ok: true } | { error: string }> {
+  const admin = getSupabaseAdminClient();
+  const { error } = await admin
+    .from("payment_orders")
+    .update({ reference_id: params.referenceId })
+    .eq("id", params.orderId);
+
+  if (error) {
+    console.error("[payram-orders] could not attach PayRam reference:", error, params);
+    return { error: "Could not record the payment reference" };
+  }
+  return { ok: true };
+}
+
 export interface CreditResult {
   success: boolean;
   credited: boolean;

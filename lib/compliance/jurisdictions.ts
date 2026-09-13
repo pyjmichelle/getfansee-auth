@@ -260,7 +260,8 @@ export function readGeoFromHeaders(headers: Headers): GeoContext {
  * be gated on data we do not have — a null country means the request did not
  * pass through a geo-aware edge (local dev, self-hosted preview), not that the
  * visitor is hiding. Money is the opposite: an unverifiable location must never
- * be able to transact, so `paymentsAllowed` requires a positive US match.
+ * be able to transact, so `paymentsAllowed` requires a positive US match with a
+ * resolved state — an unknown subdivision could be Tennessee.
  */
 export function resolveJurisdiction(geo: GeoContext): JurisdictionDecision {
   const { country, region } = geo;
@@ -290,8 +291,35 @@ export function resolveJurisdiction(geo: GeoContext): JurisdictionDecision {
     return blocked("state_excluded");
   }
 
-  const paymentsAllowed = country !== null && PAYMENT_ALLOWED_COUNTRIES.includes(country);
+  /**
+   * A US request whose edge did not supply a subdivision. Every US-specific
+   * rule here — the Tennessee exclusion and the 26-state document tier — keys
+   * off `region`, so treating an unknown one as "no rule applies" hands the
+   * most permissive outcome to exactly the visitors we cannot place. That is
+   * backwards: it is Tennessee and Texas that gain from the ambiguity.
+   */
+  const usRegionUnknown = country === "US" && region === null;
+
+  // Money needs a positive, unambiguous location. An unresolved US state could
+  // be Tennessee, where we may not sell at all, so the sale does not happen.
+  const paymentsAllowed =
+    country !== null && PAYMENT_ALLOWED_COUNTRIES.includes(country) && !usRegionUnknown;
   const creatorSignupAllowed = country === null || !CREATOR_BLOCKED_COUNTRIES.includes(country);
+
+  // Access is the opposite trade-off: blocking every US visitor with a thin
+  // edge header would deny lawful access far more often than it prevents
+  // anything, so they browse — but under the strictest US tier, and offered the
+  // anonymous route, because we cannot rule out the state that mandates it.
+  if (usRegionUnknown) {
+    return {
+      tier: "document",
+      blockReason: null,
+      paymentsAllowed,
+      creatorSignupAllowed,
+      anonymousOptionRequired: true,
+      reverifyIntervalHours: AGE_ASSURANCE_TTL_HOURS,
+    };
+  }
 
   if (country === "US" && region && AGE_VERIFICATION_US_STATES.includes(region)) {
     return {

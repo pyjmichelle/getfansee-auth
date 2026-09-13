@@ -18,14 +18,14 @@ export type PaywallState = {
 /**
  * 订阅 30 天（创建/更新 subscription）
  * @param creatorId Creator ID
- * @returns true 成功，false 失败
+ * @returns 新的 current_period_end（ISO），失败返回 null
  */
-export async function subscribe30d(creatorId: string): Promise<boolean> {
+export async function subscribe30d(creatorId: string): Promise<string | null> {
   try {
     const user = await getCurrentUserUniversal();
     if (!user) {
       console.error("[paywall] subscribe30d: no user");
-      return false;
+      return null;
     }
 
     const supabase = await getSupabaseUniversalClient();
@@ -41,6 +41,7 @@ export async function subscribe30d(creatorId: string): Promise<boolean> {
         plan: "monthly",
         status: "active",
         current_period_end: currentPeriodEnd.toISOString(),
+        cancelled_at: null,
       },
       {
         onConflict: `${subscriptionUserColumn},creator_id`,
@@ -49,12 +50,102 @@ export async function subscribe30d(creatorId: string): Promise<boolean> {
 
     if (error) {
       console.error("[paywall] subscribe30d error:", error);
+      return null;
+    }
+
+    return currentPeriodEnd.toISOString();
+  } catch (err) {
+    console.error("[paywall] subscribe30d exception:", err);
+    return null;
+  }
+}
+
+/**
+ * The subscription row as it stood before a grant, so a failed charge can put
+ * it back exactly.
+ *
+ * Rolling back with `cancelSubscription` instead would mark the row `canceled`
+ * unconditionally — which, if the fan already held a paid period, destroys
+ * access they had paid for. A failed charge must never be able to take away
+ * more than the grant it is undoing.
+ */
+export type SubscriptionSnapshot =
+  | { existed: false }
+  | {
+      existed: true;
+      status: string;
+      currentPeriodEnd: string | null;
+      cancelledAt: string | null;
+    };
+
+export async function getSubscriptionSnapshot(
+  fanId: string,
+  creatorId: string
+): Promise<SubscriptionSnapshot> {
+  try {
+    const supabase = await getSupabaseUniversalClient();
+    const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
+    const { data, error } = await supabase
+      .from("subscriptions")
+      .select("status, current_period_end, cancelled_at")
+      .eq(subscriptionUserColumn, fanId)
+      .eq("creator_id", creatorId)
+      .maybeSingle();
+
+    if (error || !data) {
+      return { existed: false };
+    }
+
+    return {
+      existed: true,
+      status: data.status,
+      currentPeriodEnd: data.current_period_end ?? null,
+      cancelledAt: data.cancelled_at ?? null,
+    };
+  } catch (err) {
+    console.error("[paywall] getSubscriptionSnapshot exception:", err);
+    return { existed: false };
+  }
+}
+
+/** Puts a subscription back to a snapshot taken before a grant. */
+export async function restoreSubscription(
+  creatorId: string,
+  snapshot: SubscriptionSnapshot
+): Promise<boolean> {
+  try {
+    const user = await getCurrentUserUniversal();
+    if (!user) {
+      console.error("[paywall] restoreSubscription: no user");
+      return false;
+    }
+
+    const supabase = await getSupabaseUniversalClient();
+    const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
+    const rows = supabase.from("subscriptions");
+
+    // No row before the grant means the grant created it, so the rollback is a
+    // delete rather than a cancel — leaving a `canceled` row behind would show
+    // the fan a subscription history entry for a purchase that never happened.
+    const { error } = snapshot.existed
+      ? await rows
+          .update({
+            status: snapshot.status,
+            current_period_end: snapshot.currentPeriodEnd,
+            cancelled_at: snapshot.cancelledAt,
+          })
+          .eq(subscriptionUserColumn, user.id)
+          .eq("creator_id", creatorId)
+      : await rows.delete().eq(subscriptionUserColumn, user.id).eq("creator_id", creatorId);
+
+    if (error) {
+      console.error("[paywall] restoreSubscription error:", error);
       return false;
     }
 
     return true;
   } catch (err) {
-    console.error("[paywall] subscribe30d exception:", err);
+    console.error("[paywall] restoreSubscription exception:", err);
     return false;
   }
 }
