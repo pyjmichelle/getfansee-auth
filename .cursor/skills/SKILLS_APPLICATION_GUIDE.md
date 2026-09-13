@@ -289,7 +289,7 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ---
 
-_最后更新: 2026-09-13（PayRam 线上契约对照官方文档订正：回调状态字段 `state`→`status`、下单 `amount`→`amountInUSD` 且 `customerEmail` 必填、移除未文档化的 `redirectURL`；新增可测接缝 `resolvePayramState()` 与人工配置向导 `scripts/payram/setup-wizard.sh`。同轮修掉 11 条资金路径缺陷：订阅改为先扣款后授予、幂等键改用 `consumption_orders` 既往单数（不收调用方 `Idempotency-Key`，读不到单数回 503）、终态无金额回 5xx、单据行先于 PayRam 会话、美国州未知时拒付并升到最严 tier、冲正已打款收益同步扣钱包、冲正订阅收回权益——门禁细则见 `chief-payments-risk-officer`。顺带查出一条独立 P0：`subscriptions` 的 RLS 允许粉丝自行增删改订阅行，见 `docs/planning/sprint-current.md`）_
+_最后更新: 2026-09-13（PayRam 线上契约对照官方文档订正：回调状态字段 `state`→`status`、下单 `amount`→`amountInUSD` 且 `customerEmail` 必填、移除未文档化的 `redirectURL`；新增可测接缝 `resolvePayramState()` 与人工配置向导 `scripts/payram/setup-wizard.sh`。同轮修掉资金路径缺陷若干：订阅购买原子化为 `spend_wallet_on_subscription`（`migrations/053`，扣款与授予同事务 + advisory lock，替代此前三次都没修对的「路由挑幂等键」思路）、终态无金额回 5xx、单据行先于 PayRam 会话、美国州未知时拒付并升到最严 tier、冲正已打款收益同步扣钱包、冲正订阅收回权益——门禁细则见 `chief-payments-risk-officer`。顺带查出一条独立 P0：`subscriptions` 的 RLS 允许粉丝自行增删改订阅行、可白拿订阅权益，见 `docs/planning/sprint-current.md`）_
 
 \*历史: 2026-08-24（PayRam 支付账本落地：新增 `pnpm reconcile` / `pnpm reconcile:full` / `pnpm payram:replay` 三条验证命令；支付相关改动的门禁见 `chief-payments-risk-officer` 与 `docs/planning/soft-beta-loop.md`）\*\*
 

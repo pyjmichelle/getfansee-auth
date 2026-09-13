@@ -44,16 +44,19 @@ PROJECT-SPECIFIC SURFACES:
   - **单据行必须先于 PayRam 会话落库**：`openPayramOrder` 用我方 `invoiceId` 先建 OPEN 单，再向 PayRam 下单，最后 `attachPayramReference` 换成 PayRam 的 `reference_id`。反过来（先下单后建行）一旦建行失败，PayRam 那边已有活跃收款而我方无行可查，webhook 永远 `Unknown order` + 500，付了钱的粉丝永不入账
   - 充值档位固定 `$20 / $50 / $100`：onramp 最低约 $20 而 PPV $1.99，逐单刷卡在算术上不可能。onramp 费由粉丝直付第三方，**不进我方成本**，但必须在充值页提前披露
 - **账本与结算（`migrations/051` + `052`）**: `payment_orders`（预收负债）、`consumption_orders`（唯一确认收入的地方）、`creator_ledger`（欠创作者的权威账）、`payout_batches`。
-  - 所有花钱路径必须走 `spend_wallet` / `spend_wallet_on_ppv` / `spend_wallet_on_tip`，禁止直接改 `wallet_accounts`
+  - 所有花钱路径必须走 `spend_wallet` / `spend_wallet_on_ppv` / `spend_wallet_on_tip` / `spend_wallet_on_subscription`，禁止直接改 `wallet_accounts`
   - 平台费 20%（`PLATFORM_FEE_BPS`），下单时快照进 `consumption_orders.platform_fee_bps`，读历史时永不重算
   - 退款走 `reverse_consumption_order`：已打款的场景落 `negative_adjustment`（对冲未来收入）。**此处创作者可用余额必须一并扣减、允许为负**——负额就是那笔债本身，也正是「对冲未来收入」的实现方式（下次结算加进这个负数）。曾经只记账本不动钱包，结果 `creator_ledger_matches_wallets` 恒等式在冲正后永久失衡，而冲正恰恰是公测必须演练的路径。任何「不让余额为负」的改动都会重新打破对账，需此 agent 复核
   - **权益必须跟着钱走**：冲正 PPV 要删 `purchases` 行，冲正订阅要把 `current_period_end` 收到当下（只置 `status='canceled'` 无效，所有读路径都按 `current_period_end` 判权）。冲正订阅前要确认没有更晚的未冲正订阅单，否则会把粉丝后来又付过的周期一起收回
-  - **订阅必须「先扣款、后授予」，且幂等键锚定「被替换的那个周期」**：`subscriptions` 的用户列是运行时解析的（`resolveSubscriptionUserColumn`），无法像 PPV/tip 那样在 SQL 函数里连同权益一起提交，所以这条路径只能靠顺序与键来保证正确性。三条都踩过：
-    - 先授予后扣款 → 授予成功而扣款没跑完（进程挂掉、RPC 抛错）时，重试会命中「已是订阅者」闸并返回 `alreadySubscribed`，未付费的周期与已付费的周期从此无法区分，粉丝白拿一个月。顺序反过来后，唯一的中间态是「已扣款未授予」——有 `consumption_orders` 单据可见、重试即补授予且不会二次扣款
-    - 幂等键绑定「新周期结束时间」不行：那个值由 `subscribe30d` 用 `Date.now()` 现算，毫秒级不同 → 并发两个请求各生成一个键、各扣一次钱
-    - 键也不能锚在 `subscriptions` 的任何字段上：`subscriptions_delete_own` / `subscriptions_update_own` 允许粉丝用浏览器端 anon key 直接改自己的行，键会被退回到一个**已经付过钱的值**，`spend_wallet` 命中 idempotent 分支报成功而其实没扣钱。正解是 `countSubscriptionOrders()`（`lib/wallet-spend.ts`）——数 `consumption_orders` 里该 (fan, creator, subscription) 的既往单数作为序号：这张表对粉丝只有 SELECT 策略、只增不减，被冲正的单也照数（退款不该把买它的那个键还回去）。读不到时返回 `null`，路由必须回 503 拒绝本次请求，**绝不可当 0 处理**（当 0 就是退回首购键 = 白送一个周期）
-    - 不接受调用方传入的 `Idempotency-Key`：跨周期复用同一个 header 即可白拿窗口，而服务端键本身已经让重试幂等，这个 header 只有风险没有收益
-  - 扣款失败时禁止无条件 `cancelSubscription`（会把粉丝此前已付的有效订阅一起作废）。改成先扣款后授予之后，扣款失败时压根还没动过订阅行，不需要回滚
+  - **订阅走 `spend_wallet_on_subscription`（`migrations/053`），扣款与授予必须同一事务**：不要再试图在路由里「先扣款后授予 / 先授予后扣款 + 挑一个好的幂等键」。那条路连着三轮评审都没修对，因为凡是路由能读来做键的东西都不合格：
+    - 「新周期结束时间」由 `subscribe30d` 用 `Date.now()` 现算 → 并发两个请求键不同、各扣一次钱
+    - 「被替换的周期」读自 `subscriptions`，而 `subscriptions_delete_own` / `subscriptions_update_own` 允许粉丝用浏览器端 anon key 自行删改该行 → 键被退回到一个已经付过钱的值，`spend_wallet` 命中 idempotent 分支报成功而实际没扣钱
+    - 「既往订阅单数」会被扣款本身改变 → 授予失败后叫粉丝重试，重试算出的是新键，于是二次扣款
+    - 根因是「要保证幂等的那件事跨了两个事务」，只能消掉这个缝而不是给它取名字。053 的包装函数与 `spend_wallet_on_ppv` 同形：debit + 平台分成 + 创作者 pending + `subscriptions` 行一起提交或一起回滚
+  - **「是否已在有效期内」的判断必须在 RPC 里、且先取 `pg_advisory_xact_lock(fan:creator)`**：这个检查要与自己串行化，放在路由里两个并发请求会都读到「未订阅」并各扣一次。锁在提交时释放，双击的那个请求读到已提交的授予并走 `already_subscribed` 分支
+  - 幂等键在 053 之后退化为纯粹的重试保护（路由传 `randomUUID()`），仍然不接受调用方传入的 `Idempotency-Key`——跨周期复用同一个 header 即可白拿窗口，而 RPC 自身已经幂等，这个 header 只有风险没有收益
+  - 扣款失败时禁止无条件 `cancelSubscription`（会把粉丝此前已付的有效订阅一起作废）。原子化之后扣款失败根本不会动订阅行
+  - 续期从 `GREATEST(现有 current_period_end, now())` 起算：粉丝已付费但已取消（未到期）的那段不能因为重新订阅而被截短，不需要回滚
   - 结算 `settle_matured_earnings`（pending 7 天后转 available），由 `/api/cron/settlement` 驱动，跑完立即验对账等式
   - 对账等式四条：`pnpm reconcile` / `pnpm reconcile:full`。**任何非零差额都不是舍入误差**（账本是整数分），必须逐笔解释，否则不许开公测
 - **NowPayments（加密货币充值，新，高风险）**: `app/api/webhooks/nowpayments/route.ts` + `lib/nowpayments.ts`。2026-07-26 三次审查排查发现的架构缺陷**已通过 `migrations/048_nowpayments_atomic_credit.sql` 修复**：
@@ -65,7 +68,7 @@ PROJECT-SPECIFIC SURFACES:
   - 任何后续改动前必须先读 `migrations/048_nowpayments_atomic_credit.sql` 与 `app/api/webhooks/nowpayments/route.ts` 的完整实现，不得绕开 `credit_nowpayments_deposit` RPC 直接操作 `wallet_accounts`
 - Tip 支付幂等（新）: `components/tip-modal.tsx` 的 `nonce` 只在组件挂载时生成一次，modal 保持挂载状态下重复打开会复用同一 nonce，导致二次打赏命中后端 idempotent 分支但前端仍提示成功——修复需在每次 `open` 或每次成功后重新生成 nonce
 - Ambassador 佣金（新）: 推荐计划（`migrations/042`）定义了推荐奖励与佣金分成逻辑；MVP 阶段仅追踪不提现，后续钱包入账需通过此 agent 审查；业务代码见 `lib/ambassador/server.ts`、`lib/referral.ts`
-- Schema: `migrations/` 中与 billing、wallet、webhook、unlock、ambassador 相关的变更（最新：`051_payment_ledger.sql`、`052_settlement_and_reconciliation.sql`）
+- Schema: `migrations/` 中与 billing、wallet、webhook、unlock、ambassador 相关的变更（最新：`051_payment_ledger.sql`、`052_settlement_and_reconciliation.sql`、`053_spend_wallet_on_subscription.sql`）
 - 上线前必读：`docs/planning/payram-phase0-validation.md`（商务门）、`docs/planning/soft-beta-loop.md`（小额闭环门）、`docs/planning/legal-counsel-brief.md`（MTL / 代金券税务 / 无银行账户）
 
 REQUIRED INPUTS:

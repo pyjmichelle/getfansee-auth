@@ -1,10 +1,11 @@
+import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { subscribe30d, isActiveSubscriber } from "@/lib/paywall";
+import { subscribe30d } from "@/lib/paywall";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { sendSubscriptionConfirmation } from "@/lib/email";
 import { isInAppPaymentsEnabled } from "@/lib/constants/alpha";
-import { countSubscriptionOrders, spendWallet } from "@/lib/wallet-spend";
+import { spendWalletOnSubscription } from "@/lib/wallet-spend";
 import { getRequestGeo } from "@/lib/compliance/request-geo";
 
 const SITE_URL =
@@ -57,51 +58,25 @@ export async function POST(request: NextRequest) {
 
     // 2. If subscription has a price, charge the wallet.
     if (subscriptionPriceCents > 0) {
-      // Re-subscribing while already inside a paid period must not reach the
-      // charge at all: `subscribe30d` upserts a fresh 30-day window, so a
-      // second request would extend access, and there is nothing to sell to
-      // someone who already holds the period.
-      if (await isActiveSubscriber(user.id, creatorId)) {
-        return NextResponse.json({ success: true, alreadySubscribed: true });
-      }
-
-      // Charge before granting. Granting first looks safer per-request — worst
-      // case a fan we failed to bill rather than a fan billed for nothing — but
-      // it makes an unbilled grant indistinguishable from a paid one: the retry
-      // hits the guard above, returns `alreadySubscribed`, and the fan keeps a
-      // free window. Charging first is retry-safe in the other direction,
-      // because the key below dedupes the debit while the grant re-runs.
-      // The key numbers this purchase within the fan's history with this
-      // creator, counted off the append-only ledger. Two concurrent requests
-      // read the same count and collide on one debit; the next renewal reads a
-      // higher count and pays again. The two anchors that look more natural both
-      // fail: the new period end is derived from `Date.now()` inside
-      // `subscribe30d`, so concurrent requests get different keys and both
-      // charge; and anything read from `subscriptions` is fan-writable
-      // (`subscriptions_delete_own` / `subscriptions_update_own`), so a fan can
-      // walk the key back onto one they have already paid and collect a free
-      // period.
+      // One atomic call: the debit, the commission split, the creator credit
+      // and the `subscriptions` row commit together, exactly as PPV and tips
+      // already do. Charging here and writing `subscriptions` separately
+      // afterwards left a gap that no idempotency key could cover — see
+      // `spendWalletOnSubscription` for why each candidate key failed — so the
+      // gap is gone rather than named.
+      //
+      // The RPC also owns the "already inside a live period" check, because that
+      // check has to be serialised against itself: run from here, two in-flight
+      // requests both read "not subscribed" and both charge.
       //
       // No caller-supplied `Idempotency-Key` is honoured: reusing one across
-      // periods would take a free window, and it buys nothing, since retries are
-      // already idempotent under the server key.
-      const priorSubscriptionOrders = await countSubscriptionOrders(user.id, creatorId);
-      if (priorSubscriptionOrders === null) {
-        // Defaulting to 0 would reuse the first purchase's key and grant a free
-        // period, so a read failure has to fail the request instead.
-        return NextResponse.json(
-          { success: false, error: "Could not verify purchase history. Please retry." },
-          { status: 503 }
-        );
-      }
-
-      const spend = await spendWallet({
+      // periods would take a free window, and it buys nothing now that the RPC
+      // makes retries idempotent on its own.
+      const spend = await spendWalletOnSubscription({
         fanId: user.id,
         creatorId,
-        kind: "subscription",
-        grossCents: subscriptionPriceCents,
-        idempotencyKey: `sub_${user.id}_${creatorId}_${priorSubscriptionOrders}`,
-        referenceType: "subscription",
+        priceCents: subscriptionPriceCents,
+        idempotencyKey: `sub_${user.id}_${creatorId}_${randomUUID()}`,
         geo: getRequestGeo(request.headers),
       });
 
@@ -121,31 +96,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: spend.error }, { status: 500 });
       }
 
-      // `subscriptions` has a runtime-resolved user column (see
-      // resolveSubscriptionUserColumn), so it cannot be written from inside the
-      // SQL function the way PPV and tips write `purchases` / `tips`. That
-      // leaves this one window where the debit has committed and the grant has
-      // not. It is a recoverable state rather than a silent one: the
-      // consumption order exists, so the fan sees the charge and retrying
-      // completes the grant without charging again.
-      //
-      // This route stays behind `isInAppPaymentsEnabled()` until the
-      // subscriptions schema is normalised and this can move into a wrapper
-      // alongside spend_wallet_on_ppv / spend_wallet_on_tip.
-      const periodEnd = await subscribe30d(creatorId);
-      if (!periodEnd) {
-        console.error("[api/subscribe] charged but grant failed", {
-          fanId: user.id,
-          creatorId,
-          consumptionOrderId: spend.consumptionOrderId,
-        });
-        return NextResponse.json(
-          {
-            success: false,
-            error: "Payment went through but the subscription could not be created. Please retry.",
-          },
-          { status: 500 }
-        );
+      if (spend.alreadySubscribed) {
+        return NextResponse.json({ success: true, alreadySubscribed: true });
       }
     } else {
       // Free subscription — just create the record

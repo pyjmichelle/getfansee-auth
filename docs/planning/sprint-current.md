@@ -37,11 +37,14 @@
   - 线上契约订正（2026-09-13，对照官方 API 文档核实）：回调状态字段是 `status` 而非原代码假设的 `state`（读错只会得到 `undefined` → 投递被丢弃 → **粉丝付款永不入账且无任何报错**）；下单请求 `amount`→`amountInUSD` 且 `customerEmail` 为必填；移除未文档化的 `redirectURL`。状态解析收拢到 `resolvePayramState()` 并加单测钉死回归；契约表见 `docs/planning/payram-phase0-validation.md`
   - 人工配置向导：`bash scripts/payram/setup-wizard.sh`（API Key / Site URL 写入 `.env.local`，走完存款钱包与 webhook 注册，收尾强制 `PAYRAM_ENABLED=false`）。其中 webhook 主机是最易静默配错的一步：`pay.getfansee.com` 无此路由，而 `getfansee.com` 顶级域仍指向第三方 PHP 候补页（会返回 200 让 PayRam 认为投递成功且不再重试），真正的应用是 Vercel 项目 `getfansee-auth`／`demo.getfansee.com`
   - 资金路径缺陷清理（2026-09-13，PR #25 评审拦下 5 High + 2 Medium，均为静默失效）：
-    1. 订阅路径四连（连续三轮评审才收敛，根因始终是同一个：先授予后扣款，以及幂等键锚在了会变的东西上）。终态：**先扣款、后授予**，幂等键 = `countSubscriptionOrders()` 数出的 `consumption_orders` 既往订阅单数，并加「已在有效期内直接返回」的前置闸，不再接受调用方传入的 `Idempotency-Key`
+    1. 订阅购买路径（连续四轮评审才收敛）。前三轮都在路由里「调顺序 + 换幂等键」，每一版都被揪出新洞，因为**要保证幂等的那件事跨了两个事务**，键怎么选都不对：
        - 日粒度键 → 同日二次订阅（含取消后）白拿一个周期
-       - 改绑「新周期结束时间」仍不行：该值由 `Date.now()` 现算，并发两个请求键不同 → 各扣一次钱
-       - 改绑「扣款前快照的 `current_period_end`」也不行：`subscriptions` 的 RLS 让粉丝能自己删/改这行，键会退回一个已经付过钱的值 → `spend_wallet` 报 idempotent 成功而实际没扣钱。只有 `consumption_orders` 对粉丝只读、只增不减，才能当序号锚点；读不到时返回 `null` 并回 503，当 0 处理等于退回首购键
+       - 改绑「新周期结束时间」：该值由 `Date.now()` 现算，并发两个请求键不同 → 各扣一次钱
+       - 改绑「扣款前快照的 `current_period_end`」：`subscriptions` 的 RLS 让粉丝能自己删/改这行，键会退回一个已经付过钱的值 → `spend_wallet` 报 idempotent 成功而实际没扣钱
+       - 改绑「既往订阅单数」：这个数会被扣款本身改变 → 授予失败后叫粉丝重试，重试算出新键 → 二次扣款
        - 先授予后扣款 → 扣款没跑完时重试会命中「已是订阅者」闸并回 `alreadySubscribed`，未付费周期与已付费周期从此无法区分
+       - **终态（`migrations/053_spend_wallet_on_subscription.sql`）**：消掉那道缝，不再给它取名字。新增 `spend_wallet_on_subscription`，与 `spend_wallet_on_ppv` 同形——debit + 平台分成 + 创作者 pending + `subscriptions` 行一起提交或一起回滚；「是否已在有效期内」的判断挪进 RPC 且先取 `pg_advisory_xact_lock(fan:creator)`（该检查必须与自己串行化）；续期从 `GREATEST(现有 period_end, now())` 起算；幂等键退化为纯重试保护（`randomUUID()`），仍不收调用方 header
+       - 已用 Management API 应用到线上库，并跑了一个 `RAISE` 收尾自动回滚的事务内验证：首购扣一次 → **换一个不同的幂等键**在有效期内再调不扣款（这正是前三版都会二次扣款的用例）→ 到期后续订正常扣款；余额与单据数逐步断言，跑完确认 `consumption_orders` 无残留
     2. 扣款失败时无条件 `cancelSubscription` → 会把粉丝此前已付的有效订阅一起作废。改成先扣款后授予之后，扣款失败时压根还没动过订阅行
     3. PayRam 终态但读不出 `filled_amount_in_usd` 时回 200 → PayRam 视为投递成功并停止重试，一笔已被告知的入账永久丢失。改回 5xx，让它留在重试队列与失败列表里
     4. 美国请求缺 `region` 时落到 `self_attest` 且 `paymentsAllowed: true` → 田纳西/德州访客只要边缘没带州码就能浏览并付款。改为：拒付（州未知不能确认不是禁售州），访问按最严 US tier 且提供匿名通道（不整体拉黑，边缘头信息薄不等于禁售州证据）

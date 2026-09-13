@@ -51,6 +51,11 @@ export type SpendWalletResult =
       purchaseId?: string | null;
       /** Set by the tip wrapper. */
       tipId?: string | null;
+      /** Set by the subscription wrapper — the row that grants access. */
+      subscriptionId?: string | null;
+      currentPeriodEnd?: string | null;
+      /** Subscription wrapper only: the fan already held a live period. */
+      alreadySubscribed?: boolean;
     }
   | { success: false; error: string; balanceCents?: number; insufficient?: boolean };
 
@@ -65,6 +70,9 @@ interface SpendRpcResult {
   creator_net_cents?: number;
   purchase_id?: string;
   tip_id?: string;
+  subscription_id?: string;
+  current_period_end?: string;
+  already_subscribed?: boolean;
 }
 
 /**
@@ -123,47 +131,10 @@ function interpretSpendRpc(
     creatorNetCents: result.creator_net_cents ?? grossCents - fallbackFee,
     purchaseId: result.purchase_id ?? null,
     tipId: result.tip_id ?? null,
+    subscriptionId: result.subscription_id ?? null,
+    currentPeriodEnd: result.current_period_end ?? null,
+    alreadySubscribed: result.already_subscribed === true,
   };
-}
-
-/**
- * How many subscription purchases this fan has already made from this creator,
- * counting reversed ones.
- *
- * `/api/subscribe` uses this as the sequence number in its charge idempotency
- * key, so it needs two properties that only this table has: it is append-only
- * to fans (`consumption_orders` grants them SELECT and nothing else), and it
- * never loses a row. Anchoring the key on `subscriptions` instead cannot work —
- * `subscriptions_delete_own` / `subscriptions_update_own` let a fan reset their
- * own row from the browser, which would walk the sequence backwards onto a key
- * that has already been paid, and `spend_wallet` would report that stale order
- * as idempotent success while the fan collects a fresh period for free.
- *
- * Reversed orders stay counted on purpose: refunding a purchase must not hand
- * back the key that bought it.
- *
- * Returns null when the count cannot be read. Callers must fail the request
- * rather than assume zero — guessing here is what turns a transient read error
- * into a free subscription.
- */
-export async function countSubscriptionOrders(
-  fanId: string,
-  creatorId: string
-): Promise<number | null> {
-  const admin = getSupabaseAdminClient();
-  const { count, error } = await admin
-    .from("consumption_orders")
-    .select("id", { count: "exact", head: true })
-    .eq("fan_id", fanId)
-    .eq("creator_id", creatorId)
-    .eq("kind", "subscription");
-
-  if (error) {
-    console.error("[wallet-spend] countSubscriptionOrders failed:", error);
-    return null;
-  }
-
-  return count ?? 0;
 }
 
 export async function spendWallet(params: SpendWalletParams): Promise<SpendWalletResult> {
@@ -216,6 +187,49 @@ export async function spendWalletOnPpv(params: {
   });
 
   return interpretSpendRpc(data, error, params.priceCents, feeBps, "spend_wallet_on_ppv");
+}
+
+/** Days granted by one subscription purchase. */
+export const SUBSCRIPTION_PERIOD_DAYS = 30;
+
+/**
+ * Subscription purchase. Debit, commission split, creator credit and the
+ * `subscriptions` row commit together — see `spend_wallet_on_subscription`.
+ *
+ * The route used to charge here and write `subscriptions` separately afterwards,
+ * and three review rounds of trying to pick an idempotency key that survived
+ * that gap all failed: whatever the route can read to build a key is either
+ * derived from the clock (differs between concurrent requests), fan-writable
+ * (`subscriptions_delete_own` / `_update_own`), or changed by the charge itself.
+ * The RPC removes the gap instead, and takes an advisory lock on (fan, creator)
+ * so the "already subscribed" check is serialised against itself.
+ *
+ * `alreadySubscribed` means the fan was inside a live period and nothing was
+ * charged.
+ */
+export async function spendWalletOnSubscription(params: {
+  fanId: string;
+  creatorId: string;
+  priceCents: number;
+  idempotencyKey: string;
+  geo?: GeoContext | null;
+}): Promise<SpendWalletResult> {
+  const admin = getSupabaseAdminClient();
+  const feeBps = await resolveFeeBpsForCreator(params.creatorId);
+
+  const { data, error } = await admin.rpc("spend_wallet_on_subscription", {
+    p_fan_id: params.fanId,
+    p_creator_id: params.creatorId,
+    p_price_cents: params.priceCents,
+    p_platform_fee_bps: feeBps,
+    p_idempotency_key: params.idempotencyKey,
+    p_period_days: SUBSCRIPTION_PERIOD_DAYS,
+    p_buyer_country: params.geo?.country ?? null,
+    p_buyer_region: params.geo?.region ?? null,
+    p_available_on: pendingAvailableOn(),
+  });
+
+  return interpretSpendRpc(data, error, params.priceCents, feeBps, "spend_wallet_on_subscription");
 }
 
 /** Tip. Same atomicity guarantee, writing the `tips` audit row. */
