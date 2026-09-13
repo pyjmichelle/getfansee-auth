@@ -20,6 +20,8 @@ PROJECT-SPECIFIC:
 
 - `pnpm ci:verify` / `.husky/pre-push` 行为见 `scripts/ci/verify.sh`（pre-push 常跳过 QA Gate 与 E2E）
 - Playwright：`tests/e2e/`，工程名 `chromium` / `auth-mock-chromium` / `auth-real-chromium` 等
+- Cron：`/api/cron/financial-audit`、`/api/cron/settlement`，均需 `Authorization: Bearer $CRON_SECRET`；结算任务用 `SKIP LOCKED`，重叠执行安全
+- 支付环境变量：`PAYRAM_ENABLED`（默认关）、`PAYRAM_BASE_URL`、`PAYRAM_API_KEY`、`PAYRAM_WEBHOOK_SECRET`；`STRIPE_FIAT_ENABLED` 保持关闭
 
 TOOLS YOU MAY USE:
 

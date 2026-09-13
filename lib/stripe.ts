@@ -15,6 +15,34 @@ export const stripe = process.env.STRIPE_SECRET_KEY
 
 export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || "";
 
+/**
+ * Master switch for the legacy Stripe fiat rail. Default OFF.
+ *
+ * Two independent reasons this must not be reachable:
+ *
+ *   1. Compliance. `create-checkout-session` has no Alpha gate, no age
+ *      assurance gate and no jurisdiction gate — it will happily take card
+ *      money from anywhere, including states whose age-verification statutes
+ *      we would then be violating, and from fans who have never passed a
+ *      check. Every other money-moving route (`/api/tip`, `/api/subscribe`,
+ *      `/api/unlock`) is gated by `isInAppPaymentsEnabled()`; this one was
+ *      missed.
+ *   2. Correctness. The Stripe webhook credits the wallet with an
+ *      application-level SELECT-then-INSERT and a read-then-write balance
+ *      update. Two concurrent deliveries of the same event can both pass the
+ *      duplicate check and both credit. The NowPayments path was fixed by
+ *      moving this into a single atomic DB function guarded by a unique index
+ *      (migration 048); Stripe never was.
+ *
+ * The MVP rail is PayRam, so rather than harden a path we do not intend to
+ * ship, both the checkout route and the webhook refuse to run. Turning this
+ * on requires fixing (2) first — see `credit_payram_deposit` in migration 051
+ * for the shape the fix has to take.
+ */
+export function isStripeFiatEnabled(): boolean {
+  return process.env.STRIPE_FIAT_ENABLED === "true";
+}
+
 /** Minimum and maximum wallet top-up amounts in USD */
 export const WALLET_MIN_TOPUP_USD = 5;
 export const WALLET_MAX_TOPUP_USD = 500;

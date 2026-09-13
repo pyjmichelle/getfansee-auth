@@ -98,6 +98,41 @@ export default function RefundPage() {
         </section>
 
         <section>
+          <h2 className="text-h2 mb-4">4a. What the Wallet Is — and Is Not</h2>
+          <p className="text-text-secondary">
+            The Fan Wallet is a <strong>closed-loop prepaid balance</strong>. It exists only to buy
+            content and features on GetFanSee. It is <strong>not withdrawable</strong>, not
+            transferable to another user, not redeemable for cash or cryptocurrency, and earns no
+            interest. This is set out in full in{" "}
+            <Link href="/terms#payments" className="text-wine-text underline hover:no-underline">
+              Section 5 of the Terms of Service
+            </Link>
+            .
+          </p>
+          <p className="text-text-secondary mt-4">
+            Because of that, a &quot;wallet refund&quot; means one of two things, and never a
+            transfer out of the platform to a third party:
+          </p>
+          <ul className="list-disc pl-6 text-text-secondary space-y-2 mt-3">
+            <li>
+              <strong>Balance correction.</strong> Where a charge or a purchase was made in error,
+              we reverse it as a wallet balance adjustment. This is the default remedy.
+            </li>
+            <li>
+              <strong>Return of unspent balance.</strong> Where we close your account without cause,
+              or discontinue the Service, we will return the unspent portion of your balance to the
+              original payment method or original paying wallet address, less any amount already
+              spent. Crypto top-ups are returned in the same asset, and network fees and market
+              movement between top-up and return are not reimbursed.
+            </li>
+          </ul>
+          <p className="text-text-secondary mt-4">
+            Balance that has already been spent on a subscription, an unlock or a tip is no longer
+            wallet balance and is governed by the relevant section above.
+          </p>
+        </section>
+
+        <section>
           <h2 className="text-h2 mb-4">5. Tips / Gratuities</h2>
           <p className="text-text-secondary">
             Tips (also called &quot;buy me a coffee&quot;, gratuities, or support) are{" "}

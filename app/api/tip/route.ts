@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
-import { computeTipPlatformFeeCents, computeTipCreatorNetCents } from "@/lib/constants/fees";
 import { isInAppPaymentsEnabled } from "@/lib/constants/alpha";
+import { spendWalletOnTip } from "@/lib/wallet-spend";
+import { getRequestGeo } from "@/lib/compliance/request-geo";
 
 // UUID v4 regex for simple validation (same pattern as paywall.ts)
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -25,16 +26,14 @@ const MAX_TIP_CENTS = 50_000; // $500.00
  *   clientNonce: string (required — caller-supplied nonce for idempotency)
  * }
  *
- * Atomic flow (mirrors unlockPost):
+ * Flow:
  *   1. Auth check
- *   2. Validate body
- *   3. Idempotency check — if tip with same key already exists, return 200
- *   4. Check fan wallet balance
- *   5. Deduct fan available_balance_cents
- *   6. Insert tips row (rollback on failure)
- *   7. Insert fan debit transaction (type: tip, status: completed)
- *   8. Insert creator credit transaction (type: tip, status: pending, available_on: +7d)
- *   9. Increment creator pending_balance_cents
+ *   2. Validate body and creator tip settings
+ *   3. spend_wallet_on_tip — one database transaction covering the balance
+ *      check, the debit, the consumption order with its commission snapshot,
+ *      the creator's pending credit, the tips audit row and the transaction
+ *      log. Idempotent on `idempotency_key`.
+ *   4. Best-effort creator notification
  */
 export async function POST(request: NextRequest) {
   try {
@@ -134,140 +133,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Platform fee (placeholder rate — see lib/constants/fees.ts)
-    const platformFeeCents = computeTipPlatformFeeCents(amountCents);
-    const creatorNetCents = computeTipCreatorNetCents(amountCents);
+    // 3-9. One atomic call: balance check, debit, consumption order with the
+    // commission snapshot, creator pending credit, tips audit row and both
+    // transaction log entries. Idempotency is enforced by the database on
+    // `idempotency_key`, so a retried request cannot charge twice.
+    const spend = await spendWalletOnTip({
+      fanId,
+      creatorId,
+      postId: postId ?? null,
+      amountCents,
+      message: message ?? null,
+      idempotencyKey: iKey,
+      geo: getRequestGeo(request.headers),
+    });
 
-    // 3. Idempotency check
-    const { data: existingTip } = await admin
-      .from("tips")
-      .select("id")
-      .eq("idempotency_key", iKey)
-      .maybeSingle();
+    if (!spend.success) {
+      if (spend.insufficient) {
+        return NextResponse.json(
+          { success: false, error: "Insufficient balance", balance_cents: spend.balanceCents ?? 0 },
+          { status: 402 }
+        );
+      }
+      console.error("[tip] spend failed:", spend.error);
+      return NextResponse.json({ success: false, error: spend.error }, { status: 500 });
+    }
 
-    if (existingTip) {
-      const { data: wallet } = await admin
-        .from("wallet_accounts")
-        .select("available_balance_cents")
-        .eq("user_id", fanId)
-        .maybeSingle();
+    if (spend.idempotent) {
       return NextResponse.json({
         success: true,
         idempotent: true,
-        balance_after_cents: wallet?.available_balance_cents ?? 0,
+        tip_id: spend.tipId,
+        balance_after_cents: spend.balanceAfterCents,
       });
     }
 
-    // 4. Check fan wallet balance
-    const { data: fanWallet } = await admin
-      .from("wallet_accounts")
-      .select("available_balance_cents")
-      .eq("user_id", fanId)
-      .maybeSingle();
-
-    const currentBalance = fanWallet?.available_balance_cents ?? 0;
-    if (currentBalance < amountCents) {
-      return NextResponse.json(
-        { success: false, error: "Insufficient balance", balance_cents: currentBalance },
-        { status: 402 }
-      );
-    }
-
-    // 5. Deduct fan balance
-    const newFanBalance = currentBalance - amountCents;
-    const { error: deductError } = await admin
-      .from("wallet_accounts")
-      .upsert(
-        { user_id: fanId, available_balance_cents: newFanBalance, pending_balance_cents: 0 },
-        { onConflict: "user_id" }
-      );
-
-    if (deductError) {
-      console.error("[tip] wallet deduct error", deductError);
-      return NextResponse.json(
-        { success: false, error: "Balance deduction failed" },
-        { status: 500 }
-      );
-    }
-
-    // 6. Insert tips row
-    const tipInsertData: Record<string, unknown> = {
-      fan_id: fanId,
-      creator_id: creatorId,
-      amount_cents: amountCents,
-      platform_fee_cents: platformFeeCents,
-      creator_net_cents: creatorNetCents,
-      idempotency_key: iKey,
-    };
-    if (postId) tipInsertData.post_id = postId;
-    if (message) tipInsertData.message = message;
-
-    const { data: newTip, error: tipError } = await admin
-      .from("tips")
-      .insert(tipInsertData)
-      .select("id")
-      .single();
-
-    if (tipError) {
-      // Rollback balance
-      await admin
-        .from("wallet_accounts")
-        .upsert(
-          { user_id: fanId, available_balance_cents: currentBalance, pending_balance_cents: 0 },
-          { onConflict: "user_id" }
-        );
-      console.error("[tip] tips insert error", tipError);
-      return NextResponse.json({ success: false, error: "Tip recording failed" }, { status: 500 });
-    }
-
-    const tipId = newTip?.id;
-    const availableOn = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-
-    // 7. Fan debit transaction
-    await admin.from("transactions").insert({
-      user_id: fanId,
-      type: "tip",
-      amount_cents: -amountCents,
-      status: "completed",
-      metadata: {
-        creator_id: creatorId,
-        post_id: postId ?? null,
-        tip_id: tipId,
-        idempotency_key: iKey,
-      },
-    });
-
-    // 8. Creator pending revenue transaction (net of platform fee)
-    await admin.from("transactions").insert({
-      user_id: creatorId,
-      type: "tip",
-      amount_cents: creatorNetCents,
-      status: "pending",
-      available_on: availableOn,
-      metadata: {
-        fan_id: fanId,
-        post_id: postId ?? null,
-        tip_id: tipId,
-        gross_amount_cents: amountCents,
-        platform_fee_cents: platformFeeCents,
-      },
-    });
-
-    // 9. Increment creator pending balance by the NET amount (after platform fee)
-    const { data: creatorWallet } = await admin
-      .from("wallet_accounts")
-      .select("available_balance_cents, pending_balance_cents")
-      .eq("user_id", creatorId)
-      .maybeSingle();
-
-    await admin.from("wallet_accounts").upsert(
-      {
-        user_id: creatorId,
-        available_balance_cents: creatorWallet?.available_balance_cents ?? 0,
-        pending_balance_cents: (creatorWallet?.pending_balance_cents ?? 0) + creatorNetCents,
-      },
-      { onConflict: "user_id" }
-    );
+    const tipId = spend.tipId;
+    const creatorNetCents = spend.creatorNetCents;
 
     // 10. Notify creator (best-effort, non-blocking)
     // Net amount is what the creator actually receives after the platform fee.
@@ -292,7 +193,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       tip_id: tipId,
-      balance_after_cents: newFanBalance,
+      balance_after_cents: spend.balanceAfterCents,
       thank_you_message: tipSettings?.thank_you_message ?? null,
     });
   } catch (err: unknown) {

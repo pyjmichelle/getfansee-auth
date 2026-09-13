@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
+import { getRequestJurisdiction } from "@/lib/compliance/request-geo";
+import { requiresVerifiedAssurance } from "@/lib/compliance/jurisdictions";
+import {
+  AGE_ASSURANCE_COOKIE,
+  getAssuranceSecret,
+  methodSatisfiesJurisdiction,
+  verifyAssuranceToken,
+} from "@/lib/compliance/assurance-token";
 
 /**
- * Middleware: refreshes the Supabase auth session on EVERY request (so the
- * cookie never silently expires), then enforces redirects for protected routes.
+ * Middleware: enforces the jurisdiction blocklist, then refreshes the Supabase
+ * auth session on EVERY request (so the cookie never silently expires), then
+ * enforces redirects for protected routes.
  *
  * Running on all routes (not just protected ones) is required by the
  * @supabase/ssr pattern — otherwise navigating across public pages lets the
@@ -14,8 +23,109 @@ import { updateSession } from "@/lib/supabase/middleware";
 const USER_PROTECTED_PATHS = ["/me", "/subscriptions", "/purchases", "/notifications"];
 const CREATOR_PROTECTED_PATHS = ["/creator/new-post", "/creator/studio", "/creator/onboarding"];
 
+/**
+ * Paths reachable from a blocked jurisdiction.
+ *
+ * `/blocked` itself must be, or the redirect loops. Webhooks originate from
+ * payment/KYC providers whose egress IPs we do not control and must never be
+ * geo-filtered. The legal pages stay open because a rights holder in a blocked
+ * country still needs to be able to file a takedown notice or read what data
+ * we hold about them.
+ */
+const GEO_EXEMPT_PREFIXES = [
+  "/blocked",
+  "/api/webhooks",
+  "/api/health",
+  "/dmca",
+  "/privacy",
+  "/terms",
+  "/2257",
+];
+
+/**
+ * Paths reachable before a Tier B/C visitor has passed age assurance.
+ *
+ * Everything else — including the landing page and the feed — sits behind the
+ * check, because UK OSA and the US state statutes gate access to the content
+ * itself, not merely the checkout. The verification flow, its callback and the
+ * legal/company pages have to stay open or the visitor can never complete it.
+ */
+const AGE_CHECK_EXEMPT_PREFIXES = [
+  ...GEO_EXEMPT_PREFIXES,
+  "/age-check",
+  "/api/age-assurance",
+  "/about",
+  "/acceptable-use",
+  "/beta-terms",
+  "/creator-rules",
+  "/refund",
+  "/support",
+  "/faq",
+];
+
+/**
+ * Vendor-backed age assurance is behind a master switch because it cannot be
+ * turned on until the Didit workflows exist and the vendor has confirmed in
+ * writing that its products map onto the statutorily enumerated methods (see
+ * docs/planning/vendor-confirmation-requests.md). Until then Tier B/C
+ * jurisdictions fall back to the self-attestation gate — the status quo.
+ */
+function isAgeAssuranceEnforced(): boolean {
+  return process.env.AGE_ASSURANCE_ENABLED === "true";
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  const matchesPrefix = (prefixes: string[]) =>
+    prefixes.some((prefix) => pathname === prefix || pathname.startsWith(prefix + "/"));
+
+  const isApiRoute = pathname.startsWith("/api/");
+  const jurisdiction = getRequestJurisdiction(request.headers);
+
+  if (!matchesPrefix(GEO_EXEMPT_PREFIXES) && jurisdiction.tier === "blocked") {
+    // API callers get a machine-readable refusal; page requests get the
+    // explanation page. Redirecting an API route would hand the caller an
+    // HTML body where it expects JSON.
+    if (isApiRoute) {
+      return NextResponse.json(
+        { error: "Not available in your region", reason: jurisdiction.blockReason },
+        { status: 451 }
+      );
+    }
+    const blockedUrl = new URL("/blocked", request.url);
+    if (jurisdiction.blockReason) {
+      blockedUrl.searchParams.set("reason", jurisdiction.blockReason);
+    }
+    return NextResponse.redirect(blockedUrl);
+  }
+
+  if (
+    isAgeAssuranceEnforced() &&
+    requiresVerifiedAssurance(jurisdiction.tier) &&
+    !matchesPrefix(AGE_CHECK_EXEMPT_PREFIXES)
+  ) {
+    const secret = getAssuranceSecret();
+    const payload = secret
+      ? await verifyAssuranceToken(request.cookies.get(AGE_ASSURANCE_COOKIE)?.value, secret)
+      : null;
+
+    // A token signed for a weaker method does not satisfy a stronger tier —
+    // a facial estimate passed in the UK must not unlock Texas.
+    const satisfied = payload !== null && methodSatisfiesJurisdiction(payload.m, jurisdiction);
+
+    if (!satisfied) {
+      if (isApiRoute) {
+        return NextResponse.json(
+          { error: "Age verification required", tier: jurisdiction.tier },
+          { status: 403 }
+        );
+      }
+      const checkUrl = new URL("/age-check", request.url);
+      checkUrl.searchParams.set("next", pathname + request.nextUrl.search);
+      return NextResponse.redirect(checkUrl);
+    }
+  }
 
   // Always refresh the session and capture the rotated-cookie response.
   const { response, user, supabase } = await updateSession(request);
