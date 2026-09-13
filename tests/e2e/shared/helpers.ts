@@ -654,6 +654,20 @@ export async function waitForPageLoad(page: Page) {
 }
 
 /**
+ * 打开 /auth。
+ *
+ * `/auth` 水合后会自行改写 URL（补上 `?mode=...`），这次客户端导航会把还在等
+ * `domcontentloaded` 的那次 `goto` 打断成 `net::ERR_ABORTED`——页面本身是好的，
+ * 只是 `goto` 的 promise 挂了。真正的就绪判据是紧随其后的 `waitForAuthReady`，
+ * 所以这里吞掉中断，让它去裁决。
+ */
+async function gotoAuth(page: Page, mode: "login" | "signup") {
+  await page
+    .goto(`${BASE_URL}/auth?mode=${mode}`, { waitUntil: "domcontentloaded" })
+    .catch(() => undefined);
+}
+
+/**
  * 等待 Auth 页面就绪
  */
 async function waitForAuthReady(page: Page) {
@@ -733,7 +747,7 @@ export async function signUpUser(
       console.warn("[helpers] admin signup failed, falling back to UI:", error);
     }
   }
-  await page.goto(`${BASE_URL}/auth?mode=signup`, { waitUntil: "domcontentloaded" });
+  await gotoAuth(page, "signup");
   await waitForAuthReady(page);
 
   // 确保在 signup tab
@@ -862,7 +876,7 @@ export async function signInUser(
   password: string = TEST_PASSWORD
 ): Promise<void> {
   await ensureTestMode(page);
-  await page.goto(`${BASE_URL}/auth?mode=login`, { waitUntil: "domcontentloaded" });
+  await gotoAuth(page, "login");
   await waitForAuthReady(page);
 
   // 确保在 login tab
