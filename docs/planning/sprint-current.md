@@ -8,6 +8,15 @@
 
 ## Active Tasks
 
+### P0 – `subscriptions` 表 RLS 允许粉丝自行授予订阅（2026-09-13 发现，未修）
+
+- 现状（已用 Management API 核实线上策略定义）：`subscriptions` 上挂着三条面向 `public` 角色的写策略——`subscriptions_insert_own`（`with_check: auth.uid() = subscriber_id`）、`subscriptions_update_own`、`subscriptions_delete_own`。也就是说任何登录粉丝都能用浏览器端 anon key 直接 `insert`/`update` 自己的订阅行，把 `status` 设成 `active`、`current_period_end` 设成十年后，**不付一分钱拿到订阅专享内容**；也能 `delete` 掉自己的行来擦掉购买痕迹。来源是 `migrations/005_paywall.sql`，与本次 PayRam 改动无关，主干上一直如此
+- 为什么这次才浮出来：订阅扣款幂等键原本想锚在 `subscriptions.current_period_end` 上，评审指出该字段粉丝可写，键会被退回到已付过钱的值。键已改用 `consumption_orders`（对粉丝只读）绕开，但**权限本身的洞还在**：`isActiveSubscriber()` 读的就是这张表，所以付费墙的判权同样可伪造
+- Scope：把 `subscriptions` 的写权限收到 `service_role`，并把 `subscribe30d` / `cancelSubscription` 从 `getSupabaseUniversalClient()`（带用户 JWT 的 anon 客户端）迁到 admin 客户端。这与 agent 文档里已记的「`subscriptions` 用户列运行时解析、待规范化后并入 `spend_wallet_*` 包装函数」是同一块债，建议一起做
+- Acceptance Criteria：粉丝用 anon key 直接写 `subscriptions` 被拒；订阅与取消流程 E2E 仍绿；`pnpm reconcile` 四条等式为零
+- Required Gates：`pnpm check-all`、`pnpm build`、`pnpm exec playwright test --project=chromium`、`pnpm reconcile`
+- 负责 agent：`chief-security-architect` + `chief-payments-risk-officer`
+
 ### P0 – PayRam 支付链路 + 合规前置 + 账本结算（2026-08-24，代码完成，等外部确认）
 
 - Scope：MVP 支付通道从 Stripe/NowPayments 切到自托管 PayRam（USDC/Base），配套年龄验证与地域路由、预收负债账本、结算/退款/对账
@@ -28,9 +37,10 @@
   - 线上契约订正（2026-09-13，对照官方 API 文档核实）：回调状态字段是 `status` 而非原代码假设的 `state`（读错只会得到 `undefined` → 投递被丢弃 → **粉丝付款永不入账且无任何报错**）；下单请求 `amount`→`amountInUSD` 且 `customerEmail` 为必填；移除未文档化的 `redirectURL`。状态解析收拢到 `resolvePayramState()` 并加单测钉死回归；契约表见 `docs/planning/payram-phase0-validation.md`
   - 人工配置向导：`bash scripts/payram/setup-wizard.sh`（API Key / Site URL 写入 `.env.local`，走完存款钱包与 webhook 注册，收尾强制 `PAYRAM_ENABLED=false`）。其中 webhook 主机是最易静默配错的一步：`pay.getfansee.com` 无此路由，而 `getfansee.com` 顶级域仍指向第三方 PHP 候补页（会返回 200 让 PayRam 认为投递成功且不再重试），真正的应用是 Vercel 项目 `getfansee-auth`／`demo.getfansee.com`
   - 资金路径缺陷清理（2026-09-13，PR #25 评审拦下 5 High + 2 Medium，均为静默失效）：
-    1. 订阅路径三连（第一轮修完又被评审揪出两条，根因是同一个：先授予后扣款 + 幂等键取自现算时间戳）。终态：**先扣款、后授予**，幂等键锚定扣款前快照里的 `current_period_end`，并加「已在有效期内直接返回」的前置闸，不再接受调用方传入的 `Idempotency-Key`
+    1. 订阅路径四连（连续三轮评审才收敛，根因始终是同一个：先授予后扣款，以及幂等键锚在了会变的东西上）。终态：**先扣款、后授予**，幂等键 = `countSubscriptionOrders()` 数出的 `consumption_orders` 既往订阅单数，并加「已在有效期内直接返回」的前置闸，不再接受调用方传入的 `Idempotency-Key`
        - 日粒度键 → 同日二次订阅（含取消后）白拿一个周期
        - 改绑「新周期结束时间」仍不行：该值由 `Date.now()` 现算，并发两个请求键不同 → 各扣一次钱
+       - 改绑「扣款前快照的 `current_period_end`」也不行：`subscriptions` 的 RLS 让粉丝能自己删/改这行，键会退回一个已经付过钱的值 → `spend_wallet` 报 idempotent 成功而实际没扣钱。只有 `consumption_orders` 对粉丝只读、只增不减，才能当序号锚点；读不到时返回 `null` 并回 503，当 0 处理等于退回首购键
        - 先授予后扣款 → 扣款没跑完时重试会命中「已是订阅者」闸并回 `alreadySubscribed`，未付费周期与已付费周期从此无法区分
     2. 扣款失败时无条件 `cancelSubscription` → 会把粉丝此前已付的有效订阅一起作废。改成先扣款后授予之后，扣款失败时压根还没动过订阅行
     3. PayRam 终态但读不出 `filled_amount_in_usd` 时回 200 → PayRam 视为投递成功并停止重试，一笔已被告知的入账永久丢失。改回 5xx，让它留在重试队列与失败列表里

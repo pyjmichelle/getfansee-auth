@@ -50,7 +50,8 @@ PROJECT-SPECIFIC SURFACES:
   - **权益必须跟着钱走**：冲正 PPV 要删 `purchases` 行，冲正订阅要把 `current_period_end` 收到当下（只置 `status='canceled'` 无效，所有读路径都按 `current_period_end` 判权）。冲正订阅前要确认没有更晚的未冲正订阅单，否则会把粉丝后来又付过的周期一起收回
   - **订阅必须「先扣款、后授予」，且幂等键锚定「被替换的那个周期」**：`subscriptions` 的用户列是运行时解析的（`resolveSubscriptionUserColumn`），无法像 PPV/tip 那样在 SQL 函数里连同权益一起提交，所以这条路径只能靠顺序与键来保证正确性。三条都踩过：
     - 先授予后扣款 → 授予成功而扣款没跑完（进程挂掉、RPC 抛错）时，重试会命中「已是订阅者」闸并返回 `alreadySubscribed`，未付费的周期与已付费的周期从此无法区分，粉丝白拿一个月。顺序反过来后，唯一的中间态是「已扣款未授予」——有 `consumption_orders` 单据可见、重试即补授予且不会二次扣款
-    - 幂等键绑定「新周期结束时间」不行：那个值由 `subscribe30d` 用 `Date.now()` 现算，毫秒级不同 → 并发两个请求各生成一个键、各扣一次钱。必须锚定扣款前快照里的 `current_period_end`（`getSubscriptionSnapshot`）：并发请求读到同一个前序周期 → 同键 → 只扣一次；到期后的续订读到不同的前序周期 → 新键 → 正常收费。**该键依赖「没有任何代码路径删除 `subscriptions` 行」这一前提**，若将来新增删除逻辑，粉丝会退回 `initial` 键并与首购去重
+    - 幂等键绑定「新周期结束时间」不行：那个值由 `subscribe30d` 用 `Date.now()` 现算，毫秒级不同 → 并发两个请求各生成一个键、各扣一次钱
+    - 键也不能锚在 `subscriptions` 的任何字段上：`subscriptions_delete_own` / `subscriptions_update_own` 允许粉丝用浏览器端 anon key 直接改自己的行，键会被退回到一个**已经付过钱的值**，`spend_wallet` 命中 idempotent 分支报成功而其实没扣钱。正解是 `countSubscriptionOrders()`（`lib/wallet-spend.ts`）——数 `consumption_orders` 里该 (fan, creator, subscription) 的既往单数作为序号：这张表对粉丝只有 SELECT 策略、只增不减，被冲正的单也照数（退款不该把买它的那个键还回去）。读不到时返回 `null`，路由必须回 503 拒绝本次请求，**绝不可当 0 处理**（当 0 就是退回首购键 = 白送一个周期）
     - 不接受调用方传入的 `Idempotency-Key`：跨周期复用同一个 header 即可白拿窗口，而服务端键本身已经让重试幂等，这个 header 只有风险没有收益
   - 扣款失败时禁止无条件 `cancelSubscription`（会把粉丝此前已付的有效订阅一起作废）。改成先扣款后授予之后，扣款失败时压根还没动过订阅行，不需要回滚
   - 结算 `settle_matured_earnings`（pending 7 天后转 available），由 `/api/cron/settlement` 驱动，跑完立即验对账等式

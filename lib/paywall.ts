@@ -61,53 +61,6 @@ export async function subscribe30d(creatorId: string): Promise<string | null> {
 }
 
 /**
- * The subscription row as it stood before a purchase.
- *
- * `/api/subscribe` reads this to name the window it is selling: the charge is
- * keyed on the period being replaced, which is the only value that is identical
- * across concurrent attempts at the same purchase and different across
- * successive renewals.
- */
-export type SubscriptionSnapshot =
-  | { existed: false }
-  | {
-      existed: true;
-      status: string;
-      currentPeriodEnd: string | null;
-      cancelledAt: string | null;
-    };
-
-export async function getSubscriptionSnapshot(
-  fanId: string,
-  creatorId: string
-): Promise<SubscriptionSnapshot> {
-  try {
-    const supabase = await getSupabaseUniversalClient();
-    const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
-    const { data, error } = await supabase
-      .from("subscriptions")
-      .select("status, current_period_end, cancelled_at")
-      .eq(subscriptionUserColumn, fanId)
-      .eq("creator_id", creatorId)
-      .maybeSingle();
-
-    if (error || !data) {
-      return { existed: false };
-    }
-
-    return {
-      existed: true,
-      status: data.status,
-      currentPeriodEnd: data.current_period_end ?? null,
-      cancelledAt: data.cancelled_at ?? null,
-    };
-  } catch (err) {
-    console.error("[paywall] getSubscriptionSnapshot exception:", err);
-    return { existed: false };
-  }
-}
-
-/**
  * 取消订阅
  * @param creatorId Creator ID
  * @returns true 成功，false 失败

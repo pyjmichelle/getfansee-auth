@@ -126,6 +126,46 @@ function interpretSpendRpc(
   };
 }
 
+/**
+ * How many subscription purchases this fan has already made from this creator,
+ * counting reversed ones.
+ *
+ * `/api/subscribe` uses this as the sequence number in its charge idempotency
+ * key, so it needs two properties that only this table has: it is append-only
+ * to fans (`consumption_orders` grants them SELECT and nothing else), and it
+ * never loses a row. Anchoring the key on `subscriptions` instead cannot work —
+ * `subscriptions_delete_own` / `subscriptions_update_own` let a fan reset their
+ * own row from the browser, which would walk the sequence backwards onto a key
+ * that has already been paid, and `spend_wallet` would report that stale order
+ * as idempotent success while the fan collects a fresh period for free.
+ *
+ * Reversed orders stay counted on purpose: refunding a purchase must not hand
+ * back the key that bought it.
+ *
+ * Returns null when the count cannot be read. Callers must fail the request
+ * rather than assume zero — guessing here is what turns a transient read error
+ * into a free subscription.
+ */
+export async function countSubscriptionOrders(
+  fanId: string,
+  creatorId: string
+): Promise<number | null> {
+  const admin = getSupabaseAdminClient();
+  const { count, error } = await admin
+    .from("consumption_orders")
+    .select("id", { count: "exact", head: true })
+    .eq("fan_id", fanId)
+    .eq("creator_id", creatorId)
+    .eq("kind", "subscription");
+
+  if (error) {
+    console.error("[wallet-spend] countSubscriptionOrders failed:", error);
+    return null;
+  }
+
+  return count ?? 0;
+}
+
 export async function spendWallet(params: SpendWalletParams): Promise<SpendWalletResult> {
   const admin = getSupabaseAdminClient();
   const feeBps = await resolveFeeBpsForCreator(params.creatorId);

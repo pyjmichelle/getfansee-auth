@@ -23,7 +23,7 @@ PROJECT-SPECIFIC SURFACES:
 - **账本 / 结算 / 退款**: `migrations/051_payment_ledger.sql` 与 `052_settlement_and_reconciliation.sql`。花钱一律走 `spend_wallet*` RPC；退款走 `reverse_consumption_order`；结算走 `settle_matured_earnings`；对账用 `pnpm reconcile:full`，非零差额即停线
   - 冲正已打款的收益时，创作者可用余额**必须一并扣减、允许为负**（负额即欠款，也正是「对冲未来收入」的实现）；只记账本不动钱包会让 `creator_ledger_matches_wallets` 恒等式在冲正后永久失衡
   - 冲正必须收回权益：PPV 删 `purchases` 行，订阅把 `current_period_end` 收到当下（只置 `canceled` 无效）；并先确认没有更晚的未冲正订阅单
-  - 订阅必须先扣款后授予（先授予的话，扣款没跑完时重试会被「已是订阅者」闸挡住并回 `alreadySubscribed`，未付费周期与已付费周期再也分不开）；幂等键锚定扣款前快照的 `current_period_end`，而不是新周期结束时间（后者由 `Date.now()` 现算，并发请求键不同、各扣一次）；不接受调用方传入的 `Idempotency-Key`
+  - 订阅必须先扣款后授予（先授予的话，扣款没跑完时重试会被「已是订阅者」闸挡住并回 `alreadySubscribed`，未付费周期与已付费周期再也分不开）；幂等键用 `countSubscriptionOrders()` 数 `consumption_orders` 既往单数作序号——不能用新周期结束时间（`Date.now()` 现算，并发请求键不同、各扣一次），也不能锚在 `subscriptions` 任何字段上（粉丝可自行增删改自己的行，会把键退回已付过的值）；读不到单数时回 503，不可当 0；不接受调用方传入的 `Idempotency-Key`
 - **PayRam 两条静默失效**：终态但读不出 `filled_amount_in_usd` 必须回 5xx（回 200 会让 PayRam 停止重试、款项永久丢失）；单据行必须先于 PayRam 会话落库（`openPayramOrder` → 下单 → `attachPayramReference`），反序一旦建行失败就会留下无行可查的活跃收款
 - **Stripe 法币通道默认关闭**（`isStripeFiatEnabled`）：checkout 无门控 + webhook 幂等弱，重开前必须先按 `credit_payram_deposit` 的形状修复
 - **NowPayments（旧，高风险）**: `app/api/webhooks/nowpayments/route.ts` + `lib/nowpayments.ts`。原有的双入账/丢款/非原子缺陷已在 `migrations/048_nowpayments_atomic_credit.sql`（`credit_nowpayments_deposit` RPC + 唯一索引）修复。改动前必须先读该迁移与 route.ts 的完整实现，不得绕开 RPC 直接操作 `wallet_accounts`

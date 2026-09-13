@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { subscribe30d, getSubscriptionSnapshot, isActiveSubscriber } from "@/lib/paywall";
+import { subscribe30d, isActiveSubscriber } from "@/lib/paywall";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { sendSubscriptionConfirmation } from "@/lib/email";
 import { isInAppPaymentsEnabled } from "@/lib/constants/alpha";
-import { spendWallet } from "@/lib/wallet-spend";
+import { countSubscriptionOrders, spendWallet } from "@/lib/wallet-spend";
 import { getRequestGeo } from "@/lib/compliance/request-geo";
 
 const SITE_URL =
@@ -71,31 +71,36 @@ export async function POST(request: NextRequest) {
       // hits the guard above, returns `alreadySubscribed`, and the fan keeps a
       // free window. Charging first is retry-safe in the other direction,
       // because the key below dedupes the debit while the grant re-runs.
-      const previous = await getSubscriptionSnapshot(user.id, creatorId);
-
-      // The key identifies the window being sold as "the one replacing the
-      // window the fan holds now". Two concurrent requests read the same prior
-      // end and collide on one debit; a renewal after expiry reads a different
-      // prior end and pays again. Keying on the *new* period end instead cannot
-      // do this — `subscribe30d` derives it from `Date.now()`, so concurrent
-      // requests generate different keys and both charge. No caller-supplied
-      // `Idempotency-Key` is honoured here: a client that reuses one across
-      // periods would take a free window, and it buys nothing, since retries
-      // are already idempotent under the server key.
+      // The key numbers this purchase within the fan's history with this
+      // creator, counted off the append-only ledger. Two concurrent requests
+      // read the same count and collide on one debit; the next renewal reads a
+      // higher count and pays again. The two anchors that look more natural both
+      // fail: the new period end is derived from `Date.now()` inside
+      // `subscribe30d`, so concurrent requests get different keys and both
+      // charge; and anything read from `subscriptions` is fan-writable
+      // (`subscriptions_delete_own` / `subscriptions_update_own`), so a fan can
+      // walk the key back onto one they have already paid and collect a free
+      // period.
       //
-      // Invariant this depends on: no code path deletes a `subscriptions` row.
-      // If one is ever added, a fan could return to the `initial` key and
-      // dedupe against their first purchase.
-      const replacedPeriodEnd = previous.existed
-        ? (previous.currentPeriodEnd ?? "unbounded")
-        : "initial";
+      // No caller-supplied `Idempotency-Key` is honoured: reusing one across
+      // periods would take a free window, and it buys nothing, since retries are
+      // already idempotent under the server key.
+      const priorSubscriptionOrders = await countSubscriptionOrders(user.id, creatorId);
+      if (priorSubscriptionOrders === null) {
+        // Defaulting to 0 would reuse the first purchase's key and grant a free
+        // period, so a read failure has to fail the request instead.
+        return NextResponse.json(
+          { success: false, error: "Could not verify purchase history. Please retry." },
+          { status: 503 }
+        );
+      }
 
       const spend = await spendWallet({
         fanId: user.id,
         creatorId,
         kind: "subscription",
         grossCents: subscriptionPriceCents,
-        idempotencyKey: `sub_${user.id}_${creatorId}_${replacedPeriodEnd}`,
+        idempotencyKey: `sub_${user.id}_${creatorId}_${priorSubscriptionOrders}`,
         referenceType: "subscription",
         geo: getRequestGeo(request.headers),
       });

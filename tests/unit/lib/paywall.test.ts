@@ -73,35 +73,4 @@ describe("paywall.ts", () => {
     const { subscribe30d } = await import("@/lib/paywall");
     await expect(subscribe30d("creator-1")).resolves.toBeNull();
   });
-
-  // /api/subscribe keys the wallet charge on the period this snapshot reports,
-  // so the snapshot has to distinguish "no subscription yet" from "a row whose
-  // period has expired" — those are different purchases and must not share a key.
-  it("getSubscriptionSnapshot 报告授予前的周期，供扣款幂等键锚定", async () => {
-    queryBuilder.maybeSingle.mockResolvedValue({
-      data: {
-        status: "canceled",
-        current_period_end: "2026-09-01T00:00:00.000Z",
-        cancelled_at: "2026-08-20T00:00:00.000Z",
-      },
-      error: null,
-    });
-    const { getSubscriptionSnapshot } = await import("@/lib/paywall");
-
-    await expect(getSubscriptionSnapshot("fan-1", "creator-1")).resolves.toEqual({
-      existed: true,
-      status: "canceled",
-      currentPeriodEnd: "2026-09-01T00:00:00.000Z",
-      cancelledAt: "2026-08-20T00:00:00.000Z",
-    });
-  });
-
-  it("getSubscriptionSnapshot 在无订阅行时报告 existed: false", async () => {
-    queryBuilder.maybeSingle.mockResolvedValue({ data: null, error: null });
-    const { getSubscriptionSnapshot } = await import("@/lib/paywall");
-
-    await expect(getSubscriptionSnapshot("fan-1", "creator-1")).resolves.toEqual({
-      existed: false,
-    });
-  });
 });
