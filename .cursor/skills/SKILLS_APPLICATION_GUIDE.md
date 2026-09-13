@@ -289,7 +289,7 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ---
 
-_最后更新: 2026-09-13（PayRam 线上契约对照官方文档订正：回调状态字段 `state`→`status`、下单 `amount`→`amountInUSD` 且 `customerEmail` 必填、移除未文档化的 `redirectURL`；新增可测接缝 `resolvePayramState()` 与人工配置向导 `scripts/payram/setup-wizard.sh`。同轮修掉 7 条资金路径缺陷：订阅幂等键绑定周期、扣款失败按快照精确回滚、终态无金额回 5xx、单据行先于 PayRam 会话、美国州未知时拒付并升到最严 tier、冲正已打款收益同步扣钱包、冲正订阅收回权益——门禁细则见 `chief-payments-risk-officer`）_
+_最后更新: 2026-09-13（PayRam 线上契约对照官方文档订正：回调状态字段 `state`→`status`、下单 `amount`→`amountInUSD` 且 `customerEmail` 必填、移除未文档化的 `redirectURL`；新增可测接缝 `resolvePayramState()` 与人工配置向导 `scripts/payram/setup-wizard.sh`。同轮修掉 10 条资金路径缺陷：订阅改为先扣款后授予且幂等键锚定被替换周期（不收调用方 `Idempotency-Key`）、终态无金额回 5xx、单据行先于 PayRam 会话、美国州未知时拒付并升到最严 tier、冲正已打款收益同步扣钱包、冲正订阅收回权益——门禁细则见 `chief-payments-risk-officer`）_
 
 \*历史: 2026-08-24（PayRam 支付账本落地：新增 `pnpm reconcile` / `pnpm reconcile:full` / `pnpm payram:replay` 三条验证命令；支付相关改动的门禁见 `chief-payments-risk-officer` 与 `docs/planning/soft-beta-loop.md`）\*\*
 

@@ -48,7 +48,11 @@ PROJECT-SPECIFIC SURFACES:
   - 平台费 20%（`PLATFORM_FEE_BPS`），下单时快照进 `consumption_orders.platform_fee_bps`，读历史时永不重算
   - 退款走 `reverse_consumption_order`：已打款的场景落 `negative_adjustment`（对冲未来收入）。**此处创作者可用余额必须一并扣减、允许为负**——负额就是那笔债本身，也正是「对冲未来收入」的实现方式（下次结算加进这个负数）。曾经只记账本不动钱包，结果 `creator_ledger_matches_wallets` 恒等式在冲正后永久失衡，而冲正恰恰是公测必须演练的路径。任何「不让余额为负」的改动都会重新打破对账，需此 agent 复核
   - **权益必须跟着钱走**：冲正 PPV 要删 `purchases` 行，冲正订阅要把 `current_period_end` 收到当下（只置 `status='canceled'` 无效，所有读路径都按 `current_period_end` 判权）。冲正订阅前要确认没有更晚的未冲正订阅单，否则会把粉丝后来又付过的周期一起收回
-  - **订阅扣款的幂等键必须绑定「所购周期」，不能只到日粒度**：`subscribe30d` 每次都 upsert 一个新的 30 天窗口，若幂等键只含日期，同日二次订阅会命中 idempotent 分支——周期照发、钱不收。同理，扣款失败时禁止无条件 `cancelSubscription`（会把粉丝此前已付的有效订阅一起作废），必须先快照再精确回滚（`getSubscriptionSnapshot` / `restoreSubscription`）
+  - **订阅必须「先扣款、后授予」，且幂等键锚定「被替换的那个周期」**：`subscriptions` 的用户列是运行时解析的（`resolveSubscriptionUserColumn`），无法像 PPV/tip 那样在 SQL 函数里连同权益一起提交，所以这条路径只能靠顺序与键来保证正确性。三条都踩过：
+    - 先授予后扣款 → 授予成功而扣款没跑完（进程挂掉、RPC 抛错）时，重试会命中「已是订阅者」闸并返回 `alreadySubscribed`，未付费的周期与已付费的周期从此无法区分，粉丝白拿一个月。顺序反过来后，唯一的中间态是「已扣款未授予」——有 `consumption_orders` 单据可见、重试即补授予且不会二次扣款
+    - 幂等键绑定「新周期结束时间」不行：那个值由 `subscribe30d` 用 `Date.now()` 现算，毫秒级不同 → 并发两个请求各生成一个键、各扣一次钱。必须锚定扣款前快照里的 `current_period_end`（`getSubscriptionSnapshot`）：并发请求读到同一个前序周期 → 同键 → 只扣一次；到期后的续订读到不同的前序周期 → 新键 → 正常收费。**该键依赖「没有任何代码路径删除 `subscriptions` 行」这一前提**，若将来新增删除逻辑，粉丝会退回 `initial` 键并与首购去重
+    - 不接受调用方传入的 `Idempotency-Key`：跨周期复用同一个 header 即可白拿窗口，而服务端键本身已经让重试幂等，这个 header 只有风险没有收益
+  - 扣款失败时禁止无条件 `cancelSubscription`（会把粉丝此前已付的有效订阅一起作废）。改成先扣款后授予之后，扣款失败时压根还没动过订阅行，不需要回滚
   - 结算 `settle_matured_earnings`（pending 7 天后转 available），由 `/api/cron/settlement` 驱动，跑完立即验对账等式
   - 对账等式四条：`pnpm reconcile` / `pnpm reconcile:full`。**任何非零差额都不是舍入误差**（账本是整数分），必须逐笔解释，否则不许开公测
 - **NowPayments（加密货币充值，新，高风险）**: `app/api/webhooks/nowpayments/route.ts` + `lib/nowpayments.ts`。2026-07-26 三次审查排查发现的架构缺陷**已通过 `migrations/048_nowpayments_atomic_credit.sql` 修复**：

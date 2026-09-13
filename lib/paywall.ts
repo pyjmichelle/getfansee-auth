@@ -61,13 +61,12 @@ export async function subscribe30d(creatorId: string): Promise<string | null> {
 }
 
 /**
- * The subscription row as it stood before a grant, so a failed charge can put
- * it back exactly.
+ * The subscription row as it stood before a purchase.
  *
- * Rolling back with `cancelSubscription` instead would mark the row `canceled`
- * unconditionally — which, if the fan already held a paid period, destroys
- * access they had paid for. A failed charge must never be able to take away
- * more than the grant it is undoing.
+ * `/api/subscribe` reads this to name the window it is selling: the charge is
+ * keyed on the period being replaced, which is the only value that is identical
+ * across concurrent attempts at the same purchase and different across
+ * successive renewals.
  */
 export type SubscriptionSnapshot =
   | { existed: false }
@@ -105,48 +104,6 @@ export async function getSubscriptionSnapshot(
   } catch (err) {
     console.error("[paywall] getSubscriptionSnapshot exception:", err);
     return { existed: false };
-  }
-}
-
-/** Puts a subscription back to a snapshot taken before a grant. */
-export async function restoreSubscription(
-  creatorId: string,
-  snapshot: SubscriptionSnapshot
-): Promise<boolean> {
-  try {
-    const user = await getCurrentUserUniversal();
-    if (!user) {
-      console.error("[paywall] restoreSubscription: no user");
-      return false;
-    }
-
-    const supabase = await getSupabaseUniversalClient();
-    const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
-    const rows = supabase.from("subscriptions");
-
-    // No row before the grant means the grant created it, so the rollback is a
-    // delete rather than a cancel — leaving a `canceled` row behind would show
-    // the fan a subscription history entry for a purchase that never happened.
-    const { error } = snapshot.existed
-      ? await rows
-          .update({
-            status: snapshot.status,
-            current_period_end: snapshot.currentPeriodEnd,
-            cancelled_at: snapshot.cancelledAt,
-          })
-          .eq(subscriptionUserColumn, user.id)
-          .eq("creator_id", creatorId)
-      : await rows.delete().eq(subscriptionUserColumn, user.id).eq("creator_id", creatorId);
-
-    if (error) {
-      console.error("[paywall] restoreSubscription error:", error);
-      return false;
-    }
-
-    return true;
-  } catch (err) {
-    console.error("[paywall] restoreSubscription exception:", err);
-    return false;
   }
 }
 

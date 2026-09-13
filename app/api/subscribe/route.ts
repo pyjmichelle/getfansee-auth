@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  subscribe30d,
-  getSubscriptionSnapshot,
-  restoreSubscription,
-  isActiveSubscriber,
-} from "@/lib/paywall";
+import { subscribe30d, getSubscriptionSnapshot, isActiveSubscriber } from "@/lib/paywall";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { sendSubscriptionConfirmation } from "@/lib/email";
@@ -63,49 +58,49 @@ export async function POST(request: NextRequest) {
     // 2. If subscription has a price, charge the wallet.
     if (subscriptionPriceCents > 0) {
       // Re-subscribing while already inside a paid period must not reach the
-      // charge at all. `subscribe30d` upserts a fresh 30-day window, so without
-      // this guard a second request extends access — and any idempotency key
-      // coarser than the period makes that extension free.
+      // charge at all: `subscribe30d` upserts a fresh 30-day window, so a
+      // second request would extend access, and there is nothing to sell to
+      // someone who already holds the period.
       if (await isActiveSubscriber(user.id, creatorId)) {
         return NextResponse.json({ success: true, alreadySubscribed: true });
       }
 
-      // The subscription record is written first because `subscriptions` has a
-      // runtime-resolved user column (see resolveSubscriptionUserColumn), which
-      // makes it unsafe to write from inside a SQL function the way PPV and
-      // tips do. Granting before charging means the worst case is a fan with a
-      // subscription we failed to bill, not a fan billed for nothing — and the
-      // charge failure path restores the previous state below.
-      //
-      // This route stays behind `isInAppPaymentsEnabled()` until the
-      // subscriptions schema is normalised and this can move into a wrapper
-      // alongside spend_wallet_on_ppv / spend_wallet_on_tip.
+      // Charge before granting. Granting first looks safer per-request — worst
+      // case a fan we failed to bill rather than a fan billed for nothing — but
+      // it makes an unbilled grant indistinguishable from a paid one: the retry
+      // hits the guard above, returns `alreadySubscribed`, and the fan keeps a
+      // free window. Charging first is retry-safe in the other direction,
+      // because the key below dedupes the debit while the grant re-runs.
       const previous = await getSubscriptionSnapshot(user.id, creatorId);
-      const periodEnd = await subscribe30d(creatorId);
-      if (!periodEnd) {
-        return NextResponse.json(
-          { success: false, error: "Failed to create subscription" },
-          { status: 500 }
-        );
-      }
+
+      // The key identifies the window being sold as "the one replacing the
+      // window the fan holds now". Two concurrent requests read the same prior
+      // end and collide on one debit; a renewal after expiry reads a different
+      // prior end and pays again. Keying on the *new* period end instead cannot
+      // do this — `subscribe30d` derives it from `Date.now()`, so concurrent
+      // requests generate different keys and both charge. No caller-supplied
+      // `Idempotency-Key` is honoured here: a client that reuses one across
+      // periods would take a free window, and it buys nothing, since retries
+      // are already idempotent under the server key.
+      //
+      // Invariant this depends on: no code path deletes a `subscriptions` row.
+      // If one is ever added, a fan could return to the `initial` key and
+      // dedupe against their first purchase.
+      const replacedPeriodEnd = previous.existed
+        ? (previous.currentPeriodEnd ?? "unbounded")
+        : "initial";
 
       const spend = await spendWallet({
         fanId: user.id,
         creatorId,
         kind: "subscription",
         grossCents: subscriptionPriceCents,
-        // Keyed on the period the fan is buying, not on the wall-clock day: a
-        // date-granular key made a same-day re-subscribe look like a duplicate
-        // of the first one and granted the new period without charging. An
-        // explicit Idempotency-Key still wins, so a retried request is safe.
-        idempotencyKey:
-          request.headers.get("Idempotency-Key") ?? `sub_${user.id}_${creatorId}_${periodEnd}`,
+        idempotencyKey: `sub_${user.id}_${creatorId}_${replacedPeriodEnd}`,
         referenceType: "subscription",
         geo: getRequestGeo(request.headers),
       });
 
       if (!spend.success) {
-        await restoreSubscription(creatorId, previous);
         if (spend.insufficient) {
           return NextResponse.json(
             {
@@ -119,6 +114,33 @@ export async function POST(request: NextRequest) {
         }
         console.error("[api/subscribe] spend failed:", spend.error);
         return NextResponse.json({ success: false, error: spend.error }, { status: 500 });
+      }
+
+      // `subscriptions` has a runtime-resolved user column (see
+      // resolveSubscriptionUserColumn), so it cannot be written from inside the
+      // SQL function the way PPV and tips write `purchases` / `tips`. That
+      // leaves this one window where the debit has committed and the grant has
+      // not. It is a recoverable state rather than a silent one: the
+      // consumption order exists, so the fan sees the charge and retrying
+      // completes the grant without charging again.
+      //
+      // This route stays behind `isInAppPaymentsEnabled()` until the
+      // subscriptions schema is normalised and this can move into a wrapper
+      // alongside spend_wallet_on_ppv / spend_wallet_on_tip.
+      const periodEnd = await subscribe30d(creatorId);
+      if (!periodEnd) {
+        console.error("[api/subscribe] charged but grant failed", {
+          fanId: user.id,
+          creatorId,
+          consumptionOrderId: spend.consumptionOrderId,
+        });
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Payment went through but the subscription could not be created. Please retry.",
+          },
+          { status: 500 }
+        );
       }
     } else {
       // Free subscription — just create the record

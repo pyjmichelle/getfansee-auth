@@ -28,8 +28,11 @@
   - 线上契约订正（2026-09-13，对照官方 API 文档核实）：回调状态字段是 `status` 而非原代码假设的 `state`（读错只会得到 `undefined` → 投递被丢弃 → **粉丝付款永不入账且无任何报错**）；下单请求 `amount`→`amountInUSD` 且 `customerEmail` 为必填；移除未文档化的 `redirectURL`。状态解析收拢到 `resolvePayramState()` 并加单测钉死回归；契约表见 `docs/planning/payram-phase0-validation.md`
   - 人工配置向导：`bash scripts/payram/setup-wizard.sh`（API Key / Site URL 写入 `.env.local`，走完存款钱包与 webhook 注册，收尾强制 `PAYRAM_ENABLED=false`）。其中 webhook 主机是最易静默配错的一步：`pay.getfansee.com` 无此路由，而 `getfansee.com` 顶级域仍指向第三方 PHP 候补页（会返回 200 让 PayRam 认为投递成功且不再重试），真正的应用是 Vercel 项目 `getfansee-auth`／`demo.getfansee.com`
   - 资金路径缺陷清理（2026-09-13，PR #25 评审拦下 5 High + 2 Medium，均为静默失效）：
-    1. 订阅扣款幂等键只到日粒度，而 `subscribe30d` 每次 upsert 新的 30 天窗口 → 同日二次订阅（含取消后）白拿一个周期。改为绑定所购周期，并加「已在有效期内直接返回、不再授予不再扣款」的前置闸
-    2. 扣款失败时无条件 `cancelSubscription` → 会把粉丝此前已付的有效订阅一起作废。改为授予前快照、失败按快照精确回滚（无原行则删除，不留假的订阅历史）
+    1. 订阅路径三连（第一轮修完又被评审揪出两条，根因是同一个：先授予后扣款 + 幂等键取自现算时间戳）。终态：**先扣款、后授予**，幂等键锚定扣款前快照里的 `current_period_end`，并加「已在有效期内直接返回」的前置闸，不再接受调用方传入的 `Idempotency-Key`
+       - 日粒度键 → 同日二次订阅（含取消后）白拿一个周期
+       - 改绑「新周期结束时间」仍不行：该值由 `Date.now()` 现算，并发两个请求键不同 → 各扣一次钱
+       - 先授予后扣款 → 扣款没跑完时重试会命中「已是订阅者」闸并回 `alreadySubscribed`，未付费周期与已付费周期从此无法区分
+    2. 扣款失败时无条件 `cancelSubscription` → 会把粉丝此前已付的有效订阅一起作废。改成先扣款后授予之后，扣款失败时压根还没动过订阅行
     3. PayRam 终态但读不出 `filled_amount_in_usd` 时回 200 → PayRam 视为投递成功并停止重试，一笔已被告知的入账永久丢失。改回 5xx，让它留在重试队列与失败列表里
     4. 美国请求缺 `region` 时落到 `self_attest` 且 `paymentsAllowed: true` → 田纳西/德州访客只要边缘没带州码就能浏览并付款。改为：拒付（州未知不能确认不是禁售州），访问按最严 US tier 且提供匿名通道（不整体拉黑，边缘头信息薄不等于禁售州证据）
     5. 冲正「已打款」收益时只插负数账本行、不动钱包 → `creator_ledger_matches_wallets` 恒等式在冲正后永久非零。改为同步扣减创作者可用余额并允许为负（负额即欠款，也正是对冲未来收入的实现）
