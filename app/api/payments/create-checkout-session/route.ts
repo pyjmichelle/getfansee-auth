@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { stripe, WALLET_MIN_TOPUP_USD, WALLET_MAX_TOPUP_USD } from "@/lib/stripe";
+import {
+  stripe,
+  isStripeFiatEnabled,
+  WALLET_MIN_TOPUP_USD,
+  WALLET_MAX_TOPUP_USD,
+} from "@/lib/stripe";
 import { requireUser } from "@/lib/authz";
 import { jsonError } from "@/lib/http-errors";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
@@ -15,12 +20,19 @@ type CheckoutPayload = {
 /**
  * POST /api/payments/create-checkout-session
  * Creates a Stripe Checkout Session for wallet top-up.
- * On success, returns { url } — the client should redirect there.
- * After payment, Stripe redirects to /me/wallet?payment=success
- * and fires a webhook that credits the wallet.
+ *
+ * Disabled by default — see `isStripeFiatEnabled` in lib/stripe.ts for why
+ * this route is not merely unused but must not be reachable.
  */
 export async function POST(request: NextRequest) {
   try {
+    if (!isStripeFiatEnabled()) {
+      return NextResponse.json(
+        { success: false, error: "Card top-up is not available." },
+        { status: 503 }
+      );
+    }
+
     if (!stripe) {
       return NextResponse.json(
         { success: false, error: "Payment service is not configured" },

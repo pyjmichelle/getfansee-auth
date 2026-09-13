@@ -6,6 +6,7 @@ import { unlockPost } from "@/lib/paywall";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { sendPPVConfirmation } from "@/lib/email";
 import { isInAppPaymentsEnabled } from "@/lib/constants/alpha";
+import { getRequestGeo } from "@/lib/compliance/request-geo";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://getfansee.com";
@@ -40,7 +41,13 @@ export async function POST(request: NextRequest) {
 
     const idempotencyKey = request.headers.get("Idempotency-Key") ?? randomUUID();
     // 将已验证的 userId 显式传入，避免下层重复获取 session 的竞态
-    const result = await unlockPost(postId, priceCents, idempotencyKey, user.id);
+    const result = await unlockPost(
+      postId,
+      priceCents,
+      idempotencyKey,
+      user.id,
+      getRequestGeo(request.headers)
+    );
 
     if (result.success) {
       // Send PPV receipt email (non-blocking)

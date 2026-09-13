@@ -41,14 +41,16 @@ All agent definitions live in [`.cursor/agents/`](.cursor/agents/). Mirror docs 
 - Creator Discovery — NEW (`app/creators/`, `app/api/creators/directory/`)
 - Creator Studio (`app/creator/studio/`, incl. `links/` — NEW)
 - Ambassador / Referral Program (`app/creator/studio/ambassador/`, `app/api/referral/*`, `app/r/[code]/`)
-- Wallet / Payments (`app/me/wallet/`, `app/api/wallet/`, Stripe webhooks, NowPayments webhooks — NEW, see payments-risk agent for known idempotency defects)
+- Wallet / Payments (`app/me/wallet/`, `app/api/wallet/`, **PayRam — the MVP rail**: `lib/payram.ts`, `app/api/payments/payram/*`, `app/api/webhooks/payram/`; ledger + settlement in `migrations/051`/`052`, `lib/settlement.ts`, `/api/cron/settlement`, `/api/admin/refunds`. Stripe fiat is disabled by default (`STRIPE_FIAT_ENABLED`); NowPayments remains as the earlier crypto path — see payments-risk agent)
 - KYC (`lib/kyc/kyc-service.ts`, `app/api/kyc/`)
 - Legal pages (`app/2257/`, `app/privacy/`, `app/dmca/`, `app/about/`, `app/acceptable-use/`, `app/beta-terms/`, `app/creator-rules/`)
 - Admin (`app/admin/*`, incl. `creator-links/` — NEW)
 
 **Known systemic UI defect (2026-07-26 third-pass audit, not yet fixed)**: tab/segment switching causes layout jump on both PC and mobile via a 5-layer root cause chain (missing `scrollbar-gutter`, panel unmount/remount, skeleton height mismatch, active/inactive border+font-weight asymmetry, `transition-all` perceived jank) — see `.cursor/plans/ui根治三次审查修订_*.plan.md` and `chief-frontend-architect` agent notes before touching any tab-like control.
 
-**Latest migration**: `049_creator_aggregate_counts.sql`
+**Latest migration**: `052_settlement_and_reconciliation.sql` (`050` age assurance, `051` payment ledger, `052` settlement + reversal + reconciliation)
+
+**Compliance layer (2026-08)**: server-enforced age assurance and geo routing live in `lib/compliance/` (`jurisdictions.ts` defines the four access tiers, `assurance-token.ts` the HMAC cookie checked in `middleware.ts`), backed by `migrations/050_age_assurance.sql`. Blocked: OFAC-sanctioned countries, countries where adult content is illegal, and Tennessee. Payments are US-only at launch.
 
 ---
 
@@ -77,23 +79,31 @@ For repair / refactor / pre-merge, dispatch agents in this order:
 
 ## Key Skills Index
 
-| Skill                                   | Trigger                                                     |
-| --------------------------------------- | ----------------------------------------------------------- |
-| `supabase`                              | Any Supabase Auth / DB / RLS / SSR work                     |
-| `supabase-postgres-best-practices`      | Schema design, query optimization, RLS                      |
-| `next-best-practices`                   | Next.js 16 App Router patterns                              |
-| `creator-ambassador-referral`           | Ambassador / referral program feature                       |
-| `qa-gate`                               | QA gate pipeline (gate-ui + gate-deadclick + audit:full)    |
-| `release-gate`                          | Pre-merge gate sequence                                     |
-| `release-review-walkthrough`            | Structured UI release review                                |
-| `feature-qa-walkthrough`                | PRD-driven dual-viewport, all-roles, all-button walkthrough |
-| `page-ia-review` (`.cursor/skills/`)    | Layout/IA/tab tradeoffs, overlays, ≥44px touch targets      |
-| `impeccable` (`.agents/skills/`)        | UI polish implementation pass                               |
-| `web-quality-audit` (`.agents/skills/`) | Performance/a11y/SEO/CLS audit                              |
-| `code-check`                            | Run `pnpm check-all`                                        |
-| `find-skills`                           | Discover new skills via `npx skills find`                   |
+| Skill                                               | Trigger                                                                                                      |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `supabase`                                          | Any Supabase Auth / DB / RLS / SSR work                                                                      |
+| `supabase-postgres-best-practices`                  | Schema design, query optimization, RLS                                                                       |
+| `next-best-practices`                               | Next.js 16 App Router patterns                                                                               |
+| `creator-ambassador-referral`                       | Ambassador / referral program feature                                                                        |
+| `qa-gate`                                           | QA gate pipeline (gate-ui + gate-deadclick + audit:full)                                                     |
+| `release-gate`                                      | Pre-merge gate sequence                                                                                      |
+| `release-review-walkthrough`                        | Structured UI release review                                                                                 |
+| `feature-qa-walkthrough`                            | PRD-driven dual-viewport, all-roles, all-button walkthrough                                                  |
+| `page-ia-review` (`.cursor/skills/`)                | Layout/IA/tab tradeoffs, overlays, ≥44px touch targets                                                       |
+| `impeccable` (`.agents/skills/`)                    | UI polish implementation pass                                                                                |
+| `web-quality-audit` (`.agents/skills/`)             | Performance/a11y/SEO/CLS audit                                                                               |
+| `code-check`                                        | Run `pnpm check-all`                                                                                         |
+| `find-skills`                                       | Discover new skills via `npx skills find`                                                                    |
+| `tdd` (`.agents/skills/`)                           | Red-green-refactor loop, seam-based testing discipline                                                       |
+| `code-review` (`.agents/skills/`)                   | Two-axis review (Standards + Spec) via parallel sub-agents                                                   |
+| `domain-modeling` (`.agents/skills/`)               | Maintain `CONTEXT.md` glossary + ADRs for hard-to-reverse decisions                                          |
+| `diagnosing-bugs` (`.agents/skills/`)               | Disciplined repro → minimize → hypothesize → fix loop for hard bugs                                          |
+| `wizard` (`.agents/skills/`)                        | Generate interactive bash wizard for manual ops steps (e.g. sprint-current.md's launch-readiness checklists) |
+| `resolving-merge-conflicts` (`.agents/skills/`)     | Hunk-by-hunk merge/rebase conflict resolution, never `--abort`                                               |
+| `improve-codebase-architecture` (`.agents/skills/`) | Periodic scan for module-deepening opportunities                                                             |
+| `research` (`.agents/skills/`)                      | Cited-source investigation saved as a Markdown report                                                        |
 
-Full index: [`.cursor/skills/SKILLS_APPLICATION_GUIDE.md`](.cursor/skills/SKILLS_APPLICATION_GUIDE.md)
+Full index: [`.cursor/skills/SKILLS_APPLICATION_GUIDE.md`](.cursor/skills/SKILLS_APPLICATION_GUIDE.md) (see "工程纪律补充" section for the mattpocock/skills batch above and what was deliberately left out)
 
 ---
 

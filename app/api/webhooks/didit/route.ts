@@ -14,6 +14,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import { processWebhookEvent } from "@/lib/kyc/kyc-service";
+import { applyVendorAgeDecision, AGE_VENDOR_DATA_PREFIX } from "@/lib/compliance/age-assurance";
 import type { DiditWebhookPayload } from "@/lib/kyc/didit-mapper";
 
 // ─── Signature Verification ──────────────────────────────
@@ -172,6 +173,15 @@ export async function POST(request: NextRequest) {
       webhookType: body.webhook_type,
       vendorData: body.vendor_data,
     });
+
+    // Fan age assurance and creator KYC share one Didit account and therefore
+    // one webhook endpoint. They are told apart by the vendor_data prefix —
+    // routing an age check through processWebhookEvent would try to update a
+    // creator KYC record that does not exist.
+    if (body.vendor_data?.startsWith(AGE_VENDOR_DATA_PREFIX)) {
+      await applyVendorAgeDecision(body.vendor_data, body.status);
+      return NextResponse.json({ success: true, message: "Age assurance event processed" });
+    }
 
     // Process the event
     const result = await processWebhookEvent(body);

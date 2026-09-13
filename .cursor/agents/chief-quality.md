@@ -48,6 +48,12 @@ REQUIRED SKILLS (MANDATORY):
 - `.cursor/skills/api-test-runner.skill.md`
 - `.cursor/skills/ci-pipeline-config.skill.md`
 
+SUPPLEMENTARY SKILLS (optional, from `mattpocock/skills`, 2026-08-24；不替代上面的 MANDATORY 列表)：
+
+- `.agents/skills/tdd/SKILL.md` — 写新测试前的红绿重构循环与 seam 纪律
+- `.agents/skills/code-review/SKILL.md` — Standards/Spec 双轴子 agent 评审，可与 `bugbot`/`security-review` 并用
+- `.agents/skills/diagnosing-bugs/SKILL.md` — 难复现 bug 的结构化排查循环
+
 DEFAULT VERIFICATION COMMANDS:
 
 - `pnpm check-all`
@@ -60,6 +66,7 @@ SCOPED COMMANDS (BY CHANGE TYPE):
 - Auth related: `pnpm test:auth:mock` and `pnpm test:auth:full`
 - UI regression: `pnpm test:e2e:smoke`（`tests/e2e/smoke.spec.ts`）或 `tests/e2e/` 下相关 spec
 - API or DB behavior: `pnpm test:server-health` plus targeted E2E
+- 支付 / 账本 / 结算相关：`pnpm vitest run tests/unit/lib/payram.test.ts`、`pnpm reconcile`（对账等式必须全零），改动 webhook 时另跑 `pnpm payram:replay --reference=<ref>` 验重放幂等。开公测前按 `docs/planning/soft-beta-loop.md` 全表走一遍——**未观察到完整结算周期就不算验过**
 
 REQUIRED INPUTS:
 

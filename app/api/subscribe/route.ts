@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { subscribe30d } from "@/lib/paywall";
+import { subscribe30d, cancelSubscription } from "@/lib/paywall";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { sendSubscriptionConfirmation } from "@/lib/email";
 import { isInAppPaymentsEnabled } from "@/lib/constants/alpha";
+import { spendWallet } from "@/lib/wallet-spend";
+import { getRequestGeo } from "@/lib/compliance/request-geo";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://getfansee.com";
@@ -53,102 +55,53 @@ export async function POST(request: NextRequest) {
     const subscriptionPriceCents = priceCents ?? creatorProfile?.subscription_price_cents ?? 0;
     const creatorName = creatorProfile?.display_name || "Creator";
 
-    // 2. If subscription has a price, deduct from fan wallet first
+    // 2. If subscription has a price, charge the wallet.
     if (subscriptionPriceCents > 0) {
-      // 2a. Check fan wallet balance
-      const { data: fanWallet } = await admin
-        .from("wallet_accounts")
-        .select("available_balance_cents")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      const currentBalance = fanWallet?.available_balance_cents ?? 0;
-      if (currentBalance < subscriptionPriceCents) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: "Insufficient wallet balance",
-            balance_cents: currentBalance,
-            required_cents: subscriptionPriceCents,
-          },
-          { status: 402 }
-        );
-      }
-
-      // 2b. Deduct fan wallet balance
-      const newFanBalance = currentBalance - subscriptionPriceCents;
-      const { error: deductError } = await admin
-        .from("wallet_accounts")
-        .upsert(
-          { user_id: user.id, available_balance_cents: newFanBalance, pending_balance_cents: 0 },
-          { onConflict: "user_id" }
-        );
-
-      if (deductError) {
-        console.error("[api/subscribe] wallet deduct error:", deductError);
-        return NextResponse.json(
-          { success: false, error: "Balance deduction failed" },
-          { status: 500 }
-        );
-      }
-
-      // 2c. Create subscription record
-      const success = await subscribe30d(creatorId);
-      if (!success) {
-        // Rollback wallet deduction on subscription failure
-        await admin
-          .from("wallet_accounts")
-          .upsert(
-            { user_id: user.id, available_balance_cents: currentBalance, pending_balance_cents: 0 },
-            { onConflict: "user_id" }
-          );
+      // The subscription record is written first because `subscriptions` has a
+      // runtime-resolved user column (see resolveSubscriptionUserColumn), which
+      // makes it unsafe to write from inside a SQL function the way PPV and
+      // tips do. Granting before charging means the worst case is a fan with a
+      // subscription we failed to bill, not a fan billed for nothing — and the
+      // charge failure path cancels the grant below.
+      //
+      // This route stays behind `isInAppPaymentsEnabled()` until the
+      // subscriptions schema is normalised and this can move into a wrapper
+      // alongside spend_wallet_on_ppv / spend_wallet_on_tip.
+      const granted = await subscribe30d(creatorId);
+      if (!granted) {
         return NextResponse.json(
           { success: false, error: "Failed to create subscription" },
           { status: 500 }
         );
       }
 
-      // 2d. Record fan debit transaction
-      await admin.from("transactions").insert({
-        user_id: user.id,
-        type: "subscription",
-        amount_cents: -subscriptionPriceCents,
-        status: "completed",
-        metadata: {
-          creator_id: creatorId,
-          billing_period: "monthly",
-        },
+      const spend = await spendWallet({
+        fanId: user.id,
+        creatorId,
+        kind: "subscription",
+        grossCents: subscriptionPriceCents,
+        // One charge per fan/creator/30-day period.
+        idempotencyKey: `sub_${user.id}_${creatorId}_${new Date().toISOString().slice(0, 10)}`,
+        referenceType: "subscription",
+        geo: getRequestGeo(request.headers),
       });
 
-      // 2e. Record creator pending revenue transaction
-      await admin.from("transactions").insert({
-        user_id: creatorId,
-        type: "subscription",
-        amount_cents: subscriptionPriceCents,
-        status: "pending",
-        available_on: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        metadata: {
-          fan_id: user.id,
-          billing_period: "monthly",
-        },
-      });
-
-      // 2f. Update creator pending balance
-      const { data: creatorWallet } = await admin
-        .from("wallet_accounts")
-        .select("available_balance_cents, pending_balance_cents")
-        .eq("user_id", creatorId)
-        .maybeSingle();
-
-      await admin.from("wallet_accounts").upsert(
-        {
-          user_id: creatorId,
-          available_balance_cents: creatorWallet?.available_balance_cents ?? 0,
-          pending_balance_cents:
-            (creatorWallet?.pending_balance_cents ?? 0) + subscriptionPriceCents,
-        },
-        { onConflict: "user_id" }
-      );
+      if (!spend.success) {
+        await cancelSubscription(creatorId);
+        if (spend.insufficient) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: "Insufficient wallet balance",
+              balance_cents: spend.balanceCents ?? 0,
+              required_cents: subscriptionPriceCents,
+            },
+            { status: 402 }
+          );
+        }
+        console.error("[api/subscribe] spend failed:", spend.error);
+        return NextResponse.json({ success: false, error: spend.error }, { status: 500 });
+      }
     } else {
       // Free subscription — just create the record
       const success = await subscribe30d(creatorId);

@@ -7,6 +7,8 @@ import { getSupabaseUniversalClient } from "./supabase-universal";
 import { getCurrentUserUniversal } from "./auth-universal";
 import { getSubscriptionUserId, resolveSubscriptionUserColumn } from "./subscriptions";
 import { getSupabaseAdminClient } from "./supabase-admin";
+import { spendWalletOnPpv } from "./wallet-spend";
+import type { GeoContext } from "./compliance/jurisdictions";
 
 export type PaywallState = {
   hasActiveSubscription: boolean;
@@ -301,19 +303,27 @@ export async function isActiveSubscriber(
 
 /**
  * 解锁单个 post（PPV unlock）
- * 使用 admin client 直接操作 DB，绕过 unlock_ppv RPC 函数的潜在 bug
- * (migration 035 在 RPC 中引入了 v_post.price 字段名 bug)
+ *
+ * Money movement runs entirely inside `spend_wallet_on_ppv` (migration 051):
+ * the balance check, the debit, the consumption order carrying the commission
+ * snapshot, the creator's pending credit and the `purchases` row that grants
+ * access all commit or roll back together. The previous implementation did
+ * these as five sequential admin-client calls, which could leave a fan debited
+ * without access, and credited the creator the *full* price because PPV had no
+ * platform fee at all.
+ *
  * @param postId Post ID
  * @param priceCents Price in cents (from post.price_cents, optional)
  * @param idempotencyKey Idempotency key for deduplication
  * @param explicitUserId Authenticated user ID (provided by route layer)
- * @returns { success: boolean, error?: string, balance_after_cents?: number }
+ * @param geo Buyer jurisdiction, recorded on the sale for tax nexus tracking
  */
 export async function unlockPost(
   postId: string,
   priceCents?: number,
   idempotencyKey?: string,
-  explicitUserId?: string
+  explicitUserId?: string,
+  geo?: GeoContext | null
 ): Promise<{ success: boolean; error?: string; balance_after_cents?: number }> {
   try {
     // 优先使用路由层已验证的 userId，回退到通用获取（兼容直接调用场景）
@@ -354,127 +364,27 @@ export async function unlockPost(
     // 2. Idempotency key
     const iKey = idempotencyKey ?? `ppv_${userId}_${postId}`;
 
-    // 3. Idempotency check — already have a purchase with this key?
-    const { data: existingPurchase } = await admin
-      .from("purchases")
-      .select("id")
-      .eq("fan_id", userId)
-      .eq("post_id", postId)
-      .maybeSingle();
+    // 3. Charge and grant, atomically.
+    const spend = await spendWalletOnPpv({
+      fanId: userId,
+      postId,
+      creatorId: post.creator_id,
+      priceCents: resolvedPrice,
+      idempotencyKey: iKey,
+      geo,
+    });
 
-    if (existingPurchase) {
-      const { data: wallet } = await admin
-        .from("wallet_accounts")
-        .select("available_balance_cents")
-        .eq("user_id", userId)
-        .maybeSingle();
-      return {
-        success: true,
-        balance_after_cents: wallet?.available_balance_cents ?? 0,
-      };
-    }
-
-    // 4. Check fan wallet balance
-    const { data: fanWallet } = await admin
-      .from("wallet_accounts")
-      .select("available_balance_cents")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    const currentBalance = fanWallet?.available_balance_cents ?? 0;
-    if (currentBalance < resolvedPrice) {
+    if (!spend.success) {
       return {
         success: false,
-        error: "Insufficient balance",
-        balance_after_cents: currentBalance,
+        error: spend.error,
+        balance_after_cents: spend.balanceCents,
       };
     }
-
-    // 5. Deduct fan balance
-    const newFanBalance = currentBalance - resolvedPrice;
-    const { error: deductError } = await admin
-      .from("wallet_accounts")
-      .upsert(
-        { user_id: userId, available_balance_cents: newFanBalance, pending_balance_cents: 0 },
-        { onConflict: "user_id" }
-      );
-
-    if (deductError) {
-      console.error("[paywall] unlockPost: wallet deduct error", deductError);
-      return { success: false, error: "Balance deduction failed" };
-    }
-
-    // 6. Record purchase
-    const { data: newPurchase, error: purchaseError } = await admin
-      .from("purchases")
-      .insert({
-        fan_id: userId,
-        post_id: postId,
-        paid_amount_cents: resolvedPrice,
-        idempotency_key: iKey,
-      })
-      .select("id")
-      .single();
-
-    if (purchaseError) {
-      // Rollback balance on insert failure
-      await admin
-        .from("wallet_accounts")
-        .upsert(
-          { user_id: userId, available_balance_cents: currentBalance, pending_balance_cents: 0 },
-          { onConflict: "user_id" }
-        );
-      console.error("[paywall] unlockPost: purchase insert error", purchaseError);
-      return { success: false, error: "Purchase recording failed" };
-    }
-
-    // 7. Fan debit transaction
-    await admin.from("transactions").insert({
-      user_id: userId,
-      type: "ppv_purchase",
-      amount_cents: -resolvedPrice,
-      status: "completed",
-      metadata: {
-        post_id: postId,
-        creator_id: post.creator_id,
-        purchase_id: newPurchase?.id,
-        idempotency_key: iKey,
-      },
-    });
-
-    // 8. Creator pending revenue transaction
-    await admin.from("transactions").insert({
-      user_id: post.creator_id,
-      type: "ppv_revenue",
-      amount_cents: resolvedPrice,
-      status: "pending",
-      available_on: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      metadata: {
-        post_id: postId,
-        fan_id: userId,
-        purchase_id: newPurchase?.id,
-      },
-    });
-
-    // 9. Update creator pending balance
-    const { data: creatorWallet } = await admin
-      .from("wallet_accounts")
-      .select("available_balance_cents, pending_balance_cents")
-      .eq("user_id", post.creator_id)
-      .maybeSingle();
-
-    await admin.from("wallet_accounts").upsert(
-      {
-        user_id: post.creator_id,
-        available_balance_cents: creatorWallet?.available_balance_cents ?? 0,
-        pending_balance_cents: (creatorWallet?.pending_balance_cents ?? 0) + resolvedPrice,
-      },
-      { onConflict: "user_id" }
-    );
 
     return {
       success: true,
-      balance_after_cents: newFanBalance,
+      balance_after_cents: spend.balanceAfterCents,
     };
   } catch (err: unknown) {
     console.error("[paywall] unlockPost exception:", err);

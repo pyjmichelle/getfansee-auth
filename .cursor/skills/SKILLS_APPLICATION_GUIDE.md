@@ -21,6 +21,19 @@
 
 **维护类**：ci-auto-fix、audit-website、web-design-guidelines。
 
+**工程纪律补充（2026-08-24 新增，源自 [mattpocock/skills](https://github.com/mattpocock/skills)，MIT，经调研评估后精选安装，详见 `docs/research/mattpocock-skills-evaluation-20260824.md`）**：
+
+- `.agents/skills/tdd/SKILL.md` — 红绿重构循环 + seam（测试公共边界）纪律，写测试前先与用户/自己确认测试点，避免测内部实现细节
+- `.agents/skills/code-review/SKILL.md` — 双轴并行子 agent 评审：Standards（是否符合仓库规范 + Fowler 代码异味基线）与 Spec（是否忠实实现了需求）分开跑、分开报告，与现有 `bugbot`/`security-review` 并列使用，不替代
+- `.agents/skills/domain-modeling/SKILL.md` — 维护 `CONTEXT.md` 领域词汇表（纯术语，不含实现细节）+ ADR 记录难以逆转的架构决策；GetFanSee 领域概念多（ambassador/referral、KYC、NowPayments、paywall、founding creator），用于统一命名
+- `.agents/skills/diagnosing-bugs/SKILL.md` — 结构化调试循环（复现 → 最小化 → 假设 → 插桩 → 修复 → 回归测试），可与 Cursor 原生 Debug 模式配合
+- `.agents/skills/wizard/SKILL.md` — 生成交互式 bash 向导，用于把 `sprint-current.md` 里"上线前运营依赖"等人工操作清单（NowPayments 商务尽调、迁移执行、种子创作者邀请等）变成带校验的分步脚本
+- `.agents/skills/resolving-merge-conflicts/SKILL.md` — 逐 hunk 溯源双方改动意图来解决合并冲突，禁止 `--abort`
+- `.agents/skills/improve-codebase-architecture/SKILL.md` — 定期扫描代码库找"加深模块"候选点，生成可视化 HTML 报告
+- `.agents/skills/research/SKILL.md` — 针对高可信源的调查并落盘为带引用的 Markdown 报告（子 agent 后台跑）
+
+> **未引入**：`wayfinder`/`to-spec`/`to-tickets`/`triage`（要求把 GitHub Issues 当作大型多阶段计划的真相源，与现有 `.cursor/plans/*.plan.md` + `sprint-current.md` 角色重叠，需团队另行决策是否迁移任务管理方式）；`grill-me`/`grill-with-docs`/`handoff`（与 Cursor 原生 Plan 模式 / `AskQuestion` / session resume 重叠度高，跳过）。
+
 ## 项目技术栈概览
 
 - **框架**: Next.js 16 (App Router), React 19
@@ -245,26 +258,27 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ## 快速参考：何时使用哪个 Skill
 
-| 任务                        | 使用的 Skill                                                        |
-| --------------------------- | ------------------------------------------------------------------- |
-| 编写新 React 组件           | react-best-practices                                                |
-| 实现数据获取                | react-best-practices, supabase-postgres-best-practices              |
-| 审查 UI                     | web-design-guidelines, frontend-design                              |
-| 优化性能                    | react-best-practices, audit-website                                 |
-| 数据库查询                  | supabase-postgres-best-practices                                    |
-| 认证实现                    | supabase（官方 skill）                                              |
-| 移动端/响应式               | frontend-design, web-design-guidelines                              |
-| 全站审计                    | audit-website                                                       |
-| 安全审查                    | supabase（官方 skill）、supabase-postgres-best-practices            |
-| 前端自动化测试              | agent-browser                                                       |
-| CI 修复与配置               | ci-auto-fix, ci-pipeline-config, api-test-runner                    |
-| E2E/测试报告                | e2e-test-setup, fixture-generator, test-report-generator            |
-| 发布门禁判定                | e2e-test-setup, test-report-generator, ci-pipeline-config           |
-| 口语「跑一下检查」          | code-check（→ `pnpm check-all`）                                    |
-| 设计系统深度对齐            | ui-ux-pro-max, frontend-design, shadcn-ui                           |
-| Tab/布局跳变、触控尺寸、CLS | page-ia-review, web-quality-audit, impeccable                       |
-| PRD 全量走查/发布前复核     | feature-qa-walkthrough, release-review-walkthrough, qa-gate         |
-| 并行多 agent/防冲突         | parallel-agent-orchestration（+ `parallel-agent-coordination.mdc`） |
+| 任务                        | 使用的 Skill                                                                                                                                                                                      |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 编写新 React 组件           | react-best-practices                                                                                                                                                                              |
+| 实现数据获取                | react-best-practices, supabase-postgres-best-practices                                                                                                                                            |
+| 审查 UI                     | web-design-guidelines, frontend-design                                                                                                                                                            |
+| 优化性能                    | react-best-practices, audit-website                                                                                                                                                               |
+| 数据库查询                  | supabase-postgres-best-practices                                                                                                                                                                  |
+| 认证实现                    | supabase（官方 skill）                                                                                                                                                                            |
+| 移动端/响应式               | frontend-design, web-design-guidelines                                                                                                                                                            |
+| 全站审计                    | audit-website                                                                                                                                                                                     |
+| 安全审查                    | supabase（官方 skill）、supabase-postgres-best-practices                                                                                                                                          |
+| 前端自动化测试              | agent-browser                                                                                                                                                                                     |
+| CI 修复与配置               | ci-auto-fix, ci-pipeline-config, api-test-runner                                                                                                                                                  |
+| E2E/测试报告                | e2e-test-setup, fixture-generator, test-report-generator                                                                                                                                          |
+| 发布门禁判定                | e2e-test-setup, test-report-generator, ci-pipeline-config                                                                                                                                         |
+| 口语「跑一下检查」          | code-check（→ `pnpm check-all`）                                                                                                                                                                  |
+| 设计系统深度对齐            | ui-ux-pro-max, frontend-design, shadcn-ui                                                                                                                                                         |
+| Tab/布局跳变、触控尺寸、CLS | page-ia-review, web-quality-audit, impeccable                                                                                                                                                     |
+| PRD 全量走查/发布前复核     | feature-qa-walkthrough, release-review-walkthrough, qa-gate                                                                                                                                       |
+| 并行多 agent/防冲突         | parallel-agent-orchestration（+ `parallel-agent-coordination.mdc`）                                                                                                                               |
+| 支付 / 账本 / 结算 / 对账   | release-gate、qa-gate，外加 `pnpm reconcile:full` 与 `pnpm payram:replay`；PayRam 仪表盘/环境变量等人工配置走 `bash scripts/payram/setup-wizard.sh`；开公测前走 `docs/planning/soft-beta-loop.md` |
 
 ---
 
@@ -275,4 +289,9 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ---
 
-_最后更新: 2026-07-26（`check:hardcoded-secrets` 升级为扫描真实密钥值（sbp_\* /Supabase JWT），不再豁免 docs/scripts；修复 5 个文件中真实 SUPABASE*SERVICE_ROLE_KEY 泄露事故；Supabase MCP 改从 .env.local 读取）*
+_最后更新: 2026-09-13（PayRam 线上契约对照官方文档订正：回调状态字段 `state`→`status`、下单 `amount`→`amountInUSD` 且 `customerEmail` 必填、移除未文档化的 `redirectURL`；新增可测接缝 `resolvePayramState()` 与人工配置向导 `scripts/payram/setup-wizard.sh`）_
+
+\*历史: 2026-08-24（PayRam 支付账本落地：新增 `pnpm reconcile` / `pnpm reconcile:full` / `pnpm payram:replay` 三条验证命令；支付相关改动的门禁见 `chief-payments-risk-officer` 与 `docs/planning/soft-beta-loop.md`）\*\*
+
+*历史: 2026-08-24（新增 mattpocock/skills 工程纪律补充：tdd/code-review/domain-modeling/diagnosing-bugs/wizard/resolving-merge-conflicts/improve-codebase-architecture/research 8 个技能已装入 `.agents/skills/`；调研报告见 `docs/research/mattpocock-skills-evaluation-20260824.md`；wayfinder 系列因需团队决策 issue tracker 而暂不引入）\*
+*历史: 2026-07-26（`check:hardcoded-secrets` 升级为扫描真实密钥值（sbp\_\* /Supabase JWT），不再豁免 docs/scripts；修复 5 个文件中真实 SUPABASE*SERVICE_ROLE_KEY 泄露事故；Supabase MCP 改从 .env.local 读取）*

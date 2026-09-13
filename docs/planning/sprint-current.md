@@ -8,6 +8,65 @@
 
 ## Active Tasks
 
+### P0 – PayRam 支付链路 + 合规前置 + 账本结算（2026-08-24，代码完成，等外部确认）
+
+- Scope：MVP 支付通道从 Stripe/NowPayments 切到自托管 PayRam（USDC/Base），配套年龄验证与地域路由、预收负债账本、结算/退款/对账
+- 决策结论（详见对话计划文档）：
+  - **KYC/年龄验证统一用 Didit**——创作者 KYC 已在用，粉丝年龄验证复用同一供应商，面部估计 $0.10 起、证件回退 $0.15。同业（OnlyFans=Yoti+Ondato、Fansly=Ondato、Chaturbate=Incode）都是同样的"面部打头、边缘升级证件"瀑布架构
+  - **地域四层**：Tier 0 拦截（OFAC 制裁国 + 成人内容非法国 + 田纳西州）／Tier A 自述式／Tier B 面部估计（英国、澳洲、欧盟、巴西）／Tier C 证件级（美国 26 个立法州）。田纳西单独排除：每 60 分钟重验 + Class C 重罪 + 7 年留存无 PII，单州成本远超收益
+  - **付费仅限美国**：欧盟对非欧盟卖家 VAT 是 €0 门槛、第一笔就有义务；美国州销售税普遍有 $10 万／200 笔经济联结门槛。欧盟维持免费浏览
+  - **on-ramp 费由粉丝直付第三方**，不进平台成本；平台净留存约 18–19% of GMV
+- 已落地（代码）：
+  - 合规层：`lib/compliance/{jurisdictions,request-geo,assurance-token,age-assurance}.ts`、`middleware.ts` 服务端强制、`app/age-check/`、`app/blocked/`、`app/api/age-assurance/*`、`migrations/050_age_assurance.sql`（审计不留 PII）
+  - 钱包定性 closed-loop：`app/terms/`（§5 新增 Fan Wallet）、`app/refund/`、`app/me/wallet/` 入口处披露
+  - 关闭无门控的 Stripe 法币入口：`lib/stripe.ts#isStripeFiatEnabled`（默认 false，checkout 与 webhook 双关）
+  - 清障：`lib/constants/fees.ts` 平台费统一 20%（Founding Creator 0% 窗口）、unlock/tip 统一走原子 RPC
+  - 账本：`migrations/051_payment_ledger.sql`（`payment_orders`/`consumption_orders`/`creator_ledger`/`payout_batches` + `credit_payram_deposit`/`spend_wallet*`）
+  - PayRam 三件套：`lib/payram.ts`、`lib/payram-orders.ts`、`app/api/payments/payram/{create-payment,config}/`、`app/api/webhooks/payram/`、`components/payram-topup-modal.tsx`（充值页明示 on-ramp 费）
+  - 结算/退款/对账：`migrations/052_settlement_and_reconciliation.sql`（`settle_matured_earnings`/`reverse_consumption_order`/`refund_unspent_balance`/`reconciliation_report`/`revenue_report`/`nexus_report`）、`lib/settlement.ts`、`/api/cron/settlement`、`/api/admin/refunds`、`pnpm reconcile[:full]`
+  - 验证工具：`tests/unit/lib/payram.test.ts`（17 例，含 raw-body 重序列化必失配、篡改金额、错误签名、`status` 字段解析回归）、`pnpm payram:replay`（重放 5 项断言）
+  - 线上契约订正（2026-09-13，对照官方 API 文档核实）：回调状态字段是 `status` 而非原代码假设的 `state`（读错只会得到 `undefined` → 投递被丢弃 → **粉丝付款永不入账且无任何报错**）；下单请求 `amount`→`amountInUSD` 且 `customerEmail` 为必填；移除未文档化的 `redirectURL`。状态解析收拢到 `resolvePayramState()` 并加单测钉死回归；契约表见 `docs/planning/payram-phase0-validation.md`
+  - 人工配置向导：`bash scripts/payram/setup-wizard.sh`（API Key / Site URL 写入 `.env.local`，走完存款钱包与 webhook 注册，收尾强制 `PAYRAM_ENABLED=false`）。其中 webhook 主机是最易静默配错的一步：`pay.getfansee.com` 无此路由，而 `getfansee.com` 顶级域仍指向第三方 PHP 候补页（会返回 200 让 PayRam 认为投递成功且不再重试），真正的应用是 Vercel 项目 `getfansee-auth`／`demo.getfansee.com`
+- Acceptance Criteria：`docs/planning/soft-beta-loop.md` 全表通过，四条对账等式差额为零
+- **仍阻塞（外部依赖，非代码）**：Didit 成人行业 + 美国州法方法覆盖书面确认；律师意见（MTL/MSB 定性、充值代金券税务时点、P2P off-ramp、无公司银行账户）；PayRam 商务确认 + VPS 装机 + 小额实测（`docs/planning/payram-phase0-validation.md`）
+- Required Gates：`pnpm check-all`、`pnpm build`、`pnpm qa:gate`、`pnpm exec playwright test --project=chromium`、`pnpm reconcile`
+
+### P0 – 生产环境（Vercel `getfansee-auth` 项目）Supabase key 全面过期，真实用户 500 报错（2026-08-24）— ✅ 已修复
+
+- **触发**：用户询问"CI 修好了是否等于已经上线"，逐层核实生产环境时发现 `getfansee-auth.vercel.app`（真正跑本仓库 Next.js 代码的域名，另有 `demo.getfansee.com` 别名）调用任何读数据库的 API（如 `/api/creators/directory`）均返回 500 `"Failed to load creators"`
+- **根因**（与 GitHub Actions secrets 是两套完全独立的配置，互不同步）：
+  1. Vercel 上实际存在 **两个项目**：`getfansee`（绑定域名 `getfansee.com`，但该域名 DNS 仍指向第三方 PHP/LiteSpeed 静态候补名单页面，与 Vercel 无关，是历史遗留/未使用的项目）与 `getfansee-auth`（真正的 Next.js 生产部署，绑定 `demo.getfansee.com`）。本地仓库 `.vercel/project.json` 错误链接到了 `getfansee` 项目
+  2. `getfansee-auth` 项目的生产环境变量 `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` 是 **267 天前**设置的旧值（legacy JWT 格式 `eyJhbGci...`），Supabase 侧已迁移到新的 `sb_publishable_...`/`sb_secret_...` 格式并使旧 key 失效；且 **`SUPABASE_SERVICE_ROLE_KEY` 在该项目里完全缺失**（从未配置过）
+- **修复动作**（均通过 Vercel CLI + 用户提供的临时 token 完成，token 仅存于本地 `.env.local`，已受 `.gitignore` 保护，未提交）：
+  - 更正 `getfansee-auth` 项目 Production/Development 环境的 `NEXT_PUBLIC_SUPABASE_URL`、`NEXT_PUBLIC_SUPABASE_ANON_KEY`，并补齐缺失的 `SUPABASE_SERVICE_ROLE_KEY`（Production）
+  - **未从本地脏工作目录直接部署**——本地当前有另一 agent 会话未提交的大量 PayRam/年龄验证/结算功能改动（含 `app/api/admin/refunds/route.ts` 一处真实 TS 编译错误），直接 `vercel deploy` 差点把这些未完成代码误发布到生产；改为用 `git worktree add <tmp> origin/main --detach` 拉一份干净的远程 `main` 分支副本，仅带环境变量修复重新部署，避免污染生产
+  - 部署命中正确项目（`getfansee-auth`，非 `getfansee`）后触发生产重新构建
+- **验证证据**：
+  - `curl https://demo.getfansee.com/api/creators/directory` → `{"success":true,"creators":[...60条...]}`
+  - `curl https://getfansee-auth.vercel.app/api/creators/directory` → `success:true`，60 位 creator
+  - `curl -o /dev/null -w "%{http_code}" https://demo.getfansee.com/home` → `200`
+- **遗留待办**（未在本轮处理，需人工跟进）：
+  - `getfansee-auth` 项目的 Preview 环境（PR 预览）Supabase 变量因 Vercel CLI 非交互模式下 `git_branch_required` 限制未能自动化更新，仍是旧值——不影响生产，建议后续在 Vercel Dashboard 网页端手动补上
+  - `getfansee-auth` 项目除 Supabase 三件套外，**未配置任何 Stripe / Resend / PostHog / Didit / NowPayments 生产环境变量**（本地 `.env.local` 也未保存 Stripe/Resend 的 key，无法代为配置）——需要产品/运营确认这些集成在生产是否本就有意暂缓，还是遗漏配置
+  - `getfansee.com`（apex 域名）DNS 目前仍指向第三方 PHP 候补名单页，与真正产品 `getfansee-auth`/`demo.getfansee.com` 是两套体系，是否需要收敛成同一个域名需产品决策
+
+### P0 – main 分支 push CI Pipeline 红：Supabase 项目 INACTIVE + anon key secret 错配（2026-08-24）— ✅ 已修复
+
+- Scope：仅 GitHub 仓库 Secrets 配置 + Supabase 项目状态，无代码改动
+- 根因（两层，均已确认并修复）：
+  1. **GitHub Secrets 错配**：`NEXT_PUBLIC_SUPABASE_ANON_KEY` 与 `SUPABASE_SERVICE_ROLE_KEY` 两个 secret 在 2026-07-26T14:59 附近（`9185562` service*role 泄漏修复提交之后 ~1h43m）被一起轮换，更新后 `NEXT_PUBLIC_SUPABASE_ANON_KEY` secret 实际值疑似被误配为 `sb_secret*...`（secret 类型）而非 `sb*publishable*...`（publishable 类型），触发 Supabase JS SDK 浏览器端保护性报错 `Forbidden use of secret API key in browser`，导致 `main`分支 push 触发的 CI Pipeline 在 QA Gate 的 "Create test sessions" 步骤 100% 复现失败（run`30207688709`，2026-07-26T15:12:00Z）
+  2. 修正 anon key 后复测，报错变为 `net::ERR_NAME_NOT_RESOLVED`（浏览器 DNS 层失败，非 key 校验失败）——排查发现 Supabase 项目 `ordomkygjpujxyivwviq`（GetFanSee's Project）状态为 **`INACTIVE`**（免费层因长期无请求被自动暂停），导致 `*.supabase.co` 请求在 CI 出口网络下解析/建连失败
+- 修复动作：
+  - `gh secret set NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` / `NEXT_PUBLIC_SUPABASE_URL` 三个仓库 secret，改为与本地 `.env.local` 一致的当前有效值（Supabase 新格式 `sb_publishable_...` / `sb_secret_...`）
+  - 通过 Supabase Management API `POST /v1/projects/{ref}/restore` 恢复项目，轮询 `COMING_UP → RESTORING → ACTIVE_HEALTHY`（耗时约 3 分钟）
+- 验证证据：重新触发 `gh run rerun 30207688709 --failed` 三轮定位问题，第三轮（项目恢复 + secrets 修正后）`main CI Pipeline` run `30207688709` 全绿：
+  - `✓ Lint & Type Check` (59s)
+  - `✓ QA Gate (ui + deadclick)` (7m3s，含 Create test sessions / gate-ui / gate-deadclick / audit:full 全通过)
+  - `✓ Build` (1m2s)
+  - `✓ E2E Tests (chromium)` (9m39s)
+  - `✓ Quality Gate` (4s)
+- 后续建议（未在本轮处理，需人工评估）：Supabase 免费层项目会在约 7 天无活跃请求后自动暂停，若近期无生产流量导致再次 `INACTIVE`，建议升级至付费层或配置定期健康检查 ping 防止自动暂停，避免生产环境同样受影响
+
 ### P0 – UI 体验根治：三次审查修订（进行中）
 
 - Scope: 详见 `.cursor/plans/ui根治三次审查修订_cabf2b46.plan.md`。批次 -1（治理层，本条即其收尾记录）→ 0（全局止血：`scrollbar-gutter`/`viewportFit`/Analytics 骨架）→ 0.5（NowPayments 资金安全）→ 1–5（Auth 架构/生产泄漏/布局契约/Tab 单一真相源/设计系统扫荡）→ 6（性能，worktree 隔离）→ 验收（新增 Playwright 跳变/44px/CLS/快照断言）
