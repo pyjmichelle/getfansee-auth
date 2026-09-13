@@ -27,6 +27,7 @@ import { Analytics } from "@/lib/analytics";
 import { useCountUp } from "@/hooks/use-count-up";
 import { useAuth } from "@/contexts/auth-context";
 import { useSkeletonMetric } from "@/hooks/use-skeleton-metric";
+import { PayramTopupModal } from "@/components/payram-topup-modal";
 // EmptyState no longer needed - using inline empty state
 
 const supabase = getSupabaseBrowserClient();
@@ -399,9 +400,19 @@ export default function WalletPage() {
               >
                 ${animatedBalance.toFixed(2)}
               </div>
-              {isCreator && (
+              {isCreator ? (
                 <p className="text-small text-text-secondary mb-4">
                   ${animatedPending.toFixed(2)} pending clearance
+                </p>
+              ) : (
+                // Closed-loop disclosure at the point of use, not only buried
+                // in the Terms — the restriction is only defensible if the fan
+                // sees it where the balance lives. See Terms §5 "Fan Wallet".
+                <p className="text-small text-text-secondary mb-4">
+                  Spendable on GetFanSee only — not withdrawable or transferable.{" "}
+                  <Link href="/terms#payments" className="underline hover:no-underline">
+                    Details
+                  </Link>
                 </p>
               )}
               <div className="flex flex-wrap gap-3 mt-4">
@@ -682,44 +693,10 @@ export default function WalletPage() {
           </aside>
         </div>
 
-        {/* Add Funds Modal - Alpha: top-ups not yet available (mock flow kept for test mode / E2E) */}
-        {showAddFunds && !isTestMode && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[var(--z-modal)] flex items-center justify-center p-4">
-            <div className="bg-surface-base border border-border-default rounded-2xl max-w-md w-full shadow-2xl">
-              <div className="p-6 border-b border-border-default flex items-center justify-between">
-                <h3 className="text-xl font-bold text-text-primary">Add Funds</h3>
-                <Button
-                  onClick={() => setShowAddFunds(false)}
-                  variant="ghost"
-                  size="icon"
-                  className="w-10 h-10 rounded-xl hover:bg-surface-raised"
-                >
-                  <X className="w-5 h-5" />
-                </Button>
-              </div>
-              <div className="p-6" data-testid="alpha-topup-notice">
-                <div className="w-14 h-14 bg-brand-primary-alpha-10 rounded-2xl flex items-center justify-center mb-4">
-                  <Wallet className="w-7 h-7 text-wine-text" />
-                </div>
-                <h4 className="text-h4 font-bold text-text-primary mb-2">
-                  Wallet top-ups are coming soon
-                </h4>
-                <p className="text-small text-text-secondary mb-4">
-                  During our Alpha, in-platform purchases are not yet enabled. You can still
-                  discover and follow creators for free, and support them directly through the
-                  verified links on their profiles.
-                </p>
-                <p className="text-tiny text-text-tertiary mb-6">
-                  Payments are launching in Beta. Active Alpha members will receive Founding Fan
-                  perks, including wallet credit, when payments go live.
-                </p>
-                <Button onClick={() => setShowAddFunds(false)} className="w-full px-6 py-3.5">
-                  Got it
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Add Funds. The modal asks the server whether the crypto rail is live
+            for this visitor and falls back to the Alpha notice if it is not —
+            availability depends on jurisdiction, so it cannot be decided here. */}
+        {showAddFunds && !isTestMode && <PayramTopupModal onClose={() => setShowAddFunds(false)} />}
         {showAddFunds && isTestMode && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[var(--z-modal)] flex items-center justify-center p-4">
             <div className="bg-surface-base border border-border-default rounded-2xl max-w-md w-full shadow-2xl">

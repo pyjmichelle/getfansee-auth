@@ -1,9 +1,12 @@
+import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { subscribe30d } from "@/lib/paywall";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { sendSubscriptionConfirmation } from "@/lib/email";
 import { isInAppPaymentsEnabled } from "@/lib/constants/alpha";
+import { spendWalletOnSubscription } from "@/lib/wallet-spend";
+import { getRequestGeo } from "@/lib/compliance/request-geo";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://getfansee.com";
@@ -53,106 +56,53 @@ export async function POST(request: NextRequest) {
     const subscriptionPriceCents = priceCents ?? creatorProfile?.subscription_price_cents ?? 0;
     const creatorName = creatorProfile?.display_name || "Creator";
 
-    // 2. If subscription has a price, deduct from fan wallet first
+    // 2. If subscription has a price, charge the wallet.
     if (subscriptionPriceCents > 0) {
-      // 2a. Check fan wallet balance
-      const { data: fanWallet } = await admin
-        .from("wallet_accounts")
-        .select("available_balance_cents")
-        .eq("user_id", user.id)
-        .maybeSingle();
+      // One atomic call: the debit, the commission split, the creator credit
+      // and the `subscriptions` row commit together, exactly as PPV and tips
+      // already do. Charging here and writing `subscriptions` separately
+      // afterwards left a gap that no idempotency key could cover — see
+      // `spendWalletOnSubscription` for why each candidate key failed — so the
+      // gap is gone rather than named.
+      //
+      // The RPC also owns the "already inside a live period" check, because that
+      // check has to be serialised against itself: run from here, two in-flight
+      // requests both read "not subscribed" and both charge.
+      //
+      // No caller-supplied `Idempotency-Key` is honoured: reusing one across
+      // periods would take a free window, and it buys nothing now that the RPC
+      // makes retries idempotent on its own.
+      const spend = await spendWalletOnSubscription({
+        fanId: user.id,
+        creatorId,
+        priceCents: subscriptionPriceCents,
+        idempotencyKey: `sub_${user.id}_${creatorId}_${randomUUID()}`,
+        geo: getRequestGeo(request.headers),
+      });
 
-      const currentBalance = fanWallet?.available_balance_cents ?? 0;
-      if (currentBalance < subscriptionPriceCents) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: "Insufficient wallet balance",
-            balance_cents: currentBalance,
-            required_cents: subscriptionPriceCents,
-          },
-          { status: 402 }
-        );
-      }
-
-      // 2b. Deduct fan wallet balance
-      const newFanBalance = currentBalance - subscriptionPriceCents;
-      const { error: deductError } = await admin
-        .from("wallet_accounts")
-        .upsert(
-          { user_id: user.id, available_balance_cents: newFanBalance, pending_balance_cents: 0 },
-          { onConflict: "user_id" }
-        );
-
-      if (deductError) {
-        console.error("[api/subscribe] wallet deduct error:", deductError);
-        return NextResponse.json(
-          { success: false, error: "Balance deduction failed" },
-          { status: 500 }
-        );
-      }
-
-      // 2c. Create subscription record
-      const success = await subscribe30d(creatorId);
-      if (!success) {
-        // Rollback wallet deduction on subscription failure
-        await admin
-          .from("wallet_accounts")
-          .upsert(
-            { user_id: user.id, available_balance_cents: currentBalance, pending_balance_cents: 0 },
-            { onConflict: "user_id" }
+      if (!spend.success) {
+        if (spend.insufficient) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: "Insufficient wallet balance",
+              balance_cents: spend.balanceCents ?? 0,
+              required_cents: subscriptionPriceCents,
+            },
+            { status: 402 }
           );
-        return NextResponse.json(
-          { success: false, error: "Failed to create subscription" },
-          { status: 500 }
-        );
+        }
+        console.error("[api/subscribe] spend failed:", spend.error);
+        return NextResponse.json({ success: false, error: spend.error }, { status: 500 });
       }
 
-      // 2d. Record fan debit transaction
-      await admin.from("transactions").insert({
-        user_id: user.id,
-        type: "subscription",
-        amount_cents: -subscriptionPriceCents,
-        status: "completed",
-        metadata: {
-          creator_id: creatorId,
-          billing_period: "monthly",
-        },
-      });
-
-      // 2e. Record creator pending revenue transaction
-      await admin.from("transactions").insert({
-        user_id: creatorId,
-        type: "subscription",
-        amount_cents: subscriptionPriceCents,
-        status: "pending",
-        available_on: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        metadata: {
-          fan_id: user.id,
-          billing_period: "monthly",
-        },
-      });
-
-      // 2f. Update creator pending balance
-      const { data: creatorWallet } = await admin
-        .from("wallet_accounts")
-        .select("available_balance_cents, pending_balance_cents")
-        .eq("user_id", creatorId)
-        .maybeSingle();
-
-      await admin.from("wallet_accounts").upsert(
-        {
-          user_id: creatorId,
-          available_balance_cents: creatorWallet?.available_balance_cents ?? 0,
-          pending_balance_cents:
-            (creatorWallet?.pending_balance_cents ?? 0) + subscriptionPriceCents,
-        },
-        { onConflict: "user_id" }
-      );
+      if (spend.alreadySubscribed) {
+        return NextResponse.json({ success: true, alreadySubscribed: true });
+      }
     } else {
       // Free subscription — just create the record
-      const success = await subscribe30d(creatorId);
-      if (!success) {
+      const granted = await subscribe30d(creatorId);
+      if (!granted) {
         return NextResponse.json({ success: false, error: "Failed to subscribe" }, { status: 500 });
       }
     }

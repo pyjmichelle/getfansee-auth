@@ -7,6 +7,9 @@ const queryBuilder = {
   limit: vi.fn().mockResolvedValue({ data: [{ user_id: "u1" }], error: null }),
   maybeSingle: vi.fn(),
   single: vi.fn(),
+  upsert: vi.fn().mockResolvedValue({ error: null }),
+  update: vi.fn().mockReturnThis(),
+  delete: vi.fn().mockReturnThis(),
 };
 
 const mockSupabase = {
@@ -27,6 +30,9 @@ describe("paywall.ts", () => {
     vi.clearAllMocks();
     vi.resetModules();
     queryBuilder.limit.mockResolvedValue({ data: [{ user_id: "u1" }], error: null });
+    queryBuilder.upsert.mockResolvedValue({ error: null });
+    queryBuilder.update.mockReturnThis();
+    queryBuilder.delete.mockReturnThis();
   });
 
   it("hasPurchasedPost 在有记录时返回 true", async () => {
@@ -47,5 +53,24 @@ describe("paywall.ts", () => {
     });
     const { canViewPost } = await import("@/lib/paywall");
     await expect(canViewPost("post-1", "u1")).resolves.toBe(true);
+  });
+
+  it("subscribe30d 返回所授予周期的结束时间", async () => {
+    const { subscribe30d } = await import("@/lib/paywall");
+    const periodEnd = await subscribe30d("creator-1");
+
+    expect(periodEnd).not.toBeNull();
+    const grantedDays = (Date.parse(periodEnd as string) - Date.now()) / 86_400_000;
+    expect(grantedDays).toBeCloseTo(30, 1);
+    expect(queryBuilder.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ status: "active", current_period_end: periodEnd }),
+      expect.anything()
+    );
+  });
+
+  it("subscribe30d 在 upsert 失败时返回 null（路由据此不扣款）", async () => {
+    queryBuilder.upsert.mockResolvedValue({ error: { message: "boom" } });
+    const { subscribe30d } = await import("@/lib/paywall");
+    await expect(subscribe30d("creator-1")).resolves.toBeNull();
   });
 });

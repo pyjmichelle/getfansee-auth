@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { stripe, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe";
+import { stripe, isStripeFiatEnabled, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import type Stripe from "stripe";
 
@@ -15,6 +15,14 @@ import type Stripe from "stripe";
  *   stripe listen --forward-to localhost:3000/api/webhooks/stripe
  */
 export async function POST(request: NextRequest) {
+  // Off by default. The crediting path below is not atomic and dedupes with a
+  // racy SELECT-then-INSERT, so leaving it live while the checkout route is
+  // disabled would still expose a double-credit surface to anyone who can
+  // replay a signed event. See `isStripeFiatEnabled` in lib/stripe.ts.
+  if (!isStripeFiatEnabled()) {
+    return NextResponse.json({ error: "Stripe rail disabled" }, { status: 503 });
+  }
+
   if (!stripe) {
     return NextResponse.json({ error: "Stripe not configured" }, { status: 503 });
   }

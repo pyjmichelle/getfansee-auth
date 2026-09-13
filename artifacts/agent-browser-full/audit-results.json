@@ -10,9 +10,6 @@
     ],
     "networkErrors": [
       "GET https://va.vercel-scripts.com/v1/script.debug.js - csp",
-      "GET http://localhost:3000/__nextjs_font/geist-latin.woff2 - net::ERR_ABORTED",
-      "POST http://localhost:3000/__nextjs_original-stack-frames - net::ERR_ABORTED",
-      "GET http://localhost:3000/__nextjs_font/geist-latin.woff2 - net::ERR_ABORTED",
       "GET https://va.vercel-scripts.com/v1/script.debug.js - csp"
     ],
     "clickableElements": [
@@ -72,7 +69,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/root.png",
-    "timestamp": "2026-07-26T10:25:25.888Z"
+    "timestamp": "2026-09-13T08:30:17.316Z"
   },
   {
     "route": "/auth",
@@ -142,7 +139,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/auth.png",
-    "timestamp": "2026-07-26T10:25:28.160Z"
+    "timestamp": "2026-09-13T08:30:19.516Z"
   },
   {
     "route": "/home",
@@ -153,7 +150,6 @@
       "Loading the script 'https://va.vercel-scripts.com/v1/script.debug.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.posthog.com https://app.posthog.com https://cdn.vercel-insights.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
     ],
     "networkErrors": [
-      "GET http://localhost:3000/__nextjs_font/geist-latin.woff2 - net::ERR_ABORTED",
       "GET https://va.vercel-scripts.com/v1/script.debug.js - csp"
     ],
     "clickableElements": [
@@ -213,7 +209,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/home.png",
-    "timestamp": "2026-07-26T10:25:30.484Z"
+    "timestamp": "2026-09-13T08:30:21.762Z"
   },
   {
     "route": "/me",
@@ -284,7 +280,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/me.png",
-    "timestamp": "2026-07-26T10:25:32.768Z"
+    "timestamp": "2026-09-13T08:30:23.965Z"
   },
   {
     "route": "/me/wallet",
@@ -355,7 +351,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/me_wallet.png",
-    "timestamp": "2026-07-26T10:25:35.019Z"
+    "timestamp": "2026-09-13T08:30:26.169Z"
   },
   {
     "route": "/purchases",
@@ -426,7 +422,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/purchases.png",
-    "timestamp": "2026-07-26T10:25:37.309Z"
+    "timestamp": "2026-09-13T08:30:28.373Z"
   },
   {
     "route": "/subscriptions",
@@ -497,7 +493,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/subscriptions.png",
-    "timestamp": "2026-07-26T10:25:39.569Z"
+    "timestamp": "2026-09-13T08:30:30.572Z"
   },
   {
     "route": "/search",
@@ -771,7 +767,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/search.png",
-    "timestamp": "2026-07-26T10:25:42.021Z"
+    "timestamp": "2026-09-13T08:30:32.928Z"
   },
   {
     "route": "/support",
@@ -961,7 +957,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/support.png",
-    "timestamp": "2026-07-26T10:25:45.104Z"
+    "timestamp": "2026-09-13T08:30:35.137Z"
   },
   {
     "route": "/creator/new-post",
@@ -1032,7 +1028,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/creator_new-post.png",
-    "timestamp": "2026-07-26T10:25:47.368Z"
+    "timestamp": "2026-09-13T08:30:37.344Z"
   },
   {
     "route": "/creator/upgrade",
@@ -1204,7 +1200,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/creator_upgrade.png",
-    "timestamp": "2026-07-26T10:25:50.293Z"
+    "timestamp": "2026-09-13T08:30:39.599Z"
   },
   {
     "route": "/creator/onboarding",
@@ -1275,7 +1271,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/creator_onboarding.png",
-    "timestamp": "2026-07-26T10:25:52.675Z"
+    "timestamp": "2026-09-13T08:30:41.804Z"
   },
   {
     "route": "/creator/studio",
@@ -1346,7 +1342,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/creator_studio.png",
-    "timestamp": "2026-07-26T10:25:54.936Z"
+    "timestamp": "2026-09-13T08:30:44.014Z"
   },
   {
     "route": "/creator/studio/analytics",
@@ -1417,7 +1413,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/creator_studio_analytics.png",
-    "timestamp": "2026-07-26T10:25:57.189Z"
+    "timestamp": "2026-09-13T08:30:46.217Z"
   },
   {
     "route": "/creator/studio/earnings",
@@ -1488,7 +1484,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/creator_studio_earnings.png",
-    "timestamp": "2026-07-26T10:25:59.450Z"
+    "timestamp": "2026-09-13T08:30:48.408Z"
   },
   {
     "route": "/creator/studio/subscribers",
@@ -1559,7 +1555,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/creator_studio_subscribers.png",
-    "timestamp": "2026-07-26T10:26:01.717Z"
+    "timestamp": "2026-09-13T08:30:50.624Z"
   },
   {
     "route": "/creator/studio/post/list",
@@ -1630,7 +1626,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/creator_studio_post_list.png",
-    "timestamp": "2026-07-26T10:26:04.051Z"
+    "timestamp": "2026-09-13T08:30:52.823Z"
   },
   {
     "route": "/admin/reports",
@@ -1701,7 +1697,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/admin_reports.png",
-    "timestamp": "2026-07-26T10:26:06.327Z"
+    "timestamp": "2026-09-13T08:30:55.031Z"
   },
   {
     "route": "/admin/content-review",
@@ -1772,7 +1768,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/admin_content-review.png",
-    "timestamp": "2026-07-26T10:26:08.600Z"
+    "timestamp": "2026-09-13T08:30:57.248Z"
   },
   {
     "route": "/admin/creator-verifications",
@@ -1843,7 +1839,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/anonymous/admin_creator-verifications.png",
-    "timestamp": "2026-07-26T10:26:10.861Z"
+    "timestamp": "2026-09-13T08:30:59.447Z"
   },
   {
     "route": "/",
@@ -1886,7 +1882,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/root.png",
-    "timestamp": "2026-07-26T10:26:16.059Z"
+    "timestamp": "2026-09-13T08:31:04.276Z"
   },
   {
     "route": "/auth",
@@ -1962,7 +1958,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/auth.png",
-    "timestamp": "2026-07-26T10:26:19.287Z"
+    "timestamp": "2026-09-13T08:31:07.422Z"
   },
   {
     "route": "/home",
@@ -1970,21 +1966,23 @@
     "httpStatus": 200,
     "finalUrl": "http://localhost:3000/home",
     "consoleErrors": [
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
-      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "Loading the script 'https://va.vercel-scripts.com/v1/script.debug.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.posthog.com https://app.posthog.com https://cdn.vercel-insights.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
@@ -2192,7 +2190,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(32)",
         "status": "untested"
       },
@@ -2204,25 +2202,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(37)",
         "status": "untested"
       },
@@ -2330,7 +2328,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(55)",
         "status": "untested"
       },
@@ -2342,25 +2340,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(57)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(58)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(59)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(60)",
         "status": "untested"
       },
@@ -2468,7 +2466,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(78)",
         "status": "untested"
       },
@@ -2480,25 +2478,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(80)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(81)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(82)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(83)",
         "status": "untested"
       },
@@ -2744,7 +2742,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(124)",
         "status": "untested"
       },
@@ -2756,25 +2754,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(126)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(127)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(128)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "",
         "selector": "button:nth-of-type(129)",
         "status": "untested"
       },
@@ -2786,13 +2784,13 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(131)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(132)",
         "status": "untested"
       },
@@ -2810,20 +2808,26 @@
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(135)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Accept All",
+        "text": "",
         "selector": "button:nth-of-type(136)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Decline",
+        "text": "Accept All",
         "selector": "button:nth-of-type(137)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Decline",
+        "selector": "button:nth-of-type(138)",
         "status": "untested"
       },
       {
@@ -2882,241 +2886,241 @@
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/5f781e41-c553-4ece-a963-31098184b7c3",
         "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286958067-4cufki",
         "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(13)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(14)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(15)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/480f9b81-3e76-477e-a2b8-eed428771322",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(16)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107514148-z4h5g6",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(17)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/e0f3a884-fabe-4438-9b62-8e47f460f94d",
         "selector": "a[href]:nth-of-type(18)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789286004898-b4hw5o",
         "selector": "a[href]:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(21)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(22)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(23)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/561bcc46-f769-4ac1-9c6d-d98fced2ad22",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(24)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107342290-7doszh",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(25)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/969008e1-cde2-469f-b331-0d99cab32d93",
         "selector": "a[href]:nth-of-type(26)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581557348-54n6hu",
         "selector": "a[href]:nth-of-type(27)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(28)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(29)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(30)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(31)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/6c029f1e-f49f-4c12-a6d8-cfe111da750f",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(32)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703982962-7tomdf",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(33)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/f0dd49b1-e6f5-44a3-965c-2518f64397f9",
+        "text": "/creator/6c4fcf50-2811-4a13-94dc-51721d387f97",
         "selector": "a[href]:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703955507-nl3d1b",
+        "text": "e2e-creator-1787580944313-lyno2d",
         "selector": "a[href]:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(37)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(38)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(39)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(40)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(41)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/c4b3d0d1-b09e-43b2-aa62-7165c279a9d1",
         "selector": "a[href]:nth-of-type(42)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787580064937-oat5jd",
         "selector": "a[href]:nth-of-type(43)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(44)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(45)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(46)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(47)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/77deaaa3-0c60-417d-ac8d-152ec291f674",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(48)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Test Creator",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(49)",
         "status": "untested"
       },
@@ -3236,7 +3240,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/home.png",
-    "timestamp": "2026-07-26T10:26:25.904Z"
+    "timestamp": "2026-09-13T08:31:13.716Z"
   },
   {
     "route": "/me",
@@ -3480,7 +3484,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/me.png",
-    "timestamp": "2026-07-26T10:26:29.111Z"
+    "timestamp": "2026-09-13T08:31:16.905Z"
   },
   {
     "route": "/me/wallet",
@@ -3598,121 +3602,127 @@
       },
       {
         "type": "link",
-        "text": "Refund Policy",
+        "text": "Details",
         "selector": "a[href]:nth-of-type(6)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Terms of Service",
+        "text": "Refund Policy",
         "selector": "a[href]:nth-of-type(7)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Privacy Policy",
+        "text": "Terms of Service",
         "selector": "a[href]:nth-of-type(8)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Terms of Service",
+        "text": "Privacy Policy",
         "selector": "a[href]:nth-of-type(9)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Beta Program Terms",
+        "text": "Terms of Service",
         "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Creator Rules",
+        "text": "Beta Program Terms",
         "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Privacy Policy",
+        "text": "Creator Rules",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Refund Policy",
+        "text": "Privacy Policy",
         "selector": "a[href]:nth-of-type(13)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Acceptable Use",
+        "text": "Refund Policy",
         "selector": "a[href]:nth-of-type(14)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "DMCA",
+        "text": "Acceptable Use",
         "selector": "a[href]:nth-of-type(15)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "18 U.S.C. § 2257",
+        "text": "DMCA",
         "selector": "a[href]:nth-of-type(16)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "About",
+        "text": "18 U.S.C. § 2257",
         "selector": "a[href]:nth-of-type(17)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "FAQ",
+        "text": "About",
         "selector": "a[href]:nth-of-type(18)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Support",
+        "text": "FAQ",
         "selector": "a[href]:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Home",
+        "text": "Support",
         "selector": "a[href]:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Search",
+        "text": "Home",
         "selector": "a[href]:nth-of-type(21)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Alerts",
+        "text": "Search",
         "selector": "a[href]:nth-of-type(22)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Profile",
+        "text": "Alerts",
         "selector": "a[href]:nth-of-type(23)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Privacy Policy",
+        "text": "Profile",
         "selector": "a[href]:nth-of-type(24)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Privacy Policy",
+        "selector": "a[href]:nth-of-type(25)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/me_wallet.png",
-    "timestamp": "2026-07-26T10:26:32.358Z"
+    "timestamp": "2026-09-13T08:31:20.045Z"
   },
   {
     "route": "/purchases",
@@ -3914,7 +3924,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/purchases.png",
-    "timestamp": "2026-07-26T10:26:37.484Z"
+    "timestamp": "2026-09-13T08:31:23.166Z"
   },
   {
     "route": "/subscriptions",
@@ -4092,7 +4102,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/subscriptions.png",
-    "timestamp": "2026-07-26T10:26:41.580Z"
+    "timestamp": "2026-09-13T08:31:26.368Z"
   },
   {
     "route": "/search",
@@ -4385,7 +4395,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/search.png",
-    "timestamp": "2026-07-26T10:26:45.018Z"
+    "timestamp": "2026-09-13T08:31:30.219Z"
   },
   {
     "route": "/support",
@@ -4593,7 +4603,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/support.png",
-    "timestamp": "2026-07-26T10:26:48.461Z"
+    "timestamp": "2026-09-13T08:31:33.594Z"
   },
   {
     "route": "/creator/new-post",
@@ -4753,7 +4763,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/creator_new-post.png",
-    "timestamp": "2026-07-26T10:26:51.609Z"
+    "timestamp": "2026-09-13T08:31:36.716Z"
   },
   {
     "route": "/creator/upgrade",
@@ -4943,7 +4953,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/creator_upgrade.png",
-    "timestamp": "2026-07-26T10:26:54.916Z"
+    "timestamp": "2026-09-13T08:31:39.902Z"
   },
   {
     "route": "/creator/onboarding",
@@ -5121,7 +5131,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/creator_onboarding.png",
-    "timestamp": "2026-07-26T10:26:59.728Z"
+    "timestamp": "2026-09-13T08:31:44.245Z"
   },
   {
     "route": "/creator/studio",
@@ -5161,7 +5171,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/creator_studio.png",
-    "timestamp": "2026-07-26T10:27:04.045Z"
+    "timestamp": "2026-09-13T08:31:47.380Z"
   },
   {
     "route": "/creator/studio/analytics",
@@ -5172,6 +5182,7 @@
       "Loading the script 'https://va.vercel-scripts.com/v1/script.debug.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.posthog.com https://app.posthog.com https://cdn.vercel-insights.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
     ],
     "networkErrors": [
+      "GET http://localhost:3000/creator/studio/analytics?_rsc=i2fhn - net::ERR_ABORTED",
       "GET https://va.vercel-scripts.com/v1/script.debug.js - csp"
     ],
     "clickableElements": [
@@ -5201,7 +5212,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/creator_studio_analytics.png",
-    "timestamp": "2026-07-26T10:27:07.879Z"
+    "timestamp": "2026-09-13T08:31:50.569Z"
   },
   {
     "route": "/creator/studio/earnings",
@@ -5241,7 +5252,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/creator_studio_earnings.png",
-    "timestamp": "2026-07-26T10:27:11.322Z"
+    "timestamp": "2026-09-13T08:31:53.954Z"
   },
   {
     "route": "/creator/studio/subscribers",
@@ -5281,7 +5292,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/creator_studio_subscribers.png",
-    "timestamp": "2026-07-26T10:27:15.146Z"
+    "timestamp": "2026-09-13T08:31:57.080Z"
   },
   {
     "route": "/creator/studio/post/list",
@@ -5321,7 +5332,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/creator_studio_post_list.png",
-    "timestamp": "2026-07-26T10:27:18.880Z"
+    "timestamp": "2026-09-13T08:32:00.684Z"
   },
   {
     "route": "/admin/reports",
@@ -5358,6 +5369,8 @@
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}"
     ],
     "networkErrors": [
@@ -5552,7 +5565,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(32)",
         "status": "untested"
       },
@@ -5564,25 +5577,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(37)",
         "status": "untested"
       },
@@ -5690,7 +5703,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(55)",
         "status": "untested"
       },
@@ -5702,25 +5715,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(57)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(58)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(59)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(60)",
         "status": "untested"
       },
@@ -5828,7 +5841,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(78)",
         "status": "untested"
       },
@@ -5840,25 +5853,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(80)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(81)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(82)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(83)",
         "status": "untested"
       },
@@ -6104,7 +6117,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(124)",
         "status": "untested"
       },
@@ -6116,25 +6129,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(126)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(127)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(128)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "",
         "selector": "button:nth-of-type(129)",
         "status": "untested"
       },
@@ -6146,44 +6159,32 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(131)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(132)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "",
         "selector": "button:nth-of-type(133)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Accept All",
         "selector": "button:nth-of-type(134)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
-        "selector": "button:nth-of-type(135)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Accept All",
-        "selector": "button:nth-of-type(136)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
         "text": "Decline",
-        "selector": "button:nth-of-type(137)",
+        "selector": "button:nth-of-type(135)",
         "status": "untested"
       },
       {
@@ -6242,361 +6243,343 @@
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/5f781e41-c553-4ece-a963-31098184b7c3",
         "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286958067-4cufki",
         "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(13)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(14)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(15)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/480f9b81-3e76-477e-a2b8-eed428771322",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(16)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107514148-z4h5g6",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(17)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/e0f3a884-fabe-4438-9b62-8e47f460f94d",
         "selector": "a[href]:nth-of-type(18)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789286004898-b4hw5o",
         "selector": "a[href]:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(21)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(22)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(23)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/561bcc46-f769-4ac1-9c6d-d98fced2ad22",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(24)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107342290-7doszh",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(25)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/969008e1-cde2-469f-b331-0d99cab32d93",
         "selector": "a[href]:nth-of-type(26)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581557348-54n6hu",
         "selector": "a[href]:nth-of-type(27)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(28)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(29)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(30)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(31)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/6c029f1e-f49f-4c12-a6d8-cfe111da750f",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(32)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703982962-7tomdf",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(33)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/f0dd49b1-e6f5-44a3-965c-2518f64397f9",
+        "text": "/creator/6c4fcf50-2811-4a13-94dc-51721d387f97",
         "selector": "a[href]:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703955507-nl3d1b",
+        "text": "e2e-creator-1787580944313-lyno2d",
         "selector": "a[href]:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(37)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(38)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(39)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(40)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(41)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/c4b3d0d1-b09e-43b2-aa62-7165c279a9d1",
         "selector": "a[href]:nth-of-type(42)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787580064937-oat5jd",
         "selector": "a[href]:nth-of-type(43)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(44)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(45)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(46)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(47)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/77deaaa3-0c60-417d-ac8d-152ec291f674",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(48)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Test Creator",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(49)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "c",
+        "text": "Terms of Service",
         "selector": "a[href]:nth-of-type(50)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "c",
+        "text": "Beta Program Terms",
         "selector": "a[href]:nth-of-type(51)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "c",
+        "text": "Creator Rules",
         "selector": "a[href]:nth-of-type(52)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Terms of Service",
+        "text": "Privacy Policy",
         "selector": "a[href]:nth-of-type(53)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Beta Program Terms",
+        "text": "Refund Policy",
         "selector": "a[href]:nth-of-type(54)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Creator Rules",
+        "text": "Acceptable Use",
         "selector": "a[href]:nth-of-type(55)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Privacy Policy",
+        "text": "DMCA",
         "selector": "a[href]:nth-of-type(56)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Refund Policy",
+        "text": "18 U.S.C. § 2257",
         "selector": "a[href]:nth-of-type(57)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Acceptable Use",
+        "text": "About",
         "selector": "a[href]:nth-of-type(58)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "DMCA",
+        "text": "FAQ",
         "selector": "a[href]:nth-of-type(59)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "18 U.S.C. § 2257",
+        "text": "Support",
         "selector": "a[href]:nth-of-type(60)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "About",
+        "text": "Home",
         "selector": "a[href]:nth-of-type(61)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "FAQ",
+        "text": "Search",
         "selector": "a[href]:nth-of-type(62)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Support",
+        "text": "Alerts",
         "selector": "a[href]:nth-of-type(63)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Home",
+        "text": "Profile",
         "selector": "a[href]:nth-of-type(64)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Search",
-        "selector": "a[href]:nth-of-type(65)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Alerts",
-        "selector": "a[href]:nth-of-type(66)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Profile",
-        "selector": "a[href]:nth-of-type(67)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
         "text": "Privacy Policy",
-        "selector": "a[href]:nth-of-type(68)",
+        "selector": "a[href]:nth-of-type(65)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/admin_reports.png",
-    "timestamp": "2026-07-26T10:27:25.545Z"
+    "timestamp": "2026-09-13T08:32:07.637Z"
   },
   {
     "route": "/admin/content-review",
@@ -6633,6 +6616,8 @@
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}"
     ],
     "networkErrors": [
@@ -6827,7 +6812,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(32)",
         "status": "untested"
       },
@@ -6839,25 +6824,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(37)",
         "status": "untested"
       },
@@ -6965,7 +6950,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(55)",
         "status": "untested"
       },
@@ -6977,25 +6962,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(57)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(58)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(59)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(60)",
         "status": "untested"
       },
@@ -7103,7 +7088,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(78)",
         "status": "untested"
       },
@@ -7115,25 +7100,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(80)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(81)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(82)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(83)",
         "status": "untested"
       },
@@ -7379,7 +7364,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(124)",
         "status": "untested"
       },
@@ -7391,25 +7376,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(126)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(127)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(128)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "",
         "selector": "button:nth-of-type(129)",
         "status": "untested"
       },
@@ -7421,13 +7406,13 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(131)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(132)",
         "status": "untested"
       },
@@ -7445,20 +7430,26 @@
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(135)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Accept All",
+        "text": "",
         "selector": "button:nth-of-type(136)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Decline",
+        "text": "Accept All",
         "selector": "button:nth-of-type(137)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Decline",
+        "selector": "button:nth-of-type(138)",
         "status": "untested"
       },
       {
@@ -7517,241 +7508,241 @@
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/5f781e41-c553-4ece-a963-31098184b7c3",
         "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286958067-4cufki",
         "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(13)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(14)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(15)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/480f9b81-3e76-477e-a2b8-eed428771322",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(16)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107514148-z4h5g6",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(17)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/e0f3a884-fabe-4438-9b62-8e47f460f94d",
         "selector": "a[href]:nth-of-type(18)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789286004898-b4hw5o",
         "selector": "a[href]:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(21)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(22)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(23)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/561bcc46-f769-4ac1-9c6d-d98fced2ad22",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(24)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107342290-7doszh",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(25)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/969008e1-cde2-469f-b331-0d99cab32d93",
         "selector": "a[href]:nth-of-type(26)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581557348-54n6hu",
         "selector": "a[href]:nth-of-type(27)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(28)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(29)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(30)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(31)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/6c029f1e-f49f-4c12-a6d8-cfe111da750f",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(32)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703982962-7tomdf",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(33)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/f0dd49b1-e6f5-44a3-965c-2518f64397f9",
+        "text": "/creator/6c4fcf50-2811-4a13-94dc-51721d387f97",
         "selector": "a[href]:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703955507-nl3d1b",
+        "text": "e2e-creator-1787580944313-lyno2d",
         "selector": "a[href]:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(37)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(38)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(39)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(40)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(41)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/c4b3d0d1-b09e-43b2-aa62-7165c279a9d1",
         "selector": "a[href]:nth-of-type(42)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787580064937-oat5jd",
         "selector": "a[href]:nth-of-type(43)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(44)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(45)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(46)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(47)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/77deaaa3-0c60-417d-ac8d-152ec291f674",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(48)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Test Creator",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(49)",
         "status": "untested"
       },
@@ -7871,7 +7862,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/admin_content-review.png",
-    "timestamp": "2026-07-26T10:27:34.446Z"
+    "timestamp": "2026-09-13T08:32:14.784Z"
   },
   {
     "route": "/admin/creator-verifications",
@@ -7908,11 +7899,12 @@
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}"
     ],
     "networkErrors": [
-      "GET https://va.vercel-scripts.com/v1/script.debug.js - csp",
-      "GET http://localhost:3000/home?_rsc=1jyq9 - net::ERR_ABORTED"
+      "GET https://va.vercel-scripts.com/v1/script.debug.js - csp"
     ],
     "clickableElements": [
       {
@@ -8103,7 +8095,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(32)",
         "status": "untested"
       },
@@ -8115,25 +8107,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(37)",
         "status": "untested"
       },
@@ -8241,7 +8233,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(55)",
         "status": "untested"
       },
@@ -8253,25 +8245,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(57)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(58)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(59)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(60)",
         "status": "untested"
       },
@@ -8379,7 +8371,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(78)",
         "status": "untested"
       },
@@ -8391,25 +8383,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(80)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(81)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(82)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(83)",
         "status": "untested"
       },
@@ -8655,7 +8647,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(124)",
         "status": "untested"
       },
@@ -8667,25 +8659,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(126)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(127)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(128)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "",
         "selector": "button:nth-of-type(129)",
         "status": "untested"
       },
@@ -8697,13 +8689,13 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(131)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(132)",
         "status": "untested"
       },
@@ -8721,20 +8713,26 @@
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(135)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Accept All",
+        "text": "",
         "selector": "button:nth-of-type(136)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Decline",
+        "text": "Accept All",
         "selector": "button:nth-of-type(137)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Decline",
+        "selector": "button:nth-of-type(138)",
         "status": "untested"
       },
       {
@@ -8793,241 +8791,241 @@
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/5f781e41-c553-4ece-a963-31098184b7c3",
         "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286958067-4cufki",
         "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(13)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(14)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(15)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/480f9b81-3e76-477e-a2b8-eed428771322",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(16)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107514148-z4h5g6",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(17)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/e0f3a884-fabe-4438-9b62-8e47f460f94d",
         "selector": "a[href]:nth-of-type(18)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789286004898-b4hw5o",
         "selector": "a[href]:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(21)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(22)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(23)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/561bcc46-f769-4ac1-9c6d-d98fced2ad22",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(24)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107342290-7doszh",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(25)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/969008e1-cde2-469f-b331-0d99cab32d93",
         "selector": "a[href]:nth-of-type(26)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581557348-54n6hu",
         "selector": "a[href]:nth-of-type(27)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(28)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(29)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(30)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(31)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/6c029f1e-f49f-4c12-a6d8-cfe111da750f",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(32)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703982962-7tomdf",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(33)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/f0dd49b1-e6f5-44a3-965c-2518f64397f9",
+        "text": "/creator/6c4fcf50-2811-4a13-94dc-51721d387f97",
         "selector": "a[href]:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703955507-nl3d1b",
+        "text": "e2e-creator-1787580944313-lyno2d",
         "selector": "a[href]:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(37)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(38)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(39)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(40)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(41)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/c4b3d0d1-b09e-43b2-aa62-7165c279a9d1",
         "selector": "a[href]:nth-of-type(42)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787580064937-oat5jd",
         "selector": "a[href]:nth-of-type(43)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(44)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(45)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(46)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(47)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/77deaaa3-0c60-417d-ac8d-152ec291f674",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(48)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Test Creator",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(49)",
         "status": "untested"
       },
@@ -9147,7 +9145,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/fan/admin_creator-verifications.png",
-    "timestamp": "2026-07-26T10:27:41.445Z"
+    "timestamp": "2026-09-13T08:32:22.696Z"
   },
   {
     "route": "/",
@@ -9190,7 +9188,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/root.png",
-    "timestamp": "2026-07-26T10:27:44.989Z"
+    "timestamp": "2026-09-13T08:32:26.579Z"
   },
   {
     "route": "/auth",
@@ -9266,7 +9264,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/auth.png",
-    "timestamp": "2026-07-26T10:27:49.161Z"
+    "timestamp": "2026-09-13T08:32:29.967Z"
   },
   {
     "route": "/home",
@@ -9302,11 +9300,12 @@
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}"
     ],
     "networkErrors": [
-      "GET https://va.vercel-scripts.com/v1/script.debug.js - csp",
-      "GET http://localhost:3000/home?_rsc=1jyq9 - net::ERR_ABORTED"
+      "GET https://va.vercel-scripts.com/v1/script.debug.js - csp"
     ],
     "clickableElements": [
       {
@@ -9497,7 +9496,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(32)",
         "status": "untested"
       },
@@ -9509,25 +9508,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(37)",
         "status": "untested"
       },
@@ -9635,7 +9634,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(55)",
         "status": "untested"
       },
@@ -9647,25 +9646,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(57)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(58)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(59)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(60)",
         "status": "untested"
       },
@@ -9773,7 +9772,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(78)",
         "status": "untested"
       },
@@ -9785,25 +9784,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(80)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(81)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(82)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(83)",
         "status": "untested"
       },
@@ -10049,7 +10048,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(124)",
         "status": "untested"
       },
@@ -10061,50 +10060,80 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(126)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Share",
         "selector": "button:nth-of-type(127)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "Follow",
         "selector": "button:nth-of-type(128)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "",
         "selector": "button:nth-of-type(129)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(130)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "0",
         "selector": "button:nth-of-type(131)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Accept All",
+        "text": "Share",
         "selector": "button:nth-of-type(132)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Decline",
+        "text": "Follow",
         "selector": "button:nth-of-type(133)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Follow",
+        "selector": "button:nth-of-type(134)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Follow",
+        "selector": "button:nth-of-type(135)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "",
+        "selector": "button:nth-of-type(136)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Accept All",
+        "selector": "button:nth-of-type(137)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Decline",
+        "selector": "button:nth-of-type(138)",
         "status": "untested"
       },
       {
@@ -10157,349 +10186,367 @@
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/5f781e41-c553-4ece-a963-31098184b7c3",
         "selector": "a[href]:nth-of-type(9)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286958067-4cufki",
         "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(13)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(14)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/480f9b81-3e76-477e-a2b8-eed428771322",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(15)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107514148-z4h5g6",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(16)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/e0f3a884-fabe-4438-9b62-8e47f460f94d",
         "selector": "a[href]:nth-of-type(17)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789286004898-b4hw5o",
         "selector": "a[href]:nth-of-type(18)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(21)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(22)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/561bcc46-f769-4ac1-9c6d-d98fced2ad22",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(23)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107342290-7doszh",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(24)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/969008e1-cde2-469f-b331-0d99cab32d93",
         "selector": "a[href]:nth-of-type(25)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581557348-54n6hu",
         "selector": "a[href]:nth-of-type(26)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(27)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(28)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(29)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(30)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/6c029f1e-f49f-4c12-a6d8-cfe111da750f",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(31)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703982962-7tomdf",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(32)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/f0dd49b1-e6f5-44a3-965c-2518f64397f9",
+        "text": "/creator/6c4fcf50-2811-4a13-94dc-51721d387f97",
         "selector": "a[href]:nth-of-type(33)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703955507-nl3d1b",
+        "text": "e2e-creator-1787580944313-lyno2d",
         "selector": "a[href]:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(37)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(38)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(39)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(40)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/c4b3d0d1-b09e-43b2-aa62-7165c279a9d1",
         "selector": "a[href]:nth-of-type(41)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787580064937-oat5jd",
         "selector": "a[href]:nth-of-type(42)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(43)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(44)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(45)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(46)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/77deaaa3-0c60-417d-ac8d-152ec291f674",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(47)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Test Creator",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(48)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Terms of Service",
+        "text": "c",
         "selector": "a[href]:nth-of-type(49)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Beta Program Terms",
+        "text": "c",
         "selector": "a[href]:nth-of-type(50)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Creator Rules",
+        "text": "c",
         "selector": "a[href]:nth-of-type(51)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Privacy Policy",
+        "text": "Terms of Service",
         "selector": "a[href]:nth-of-type(52)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Refund Policy",
+        "text": "Beta Program Terms",
         "selector": "a[href]:nth-of-type(53)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Acceptable Use",
+        "text": "Creator Rules",
         "selector": "a[href]:nth-of-type(54)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "DMCA",
+        "text": "Privacy Policy",
         "selector": "a[href]:nth-of-type(55)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "18 U.S.C. § 2257",
+        "text": "Refund Policy",
         "selector": "a[href]:nth-of-type(56)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "About",
+        "text": "Acceptable Use",
         "selector": "a[href]:nth-of-type(57)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "FAQ",
+        "text": "DMCA",
         "selector": "a[href]:nth-of-type(58)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Support",
+        "text": "18 U.S.C. § 2257",
         "selector": "a[href]:nth-of-type(59)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Home",
+        "text": "About",
         "selector": "a[href]:nth-of-type(60)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Search",
+        "text": "FAQ",
         "selector": "a[href]:nth-of-type(61)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Create",
+        "text": "Support",
         "selector": "a[href]:nth-of-type(62)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Alerts",
+        "text": "Home",
         "selector": "a[href]:nth-of-type(63)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Profile",
+        "text": "Search",
         "selector": "a[href]:nth-of-type(64)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Privacy Policy",
+        "text": "Create",
         "selector": "a[href]:nth-of-type(65)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Alerts",
+        "selector": "a[href]:nth-of-type(66)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Profile",
+        "selector": "a[href]:nth-of-type(67)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Privacy Policy",
+        "selector": "a[href]:nth-of-type(68)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/home.png",
-    "timestamp": "2026-07-26T10:27:56.486Z"
+    "timestamp": "2026-09-13T08:32:36.536Z"
   },
   {
     "route": "/me",
@@ -10743,7 +10790,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/me.png",
-    "timestamp": "2026-07-26T10:28:00.025Z"
+    "timestamp": "2026-09-13T08:32:39.643Z"
   },
   {
     "route": "/me/wallet",
@@ -10975,7 +11022,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/me_wallet.png",
-    "timestamp": "2026-07-26T10:28:03.255Z"
+    "timestamp": "2026-09-13T08:32:42.779Z"
   },
   {
     "route": "/purchases",
@@ -11159,7 +11206,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/purchases.png",
-    "timestamp": "2026-07-26T10:28:06.428Z"
+    "timestamp": "2026-09-13T08:32:45.857Z"
   },
   {
     "route": "/subscriptions",
@@ -11193,20 +11240,26 @@
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Discover More Creators",
         "selector": "button:nth-of-type(4)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Accept All",
+        "text": "",
         "selector": "button:nth-of-type(5)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Decline",
+        "text": "Accept All",
         "selector": "button:nth-of-type(6)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Decline",
+        "selector": "button:nth-of-type(7)",
         "status": "untested"
       },
       {
@@ -11235,109 +11288,121 @@
       },
       {
         "type": "link",
-        "text": "Terms of Service",
+        "text": "Discover More Creators",
         "selector": "a[href]:nth-of-type(5)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Beta Program Terms",
+        "text": "Discover Creators",
         "selector": "a[href]:nth-of-type(6)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Creator Rules",
+        "text": "Terms of Service",
         "selector": "a[href]:nth-of-type(7)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Privacy Policy",
+        "text": "Beta Program Terms",
         "selector": "a[href]:nth-of-type(8)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Refund Policy",
+        "text": "Creator Rules",
         "selector": "a[href]:nth-of-type(9)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Acceptable Use",
+        "text": "Privacy Policy",
         "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "DMCA",
+        "text": "Refund Policy",
         "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "18 U.S.C. § 2257",
+        "text": "Acceptable Use",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "About",
+        "text": "DMCA",
         "selector": "a[href]:nth-of-type(13)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "FAQ",
+        "text": "18 U.S.C. § 2257",
         "selector": "a[href]:nth-of-type(14)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Support",
+        "text": "About",
         "selector": "a[href]:nth-of-type(15)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Home",
+        "text": "FAQ",
         "selector": "a[href]:nth-of-type(16)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Search",
+        "text": "Support",
         "selector": "a[href]:nth-of-type(17)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Create",
+        "text": "Home",
         "selector": "a[href]:nth-of-type(18)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Alerts",
+        "text": "Search",
         "selector": "a[href]:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Profile",
+        "text": "Create",
         "selector": "a[href]:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Privacy Policy",
+        "text": "Alerts",
         "selector": "a[href]:nth-of-type(21)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Profile",
+        "selector": "a[href]:nth-of-type(22)",
+        "status": "untested"
+      },
+      {
+        "type": "link",
+        "text": "Privacy Policy",
+        "selector": "a[href]:nth-of-type(23)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/subscriptions.png",
-    "timestamp": "2026-07-26T10:28:09.677Z"
+    "timestamp": "2026-09-13T08:32:48.979Z"
   },
   {
     "route": "/search",
@@ -11630,7 +11695,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/search.png",
-    "timestamp": "2026-07-26T10:28:13.115Z"
+    "timestamp": "2026-09-13T08:32:52.232Z"
   },
   {
     "route": "/support",
@@ -11838,7 +11903,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/support.png",
-    "timestamp": "2026-07-26T10:28:16.330Z"
+    "timestamp": "2026-09-13T08:32:55.405Z"
   },
   {
     "route": "/creator/new-post",
@@ -12070,7 +12135,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/creator_new-post.png",
-    "timestamp": "2026-07-26T10:28:19.531Z"
+    "timestamp": "2026-09-13T08:32:59.069Z"
   },
   {
     "route": "/creator/upgrade",
@@ -12260,7 +12325,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/creator_upgrade.png",
-    "timestamp": "2026-07-26T10:28:23.412Z"
+    "timestamp": "2026-09-13T08:33:03.151Z"
   },
   {
     "route": "/creator/onboarding",
@@ -12432,7 +12497,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/creator_onboarding.png",
-    "timestamp": "2026-07-26T10:28:26.576Z"
+    "timestamp": "2026-09-13T08:33:06.336Z"
   },
   {
     "route": "/creator/studio",
@@ -12610,7 +12675,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/creator_studio.png",
-    "timestamp": "2026-07-26T10:28:30.021Z"
+    "timestamp": "2026-09-13T08:33:09.603Z"
   },
   {
     "route": "/creator/studio/analytics",
@@ -12644,38 +12709,20 @@
       },
       {
         "type": "button",
-        "text": "7 Days",
+        "text": "",
         "selector": "button:nth-of-type(4)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "30 Days",
+        "text": "Accept All",
         "selector": "button:nth-of-type(5)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "90 Days",
-        "selector": "button:nth-of-type(6)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "",
-        "selector": "button:nth-of-type(7)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
-        "text": "Accept All",
-        "selector": "button:nth-of-type(8)",
-        "status": "untested"
-      },
-      {
-        "type": "button",
         "text": "Decline",
-        "selector": "button:nth-of-type(9)",
+        "selector": "button:nth-of-type(6)",
         "status": "untested"
       },
       {
@@ -12704,247 +12751,109 @@
       },
       {
         "type": "link",
-        "text": "Overview",
+        "text": "Terms of Service",
         "selector": "a[href]:nth-of-type(5)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Create Post",
+        "text": "Beta Program Terms",
         "selector": "a[href]:nth-of-type(6)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Earnings",
+        "text": "Creator Rules",
         "selector": "a[href]:nth-of-type(7)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Subscribers",
+        "text": "Privacy Policy",
         "selector": "a[href]:nth-of-type(8)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Tips",
+        "text": "Refund Policy",
         "selector": "a[href]:nth-of-type(9)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Post List",
+        "text": "Acceptable Use",
         "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Analytics",
+        "text": "DMCA",
         "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Profile & Links",
+        "text": "18 U.S.C. § 2257",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Ambassador",
+        "text": "About",
         "selector": "a[href]:nth-of-type(13)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/studio",
+        "text": "FAQ",
         "selector": "a[href]:nth-of-type(14)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Earnings page",
+        "text": "Support",
         "selector": "a[href]:nth-of-type(15)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/posts/0b5a7f54-4fc5-4b68-a78d-19810ebed02d",
+        "text": "Home",
         "selector": "a[href]:nth-of-type(16)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/posts/f64f8fe6-c26f-4a5f-8806-0f545c08cf63",
+        "text": "Search",
         "selector": "a[href]:nth-of-type(17)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/posts/53192447-9c87-42e0-a400-c41be4c41a46",
+        "text": "Create",
         "selector": "a[href]:nth-of-type(18)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Overview",
+        "text": "Alerts",
         "selector": "a[href]:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Create Post",
+        "text": "Profile",
         "selector": "a[href]:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Earnings",
+        "text": "Privacy Policy",
         "selector": "a[href]:nth-of-type(21)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Subscribers",
-        "selector": "a[href]:nth-of-type(22)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Tips",
-        "selector": "a[href]:nth-of-type(23)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Post List",
-        "selector": "a[href]:nth-of-type(24)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Analytics",
-        "selector": "a[href]:nth-of-type(25)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Profile & Links",
-        "selector": "a[href]:nth-of-type(26)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Ambassador",
-        "selector": "a[href]:nth-of-type(27)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Terms of Service",
-        "selector": "a[href]:nth-of-type(28)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Beta Program Terms",
-        "selector": "a[href]:nth-of-type(29)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Creator Rules",
-        "selector": "a[href]:nth-of-type(30)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Privacy Policy",
-        "selector": "a[href]:nth-of-type(31)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Refund Policy",
-        "selector": "a[href]:nth-of-type(32)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Acceptable Use",
-        "selector": "a[href]:nth-of-type(33)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "DMCA",
-        "selector": "a[href]:nth-of-type(34)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "18 U.S.C. § 2257",
-        "selector": "a[href]:nth-of-type(35)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "About",
-        "selector": "a[href]:nth-of-type(36)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "FAQ",
-        "selector": "a[href]:nth-of-type(37)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Support",
-        "selector": "a[href]:nth-of-type(38)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Home",
-        "selector": "a[href]:nth-of-type(39)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Search",
-        "selector": "a[href]:nth-of-type(40)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Create",
-        "selector": "a[href]:nth-of-type(41)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Alerts",
-        "selector": "a[href]:nth-of-type(42)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Profile",
-        "selector": "a[href]:nth-of-type(43)",
-        "status": "untested"
-      },
-      {
-        "type": "link",
-        "text": "Privacy Policy",
-        "selector": "a[href]:nth-of-type(44)",
         "status": "untested"
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/creator_studio_analytics.png",
-    "timestamp": "2026-07-26T10:28:33.299Z"
+    "timestamp": "2026-09-13T08:33:12.741Z"
   },
   {
     "route": "/creator/studio/earnings",
@@ -13278,7 +13187,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/creator_studio_earnings.png",
-    "timestamp": "2026-07-26T10:28:37.755Z"
+    "timestamp": "2026-09-13T08:33:16.525Z"
   },
   {
     "route": "/creator/studio/subscribers",
@@ -13600,7 +13509,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/creator_studio_subscribers.png",
-    "timestamp": "2026-07-26T10:28:40.967Z"
+    "timestamp": "2026-09-13T08:33:19.661Z"
   },
   {
     "route": "/creator/studio/post/list",
@@ -13970,7 +13879,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/creator_studio_post_list.png",
-    "timestamp": "2026-07-26T10:28:44.461Z"
+    "timestamp": "2026-09-13T08:33:23.030Z"
   },
   {
     "route": "/admin/reports",
@@ -13980,6 +13889,8 @@
     "finalUrl": "http://localhost:3000/home",
     "consoleErrors": [
       "Loading the script 'https://va.vercel-scripts.com/v1/script.debug.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.posthog.com https://app.posthog.com https://cdn.vercel-insights.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
@@ -14201,7 +14112,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(32)",
         "status": "untested"
       },
@@ -14213,25 +14124,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(37)",
         "status": "untested"
       },
@@ -14339,7 +14250,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(55)",
         "status": "untested"
       },
@@ -14351,25 +14262,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(57)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(58)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(59)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(60)",
         "status": "untested"
       },
@@ -14477,7 +14388,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(78)",
         "status": "untested"
       },
@@ -14489,25 +14400,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(80)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(81)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(82)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(83)",
         "status": "untested"
       },
@@ -14753,7 +14664,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(124)",
         "status": "untested"
       },
@@ -14765,43 +14676,43 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(126)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Share",
         "selector": "button:nth-of-type(127)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "Follow",
         "selector": "button:nth-of-type(128)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "",
         "selector": "button:nth-of-type(129)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(130)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "0",
         "selector": "button:nth-of-type(131)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(132)",
         "status": "untested"
       },
@@ -14813,20 +14724,32 @@
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(134)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Accept All",
+        "text": "Follow",
         "selector": "button:nth-of-type(135)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Decline",
+        "text": "",
         "selector": "button:nth-of-type(136)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Accept All",
+        "selector": "button:nth-of-type(137)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Decline",
+        "selector": "button:nth-of-type(138)",
         "status": "untested"
       },
       {
@@ -14879,241 +14802,241 @@
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/5f781e41-c553-4ece-a963-31098184b7c3",
         "selector": "a[href]:nth-of-type(9)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286958067-4cufki",
         "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(13)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(14)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/480f9b81-3e76-477e-a2b8-eed428771322",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(15)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107514148-z4h5g6",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(16)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/e0f3a884-fabe-4438-9b62-8e47f460f94d",
         "selector": "a[href]:nth-of-type(17)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789286004898-b4hw5o",
         "selector": "a[href]:nth-of-type(18)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(21)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(22)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/561bcc46-f769-4ac1-9c6d-d98fced2ad22",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(23)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107342290-7doszh",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(24)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/969008e1-cde2-469f-b331-0d99cab32d93",
         "selector": "a[href]:nth-of-type(25)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581557348-54n6hu",
         "selector": "a[href]:nth-of-type(26)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(27)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(28)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(29)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(30)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/6c029f1e-f49f-4c12-a6d8-cfe111da750f",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(31)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703982962-7tomdf",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(32)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/f0dd49b1-e6f5-44a3-965c-2518f64397f9",
+        "text": "/creator/6c4fcf50-2811-4a13-94dc-51721d387f97",
         "selector": "a[href]:nth-of-type(33)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703955507-nl3d1b",
+        "text": "e2e-creator-1787580944313-lyno2d",
         "selector": "a[href]:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(37)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(38)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(39)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(40)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/c4b3d0d1-b09e-43b2-aa62-7165c279a9d1",
         "selector": "a[href]:nth-of-type(41)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787580064937-oat5jd",
         "selector": "a[href]:nth-of-type(42)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(43)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(44)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(45)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(46)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/77deaaa3-0c60-417d-ac8d-152ec291f674",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(47)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Test Creator",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(48)",
         "status": "untested"
       },
@@ -15239,7 +15162,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/admin_reports.png",
-    "timestamp": "2026-07-26T10:28:52.429Z"
+    "timestamp": "2026-09-13T08:33:32.090Z"
   },
   {
     "route": "/admin/content-review",
@@ -15249,6 +15172,8 @@
     "finalUrl": "http://localhost:3000/home",
     "consoleErrors": [
       "Loading the script 'https://va.vercel-scripts.com/v1/script.debug.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.posthog.com https://app.posthog.com https://cdn.vercel-insights.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
@@ -15470,7 +15395,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(32)",
         "status": "untested"
       },
@@ -15482,25 +15407,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(37)",
         "status": "untested"
       },
@@ -15608,7 +15533,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(55)",
         "status": "untested"
       },
@@ -15620,25 +15545,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(57)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(58)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(59)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(60)",
         "status": "untested"
       },
@@ -15746,7 +15671,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(78)",
         "status": "untested"
       },
@@ -15758,25 +15683,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(80)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(81)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(82)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(83)",
         "status": "untested"
       },
@@ -16022,7 +15947,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(124)",
         "status": "untested"
       },
@@ -16034,43 +15959,43 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(126)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Share",
         "selector": "button:nth-of-type(127)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "Follow",
         "selector": "button:nth-of-type(128)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "",
         "selector": "button:nth-of-type(129)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(130)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "0",
         "selector": "button:nth-of-type(131)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(132)",
         "status": "untested"
       },
@@ -16082,20 +16007,32 @@
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(134)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Accept All",
+        "text": "Follow",
         "selector": "button:nth-of-type(135)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Decline",
+        "text": "",
         "selector": "button:nth-of-type(136)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Accept All",
+        "selector": "button:nth-of-type(137)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Decline",
+        "selector": "button:nth-of-type(138)",
         "status": "untested"
       },
       {
@@ -16148,241 +16085,241 @@
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/5f781e41-c553-4ece-a963-31098184b7c3",
         "selector": "a[href]:nth-of-type(9)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286958067-4cufki",
         "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(13)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(14)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/480f9b81-3e76-477e-a2b8-eed428771322",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(15)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107514148-z4h5g6",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(16)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/e0f3a884-fabe-4438-9b62-8e47f460f94d",
         "selector": "a[href]:nth-of-type(17)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789286004898-b4hw5o",
         "selector": "a[href]:nth-of-type(18)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(21)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(22)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/561bcc46-f769-4ac1-9c6d-d98fced2ad22",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(23)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107342290-7doszh",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(24)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/969008e1-cde2-469f-b331-0d99cab32d93",
         "selector": "a[href]:nth-of-type(25)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581557348-54n6hu",
         "selector": "a[href]:nth-of-type(26)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(27)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(28)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(29)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(30)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/6c029f1e-f49f-4c12-a6d8-cfe111da750f",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(31)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703982962-7tomdf",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(32)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/f0dd49b1-e6f5-44a3-965c-2518f64397f9",
+        "text": "/creator/6c4fcf50-2811-4a13-94dc-51721d387f97",
         "selector": "a[href]:nth-of-type(33)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703955507-nl3d1b",
+        "text": "e2e-creator-1787580944313-lyno2d",
         "selector": "a[href]:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(37)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(38)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(39)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(40)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/c4b3d0d1-b09e-43b2-aa62-7165c279a9d1",
         "selector": "a[href]:nth-of-type(41)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787580064937-oat5jd",
         "selector": "a[href]:nth-of-type(42)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(43)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(44)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(45)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(46)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/77deaaa3-0c60-417d-ac8d-152ec291f674",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(47)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Test Creator",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(48)",
         "status": "untested"
       },
@@ -16508,7 +16445,7 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/admin_content-review.png",
-    "timestamp": "2026-07-26T10:29:00.751Z"
+    "timestamp": "2026-09-13T08:33:40.215Z"
   },
   {
     "route": "/admin/creator-verifications",
@@ -16518,6 +16455,8 @@
     "finalUrl": "http://localhost:3000/home",
     "consoleErrors": [
       "Loading the script 'https://va.vercel-scripts.com/v1/script.debug.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.posthog.com https://app.posthog.com https://cdn.vercel-insights.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
+      "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
       "%c%s%c [paywall] canViewPost: post not found background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   {code: PGRST116, details: The result contains 0 rows, hint: null, message: Cannot coerce the result to a single JSON object}",
@@ -16739,7 +16678,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(32)",
         "status": "untested"
       },
@@ -16751,25 +16690,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(37)",
         "status": "untested"
       },
@@ -16877,7 +16816,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(55)",
         "status": "untested"
       },
@@ -16889,25 +16828,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(57)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(58)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(59)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(60)",
         "status": "untested"
       },
@@ -17015,7 +16954,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(78)",
         "status": "untested"
       },
@@ -17027,25 +16966,25 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(80)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(81)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(82)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "View Options",
+        "text": "",
         "selector": "button:nth-of-type(83)",
         "status": "untested"
       },
@@ -17291,7 +17230,7 @@
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "View Options",
         "selector": "button:nth-of-type(124)",
         "status": "untested"
       },
@@ -17303,43 +17242,43 @@
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(126)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Share",
         "selector": "button:nth-of-type(127)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "Follow",
         "selector": "button:nth-of-type(128)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "0",
+        "text": "",
         "selector": "button:nth-of-type(129)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Share",
+        "text": "0",
         "selector": "button:nth-of-type(130)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "0",
         "selector": "button:nth-of-type(131)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Follow",
+        "text": "Share",
         "selector": "button:nth-of-type(132)",
         "status": "untested"
       },
@@ -17351,20 +17290,32 @@
       },
       {
         "type": "button",
-        "text": "",
+        "text": "Follow",
         "selector": "button:nth-of-type(134)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Accept All",
+        "text": "Follow",
         "selector": "button:nth-of-type(135)",
         "status": "untested"
       },
       {
         "type": "button",
-        "text": "Decline",
+        "text": "",
         "selector": "button:nth-of-type(136)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Accept All",
+        "selector": "button:nth-of-type(137)",
+        "status": "untested"
+      },
+      {
+        "type": "button",
+        "text": "Decline",
+        "selector": "button:nth-of-type(138)",
         "status": "untested"
       },
       {
@@ -17417,241 +17368,241 @@
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/5f781e41-c553-4ece-a963-31098184b7c3",
         "selector": "a[href]:nth-of-type(9)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286958067-4cufki",
         "selector": "a[href]:nth-of-type(10)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(11)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(12)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/9ed2ac43-e5f4-4f38-903e-a4383f691dab",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(13)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1783860356086-unww6p",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(14)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/480f9b81-3e76-477e-a2b8-eed428771322",
+        "text": "/creator/7b186256-9058-4ae3-b743-08d062aa83c9",
         "selector": "a[href]:nth-of-type(15)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107514148-z4h5g6",
+        "text": "e2e-creator-1789286708895-p3d936",
         "selector": "a[href]:nth-of-type(16)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/e0f3a884-fabe-4438-9b62-8e47f460f94d",
         "selector": "a[href]:nth-of-type(17)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789286004898-b4hw5o",
         "selector": "a[href]:nth-of-type(18)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(19)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(20)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/dab9453f-65b0-4d35-8d0f-d16cf913efe3",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(21)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107399669-3zjqjw",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(22)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/561bcc46-f769-4ac1-9c6d-d98fced2ad22",
+        "text": "/creator/d9eaf921-6404-42eb-912e-8cbdd39723d6",
         "selector": "a[href]:nth-of-type(23)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107342290-7doszh",
+        "text": "e2e-creator-1789285752561-stgygt",
         "selector": "a[href]:nth-of-type(24)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/969008e1-cde2-469f-b331-0d99cab32d93",
         "selector": "a[href]:nth-of-type(25)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581557348-54n6hu",
         "selector": "a[href]:nth-of-type(26)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(27)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(28)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/90f843d7-3850-4a85-93c7-c4343cef3733",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(29)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1781107248171-n1uox7",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(30)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/6c029f1e-f49f-4c12-a6d8-cfe111da750f",
+        "text": "/creator/69b425f2-7fdc-45c0-b67a-d372da9bf7e9",
         "selector": "a[href]:nth-of-type(31)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703982962-7tomdf",
+        "text": "e2e-creator-1787581238368-k9g7uj",
         "selector": "a[href]:nth-of-type(32)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/f0dd49b1-e6f5-44a3-965c-2518f64397f9",
+        "text": "/creator/6c4fcf50-2811-4a13-94dc-51721d387f97",
         "selector": "a[href]:nth-of-type(33)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703955507-nl3d1b",
+        "text": "e2e-creator-1787580944313-lyno2d",
         "selector": "a[href]:nth-of-type(34)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(35)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(36)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(37)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(38)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/8d190b0c-d9ee-4e70-b522-7f9ceb923e72",
+        "text": "/creator/7152b330-6d4e-4f40-a32a-42591c431896",
         "selector": "a[href]:nth-of-type(39)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703859894-4hwyl1",
+        "text": "e2e-creator-1787580630397-psfq1t",
         "selector": "a[href]:nth-of-type(40)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/c4b3d0d1-b09e-43b2-aa62-7165c279a9d1",
         "selector": "a[href]:nth-of-type(41)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787580064937-oat5jd",
         "selector": "a[href]:nth-of-type(42)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(43)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(44)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/74e5ab74-3fb1-4c41-a7ea-3368307b019c",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(45)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "e2e-creator-1776703836463-v91tab",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(46)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "/creator/77deaaa3-0c60-417d-ac8d-152ec291f674",
+        "text": "/creator/b751a757-be5b-42e0-95d9-12474c8eca57",
         "selector": "a[href]:nth-of-type(47)",
         "status": "untested"
       },
       {
         "type": "link",
-        "text": "Test Creator",
+        "text": "e2e-creator-1787579879707-ba0kji",
         "selector": "a[href]:nth-of-type(48)",
         "status": "untested"
       },
@@ -17777,6 +17728,6 @@
       }
     ],
     "screenshotPath": "/Users/puyijun/Downloads/getfansee-main(1)/artifacts/agent-browser-full/creator/admin_creator-verifications.png",
-    "timestamp": "2026-07-26T10:29:09.189Z"
+    "timestamp": "2026-09-13T08:33:48.294Z"
   }
 ]

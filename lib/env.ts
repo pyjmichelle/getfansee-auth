@@ -19,6 +19,22 @@ export const env = createEnv({
     DIDIT_WEBHOOK_SECRET: z.string().optional(),
     /** Didit Workflow ID — identifies which verification flow to use */
     DIDIT_WORKFLOW_ID: z.string().optional(),
+    /** Didit workflow for fan facial age estimation (Tier B). No identity data. */
+    DIDIT_AGE_ESTIMATION_WORKFLOW_ID: z.string().optional(),
+    /** Didit workflow for fan document/database age verification (Tier C, US states). */
+    DIDIT_AGE_DOCUMENT_WORKFLOW_ID: z.string().optional(),
+    /** HMAC key for the age-assurance cookie. ≥32 chars, else the gate fails closed. */
+    AGE_ASSURANCE_SECRET: z.string().optional(),
+    /** Master switch for vendor-backed age assurance (Tier B/C). Default OFF. */
+    AGE_ASSURANCE_ENABLED: z.string().optional(),
+    /** PayRam self-hosted crypto payment rail. Default OFF. */
+    PAYRAM_ENABLED: z.string().optional(),
+    /** Base URL of our self-hosted PayRam instance, e.g. https://pay.example.com */
+    PAYRAM_BASE_URL: z.string().optional(),
+    /** PayRam project API key — also the webhook HMAC key unless overridden. */
+    PAYRAM_API_KEY: z.string().optional(),
+    /** Separate webhook signing key, if PayRam is configured with one. */
+    PAYRAM_WEBHOOK_SECRET: z.string().optional(),
     CRON_SECRET: z.string().optional(),
     ALERT_SLACK_WEBHOOK: z.string().optional(),
     PENDING_STUCK_MINUTES: z.coerce.number().optional(),
@@ -54,6 +70,14 @@ export const env = createEnv({
     DIDIT_API_KEY: process.env.DIDIT_API_KEY,
     DIDIT_WEBHOOK_SECRET: process.env.DIDIT_WEBHOOK_SECRET,
     DIDIT_WORKFLOW_ID: process.env.DIDIT_WORKFLOW_ID,
+    DIDIT_AGE_ESTIMATION_WORKFLOW_ID: process.env.DIDIT_AGE_ESTIMATION_WORKFLOW_ID,
+    DIDIT_AGE_DOCUMENT_WORKFLOW_ID: process.env.DIDIT_AGE_DOCUMENT_WORKFLOW_ID,
+    AGE_ASSURANCE_SECRET: process.env.AGE_ASSURANCE_SECRET,
+    AGE_ASSURANCE_ENABLED: process.env.AGE_ASSURANCE_ENABLED,
+    PAYRAM_ENABLED: process.env.PAYRAM_ENABLED,
+    PAYRAM_BASE_URL: process.env.PAYRAM_BASE_URL,
+    PAYRAM_API_KEY: process.env.PAYRAM_API_KEY,
+    PAYRAM_WEBHOOK_SECRET: process.env.PAYRAM_WEBHOOK_SECRET,
     CRON_SECRET: process.env.CRON_SECRET,
     ALERT_SLACK_WEBHOOK: process.env.ALERT_SLACK_WEBHOOK,
     PENDING_STUCK_MINUTES: process.env.PENDING_STUCK_MINUTES,

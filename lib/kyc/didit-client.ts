@@ -24,8 +24,8 @@ function getApiKey(): string {
   return key;
 }
 
-function getWorkflowId(): string {
-  const id = env.DIDIT_WORKFLOW_ID;
+function getWorkflowId(override?: string): string {
+  const id = override ?? env.DIDIT_WORKFLOW_ID;
   if (!id) {
     throw new Error(
       "[didit-client] DIDIT_WORKFLOW_ID is not configured. " +
@@ -47,6 +47,12 @@ export interface CreateSessionParams {
     email?: string;
     phone?: string;
   };
+  /**
+   * Overrides DIDIT_WORKFLOW_ID. Creator KYC and fan age assurance are
+   * different Didit workflows — the latter must not collect or return identity
+   * data we are forbidden from retaining.
+   */
+  workflowId?: string;
 }
 
 /**
@@ -58,7 +64,7 @@ export async function createDiditSession(
   params: CreateSessionParams
 ): Promise<DiditCreateSessionResponse> {
   const apiKey = getApiKey();
-  const workflowId = getWorkflowId();
+  const workflowId = getWorkflowId(params.workflowId);
 
   const body: Record<string, unknown> = {
     workflow_id: workflowId,

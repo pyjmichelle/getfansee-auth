@@ -68,7 +68,7 @@ export default function TermsPage() {
           </ul>
         </section>
 
-        <section>
+        <section id="payments">
           <h2 className="text-h2 mb-4">5. Payments, Subscriptions & Refunds</h2>
           <p className="text-text-secondary">
             All transactions on GetFanSee are processed securely. By completing a purchase, you
@@ -116,6 +116,43 @@ export default function TermsPage() {
               within 14 days of the charge.
             </li>
           </ul>
+
+          <h3 className="text-h4 mt-4 mb-2">Fan Wallet</h3>
+          <p className="text-text-secondary">
+            The Fan Wallet is a <strong>closed-loop prepaid balance</strong>, not a deposit account,
+            a payment account or stored value that can be moved. Adding funds buys a limited licence
+            to purchase content and features on GetFanSee, and nothing else.
+          </p>
+          <ul className="list-disc pl-6 text-text-secondary space-y-2 mt-3">
+            <li>
+              Wallet balance can only be spent inside GetFanSee — on subscriptions, pay-per-view
+              unlocks and tips.
+            </li>
+            <li>
+              Wallet balance <strong>cannot be withdrawn</strong>, cashed out, or converted back
+              into money or cryptocurrency by you.
+            </li>
+            <li>
+              Wallet balance <strong>cannot be transferred</strong> or gifted to another user,
+              account or third party, and cannot be resold.
+            </li>
+            <li>
+              Wallet balance earns no interest, and GetFanSee does not hold it on your behalf as a
+              custodian, trustee or fiduciary.
+            </li>
+            <li>
+              Unused balance may be refunded at our discretion under the{" "}
+              <Link href="/refund" className="text-wine-text underline hover:no-underline">
+                Refund & Cancellation Policy
+              </Link>{" "}
+              — for example if we close your account without cause, or discontinue the Service.
+            </li>
+          </ul>
+          <p className="text-text-secondary mt-3">
+            These restrictions are deliberate. A balance that could be withdrawn or sent to another
+            person would be a money-transmission product; a balance that can only buy our own
+            content is a prepaid purchase of our own services.
+          </p>
 
           <p className="text-text-secondary mt-4">
             Initiating a chargeback without first contacting our support team may result in account
