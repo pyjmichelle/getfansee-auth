@@ -48,9 +48,9 @@ All agent definitions live in [`.cursor/agents/`](.cursor/agents/). Mirror docs 
 
 **Known systemic UI defect (2026-07-26 third-pass audit, not yet fixed)**: tab/segment switching causes layout jump on both PC and mobile via a 5-layer root cause chain (missing `scrollbar-gutter`, panel unmount/remount, skeleton height mismatch, active/inactive border+font-weight asymmetry, `transition-all` perceived jank) — see `.cursor/plans/ui根治三次审查修订_*.plan.md` and `chief-frontend-architect` agent notes before touching any tab-like control.
 
-**Latest migration**: `052_settlement_and_reconciliation.sql` (`050` age assurance, `051` payment ledger, `052` settlement + reversal + reconciliation)
+**Latest migration**: `054_age_assurance_claim.sql` (`050` age assurance, `051` payment ledger, `052` settlement + reversal + reconciliation, `053` atomic subscription purchase — debit and `subscriptions` row in one transaction, `054` one-time browser-bound claim for the age gate cookie)
 
-**Compliance layer (2026-08)**: server-enforced age assurance and geo routing live in `lib/compliance/` (`jurisdictions.ts` defines the four access tiers, `assurance-token.ts` the HMAC cookie checked in `middleware.ts`), backed by `migrations/050_age_assurance.sql`. Blocked: OFAC-sanctioned countries, countries where adult content is illegal, and Tennessee. Payments are US-only at launch.
+**Compliance layer (2026-08)**: server-enforced age assurance and geo routing live in `lib/compliance/` (`jurisdictions.ts` defines the four access tiers, `assurance-token.ts` the HMAC cookie checked in `middleware.ts`), backed by `migrations/050_age_assurance.sql`. Blocked: OFAC-sanctioned countries, countries where adult content is illegal, and Tennessee. Payments are US-only at launch. The vendor callback (`/api/age-assurance/callback`) issues the gate cookie only against the one-time secret minted at `/start` (httpOnly cookie, hash in `age_assurance_checks.claim_secret_hash`) and only once (`claimed_at`) — the `check` id in the URL is an identifier, never a credential.
 
 ---
 

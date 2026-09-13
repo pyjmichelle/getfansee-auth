@@ -14,7 +14,11 @@ import { getCurrentUser } from "@/lib/auth-server";
 import { getRequestGeo } from "@/lib/compliance/request-geo";
 import { resolveJurisdiction, requiresVerifiedAssurance } from "@/lib/compliance/jurisdictions";
 import { methodSatisfiesJurisdiction } from "@/lib/compliance/assurance-token";
-import { hashClientIp, startVendorAgeCheck } from "@/lib/compliance/age-assurance";
+import {
+  buildAgeClaimCookie,
+  hashClientIp,
+  startVendorAgeCheck,
+} from "@/lib/compliance/age-assurance";
 import type { VendorAssuranceMethod } from "@/lib/compliance/age-assurance";
 
 const SITE_URL =
@@ -82,5 +86,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: result.error }, { status: 503 });
   }
 
-  return NextResponse.json({ url: result.url });
+  // The callback must prove it is the browser that opened this session, not
+  // merely that it knows the check id (which travels in a URL). See 054.
+  const response = NextResponse.json({ url: result.url });
+  const claim = buildAgeClaimCookie(result.checkId, result.claimSecret);
+  response.cookies.set(claim.name, claim.value, claim.options);
+  return response;
 }

@@ -51,6 +51,7 @@
     5. 冲正「已打款」收益时只插负数账本行、不动钱包 → `creator_ledger_matches_wallets` 恒等式在冲正后永久非零。改为同步扣减创作者可用余额并允许为负（负额即欠款，也正是对冲未来收入的实现）
     6. `createPayramPayment` 早于 `openPayramOrder` → 建行失败后 PayRam 已有活跃收款而我方无行可查，webhook 永远 `Unknown order` + 500。改为先用 `invoiceId` 建 OPEN 单，再下单，最后 `attachPayramReference` 换成 PayRam 的 `reference_id`
     7. `reverse_consumption_order` 只删 PPV 的 `purchases` 行 → 被退款的订阅仍 `active` 到期末，粉丝退了钱还留着一个月访问权。改为同时把 `current_period_end` 收到当下，且先确认没有更晚的未冲正订阅单
+    8. 年龄验证回调把 `?check=<uuid>` 当凭证 → 任何拿到该 URL 的人（浏览器历史、供应商日志、Referer、截屏）都能换到过闸 cookie，且因为已结算的行永远是 `passed`，还能反复重放来无限续期，等于绕过全部州法年龄验证。修法（`migrations/054_age_assurance_claim.sql`）：`/start` 生成 256 位一次性密钥，只把哈希落库（`claim_secret_hash`），明文以 httpOnly cookie 交给发起验证的那个浏览器；回调必须同时满足「状态 passed + 密钥哈希匹配 + `claimed_at IS NULL`」，三个条件写在同一条 `UPDATE` 的 `WHERE` 里（先读后写会让并发回调都通过「未领取」判断）。领取排在能签出 cookie 之后——签名密钥缺失是我方配置问题，不该烧掉访客的 check 让他重验（文档档可能要再付一次）；`in_review` 不烧密钥，人工复核仍可能落成 pass。已在线上库用 `RAISE` 回滚事务验证：首次领取 1 行、重放 0 行、只有链接没密钥 0 行
 - Acceptance Criteria：`docs/planning/soft-beta-loop.md` 全表通过，四条对账等式差额为零
 - **仍阻塞（外部依赖，非代码）**：Didit 成人行业 + 美国州法方法覆盖书面确认；律师意见（MTL/MSB 定性、充值代金券税务时点、P2P off-ramp、无公司银行账户）；PayRam 商务确认 + VPS 装机 + 小额实测（`docs/planning/payram-phase0-validation.md`）
 - Required Gates：`pnpm check-all`、`pnpm build`、`pnpm qa:gate`、`pnpm exec playwright test --project=chromium`、`pnpm reconcile`

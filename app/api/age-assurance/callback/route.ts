@@ -5,16 +5,30 @@
  * settles the evidence row, and — on a pass — issues the signed cookie that the
  * middleware gate checks.
  *
+ * The `check` query parameter is an identifier, not a credential: it sits in
+ * browser history, in the vendor's logs, in any Referer this URL leaks into. So
+ * the cookie is issued only against the one-time secret minted at /start and
+ * held in an httpOnly cookie, and only if that secret has not been spent —
+ * otherwise the link alone would grant the gate, repeatedly and to anyone.
+ *
  * A "pending" decision is a real outcome for document checks that go to manual
  * review. The visitor is returned to /age-check with a status so they see an
- * honest "still reviewing" state instead of a silent redirect loop.
+ * honest "still reviewing" state instead of a silent redirect loop. The claim
+ * cookie survives that case, because the check may still land as a pass.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { AGE_ASSURANCE_TTL_HOURS, resolveJurisdiction } from "@/lib/compliance/jurisdictions";
 import { getRequestGeo } from "@/lib/compliance/request-geo";
 import { methodSatisfiesJurisdiction } from "@/lib/compliance/assurance-token";
-import { buildAssuranceCookie, finaliseVendorAgeCheck } from "@/lib/compliance/age-assurance";
+import {
+  AGE_CLAIM_COOKIE,
+  buildAssuranceCookie,
+  claimPassedAgeCheck,
+  expiredAgeClaimCookie,
+  finaliseVendorAgeCheck,
+  readAgeClaimSecret,
+} from "@/lib/compliance/age-assurance";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -34,14 +48,32 @@ export async function GET(request: NextRequest) {
     return url;
   };
 
+  /** Sends the visitor back to the gate and burns the claim cookie with them. */
+  const spentFailure = (status: string) => {
+    const response = NextResponse.redirect(failureUrl(status));
+    const cleared = expiredAgeClaimCookie();
+    response.cookies.set(cleared.name, cleared.value, cleared.options);
+    return response;
+  };
+
   if (!checkId || !UUID_REGEX.test(checkId)) {
     return NextResponse.redirect(failureUrl("invalid"));
   }
 
+  const claimSecret = readAgeClaimSecret(request.cookies.get(AGE_CLAIM_COOKIE)?.value, checkId);
+  if (!claimSecret) {
+    return spentFailure("invalid");
+  }
+
   const { outcome, method, country } = await finaliseVendorAgeCheck(checkId);
 
+  if (outcome === "pending") {
+    // Keep the claim cookie: manual review may still come back a pass, and the
+    // visitor returns through this same URL when it does.
+    return NextResponse.redirect(failureUrl("in_review"));
+  }
   if (outcome !== "passed") {
-    return NextResponse.redirect(failureUrl(outcome === "pending" ? "in_review" : "declined"));
+    return spentFailure("declined");
   }
 
   // Re-resolve the jurisdiction at callback time: a method that was acceptable
@@ -50,9 +82,11 @@ export async function GET(request: NextRequest) {
   // requires.
   const jurisdiction = resolveJurisdiction(getRequestGeo(request.headers));
   if (jurisdiction.tier !== "blocked" && !methodSatisfiesJurisdiction(method, jurisdiction)) {
-    return NextResponse.redirect(failureUrl("insufficient"));
+    return spentFailure("insufficient");
   }
 
+  // Mint before spending: a missing signing secret is our misconfiguration, and
+  // burning the visitor's check over it would make them verify (and pay) again.
   const cookie = await buildAssuranceCookie({
     checkId,
     method,
@@ -64,7 +98,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(failureUrl("unavailable"));
   }
 
+  // Spend the check last. A second visit to this URL — with the same cookie, or
+  // a copy of it — finds the row already claimed and gets nothing.
+  if (!(await claimPassedAgeCheck(checkId, claimSecret))) {
+    return spentFailure("invalid");
+  }
+
   const response = NextResponse.redirect(new URL(next, request.url));
   response.cookies.set(cookie.name, cookie.value, cookie.options);
+  const cleared = expiredAgeClaimCookie();
+  response.cookies.set(cleared.name, cleared.value, cleared.options);
   return response;
 }

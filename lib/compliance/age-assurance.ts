@@ -8,7 +8,7 @@
 
 import "server-only";
 
-import { createHash } from "crypto";
+import { createHash, randomBytes, timingSafeEqual } from "crypto";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { env } from "@/lib/env";
 import { createDiditSession, getDiditSessionDecision } from "@/lib/kyc/didit-client";
@@ -42,12 +42,99 @@ export interface AssuranceCookie {
   };
 }
 
+/**
+ * Holds the secret that lets the callback claim a passed check.
+ *
+ * Scoped to the callback's own path so it is not attached to ordinary page
+ * loads, and `sameSite: "lax"` so it still rides the vendor's top-level
+ * redirect back to us (a `strict` cookie would not be sent and every
+ * verification would fail to convert).
+ */
+export const AGE_CLAIM_COOKIE = "fs_age_claim";
+const AGE_CLAIM_COOKIE_PATH = "/api/age-assurance";
+
+/**
+ * Long enough to cover a document check that sits in manual review for a while,
+ * short enough that a stale secret in a shared browser stops being claimable.
+ */
+const AGE_CLAIM_TTL_SECONDS = 2 * 60 * 60;
+
+export interface AgeClaimCookie {
+  name: string;
+  value: string;
+  options: {
+    httpOnly: true;
+    secure: boolean;
+    sameSite: "lax";
+    path: string;
+    maxAge: number;
+  };
+}
+
+function sha256Hex(value: string): string {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function claimCookieOptions(maxAge: number): AgeClaimCookie["options"] {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: AGE_CLAIM_COOKIE_PATH,
+    maxAge,
+  };
+}
+
+/**
+ * Mints the browser-binding secret for a new check.
+ *
+ * The cookie carries `<checkId>.<secret>` so the callback can reject a cookie
+ * left over from an earlier attempt instead of failing an opaque hash compare.
+ * Only the hash is persisted.
+ */
+export function buildAgeClaimCookie(checkId: string, secret: string): AgeClaimCookie {
+  return {
+    name: AGE_CLAIM_COOKIE,
+    value: `${checkId}.${secret}`,
+    options: claimCookieOptions(AGE_CLAIM_TTL_SECONDS),
+  };
+}
+
+/** Expires the claim cookie once it has been spent (or definitively failed). */
+export function expiredAgeClaimCookie(): AgeClaimCookie {
+  return {
+    name: AGE_CLAIM_COOKIE,
+    value: "",
+    options: claimCookieOptions(0),
+  };
+}
+
+/** Pulls the secret out of the claim cookie, if it is for this very check. */
+export function readAgeClaimSecret(
+  cookieValue: string | undefined,
+  checkId: string
+): string | null {
+  if (!cookieValue) return null;
+  const separator = cookieValue.indexOf(".");
+  if (separator <= 0) return null;
+
+  const cookieCheckId = cookieValue.slice(0, separator);
+  const secret = cookieValue.slice(separator + 1);
+  if (!secret) return null;
+
+  const expected = Buffer.from(checkId);
+  const actual = Buffer.from(cookieCheckId);
+  if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) return null;
+
+  return secret;
+}
+
 /** SHA-256 of the client IP, matching the scheme already used by 037. */
 export function hashClientIp(headers: Headers): string | null {
   const forwarded = headers.get("x-forwarded-for");
   const raw = forwarded?.split(",")[0]?.trim() ?? headers.get("x-real-ip")?.trim();
   if (!raw) return null;
-  return createHash("sha256").update(raw).digest("hex");
+  return sha256Hex(raw);
 }
 
 /**
@@ -64,6 +151,8 @@ export async function recordAssuranceStart(params: {
   ipHash: string | null;
   userAgent: string | null;
   userId: string | null;
+  /** SHA-256 of the secret the callback must present. See migration 054. */
+  claimSecretHash: string | null;
 }): Promise<string | null> {
   const admin = getSupabaseAdminClient();
   const { data, error } = await admin
@@ -79,6 +168,7 @@ export async function recordAssuranceStart(params: {
       region: params.geo.region,
       ip_hash: params.ipHash,
       user_agent: params.userAgent?.slice(0, 500) ?? null,
+      claim_secret_hash: params.claimSecretHash,
     })
     .select("id")
     .single();
@@ -117,6 +207,37 @@ export async function resolveAssuranceCheck(params: {
   }
 
   return params.passed ? { expiresAt } : null;
+}
+
+/**
+ * Spends a passed check so it can mint exactly one gate cookie.
+ *
+ * Everything that makes this safe lives in the WHERE clause of a single UPDATE:
+ * the check must have passed, the caller must hold the secret minted at start,
+ * and it must not have been claimed before. Postgres serialises writers to a
+ * row, so two requests arriving together cannot both match `claimed_at IS NULL`
+ * — the loser updates nothing and is refused. Doing the read and the write as
+ * separate statements would reopen exactly that race.
+ */
+export async function claimPassedAgeCheck(checkId: string, secret: string): Promise<boolean> {
+  const admin = getSupabaseAdminClient();
+  const now = new Date().toISOString();
+
+  const { data, error } = await admin
+    .from("age_assurance_checks")
+    .update({ claimed_at: now, updated_at: now })
+    .eq("id", checkId)
+    .eq("status", "passed")
+    .eq("claim_secret_hash", sha256Hex(secret))
+    .is("claimed_at", null)
+    .select("id");
+
+  if (error) {
+    console.error("[age-assurance] failed to claim check:", error);
+    return false;
+  }
+
+  return (data?.length ?? 0) > 0;
 }
 
 /**
@@ -184,11 +305,13 @@ export async function startVendorAgeCheck(params: {
   /** Path to return the visitor to once verified. Already validated by caller. */
   next: string;
   siteUrl: string;
-}): Promise<{ checkId: string; url: string } | { error: string }> {
+}): Promise<{ checkId: string; url: string; claimSecret: string } | { error: string }> {
   const workflowId = getAgeWorkflowId(params.method);
   if (!workflowId) {
     return { error: "Age verification is not configured for this method" };
   }
+
+  const claimSecret = randomBytes(32).toString("base64url");
 
   const checkId = await recordAssuranceStart({
     requiredTier: params.requiredTier,
@@ -199,6 +322,7 @@ export async function startVendorAgeCheck(params: {
     ipHash: params.ipHash,
     userAgent: params.userAgent,
     userId: params.userId,
+    claimSecretHash: sha256Hex(claimSecret),
   });
 
   if (!checkId) {
@@ -229,7 +353,7 @@ export async function startVendorAgeCheck(params: {
     .update({ provider_session_id: session.session_id, updated_at: new Date().toISOString() })
     .eq("id", checkId);
 
-  return { checkId, url: session.verification_url };
+  return { checkId, url: session.verification_url, claimSecret };
 }
 
 export type AgeDecisionOutcome = "passed" | "failed" | "pending";
