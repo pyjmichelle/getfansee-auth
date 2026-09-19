@@ -16,6 +16,7 @@ import {
   ArrowRight,
   Plus,
 } from "@/lib/icons";
+import { CreatorPayoutPanel } from "@/components/creator-payout-panel";
 import { PageShell } from "@/components/page-shell";
 import { StudioShell } from "@/components/shells/studio-shell";
 import { StatCard } from "@/components/stat-card";
@@ -329,17 +330,8 @@ export default function EarningsPage() {
                   </div>
                 </div>
 
-                <div
-                  className="rounded-xl border border-border-base bg-surface-raised p-4 text-small text-text-secondary"
-                  data-testid="alpha-payout-policy"
-                >
-                  <p className="font-semibold text-text-primary mb-1">Payouts during Alpha</p>
-                  <p>
-                    In-platform payments are not yet enabled, so there is nothing to withdraw yet.
-                    When payments launch in Beta, Founding Creators keep{" "}
-                    <strong className="text-text-primary">100% of their earnings</strong> (0%
-                    platform commission) for the introductory period.
-                  </p>
+                <div className="rounded-xl border border-border-base bg-surface-raised p-4 text-small text-text-secondary">
+                  <CreatorPayoutPanel />
                 </div>
               </div>
             </div>
@@ -370,7 +362,7 @@ export default function EarningsPage() {
 
               <div className="flex items-center gap-2 text-small text-text-tertiary">
                 <CreditCard size={14} />
-                <span>Payout methods open in Beta</span>
+                <span>Hold period is 7 days, then withdrawable</span>
               </div>
             </div>
           </div>

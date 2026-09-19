@@ -8,6 +8,23 @@
 
 ## Active Tasks
 
+### P0 – 上线前止血：RPC 默认权限 + 内容脱敏 + 环境拆分（2026-09-19，`migrations/057`）
+
+- 根因：Supabase `pg_default_acl` 把 `public` 下每个函数的 EXECUTE **直接**授给 `anon`/`authenticated`，迁移里的 `REVOKE … FROM PUBLIC` 撤不掉。全部资金/提现/报表 SECURITY DEFINER RPC 对匿名调用者开放，且函数体内无 `auth.uid()`。叠加 feed 不脱敏、signed URL 一年入库、粉丝可改 `profiles.role` 与钱包余额。
+- 修复：`migrations/057_lock_rpc_and_privilege_defaults.sql`（REVOKE + 关默认授予 + spend 包装行上定价 + 删 `wallet_accounts_update_own` + 锁 `profiles` 特权列 + 财务 FK `ON DELETE RESTRICT`）。应用层：`lib/post-redaction.ts`、分钟级 signed URL、mock 回退删除、cookie 同意后加载埋点、账户导出/删除。
+- 门禁：`pnpm check:db-posture`、`pnpm check:env-isolation`、`tests/e2e/prod-config.smoke.spec.ts`。运维：`docs/ops/launch-blockers-runbook.md`、`scripts/ops/purge-test-data.sql`、`scripts/ops/create-admin.ts`、`scripts/ops/provision-staging-project.ts`。
+- 负责 agent：`chief-security-architect` + `chief-payments-risk-officer`
+- Required Gates：`pnpm check-all`、`pnpm build`、`pnpm test:unit`
+
+### P0 – 支付开关统一 + 创作者自助提现（2026-09-19，`migrations/056`）
+
+- 充值（`PAYRAM_ENABLED`）与消费（`NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED`）原为两个独立开关，只开一边会让粉丝把 USDC 锁进不可花、不可提的 closed-loop 余额。现收拢到 `lib/payments-live.ts#arePaymentsLive()`；启动时若公网消费旗开着但 PayRam 三件套不全则直接失败。Webhook 仍只看 `isPayramConfigured()`，避免关旗后进行中的付款无法入账
+- 创作者提现此前只有 `settle_matured_earnings`（pending→available），没有出款代码。`056` 增加 `creator_payout_methods` / `withdrawal_requests`（RLS 仅 SELECT own）、`request_withdrawal`（advisory lock + 立刻扣 available + 负数 ledger `state=available`）、`decide_withdrawal`（paid 挂 `payout_batches` 且 **不把 ledger 改成 paid**；reject 退回钱包并 void）。最低额 $20（`MINIMUM_PAYOUT_CENTS`）。API：`/api/creator/payout-methods`、`/api/creator/withdrawals`、`/api/admin/withdrawals`。UI：earnings 页自助申请、`/admin/withdrawals` 审核队列
+- 顺带：`credit_payram_deposit` 币种/网络走别名归一；订阅确认邮件用 RPC 的 `currentPeriodEnd`；mock 充值改为 `increment_wallet_available` 原子自增
+- 对账第五条：`payouts_match_ledger`
+- 负责 agent：`chief-payments-risk-officer` + `chief-security-architect`
+- Required Gates：`pnpm check-all`、`pnpm build`、`pnpm test:unit`、`pnpm qa:gate`、`pnpm exec playwright test --project=chromium`
+
 ### P0 – 付费墙表 RLS 允许粉丝自行授予权益（2026-09-13 发现，2026-09-19 已修 `migrations/055`）
 
 - 原始现状（已用 Management API 核实线上策略）：`subscriptions` 挂着三条面向 `public` 的写策略——`subscriptions_insert_own`（`with_check: auth.uid() = subscriber_id`）、`_update_own`、`_delete_own`。任何登录粉丝都能用浏览器端 anon key 直接 `insert`/`update` 自己的订阅行，把 `status='active'`、`current_period_end` 设成十年后，**不付一分钱拿到订阅专享内容**，也能 `delete` 擦掉痕迹。来源是 `migrations/005_paywall.sql`，主干上一直如此

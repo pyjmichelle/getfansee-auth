@@ -276,9 +276,11 @@ open_url "https://vercel.com/dashboard"
 step "Open the GetFanSee project → Settings → Environment Variables."
 step "Add PAYRAM_BASE_URL and PAYRAM_API_KEY with the same values you just entered."
 step "Leave PAYRAM_WEBHOOK_SECRET unset, and set PAYRAM_ENABLED=false for now."
+step "Leave NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED=false until Phase 0 signs off."
+step "When you flip the rail on, set PAYRAM_ENABLED and NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED together."
 note "CI needs none of these: unit tests use a fake key and the rail stays off."
 if ! confirm "Production environment variables added?"; then
-  SKIPPED+=("Add PAYRAM_BASE_URL / PAYRAM_API_KEY to Vercel (PAYRAM_ENABLED=false)")
+  SKIPPED+=("Add PAYRAM_BASE_URL / PAYRAM_API_KEY to Vercel (PAYRAM_ENABLED=false, NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED=false)")
 fi
 
 # ── 6. Keep the rail off until Phase 0 signs off ──────────────────────────
@@ -286,6 +288,7 @@ stage "Master switch stays OFF"
 say "Configuration is not permission. The rail opens only after the Phase 0"
 say "small-amount live loop has run with real money and reconciled to zero."
 write_env PAYRAM_ENABLED "false"
+write_env NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED "false"
 say ""
 say "Next, run the checks that do not need real money:"
 note "  pnpm test:unit tests/unit/lib/payram.test.ts"
@@ -293,7 +296,8 @@ note "  pnpm payram:replay --reference=<reference_id from a real created payment
 say ""
 say "Then work through Gate 3 in:"
 note "  docs/planning/payram-phase0-validation.md"
-warn "Do not set PAYRAM_ENABLED=true until every Gate 4 box is ticked."
+warn "Do not set PAYRAM_ENABLED=true or NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED=true until every Gate 4 box is ticked."
+warn "Those two flags must flip together. Funding without spend traps deposits."
 # ──────────────────────────────────────────────────────────────────────────
 
 finish

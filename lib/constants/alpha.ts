@@ -1,3 +1,5 @@
+import { arePaymentsLive } from "@/lib/payments-live";
+
 /**
  * Pre-Payment Alpha phase constants.
  *
@@ -15,27 +17,20 @@ export function isAlphaPhase(): boolean {
 }
 
 /**
- * True when in-app fiat/crypto payments are actually usable — i.e. any wallet
- * top-up path exists. This is the server-side mirror of the client-side
- * `WALLET_PATH_ACTIVE` flag in `components/paywall-modal.tsx` and the
- * `isMockRechargeAllowed()` gate in `app/api/wallet/recharge/route.ts`.
+ * True when in-app fiat/crypto payments are actually usable — i.e. a wallet
+ * top-up path exists AND spend routes are allowed to run. Delegates to
+ * `arePaymentsLive()` so funding and spending cannot flip independently.
  *
  * During the Pre-Payment Alpha (no top-up path in production), server routes
  * that move wallet balance — /api/tip, /api/subscribe, /api/unlock — must
  * refuse to run in production so a fan can never end up owing/spending money
  * that was never actually collected. Test/dev environments (E2E, Playwright,
  * NEXT_PUBLIC_TEST_MODE, local dev) stay open so existing money-flow E2E
- * suites keep working. Once the crypto top-up side-quest ships,
- * NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED=true re-opens these routes for everyone.
+ * suites keep working. Once the crypto top-up side-quest ships, both
+ * NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED and PAYRAM_* must be set together.
  */
 export function isInAppPaymentsEnabled(): boolean {
-  return (
-    process.env.E2E === "1" ||
-    process.env.PLAYWRIGHT_TEST_MODE === "true" ||
-    process.env.NEXT_PUBLIC_TEST_MODE === "true" ||
-    process.env.NODE_ENV === "development" ||
-    process.env.NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED === "true"
-  );
+  return arePaymentsLive();
 }
 
 /** Base 0% commission months every Founding Creator gets in Beta. */

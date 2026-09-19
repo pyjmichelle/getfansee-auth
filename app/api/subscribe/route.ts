@@ -1,6 +1,5 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { subscribe30d } from "@/lib/paywall";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { sendSubscriptionConfirmation } from "@/lib/email";
@@ -33,7 +32,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { creatorId, priceCents } = (await request.json()) as SubscribePayload;
+    const { creatorId } = (await request.json()) as SubscribePayload;
 
     if (!creatorId) {
       return NextResponse.json({ success: false, error: "creatorId is required" }, { status: 400 });
@@ -46,15 +45,16 @@ export async function POST(request: NextRequest) {
 
     const admin = getSupabaseAdminClient();
 
-    // 1. Fetch creator profile to get subscription price (if not provided)
+    // Price is authoritative on the creator profile. Ignore any client quote.
     const { data: creatorProfile } = await admin
       .from("profiles")
       .select("display_name, subscription_price_cents")
       .eq("id", creatorId)
       .maybeSingle();
 
-    const subscriptionPriceCents = priceCents ?? creatorProfile?.subscription_price_cents ?? 0;
+    const subscriptionPriceCents = creatorProfile?.subscription_price_cents ?? 0;
     const creatorName = creatorProfile?.display_name || "Creator";
+    let currentPeriodEnd: string | null = null;
 
     // 2. If subscription has a price, charge the wallet.
     if (subscriptionPriceCents > 0) {
@@ -99,12 +99,15 @@ export async function POST(request: NextRequest) {
       if (spend.alreadySubscribed) {
         return NextResponse.json({ success: true, alreadySubscribed: true });
       }
+      currentPeriodEnd = spend.currentPeriodEnd ?? null;
     } else {
-      // Free subscription — just create the record
-      const granted = await subscribe30d(creatorId);
-      if (!granted) {
-        return NextResponse.json({ success: false, error: "Failed to subscribe" }, { status: 500 });
-      }
+      return NextResponse.json(
+        {
+          success: false,
+          error: "This creator has no paid subscription. Use Follow for free access.",
+        },
+        { status: 400 }
+      );
     }
 
     // 3. Send order confirmation email (non-blocking)
@@ -115,10 +118,14 @@ export async function POST(request: NextRequest) {
         .eq("id", user.id)
         .maybeSingle();
       const fanName = profileRes?.display_name || user.email.split("@")[0];
-      const nextBillingDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(
-        "en-US",
-        { year: "numeric", month: "long", day: "numeric" }
-      );
+      const periodEndDate = currentPeriodEnd
+        ? new Date(currentPeriodEnd)
+        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      const nextBillingDate = periodEndDate.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
 
       await sendSubscriptionConfirmation({
         toEmail: user.email,

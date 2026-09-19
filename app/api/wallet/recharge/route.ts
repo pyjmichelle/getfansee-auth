@@ -95,34 +95,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Recharge failed" }, { status: 500 });
     }
 
-    // 3. Increment wallet balance (select-then-upsert; safe for single-request scenarios)
-    const { data: currentWallet } = await adminSupabase
-      .from("wallet_accounts")
-      .select("available_balance_cents, pending_balance_cents")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    const currentBalance = currentWallet?.available_balance_cents ?? 0;
-    const newBalance = currentBalance + amountCents;
-    const pendingBalance = currentWallet?.pending_balance_cents ?? 0;
-
-    const { error: walletError } = await adminSupabase.from("wallet_accounts").upsert(
+    const { data: incrementData, error: walletError } = await adminSupabase.rpc(
+      "increment_wallet_available",
       {
-        user_id: user.id,
-        available_balance_cents: newBalance,
-        pending_balance_cents: pendingBalance,
-      },
-      { onConflict: "user_id" }
+        p_user_id: user.id,
+        p_cents: amountCents,
+      }
     );
 
     if (walletError) {
-      console.error("[api/wallet/recharge] upsert wallet error:", walletError);
+      console.error("[api/wallet/recharge] increment wallet error:", walletError);
+      return NextResponse.json({ success: false, error: "Recharge failed" }, { status: 500 });
+    }
+
+    const increment = (
+      typeof incrementData === "string" ? JSON.parse(incrementData) : (incrementData ?? {})
+    ) as { success?: boolean; balance_cents?: number };
+    if (increment.success !== true) {
       return NextResponse.json({ success: false, error: "Recharge failed" }, { status: 500 });
     }
 
     return NextResponse.json({
       success: true,
-      balance: newBalance / 100,
+      balance: (increment.balance_cents ?? amountCents) / 100,
     });
   } catch (err: unknown) {
     return jsonError(err);

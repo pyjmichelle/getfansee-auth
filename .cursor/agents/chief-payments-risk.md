@@ -31,7 +31,9 @@ WHEN YOU ACT:
 PROJECT-SPECIFIC SURFACES:
 
 - UI: `app/me/wallet/`, `components/payram-topup-modal.tsx`, paywall / purchase flows（`components/paywall-modal.tsx`、`components/tip-modal.tsx` 等）, `app/purchases/`（若存在）
-- APIs: `app/api/wallet/`, `app/api/payments/payram/create-payment/`, `app/api/payments/payram/config/`, `app/api/webhooks/payram/`, `app/api/payments/create-checkout-session/`（已禁用）, `app/api/payments/nowpayments/create-invoice/`, `app/api/webhooks/stripe/`（已禁用）, `app/api/webhooks/nowpayments/`, `app/api/unlock/`, `app/api/tip/`, `app/api/subscribe/`, `app/api/subscriptions/`, `app/api/transactions/`, `app/api/admin/refunds/`, `app/api/cron/financial-audit/`, `app/api/cron/settlement/`
+- APIs: `app/api/wallet/`, `app/api/payments/payram/create-payment/`, `app/api/payments/payram/config/`, `app/api/webhooks/payram/`, `app/api/payments/create-checkout-session/`（已禁用）, `app/api/payments/nowpayments/create-invoice/`, `app/api/webhooks/stripe/`（已禁用）, `app/api/webhooks/nowpayments/`, `app/api/unlock/`, `app/api/tip/`, `app/api/subscribe/`, `app/api/subscriptions/`, `app/api/transactions/`, `app/api/admin/refunds/`, `app/api/cron/financial-audit/`, `app/api/cron/settlement/`, `app/api/creator/payout-methods/`, `app/api/creator/withdrawals/`, `app/api/admin/withdrawals/`
+- **支付开关必须成对**（`lib/payments-live.ts`）：`NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED` 与 `PAYRAM_ENABLED`+`PAYRAM_API_KEY`+`PAYRAM_BASE_URL` 一起翻转。只开充值会让粉丝存进 closed-loop 余额却花不出去；只开消费会打开付费墙却没有入金。`arePaymentsLive()` 是唯一事实来源；`isInAppPaymentsEnabled()` 委托给它。Webhook 仍只看 `isPayramConfigured()`，以免关旗后进行中的付款无法入账
+- **创作者提现（`migrations/056`）**：`request_withdrawal` 立刻扣 `available` 并写入负数 `creator_ledger`（`entry_type=payout`, `state=available`），所以并发两笔无法透支，且对账恒等式 #3 两侧同时动。管理员 `decide_withdrawal`：`paid` 挂上 `payout_batches` 并**保持 ledger 行在 `available`**——改成 `paid` 会把它踢出恒等式左侧而钱包已扣，对账永久失衡；`rejected` 把钱退回钱包并把 ledger 置 `void`。最低额 `MINIMUM_PAYOUT_CENTS`（$20）。实际打款在链上/Paxum 完成，本仓库只记账。写路径一律 service_role；表只给创作者 SELECT own
 
 - **PayRam（MVP 主通道，自托管加密支付）**: `lib/payram.ts` + `lib/payram-orders.ts` + `app/api/webhooks/payram/route.ts`。四条不可协商的约束：
   - **单币单网钉死 USDC / Base**。card onramp 只产出 Base 上的 USDC/ETH；多币多链只会成倍增加确认语义、对账序列与私钥面，收益为零
@@ -58,7 +60,8 @@ PROJECT-SPECIFIC SURFACES:
   - 扣款失败时禁止无条件 `cancelSubscription`（会把粉丝此前已付的有效订阅一起作废）。原子化之后扣款失败根本不会动订阅行
   - 续期从 `GREATEST(现有 current_period_end, now())` 起算：粉丝已付费但已取消（未到期）的那段不能因为重新订阅而被截短，不需要回滚
   - 结算 `settle_matured_earnings`（pending 7 天后转 available），由 `/api/cron/settlement` 驱动，跑完立即验对账等式
-  - 对账等式四条：`pnpm reconcile` / `pnpm reconcile:full`。**任何非零差额都不是舍入误差**（账本是整数分），必须逐笔解释，否则不许开公测
+  - 对账等式五条（056 起含 `payouts_match_ledger`）：`pnpm reconcile` / `pnpm reconcile:full`。**任何非零差额都不是舍入误差**（账本是整数分），必须逐笔解释，否则不许开公测
+  - PayRam 币种/网络匹配走 `normalize_payram_asset` / `normalize_payram_network`（`usdc`/`base-mainnet` 等别名），硬 `upper()` 相等会让真实回调 500 重试到入账永久失败
 - **NowPayments（加密货币充值，新，高风险）**: `app/api/webhooks/nowpayments/route.ts` + `lib/nowpayments.ts`。2026-07-26 三次审查排查发现的架构缺陷**已通过 `migrations/048_nowpayments_atomic_credit.sql` 修复**：
   - ~~idempotency key 用 `payment_id+status`，而 `confirmed`/`finished` 均为 final 状态 → 可能双入账~~ → 改为数据库唯一索引 `uq_transactions_nowpayments_payment_id`（仅按 `payment_id`，不含 status），由 Postgres 而非应用层 SELECT-then-INSERT 保证幂等
   - ~~先写 `webhook_events` 为 `processed` 再执行钱包入账，中途失败后重试被当 duplicate~~ → webhook 处理器改为先调用 `credit_nowpayments_deposit` RPC 拿到确定性结果，成功后才写 `webhook_events` 审计行；RPC 失败会返回 500 触发 NowPayments 正常重试
@@ -68,7 +71,8 @@ PROJECT-SPECIFIC SURFACES:
   - 任何后续改动前必须先读 `migrations/048_nowpayments_atomic_credit.sql` 与 `app/api/webhooks/nowpayments/route.ts` 的完整实现，不得绕开 `credit_nowpayments_deposit` RPC 直接操作 `wallet_accounts`
 - Tip 支付幂等（新）: `components/tip-modal.tsx` 的 `nonce` 只在组件挂载时生成一次，modal 保持挂载状态下重复打开会复用同一 nonce，导致二次打赏命中后端 idempotent 分支但前端仍提示成功——修复需在每次 `open` 或每次成功后重新生成 nonce
 - Ambassador 佣金（新）: 推荐计划（`migrations/042`）定义了推荐奖励与佣金分成逻辑；MVP 阶段仅追踪不提现，后续钱包入账需通过此 agent 审查；业务代码见 `lib/ambassador/server.ts`、`lib/referral.ts`
-- Schema: `migrations/` 中与 billing、wallet、webhook、unlock、ambassador 相关的变更（最新：`051_payment_ledger.sql`、`052_settlement_and_reconciliation.sql`、`053_spend_wallet_on_subscription.sql`）
+- Schema: `migrations/` 中与 billing、wallet、webhook、unlock、ambassador 相关的变更（最新：`057_lock_rpc_and_privilege_defaults.sql` — money RPC 必须 `REVOKE … FROM anon, authenticated` 且 spend 包装从行上读价；含 `051`–`056`）
+- 上线前止血：`docs/ops/launch-blockers-runbook.md`（生产库清洗、staging 拆分、管理员账号、cron、DNS/Resend）
 - 上线前必读：`docs/planning/payram-phase0-validation.md`（商务门）、`docs/planning/soft-beta-loop.md`（小额闭环门）、`docs/planning/legal-counsel-brief.md`（MTL / 代金券税务 / 无银行账户）
 
 REQUIRED INPUTS:

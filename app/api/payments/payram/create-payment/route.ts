@@ -20,13 +20,14 @@ import {
   isValidTopupTier,
   PAYRAM_TOPUP_TIERS_USD,
 } from "@/lib/payram";
+import { isPayramCheckoutOpen } from "@/lib/payments-live";
 import { attachPayramReference, openPayramOrder } from "@/lib/payram-orders";
 import { getRequestGeo } from "@/lib/compliance/request-geo";
 import { resolveJurisdiction } from "@/lib/compliance/jurisdictions";
 
 export async function POST(request: NextRequest) {
   try {
-    if (!isPayramEnabled()) {
+    if (!isPayramEnabled() || !isPayramCheckoutOpen()) {
       return NextResponse.json(
         { success: false, error: "Top-up is not available yet." },
         { status: 503 }
