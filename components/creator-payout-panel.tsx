@@ -42,6 +42,7 @@ export function CreatorPayoutPanel() {
   const [amountUsd, setAmountUsd] = useState("");
   const [methodId, setMethodId] = useState<string>("");
   const withdrawKeyRef = useRef<string>("");
+  const withdrawIntentRef = useRef<string>("");
 
   const reload = useCallback(async () => {
     const [methodsRes, withdrawalsRes] = await Promise.all([
@@ -115,7 +116,10 @@ export function CreatorPayoutPanel() {
     }
     setSubmitting(true);
     try {
-      if (!withdrawKeyRef.current) {
+      const amountCents = Math.round(dollars * 100);
+      const intent = `${methodId}:${amountCents}`;
+      if (withdrawIntentRef.current !== intent) {
+        withdrawIntentRef.current = intent;
         withdrawKeyRef.current = crypto.randomUUID();
       }
       const res = await fetch("/api/creator/withdrawals", {
@@ -124,7 +128,7 @@ export function CreatorPayoutPanel() {
           "Content-Type": "application/json",
           "Idempotency-Key": withdrawKeyRef.current,
         },
-        body: JSON.stringify({ methodId, amountCents: Math.round(dollars * 100) }),
+        body: JSON.stringify({ methodId, amountCents }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -133,6 +137,7 @@ export function CreatorPayoutPanel() {
       }
       toast.success("Withdrawal requested. An admin will send it off-platform.");
       withdrawKeyRef.current = "";
+      withdrawIntentRef.current = "";
       setAmountUsd("");
       await reload();
     } finally {

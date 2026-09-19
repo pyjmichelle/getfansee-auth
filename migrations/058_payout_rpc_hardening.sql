@@ -38,3 +38,15 @@ GRANT EXECUTE ON FUNCTION public.request_withdrawal(UUID, UUID, BIGINT, TEXT) TO
 
 REVOKE ALL ON FUNCTION public.decide_withdrawal(UUID, TEXT, TEXT, TEXT, UUID) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.decide_withdrawal(UUID, TEXT, TEXT, TEXT, UUID) TO service_role;
+
+REVOKE ALL ON FUNCTION public.credit_payram_deposit(TEXT, BIGINT, TEXT, TEXT, TEXT) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.credit_payram_deposit(TEXT, BIGINT, TEXT, TEXT, TEXT) TO service_role;
+
+REVOKE ALL ON FUNCTION public.normalize_payram_asset(TEXT) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.normalize_payram_asset(TEXT) TO service_role;
+
+REVOKE ALL ON FUNCTION public.normalize_payram_network(TEXT) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.normalize_payram_network(TEXT) TO service_role;
+
+REVOKE ALL ON FUNCTION public.reconciliation_report() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.reconciliation_report() TO service_role;
