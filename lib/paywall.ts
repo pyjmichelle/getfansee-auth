@@ -28,7 +28,12 @@ export async function subscribe30d(creatorId: string): Promise<string | null> {
       return null;
     }
 
-    const supabase = await getSupabaseUniversalClient();
+    // Write with the service-role client, not the caller's anon+JWT client:
+    // the `subscriptions` table no longer carries fan-facing write policies
+    // (migration 055), because a browser-writable access table is a free-content
+    // bypass. `user.id` above is the authorization boundary — we still only ever
+    // write the caller's own row.
+    const supabase = getSupabaseAdminClient();
     const now = new Date();
     const currentPeriodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // +30 days
 
@@ -73,7 +78,11 @@ export async function cancelSubscription(creatorId: string): Promise<boolean> {
       return false;
     }
 
-    const supabase = await getSupabaseUniversalClient();
+    // Service-role client for the same reason as subscribe30d: the fan-facing
+    // UPDATE policy on `subscriptions` is gone (migration 055). Scoped below to
+    // the caller's own (user.id, creatorId) row, so admin access grants no
+    // extra reach — it only replaces the RLS this write used to lean on.
+    const supabase = getSupabaseAdminClient();
     const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
     // 更新状态为 canceled，并设置 cancelled_at 时间戳
     const { error } = await supabase

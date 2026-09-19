@@ -50,7 +50,7 @@ PROJECT-SPECIFIC SURFACES:
   - **权益必须跟着钱走**：冲正 PPV 要删 `purchases` 行，冲正订阅要把 `current_period_end` 收到当下（只置 `status='canceled'` 无效，所有读路径都按 `current_period_end` 判权）。冲正订阅前要确认没有更晚的未冲正订阅单，否则会把粉丝后来又付过的周期一起收回
   - **订阅走 `spend_wallet_on_subscription`（`migrations/053`），扣款与授予必须同一事务**：不要再试图在路由里「先扣款后授予 / 先授予后扣款 + 挑一个好的幂等键」。那条路连着三轮评审都没修对，因为凡是路由能读来做键的东西都不合格：
     - 「新周期结束时间」由 `subscribe30d` 用 `Date.now()` 现算 → 并发两个请求键不同、各扣一次钱
-    - 「被替换的周期」读自 `subscriptions`，而 `subscriptions_delete_own` / `subscriptions_update_own` 允许粉丝用浏览器端 anon key 自行删改该行 → 键被退回到一个已经付过钱的值，`spend_wallet` 命中 idempotent 分支报成功而实际没扣钱
+    - 「被替换的周期」读自 `subscriptions`——当时 `subscriptions_delete_own` / `subscriptions_update_own` 允许粉丝用浏览器端 anon key 自行删改该行（该组写策略已在 `migrations/055` 删除），键被退回到一个已经付过钱的值，`spend_wallet` 命中 idempotent 分支报成功而实际没扣钱。注：即便写策略已收，也不要回到「读 `subscriptions` 挑键」的思路——判权表的可信读不代表它适合当幂等锚点
     - 「既往订阅单数」会被扣款本身改变 → 授予失败后叫粉丝重试，重试算出的是新键，于是二次扣款
     - 根因是「要保证幂等的那件事跨了两个事务」，只能消掉这个缝而不是给它取名字。053 的包装函数与 `spend_wallet_on_ppv` 同形：debit + 平台分成 + 创作者 pending + `subscriptions` 行一起提交或一起回滚
   - **「是否已在有效期内」的判断必须在 RPC 里、且先取 `pg_advisory_xact_lock(fan:creator)`**：这个检查要与自己串行化，放在路由里两个并发请求会都读到「未订阅」并各扣一次。锁在提交时释放，双击的那个请求读到已提交的授予并走 `already_subscribed` 分支
