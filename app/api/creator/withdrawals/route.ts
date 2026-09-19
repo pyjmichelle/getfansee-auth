@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { requireVerifiedCreator } from "@/lib/authz";
 import { jsonError } from "@/lib/http-errors";
@@ -51,11 +50,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const idempotencyKey = request.headers.get("Idempotency-Key")?.trim() ?? "";
+    if (idempotencyKey.length < 8) {
+      return NextResponse.json(
+        { success: false, error: "Idempotency-Key header is required" },
+        { status: 400 }
+      );
+    }
+
     const result = await requestWithdrawal({
       creatorId: user.id,
       methodId: body.methodId,
       amountCents: body.amountCents,
-      idempotencyKey: request.headers.get("Idempotency-Key") ?? randomUUID(),
+      idempotencyKey,
     });
 
     if (!result.success) {

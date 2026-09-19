@@ -220,7 +220,7 @@ AS $$
 DECLARE
   v_balance BIGINT;
 BEGIN
-  IF p_cents IS NULL OR p_cents = 0 THEN
+  IF p_cents IS NULL OR p_cents <= 0 THEN
     RETURN json_build_object('success', false, 'error', 'Invalid amount');
   END IF;
 
@@ -568,25 +568,25 @@ AS $$
 $$;
 
 -- ── 7. Permissions ──────────────────────────────────────────────────────────
-REVOKE ALL ON FUNCTION public.credit_payram_deposit(TEXT, BIGINT, TEXT, TEXT, TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.credit_payram_deposit(TEXT, BIGINT, TEXT, TEXT, TEXT) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.credit_payram_deposit(TEXT, BIGINT, TEXT, TEXT, TEXT) TO service_role;
 
-REVOKE ALL ON FUNCTION public.normalize_payram_asset(TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.normalize_payram_asset(TEXT) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.normalize_payram_asset(TEXT) TO service_role;
 
-REVOKE ALL ON FUNCTION public.normalize_payram_network(TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.normalize_payram_network(TEXT) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.normalize_payram_network(TEXT) TO service_role;
 
-REVOKE ALL ON FUNCTION public.increment_wallet_available(UUID, BIGINT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.increment_wallet_available(UUID, BIGINT) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.increment_wallet_available(UUID, BIGINT) TO service_role;
 
-REVOKE ALL ON FUNCTION public.request_withdrawal(UUID, UUID, BIGINT, TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.request_withdrawal(UUID, UUID, BIGINT, TEXT) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.request_withdrawal(UUID, UUID, BIGINT, TEXT) TO service_role;
 
-REVOKE ALL ON FUNCTION public.decide_withdrawal(UUID, TEXT, TEXT, TEXT, UUID) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.decide_withdrawal(UUID, TEXT, TEXT, TEXT, UUID) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.decide_withdrawal(UUID, TEXT, TEXT, TEXT, UUID) TO service_role;
 
-REVOKE ALL ON FUNCTION public.reconciliation_report() FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.reconciliation_report() FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.reconciliation_report() TO service_role;
 
 DO $$

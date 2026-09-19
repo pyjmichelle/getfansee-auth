@@ -289,7 +289,7 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ---
 
-_最后更新: 2026-09-19（支付开关统一到 `lib/payments-live.ts`：`NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED` 必须与 `PAYRAM_\*`成对打开。创作者自助提现落地`migrations/056`：`request*withdrawal` 立刻扣 available + 负数 ledger，`decide_withdrawal`批准时 ledger 保持`available`。对账增加 `payouts_match_ledger`。PayRam 币种/网络匹配容忍 `usdc`/`base-mainnet`。历史：PayRam 契约订正与 `migrations/053`–`055`。）*
+_最后更新: 2026-09-19（`migrations/058` 加固提现 RPC：对 `anon`/`authenticated` 显式 `REVOKE`，`increment_wallet_available` 只接受正数；提现 POST 必须带 `Idempotency-Key`。支付开关统一到 `lib/payments-live.ts`。创作者自助提现落地 `migrations/056`。对账增加 `payouts_match_ledger`。历史：PayRam 契约订正与 `migrations/053`–`055`。）_
 
 \*历史: 2026-08-24（PayRam 支付账本落地：新增 `pnpm reconcile` / `pnpm reconcile:full` / `pnpm payram:replay` 三条验证命令；支付相关改动的门禁见 `chief-payments-risk-officer` 与 `docs/planning/soft-beta-loop.md`）\*\*
 
