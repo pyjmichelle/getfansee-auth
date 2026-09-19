@@ -8,13 +8,13 @@
 
 ## Active Tasks
 
-### P0 – `subscriptions` 表 RLS 允许粉丝自行授予订阅（2026-09-13 发现，未修）
+### P0 – 付费墙表 RLS 允许粉丝自行授予权益（2026-09-13 发现，2026-09-19 已修 `migrations/055`）
 
-- 现状（已用 Management API 核实线上策略定义）：`subscriptions` 上挂着三条面向 `public` 角色的写策略——`subscriptions_insert_own`（`with_check: auth.uid() = subscriber_id`）、`subscriptions_update_own`、`subscriptions_delete_own`。也就是说任何登录粉丝都能用浏览器端 anon key 直接 `insert`/`update` 自己的订阅行，把 `status` 设成 `active`、`current_period_end` 设成十年后，**不付一分钱拿到订阅专享内容**；也能 `delete` 掉自己的行来擦掉购买痕迹。来源是 `migrations/005_paywall.sql`，与本次 PayRam 改动无关，主干上一直如此
-- 为什么这次才浮出来：订阅扣款幂等键原本想锚在 `subscriptions.current_period_end` 上，评审指出该字段粉丝可写，键会被退回到已付过钱的值。键已改用 `consumption_orders`（对粉丝只读）绕开，但**权限本身的洞还在**：`isActiveSubscriber()` 读的就是这张表，所以付费墙的判权同样可伪造
-- Scope：把 `subscriptions` 的写权限收到 `service_role`，并把 `subscribe30d` / `cancelSubscription` 从 `getSupabaseUniversalClient()`（带用户 JWT 的 anon 客户端）迁到 admin 客户端。这与 agent 文档里已记的「`subscriptions` 用户列运行时解析、待规范化后并入 `spend_wallet_*` 包装函数」是同一块债，建议一起做
-- Acceptance Criteria：粉丝用 anon key 直接写 `subscriptions` 被拒；订阅与取消流程 E2E 仍绿；`pnpm reconcile` 四条等式为零
-- Required Gates：`pnpm check-all`、`pnpm build`、`pnpm exec playwright test --project=chromium`、`pnpm reconcile`
+- 原始现状（已用 Management API 核实线上策略）：`subscriptions` 挂着三条面向 `public` 的写策略——`subscriptions_insert_own`（`with_check: auth.uid() = subscriber_id`）、`_update_own`、`_delete_own`。任何登录粉丝都能用浏览器端 anon key 直接 `insert`/`update` 自己的订阅行，把 `status='active'`、`current_period_end` 设成十年后，**不付一分钱拿到订阅专享内容**，也能 `delete` 擦掉痕迹。来源是 `migrations/005_paywall.sql`，主干上一直如此
+- 修复时又查出**同一类洞在 `purchases` 上更严重**：`purchases_insert_own`（`public`, `with_check auth.uid()=fan_id`）——`hasPurchasedPost()`/`canViewPost()` 判 PPV 权就读这张表，粉丝插一行即白拿任意 PPV。`post_unlocks`（旧 PPV 授权表，已被 `purchases` 取代）的自插策略同理
+- 为什么这次才浮出来：订阅扣款幂等键原本想锚在 `subscriptions.current_period_end`，评审指出粉丝可写、键会退回已付过的值。键已改锚 `consumption_orders`（对粉丝只读）绕开，但**权限本身的洞还在**：`isActiveSubscriber()` 读的就是这张表
+- 修复（`migrations/055_lock_paywall_write_access.sql`）：删掉 `subscriptions`/`purchases`/`post_unlocks` 三张表全部面向粉丝的 INSERT/UPDATE/DELETE 策略，只保留 SELECT（`subscriptions_select_self_or_creator`、`purchases_select_self_or_creator`、`post_unlocks_select_own`——粉丝仍能读自己、创作者仍能读自己的订阅者）。所有合法写入本就带 BYPASSRLS：付费走 `spend_wallet_on_ppv`/`spend_wallet_on_subscription`（`SECURITY DEFINER`，owner `postgres`，已核实），$0 订阅与取消的 `subscribe30d`/`cancelSubscription` 同轮从 `getSupabaseUniversalClient()`（anon+JWT）迁到 service-role admin 客户端（`user.id` 仍是授权边界，只写调用者自己的行）
+- 验证（均在线上库跑过）：删策略后剩余策略仅 3 条 SELECT；模拟 `role=authenticated` + 自己 uid 直插 `subscriptions`/`purchases` 均被拒（事务回滚）；`tests/unit/lib/paywall.test.ts` 加回归断言钉死 `subscribe30d`/`cancelSubscription` 必走 admin 客户端
 - 负责 agent：`chief-security-architect` + `chief-payments-risk-officer`
 
 ### P0 – PayRam 支付链路 + 合规前置 + 账本结算（2026-08-24，代码完成，等外部确认）

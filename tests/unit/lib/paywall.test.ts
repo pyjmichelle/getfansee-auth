@@ -21,6 +21,13 @@ vi.mock("@/lib/supabase-universal", () => ({
   getSupabaseUniversalClient: vi.fn(() => mockSupabase),
 }));
 
+// subscribe30d / cancelSubscription write through the service-role client now
+// that `subscriptions` has no fan-facing write policy (migration 055). Point it
+// at the same builder so the write assertions below still hold.
+vi.mock("@/lib/supabase-admin", () => ({
+  getSupabaseAdminClient: vi.fn(() => mockSupabase),
+}));
+
 vi.mock("@/lib/auth-universal", () => ({
   getCurrentUserUniversal: vi.fn(() => Promise.resolve({ id: "u1", email: "u1@example.com" })),
 }));
@@ -72,5 +79,34 @@ describe("paywall.ts", () => {
     queryBuilder.upsert.mockResolvedValue({ error: { message: "boom" } });
     const { subscribe30d } = await import("@/lib/paywall");
     await expect(subscribe30d("creator-1")).resolves.toBeNull();
+  });
+
+  // Security regression guard (migration 055): the write must go through the
+  // service-role client. If someone routes it back through the anon+JWT client,
+  // the fan-writable-subscriptions bypass reopens.
+  it("subscribe30d 走 service-role admin 客户端，而非 anon+JWT 客户端", async () => {
+    const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
+    const { getSupabaseUniversalClient } = await import("@/lib/supabase-universal");
+    const { subscribe30d } = await import("@/lib/paywall");
+
+    await subscribe30d("creator-1");
+
+    expect(getSupabaseAdminClient).toHaveBeenCalled();
+    expect(getSupabaseUniversalClient).not.toHaveBeenCalled();
+  });
+
+  it("cancelSubscription 同样走 admin 客户端并按 (user, creator) 收窄", async () => {
+    const { getSupabaseAdminClient } = await import("@/lib/supabase-admin");
+    const { getSupabaseUniversalClient } = await import("@/lib/supabase-universal");
+    const { cancelSubscription } = await import("@/lib/paywall");
+
+    await expect(cancelSubscription("creator-1")).resolves.toBe(true);
+
+    expect(getSupabaseAdminClient).toHaveBeenCalled();
+    expect(getSupabaseUniversalClient).not.toHaveBeenCalled();
+    expect(queryBuilder.update).toHaveBeenCalledWith(
+      expect.objectContaining({ status: "canceled" })
+    );
+    expect(queryBuilder.eq).toHaveBeenCalledWith("creator_id", "creator-1");
   });
 });
