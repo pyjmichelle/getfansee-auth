@@ -8,21 +8,18 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import {
-  isPayramEnabled,
-  PAYRAM_TOPUP_TIERS_USD,
-  PAYRAM_CURRENCY,
-  PAYRAM_NETWORK,
-} from "@/lib/payram";
+import { PAYRAM_TOPUP_TIERS_USD, PAYRAM_CURRENCY, PAYRAM_NETWORK } from "@/lib/payram";
+import { isPayramCheckoutOpen } from "@/lib/payments-live";
 import { getRequestJurisdiction } from "@/lib/compliance/request-geo";
 
 export async function GET(request: NextRequest) {
   const jurisdiction = getRequestJurisdiction(request.headers);
-  const enabled = isPayramEnabled() && jurisdiction.paymentsAllowed;
+  const railOpen = isPayramCheckoutOpen();
+  const enabled = railOpen && jurisdiction.paymentsAllowed;
 
   return NextResponse.json({
     enabled,
-    reason: enabled ? null : !isPayramEnabled() ? "rail_disabled" : "region_not_supported",
+    reason: enabled ? null : !railOpen ? "rail_disabled" : "region_not_supported",
     tiers: PAYRAM_TOPUP_TIERS_USD,
     currency: PAYRAM_CURRENCY,
     network: PAYRAM_NETWORK,

@@ -5,6 +5,7 @@
  */
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
+import { assertPairedPaymentFlags } from "@/lib/payments-live";
 
 export const env = createEnv({
   server: {
@@ -102,3 +103,5 @@ export const env = createEnv({
     NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED: process.env.NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED,
   },
 });
+
+assertPairedPaymentFlags();

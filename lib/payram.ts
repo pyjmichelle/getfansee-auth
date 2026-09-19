@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createHmac, timingSafeEqual } from "crypto";
+import { isPayramConfigured } from "@/lib/payments-live";
 
 /**
  * PayRam — self-hosted crypto payment rail.
@@ -42,11 +43,7 @@ export const PAYRAM_TOPUP_TIERS_USD = [20, 50, 100] as const;
 export type PayramTopupTier = (typeof PAYRAM_TOPUP_TIERS_USD)[number];
 
 export function isPayramEnabled(): boolean {
-  return (
-    process.env.PAYRAM_ENABLED === "true" &&
-    !!process.env.PAYRAM_API_KEY &&
-    !!process.env.PAYRAM_BASE_URL
-  );
+  return isPayramConfigured();
 }
 
 export function isValidTopupTier(amountUsd: unknown): amountUsd is PayramTopupTier {

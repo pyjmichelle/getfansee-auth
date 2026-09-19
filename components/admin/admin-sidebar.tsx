@@ -11,6 +11,7 @@ import {
   Users,
   DollarSign,
   ExternalLink,
+  Wallet,
 } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/admin/reports", label: "Reports", icon: Flag },
   { href: "/admin/referrals", label: "Referrals", icon: Users },
   { href: "/admin/commissions", label: "Commissions", icon: DollarSign },
+  { href: "/admin/withdrawals", label: "Withdrawals", icon: Wallet },
 ];
 
 export function AdminSidebar() {

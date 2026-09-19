@@ -289,7 +289,7 @@ Supabase 和 PostgreSQL 最佳实践。
 
 ---
 
-_最后更新: 2026-09-19（PayRam 线上契约对照官方文档订正：回调状态字段 `state`→`status`、下单 `amount`→`amountInUSD` 且 `customerEmail` 必填、移除未文档化的 `redirectURL`；新增可测接缝 `resolvePayramState()` 与人工配置向导 `scripts/payram/setup-wizard.sh`。同轮修掉资金路径缺陷若干：订阅购买原子化为 `spend_wallet_on_subscription`（`migrations/053`，扣款与授予同事务 + advisory lock，替代此前三次都没修对的「路由挑幂等键」思路）、终态无金额回 5xx、单据行先于 PayRam 会话、美国州未知时拒付并升到最严 tier、冲正已打款收益同步扣钱包、冲正订阅收回权益——门禁细则见 `chief-payments-risk-officer`。另修一条合规门禁越权：年龄验证回调此前把 URL 里的 `?check=` 当凭证，任何拿到链接的人都能反复换到过闸 cookie，现改为凭 `/start` 下发的一次性 httpOnly 密钥 + `claimed_at` 单次领取（`migrations/054`，细则见 `chief-legal-compliance-advisor`）。顺带查出一条独立 P0 并于 2026-09-19 修复（`migrations/055`）：付费墙判权表 `subscriptions`/`purchases`/`post_unlocks` 的 owner 可写 RLS 策略允许粉丝用 anon key 自签订阅、自解锁 PPV、白拿付费内容；现删掉全部 fan-facing 写策略只留 SELECT，合法写入走 `SECURITY DEFINER` RPC 或 admin 客户端（`subscribe30d`/`cancelSubscription` 同轮迁到 admin），线上已实证自插被拒。安全域通则见 `chief-security-architect`，详见 `docs/planning/sprint-current.md`）_
+_最后更新: 2026-09-19（`migrations/058` 加固提现 RPC：对 `anon`/`authenticated` 显式 `REVOKE`，`increment_wallet_available` 只接受正数；提现 POST 必须带 `Idempotency-Key`。支付开关统一到 `lib/payments-live.ts`。创作者自助提现落地 `migrations/056`。对账增加 `payouts_match_ledger`。历史：PayRam 契约订正与 `migrations/053`–`055`。）_
 
 \*历史: 2026-08-24（PayRam 支付账本落地：新增 `pnpm reconcile` / `pnpm reconcile:full` / `pnpm payram:replay` 三条验证命令；支付相关改动的门禁见 `chief-payments-risk-officer` 与 `docs/planning/soft-beta-loop.md`）\*\*
 

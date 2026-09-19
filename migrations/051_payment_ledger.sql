@@ -291,6 +291,33 @@ BEGIN
 END;
 $$;
 
+-- ── 6b. PayRam asset / network aliases ──────────────────────────────────────
+-- Real payloads send `usdc` / `base-mainnet` more often than `USDC` / `BASE`.
+-- A hard upper() equality then 500s forever and the deposit never credits.
+CREATE OR REPLACE FUNCTION public.normalize_payram_asset(p_value TEXT)
+RETURNS TEXT
+LANGUAGE sql
+IMMUTABLE
+AS $$
+  SELECT CASE replace(replace(upper(trim(COALESCE(p_value, ''))), '-', ''), '_', '')
+    WHEN 'USDCOIN' THEN 'USDC'
+    WHEN 'USDC' THEN 'USDC'
+    ELSE replace(replace(upper(trim(COALESCE(p_value, ''))), '-', ''), '_', '')
+  END
+$$;
+
+CREATE OR REPLACE FUNCTION public.normalize_payram_network(p_value TEXT)
+RETURNS TEXT
+LANGUAGE sql
+IMMUTABLE
+AS $$
+  SELECT CASE replace(replace(upper(trim(COALESCE(p_value, ''))), '-', ''), '_', '')
+    WHEN 'BASEMAINNET' THEN 'BASE'
+    WHEN 'BASE' THEN 'BASE'
+    ELSE replace(replace(upper(trim(COALESCE(p_value, ''))), '-', ''), '_', '')
+  END
+$$;
+
 -- ── 7. credit_payram_deposit ────────────────────────────────────────────────
 -- The one place a deposit may be credited.
 --
@@ -334,10 +361,14 @@ BEGIN
 
   -- Currency/network must match what the order was opened for. A deposit in
   -- something else is not this order being paid.
-  IF p_currency IS NOT NULL AND upper(p_currency) <> upper(v_order.currency) THEN
+  IF p_currency IS NOT NULL
+     AND public.normalize_payram_asset(p_currency)
+         <> public.normalize_payram_asset(v_order.currency) THEN
     RETURN json_build_object('success', false, 'error', 'Currency mismatch');
   END IF;
-  IF p_network IS NOT NULL AND upper(p_network) <> upper(v_order.network) THEN
+  IF p_network IS NOT NULL
+     AND public.normalize_payram_network(p_network)
+         <> public.normalize_payram_network(v_order.network) THEN
     RETURN json_build_object('success', false, 'error', 'Network mismatch');
   END IF;
 

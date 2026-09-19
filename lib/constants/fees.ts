@@ -16,6 +16,12 @@
 export const PLATFORM_FEE_BPS = 2000;
 
 /**
+ * Minimum creator withdrawal, in cents. Matches the lowest PayRam top-up
+ * tier so we never send a payout smaller than the rail can settle cleanly.
+ */
+export const MINIMUM_PAYOUT_CENTS = 2000;
+
+/**
  * Founding Creators are promised a 0% commission window when Beta payments
  * launch (see lib/constants/alpha.ts). The window end is stored per creator in
  * `profiles.commission_free_until` because it starts at Beta launch, not at

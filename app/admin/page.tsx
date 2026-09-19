@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { UserCheck, FileText, Flag, ArrowRight, Shield } from "@/lib/icons";
+import { UserCheck, FileText, Flag, ArrowRight, Shield, Wallet } from "@/lib/icons";
 import Link from "next/link";
 import { useCountUp } from "@/hooks/use-count-up";
 import { useAuth } from "@/contexts/auth-context";
@@ -81,6 +81,16 @@ export default function AdminDashboardPage() {
       rawCount: pendingReports,
       color: "text-[var(--error-text)]",
       bg: "bg-[var(--error)]/10",
+    },
+    {
+      href: "/admin/withdrawals",
+      icon: Wallet,
+      label: "Withdrawals",
+      description: "Creator payout review queue",
+      count: null,
+      rawCount: null,
+      color: "text-wine-text",
+      bg: "bg-[var(--wine)]/10",
     },
   ];
 
