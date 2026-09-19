@@ -501,6 +501,7 @@ export async function createConfirmedTestUser(
       display_name: displayName,
       role,
       age_verified: true,
+      ...(role === "creator" ? { subscription_price_cents: 999 } : {}),
     },
     { onConflict: "id" }
   );
@@ -517,6 +518,48 @@ export async function createConfirmedTestUser(
   }
 
   return { email, password, userId };
+}
+
+/**
+ * UI-created creators land at subscription_price_cents=0. Subscribe now
+ * refuses $0 (Follow is the free path), so paywall journeys must seed a
+ * price and a spendable fan balance before hitting /api/subscribe.
+ */
+export async function seedPaidSubscribeFixture(
+  creatorEmail: string,
+  fanEmail: string,
+  options?: { priceCents?: number; walletCents?: number }
+): Promise<void> {
+  if (!adminClient) {
+    throw new Error("Admin client not available for seedPaidSubscribeFixture");
+  }
+  const priceCents = options?.priceCents ?? 999;
+  const walletCents = options?.walletCents ?? 5000;
+  const creator = await findUserByEmail(creatorEmail);
+  const fan = await findUserByEmail(fanEmail);
+  if (!creator?.id || !fan?.id) {
+    throw new Error(
+      `seedPaidSubscribeFixture: missing user creator=${creatorEmail} fan=${fanEmail}`
+    );
+  }
+  const priceRes = await adminClient
+    .from("profiles")
+    .update({ subscription_price_cents: priceCents })
+    .eq("id", creator.id);
+  if (priceRes.error) {
+    throw new Error(`seedPaidSubscribeFixture: price ${priceRes.error.message}`);
+  }
+  const walletRes = await adminClient.from("wallet_accounts").upsert(
+    {
+      user_id: fan.id,
+      available_balance_cents: walletCents,
+      pending_balance_cents: 0,
+    },
+    { onConflict: "user_id" }
+  );
+  if (walletRes.error) {
+    throw new Error(`seedPaidSubscribeFixture: wallet ${walletRes.error.message}`);
+  }
 }
 
 export async function deleteTestUser(userId: string) {

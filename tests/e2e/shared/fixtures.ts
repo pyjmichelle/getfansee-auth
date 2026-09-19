@@ -199,6 +199,7 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
           display_name: creatorDisplayName,
           role: "creator",
           age_verified: true,
+          subscription_price_cents: 999,
           bio: "E2E Test Creator — sharing exclusive content for subscribers.",
           avatar_url: creatorAvatarUrl,
         },

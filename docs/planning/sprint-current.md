@@ -23,6 +23,7 @@
 - 顺带：`credit_payram_deposit` 币种/网络走别名归一；订阅确认邮件用 RPC 的 `currentPeriodEnd`；mock 充值改为 `increment_wallet_available` 原子自增
 - 对账第五条：`payouts_match_ledger`
 - 负责 agent：`chief-payments-risk-officer` + `chief-security-architect`
+- CI 跟进：`/api/subscribe` 不再接受客户端报价、`$0` 改走 Follow 后，`paywall-flow` 用 UI 注册的创作者价为 0 → 400。E2E 夹具补 `subscription_price_cents` + fan 钱包
 - Required Gates：`pnpm check-all`、`pnpm build`、`pnpm test:unit`、`pnpm qa:gate`、`pnpm exec playwright test --project=chromium`
 
 ### P0 – 付费墙表 RLS 允许粉丝自行授予权益（2026-09-13 发现，2026-09-19 已修 `migrations/055`）

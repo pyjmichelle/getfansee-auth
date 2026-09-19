@@ -23,6 +23,7 @@ import {
   getOrigin,
   injectSupabaseSession,
   safeClick,
+  seedPaidSubscribeFixture,
   signInUser,
   signUpUser,
   waitForPageLoad,
@@ -144,6 +145,7 @@ test.describe("Paywall Flow E2E", () => {
       // 必须在这里重新以 Fan 身份登录，确保 page 使用 Fan 的 session 查看 feed。
       await signInUser(page, fanEmail, fanPassword);
       await waitForPageLoad(page);
+      await seedPaidSubscribeFixture(creatorEmail, fanEmail);
 
       await page.goto(`${BASE_URL}/home`, { waitUntil: "domcontentloaded", timeout: 30000 });
       await waitForPageLoad(page);
