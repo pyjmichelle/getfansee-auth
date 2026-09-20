@@ -323,14 +323,12 @@ export async function isActiveSubscriber(
  * platform fee at all.
  *
  * @param postId Post ID
- * @param priceCents Price in cents (from post.price_cents, optional)
  * @param idempotencyKey Idempotency key for deduplication
  * @param explicitUserId Authenticated user ID (provided by route layer)
  * @param geo Buyer jurisdiction, recorded on the sale for tax nexus tracking
  */
 export async function unlockPost(
   postId: string,
-  priceCents?: number,
   idempotencyKey?: string,
   explicitUserId?: string,
   geo?: GeoContext | null
@@ -366,7 +364,9 @@ export async function unlockPost(
       return { success: false, error: "Post is not PPV" };
     }
 
-    const resolvedPrice = priceCents ?? post.price_cents ?? 0;
+    // Never accept a client quote. The post row is the only price and payee
+    // authority; migration 059 repeats this check inside the money transaction.
+    const resolvedPrice = post.price_cents ?? 0;
     if (resolvedPrice <= 0) {
       return { success: false, error: "Invalid post price" };
     }
