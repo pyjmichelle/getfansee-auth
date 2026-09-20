@@ -28,6 +28,28 @@ if (!process.env.NEXT_PUBLIC_TEST_MODE) {
 
 const defaultBaseUrl = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
 const parsedUrl = new URL(defaultBaseUrl);
+const localHosts = new Set(["localhost", "127.0.0.1", "0.0.0.0"]);
+
+if (!localHosts.has(parsedUrl.hostname) && process.env.E2E_ALLOW_ANY_HOST !== "true") {
+  throw new Error(
+    "Refusing to run E2E against a non-local host. Set E2E_ALLOW_ANY_HOST=true only for an explicitly approved test target."
+  );
+}
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceRoleConfigured = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+if (supabaseUrl && serviceRoleConfigured) {
+  const actualProjectRef = new URL(supabaseUrl).hostname.split(".")[0];
+  const allowedProjectRef = process.env.E2E_SUPABASE_PROJECT_REF;
+  if (!allowedProjectRef) {
+    throw new Error(
+      "E2E_SUPABASE_PROJECT_REF is required when E2E has a Supabase service-role key. Use a dedicated test project."
+    );
+  }
+  if (actualProjectRef !== allowedProjectRef) {
+    throw new Error("Refusing E2E: Supabase project does not match E2E_SUPABASE_PROJECT_REF.");
+  }
+}
 const serverPort = parsedUrl.port || (parsedUrl.protocol === "https:" ? "443" : "80");
 const cookieExpires = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30;
 const authRealPattern = "**/auth-real/**/*.spec.ts";
