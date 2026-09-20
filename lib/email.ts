@@ -6,7 +6,7 @@ const FROM_ADDRESS = process.env.RESEND_FROM_ADDRESS || "GetFanSee <noreply@getf
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://getfansee.com";
 
-const BILLING_DESCRIPTOR = "GETFANSEE.COM";
+const RECEIPT_REFERENCE = "GetFanSee wallet";
 
 function getResend(): Resend | null {
   if (!RESEND_API_KEY) {
@@ -46,7 +46,7 @@ function baseEmailHtml(title: string, body: string): string {
           <tr>
             <td style="padding:24px 40px;border-top:1px solid rgba(255,255,255,0.06);text-align:center;">
               <p style="margin:0 0 8px;font-size:12px;color:#64748b;">
-                Charges appear on your statement as <strong style="color:#94a3b8;">${BILLING_DESCRIPTOR}</strong>
+                In-platform purchases use your <strong style="color:#94a3b8;">GetFanSee wallet balance</strong>
               </p>
               <p style="margin:0;font-size:11px;color:#475569;">
                 <a href="${SITE_URL}/terms" style="color:#7c3aed;text-decoration:none;">Terms</a> &nbsp;·&nbsp;
@@ -212,15 +212,15 @@ export async function sendSubscriptionConfirmation(
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td style="font-size:13px;color:#94a3b8;padding-bottom:8px;">Amount charged</td>
-              <td align="right" style="font-size:18px;font-weight:700;color:#f1f5f9;padding-bottom:8px;">$${amount}/month</td>
+              <td align="right" style="font-size:18px;font-weight:700;color:#f1f5f9;padding-bottom:8px;">$${amount} / 30 days</td>
             </tr>
             <tr>
-              <td style="font-size:13px;color:#94a3b8;padding-bottom:8px;">Next billing date</td>
+              <td style="font-size:13px;color:#94a3b8;padding-bottom:8px;">Access ends</td>
               <td align="right" style="font-size:13px;color:#f1f5f9;padding-bottom:8px;">${params.nextBillingDate}</td>
             </tr>
             <tr>
-              <td style="font-size:13px;color:#94a3b8;">Statement descriptor</td>
-              <td align="right" style="font-size:13px;color:#a78bfa;font-weight:600;">${BILLING_DESCRIPTOR}</td>
+              <td style="font-size:13px;color:#94a3b8;">Payment source</td>
+              <td align="right" style="font-size:13px;color:#a78bfa;font-weight:600;">${RECEIPT_REFERENCE}</td>
             </tr>
           </table>
         </td>
@@ -228,7 +228,7 @@ export async function sendSubscriptionConfirmation(
     </table>
 
     <p style="margin:0 0 16px;font-size:14px;color:#94a3b8;">
-      Your subscription renews automatically each month. You can cancel anytime from your
+      This purchase grants 30 days of access and does not renew automatically. Review your access on the
       <a href="${SITE_URL}/subscriptions" style="color:#7c3aed;text-decoration:none;">Subscriptions page</a>.
     </p>
 
@@ -293,8 +293,8 @@ export async function sendPPVConfirmation(params: PPVConfirmationParams): Promis
               <td align="right" style="font-size:13px;color:#f1f5f9;padding-bottom:8px;">${params.transactionDate}</td>
             </tr>
             <tr>
-              <td style="font-size:13px;color:#94a3b8;">Statement descriptor</td>
-              <td align="right" style="font-size:13px;color:#a78bfa;font-weight:600;">${BILLING_DESCRIPTOR}</td>
+              <td style="font-size:13px;color:#94a3b8;">Payment source</td>
+              <td align="right" style="font-size:13px;color:#a78bfa;font-weight:600;">${RECEIPT_REFERENCE}</td>
             </tr>
           </table>
         </td>
