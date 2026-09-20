@@ -57,6 +57,7 @@ function loadEnv() {
 const env = loadEnv();
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
+const testUserPassword = process.env.E2E_TEST_USER_PASSWORD;
 
 if (!supabaseUrl || !serviceKey) {
   console.error("❌ Missing environment variables:");
@@ -66,19 +67,33 @@ if (!supabaseUrl || !serviceKey) {
   process.exit(1);
 }
 
+if (!testUserPassword) {
+  console.error("❌ E2E_TEST_USER_PASSWORD is required; test credentials must not be committed.");
+  process.exit(1);
+}
+
+const actualProjectRef = new URL(supabaseUrl).hostname.split(".")[0];
+const allowedProjectRef = process.env.E2E_SUPABASE_PROJECT_REF;
+if (!allowedProjectRef || allowedProjectRef !== actualProjectRef) {
+  console.error(
+    "❌ Refusing to create test users: set E2E_SUPABASE_PROJECT_REF to the dedicated test project's ref."
+  );
+  process.exit(1);
+}
+
 const supabase = createClient(supabaseUrl, serviceKey);
 
 // 测试账号配置
 const testUsers = [
   {
     email: "test-fan@example.com",
-    password: "TestPassword123!",
+    password: testUserPassword,
     role: "fan" as const,
     displayName: "Test Fan",
   },
   {
     email: "test-creator@example.com",
-    password: "TestPassword123!",
+    password: testUserPassword,
     role: "creator" as const,
     displayName: "Test Creator",
   },
