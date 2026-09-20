@@ -110,6 +110,9 @@ mistake has to be made twice to have an effect.
 
 ## Gate 3 — Small-amount live loop
 
+逐步操作清单（账号、开关、webhook 主机、提现顺序、对账五条）见
+[`docs/ops/phase-c-live-money-loop.md`](../ops/phase-c-live-money-loop.md)。
+
 Run against production infrastructure with real money, in this order. Every step produces an
 artifact; file them under `docs/reports/payram-phase0/`.
 
