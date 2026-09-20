@@ -82,7 +82,8 @@ export default function TermsPage() {
           <h3 className="text-h4 mt-4 mb-2">Subscriptions</h3>
           <ul className="list-disc pl-6 text-text-secondary space-y-2">
             <li>
-              Subscriptions are billed on a recurring monthly basis from the date of purchase.
+              Each subscription purchase grants 30 days of access and does not renew automatically
+              in the current MVP.
             </li>
             <li>
               You may cancel your subscription at any time from your{" "}
