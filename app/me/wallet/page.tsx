@@ -587,9 +587,8 @@ export default function WalletPage() {
             <div data-testid="checkout-disclaimer">
               <div className="card-block p-5 text-small text-text-tertiary space-y-2">
                 <p data-testid="no-refund">
-                  Your statement will show:{" "}
-                  <strong className="text-text-secondary">GETFANSEE.COM</strong>. Refunds are
-                  available in qualifying cases — see our{" "}
+                  Your funding provider will show its fees and statement descriptor before you
+                  confirm. Refunds are available in qualifying cases — see our{" "}
                   <a href="/refund" className="text-wine-text hover:underline">
                     Refund Policy
                   </a>
