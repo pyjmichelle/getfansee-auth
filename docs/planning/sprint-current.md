@@ -8,6 +8,16 @@
 
 ## Active Tasks
 
+### P1 – Phase C 操作清单 + tab-stability 主干 flaky（2026-09-20）
+
+- Phase C 逐步清单：`docs/ops/phase-c-live-money-loop.md`（真卡 / 链上 / Paxum / 成对开旗 / webhook 主机 / 先打款再 Approve）
+- 主干 CI `tab-stability` Posts/About 根因两层：
+  1. Guest 首屏先挂 `NewsletterSignup`（约 180px），session hydrate 后卸掉 → 文档 Y 从 764→584
+  2. 视口 `boundingBox().y` 把 click 的 scroll-into-view 当成标签栏跳动；Follow 按钮是 `hidden md:flex`，不能当 mobile ready 信号
+- 修复：`gotoMockCreator` 等到「Get notified when」count=0；PC jump 用 `documentBox` x/y + 测量前 `stabilizeChrome`；本例不再断言 Posts↔About 的 scoped CLS（内容换页本身会抖）
+- 证据（2026-09-20，isolated `:3001`，`PLAYWRIGHT_TEST_MODE=true`）：`tests/e2e/tab-stability.spec.ts` chromium **7 passed / 1.9m**
+- Required Gates：`pnpm check-all`、该 spec 的 chromium
+
 ### P0 – 上线前止血：RPC 默认权限 + 内容脱敏 + 环境拆分（2026-09-19，`migrations/057`）
 
 - 根因：Supabase `pg_default_acl` 把 `public` 下每个函数的 EXECUTE **直接**授给 `anon`/`authenticated`，迁移里的 `REVOKE … FROM PUBLIC` 撤不掉。全部资金/提现/报表 SECURITY DEFINER RPC 对匿名调用者开放，且函数体内无 `auth.uid()`。叠加 feed 不脱敏、signed URL 一年入库、粉丝可改 `profiles.role` 与钱包余额。

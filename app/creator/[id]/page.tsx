@@ -812,8 +812,10 @@ export default function CreatorProfilePage() {
           </div>
         )}
 
-        {/* Guest email capture — signed-out visitors can still get updates */}
-        {!currentUserId && (
+        {/* Guest email capture — signed-out visitors can still get updates.
+            Use live `viewerId` (not lagged currentUserId) so a hydrating
+            session does not flash this ~180px block above the tab bar. */}
+        {!viewerId && (
           <NewsletterSignup
             source="creator_profile"
             title={`Get notified when ${creatorProfile.display_name || "this creator"} posts`}
