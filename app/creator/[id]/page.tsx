@@ -976,7 +976,7 @@ export default function CreatorProfilePage() {
           billingPeriod="month"
           benefits={[
             "Full access to all exclusive posts",
-            "Direct messaging with creator",
+            "Access to subscriber-only posts",
             "Early access to new content",
             "Member-only live streams",
             "Cancel anytime",
