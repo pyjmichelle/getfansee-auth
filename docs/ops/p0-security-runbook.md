@@ -11,10 +11,12 @@ Create a dedicated Supabase test project and add these repository secrets:
 - `E2E_SUPABASE_SERVICE_ROLE_KEY`
 - `E2E_SUPABASE_PROJECT_REF`
 - `E2E_TEST_USER_PASSWORD`
+- `E2E_DATABASE_URL`
 - `PRODUCTION_SUPABASE_PROJECT_REF`
 
-CI fails closed if the URL and project ref differ. Never store the E2E service-role
-key in a public environment or reuse the production project for QA.
+CI fails closed if the URL and project ref differ. It also runs the read-only
+database posture check before QA. Never store the E2E service-role or database
+credentials in a public environment or reuse the production project for QA.
 
 ## 2. Apply database containment
 

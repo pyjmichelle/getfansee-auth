@@ -8,6 +8,7 @@ required=(
   SUPABASE_SERVICE_ROLE_KEY
   E2E_SUPABASE_PROJECT_REF
   E2E_TEST_USER_PASSWORD
+  PRODUCTION_SUPABASE_PROJECT_REF
 )
 
 for name in "${required[@]}"; do
@@ -23,7 +24,7 @@ if [ "$actual_ref" = "$NEXT_PUBLIC_SUPABASE_URL" ] || [ "$actual_ref" != "$E2E_S
   exit 1
 fi
 
-if [ "${PRODUCTION_SUPABASE_PROJECT_REF:-}" = "$actual_ref" ]; then
+if [ "$PRODUCTION_SUPABASE_PROJECT_REF" = "$actual_ref" ]; then
   echo "ERROR: E2E project ref matches PRODUCTION_SUPABASE_PROJECT_REF."
   exit 1
 fi

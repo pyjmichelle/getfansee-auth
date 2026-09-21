@@ -4,6 +4,7 @@ DO $$
 DECLARE
   v_proc record;
   v_bad_fk record;
+  v_restrictive_fk_count integer;
 BEGIN
   IF EXISTS (
     SELECT 1
@@ -81,6 +82,60 @@ BEGIN
   IF FOUND THEN
     RAISE EXCEPTION 'financial FK is not deletion-restricted: %.%',
       v_bad_fk.table_name, v_bad_fk.column_name;
+  END IF;
+
+  SELECT count(*)
+    INTO v_restrictive_fk_count
+  FROM pg_constraint c
+  JOIN pg_class t ON t.oid = c.conrelid
+  JOIN pg_namespace n ON n.oid = t.relnamespace
+  JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY (c.conkey)
+  JOIN pg_class rt ON rt.oid = c.confrelid
+  JOIN pg_namespace rn ON rn.oid = rt.relnamespace
+  WHERE c.contype = 'f'
+    AND n.nspname = 'public'
+    AND rn.nspname = 'auth'
+    AND rt.relname = 'users'
+    AND c.confdeltype = 'r'
+    AND (t.relname, a.attname) IN (
+      ('transactions', 'user_id'),
+      ('payment_orders', 'user_id'),
+      ('consumption_orders', 'fan_id'),
+      ('consumption_orders', 'creator_id'),
+      ('creator_ledger', 'creator_id'),
+      ('withdrawal_requests', 'creator_id'),
+      ('tips', 'fan_id'),
+      ('tips', 'creator_id'),
+      ('purchases', 'fan_id')
+    );
+
+  IF v_restrictive_fk_count <> 9 THEN
+    RAISE EXCEPTION 'expected 9 deletion-restricted financial FKs, found %',
+      v_restrictive_fk_count;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_default_acl d
+    JOIN pg_namespace n ON n.oid = d.defaclnamespace
+    WHERE n.nspname = 'public'
+      AND d.defaclobjtype = 'f'
+  ) THEN
+    RAISE EXCEPTION 'no hardened default function ACL exists for public schema';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM pg_default_acl d
+    JOIN pg_namespace n ON n.oid = d.defaclnamespace
+    CROSS JOIN LATERAL aclexplode(d.defaclacl) acl
+    LEFT JOIN pg_roles r ON r.oid = acl.grantee
+    WHERE n.nspname = 'public'
+      AND d.defaclobjtype = 'f'
+      AND acl.privilege_type = 'EXECUTE'
+      AND (acl.grantee = 0 OR r.rolname IN ('anon', 'authenticated'))
+  ) THEN
+    RAISE EXCEPTION 'future public-schema functions still default to browser-callable EXECUTE';
   END IF;
 END;
 $$;
