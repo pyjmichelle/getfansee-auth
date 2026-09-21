@@ -13,7 +13,6 @@ const SITE_URL =
 
 type UnlockPayload = {
   postId?: string;
-  priceCents?: number;
 };
 
 export async function POST(request: NextRequest) {
@@ -33,7 +32,7 @@ export async function POST(request: NextRequest) {
     // 路由层显式鉴权：未登录直接 401，不依赖下层隐式判断
     const { user } = await requireUser();
 
-    const { postId, priceCents } = (await request.json()) as UnlockPayload;
+    const { postId } = (await request.json()) as UnlockPayload;
 
     if (!postId) {
       return NextResponse.json({ success: false, error: "postId is required" }, { status: 400 });
@@ -43,7 +42,6 @@ export async function POST(request: NextRequest) {
     // 将已验证的 userId 显式传入，避免下层重复获取 session 的竞态
     const result = await unlockPost(
       postId,
-      priceCents,
       idempotencyKey,
       user.id,
       getRequestGeo(request.headers)
@@ -71,7 +69,7 @@ export async function POST(request: NextRequest) {
         } | null;
         const creatorName = post?.profiles?.display_name || "Creator";
         const contentTitle = post?.title || "Premium Content";
-        const resolvedPrice = priceCents ?? post?.price_cents ?? 0;
+        const resolvedPrice = post?.price_cents ?? 0;
 
         await sendPPVConfirmation({
           toEmail: user.email,

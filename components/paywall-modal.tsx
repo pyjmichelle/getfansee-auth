@@ -507,8 +507,8 @@ export function PaywallModal({
               )}
             </div>
             <p className="text-center text-[10px] text-text-disabled mt-2">
-              Statement will show:{" "}
-              <span className="font-semibold text-text-quaternary">GETFANSEE.COM</span>
+              Purchases use your GetFanSee wallet balance. Wallet funding details are shown before
+              checkout.
             </p>
           </div>
 

@@ -22,17 +22,22 @@ const BASE_URL = getBaseUrl();
 const ARTIFACTS_DIR = path.join(process.cwd(), "artifacts", "agent-browser-full");
 const SERVER_LOG_PATH = path.join(ARTIFACTS_DIR, "server.log");
 const SERVER_TIMEOUT = 120000;
+const TEST_PASSWORD = process.env.E2E_TEST_USER_PASSWORD;
+
+if (!TEST_PASSWORD) {
+  throw new Error("E2E_TEST_USER_PASSWORD is required for authenticated audits.");
+}
 
 // Test credentials (will be created if not exist)
 const TEST_USERS = {
   fan: {
     email: "test-fan@example.com",
-    password: "TestPassword123!",
+    password: TEST_PASSWORD,
     role: "fan" as const,
   },
   creator: {
     email: "test-creator@example.com",
-    password: "TestPassword123!",
+    password: TEST_PASSWORD,
     role: "creator" as const,
   },
 };

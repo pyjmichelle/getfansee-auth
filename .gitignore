@@ -9,6 +9,12 @@ coverage/
 test-results/
 playwright-report/
 .ci-artifacts/
+artifacts/
+**/sessions/*.json
+**/*storage-state*.json
+**/authenticated-perf.json
+*.trace
+*.har
 
 # Next.js
 .next/

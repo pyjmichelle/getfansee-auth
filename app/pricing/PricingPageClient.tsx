@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/auth-context";
 const fanFeatures = [
   "Access all free creator posts",
   "Follow unlimited creators",
-  "Direct messaging (limited)",
+  "Save posts for later",
   "Browse creator profiles",
 ];
 
@@ -17,8 +17,8 @@ const subscriberFeatures = [
   "Full access to a creator's exclusive content",
   "Unlock all subscriber-only posts & photos",
   "Unlock all subscriber-only videos",
-  "Priority DMs with your subscribed creators",
-  "Cancel anytime — no hidden fees",
+  "30 days of subscriber access",
+  "No automatic renewal",
 ];
 
 const creatorFeatures = [
@@ -26,8 +26,8 @@ const creatorFeatures = [
   "Sell pay-per-view posts & videos",
   "Keep 80% of all earnings",
   "Creator analytics dashboard",
-  "Direct messaging with fans",
-  "Payout every month (minimum threshold applies)",
+  "Publish and manage exclusive content",
+  "Request withdrawals after earnings become available",
 ];
 
 export function PricingPageClient() {
@@ -48,7 +48,7 @@ export function PricingPageClient() {
         <h1 className="text-display text-text-primary mb-4">Simple, Transparent Pricing</h1>
         <p className="text-text-secondary text-body max-w-2xl mx-auto">
           No surprise charges. No hidden fees. You always see exactly what you&apos;ll pay before
-          confirming a purchase — and what will appear on your bank statement.
+          confirming a purchase. Payment availability and provider fees are shown before checkout.
         </p>
       </div>
 
@@ -72,17 +72,17 @@ export function PricingPageClient() {
         </div>
       </div>
 
-      {/* Billing Descriptor Notice */}
+      {/* Wallet funding notice */}
       <div className="card-block bg-brand-accent/10 border border-brand-accent/20 rounded-xl p-4 flex gap-3 items-start mb-10">
         <CreditCard className="w-5 h-5 text-brand-accent shrink-0 mt-0.5" />
         <div>
           <p className="text-small font-semibold text-brand-accent mb-0.5">
-            Bank Statement Descriptor
+            Wallet Funding in Beta
           </p>
           <p className="text-small text-text-secondary">
-            All charges from GetFanSee will appear on your bank or credit card statement as{" "}
-            <strong className="text-text-primary font-mono">GETFANSEE.COM</strong>. You will always
-            receive an email receipt after every transaction.
+            When payments launch, wallet funding will be handled by our payment partner. Available
+            amounts, provider fees and the final card statement descriptor will be shown before you
+            confirm. GetFanSee will send a receipt for completed in-platform purchases.
           </p>
         </div>
       </div>
@@ -132,8 +132,8 @@ export function PricingPageClient() {
               <span className="text-h1 text-text-primary">Creator&apos;s price</span>
             </div>
             <p className="text-text-tertiary text-small">
-              Each creator sets their own monthly subscription price. Prices typically range from{" "}
-              <strong className="text-text-secondary">$4.99 – $49.99 / month</strong>.
+              Each creator sets the price of a 30-day access pass. Prices typically range from{" "}
+              <strong className="text-text-secondary">$4.99 – $49.99 / 30 days</strong>.
             </p>
           </div>
 
@@ -147,9 +147,9 @@ export function PricingPageClient() {
           </ul>
 
           <div className="bg-surface-raised rounded-lg p-3 mb-4 text-tiny text-text-tertiary">
-            <strong className="text-text-secondary">Recurring billing notice:</strong> Subscriptions
-            renew automatically each month on the date you subscribed. You will be charged the same
-            amount unless you cancel before the renewal date.
+            <strong className="text-text-secondary">Renewal notice:</strong> The current MVP grants
+            30 days of access after each purchase and does not renew automatically. You can purchase
+            another access period after it expires.
           </div>
 
           <Link href="/creators">

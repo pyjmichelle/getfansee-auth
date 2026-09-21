@@ -13,7 +13,10 @@ import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
-const TEST_PASSWORD = "TestPassword123!";
+const TEST_PASSWORD = process.env.E2E_TEST_USER_PASSWORD;
+if (!TEST_PASSWORD) {
+  throw new Error("E2E_TEST_USER_PASSWORD is required for real auth E2E tests.");
+}
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;

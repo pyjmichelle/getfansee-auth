@@ -23,10 +23,14 @@ TOKEN_LEAKS="$(rg -n 'sbp_[a-f0-9]{20,}' "${EXCLUDES[@]}" . 2>/dev/null || true)
 echo "Checking for hardcoded Supabase project JWTs (service_role/anon)..."
 # Matches the fixed header+iss-claim prefix of every real Supabase JWT:
 # base64("{"alg":"HS256","typ":"JWT"}").base64("{"iss":"supabase"...).
-JWT_LEAKS="$(rg -n 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZSI[A-Za-z0-9_-]{30,}' "${EXCLUDES[@]}" . 2>/dev/null || true)"
+JWT_LEAKS="$(rg -l 'eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}' "${EXCLUDES[@]}" . 2>/dev/null || true)"
+
+echo "Checking for committed browser auth/session state..."
+SESSION_LEAKS="$(rg -l '"(access_token|refresh_token)"[[:space:]]*:[[:space:]]*"[^"]{20,}"' "${EXCLUDES[@]}" . 2>/dev/null || true)"
 
 LEAKS="$TOKEN_LEAKS
-$JWT_LEAKS"
+$JWT_LEAKS
+$SESSION_LEAKS"
 LEAKS="$(echo "$LEAKS" | sed '/^$/d')"
 
 if [ -n "$LEAKS" ]; then

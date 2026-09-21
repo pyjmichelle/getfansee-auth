@@ -12,7 +12,6 @@ export function isTestPaymentsOverride(): boolean {
   return (
     process.env.E2E === "1" ||
     process.env.PLAYWRIGHT_TEST_MODE === "true" ||
-    process.env.NEXT_PUBLIC_TEST_MODE === "true" ||
     process.env.NODE_ENV === "development"
   );
 }

@@ -30,19 +30,24 @@ if (fs.existsSync(envLocalPath)) {
 const BASE_URL = getBaseUrl();
 const ROLE = process.env.ROLE || "fan";
 const HEADED = process.env.HEADED === "true";
+const TEST_PASSWORD = process.env.E2E_TEST_USER_PASSWORD;
 const SESSIONS_DIR = path.join(process.cwd(), "artifacts", "agent-browser-full", "sessions");
+
+if (!TEST_PASSWORD) {
+  throw new Error("E2E_TEST_USER_PASSWORD is required for automated login.");
+}
 
 const TEST_ACCOUNTS = {
   fan: {
     email: "test-fan@example.com",
-    password: "TestPassword123!",
+    password: TEST_PASSWORD,
     userId: "dec562f2-a534-42a0-91f7-a5b8dbcf9305",
     testPage: "/home",
     name: "Fan",
   },
   creator: {
     email: "test-creator@example.com",
-    password: "TestPassword123!",
+    password: TEST_PASSWORD,
     userId: "77deaaa3-0c60-417d-ac8d-152ec291f674",
     testPage: "/creator/studio",
     name: "Creator",

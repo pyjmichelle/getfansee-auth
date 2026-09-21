@@ -13,17 +13,22 @@ import { getBaseUrl } from "../_shared/env";
 
 const BASE_URL = getBaseUrl();
 const SESSIONS_DIR = path.join(process.cwd(), "artifacts", "agent-browser-full", "sessions");
+const TEST_PASSWORD = process.env.E2E_TEST_USER_PASSWORD;
 
-// Test accounts from environment or defaults
+if (!TEST_PASSWORD) {
+  throw new Error("E2E_TEST_USER_PASSWORD is required to bootstrap sessions.");
+}
+
+// Test account emails may be overridden; the password must come from a secret.
 const TEST_ACCOUNTS = {
   fan: {
     email: process.env.FAN_EMAIL || "fan@test.com",
-    password: process.env.FAN_PASSWORD || "TestPassword123!",
+    password: process.env.FAN_PASSWORD || TEST_PASSWORD,
     role: "fan" as const,
   },
   creator: {
     email: process.env.CREATOR_EMAIL || "creator@test.com",
-    password: process.env.CREATOR_PASSWORD || "TestPassword123!",
+    password: process.env.CREATOR_PASSWORD || TEST_PASSWORD,
     role: "creator" as const,
   },
 };
@@ -236,9 +241,9 @@ async function main() {
       console.log("2. Create test accounts manually at /auth");
       console.log("3. Set correct credentials in environment:");
       console.log("   export FAN_EMAIL=fan@test.com");
-      console.log("   export FAN_PASSWORD=TestPassword123!");
+      console.log("   export FAN_PASSWORD=<secret>");
       console.log("   export CREATOR_EMAIL=creator@test.com");
-      console.log("   export CREATOR_PASSWORD=TestPassword123!");
+      console.log("   export CREATOR_PASSWORD=<secret>");
       process.exit(1);
     }
   } catch (error: any) {

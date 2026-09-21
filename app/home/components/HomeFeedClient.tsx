@@ -776,7 +776,7 @@ export function HomeFeedClient({
             paywallPost.visibility === "subscribers"
               ? [
                   "Full access to all exclusive posts",
-                  "Direct messaging with the creator",
+                  "Access to the creator's subscriber-only posts",
                   "Early access to new content",
                   "Cancel anytime",
                 ]

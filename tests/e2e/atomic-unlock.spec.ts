@@ -17,6 +17,7 @@ import {
   fetchAuthedJson,
   injectSupabaseSession,
   safeClick,
+  TEST_PASSWORD,
   waitForPageLoad,
 } from "./shared/helpers";
 import {
@@ -27,7 +28,6 @@ import {
 } from "./shared/fixtures";
 
 // Test fixtures
-const TEST_PASSWORD = "TestPassword123!";
 const PPV_PRICE = 5.0;
 const INITIAL_BALANCE = 10.0;
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
