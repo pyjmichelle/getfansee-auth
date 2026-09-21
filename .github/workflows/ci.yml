@@ -88,9 +88,11 @@ jobs:
     timeout-minutes: 25
     env:
       CI: true
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.E2E_SUPABASE_SERVICE_ROLE_KEY }}
+      E2E_SUPABASE_PROJECT_REF: ${{ secrets.E2E_SUPABASE_PROJECT_REF }}
+      E2E_TEST_USER_PASSWORD: ${{ secrets.E2E_TEST_USER_PASSWORD }}
       NEXT_PUBLIC_TEST_MODE: "true"
       # 统一测试开关：/api/test/* 路由 gate 依赖 E2E 或 PLAYWRIGHT_TEST_MODE
       PLAYWRIGHT_TEST_MODE: "true"
@@ -113,6 +115,9 @@ jobs:
 
       - name: Install dependencies (locked)
         run: pnpm install --frozen-lockfile
+
+      - name: Verify dedicated E2E environment
+        run: bash scripts/ci/assert-dedicated-e2e-env.sh
 
       # If your qa:gate starts the app itself, you may not need pnpm build.
       # Keeping build here is safer for Next apps and avoids missing .next in CI.
@@ -159,9 +164,7 @@ jobs:
           echo "✅ /api/test/session route reachable (HEAD => $SESSION_CODE, 405/400 ok)"
 
       - name: Create test users (if needed)
-        run: |
-          echo "🔧 Creating test users for QA gate..."
-          pnpm tsx scripts/create-test-users.ts || echo "⚠️  Test users may already exist, continuing..."
+        run: pnpm tsx scripts/create-test-users.ts
 
       - name: Create test sessions
         run: |
@@ -225,9 +228,11 @@ jobs:
     timeout-minutes: 35
     env:
       CI: true
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.E2E_SUPABASE_SERVICE_ROLE_KEY }}
+      E2E_SUPABASE_PROJECT_REF: ${{ secrets.E2E_SUPABASE_PROJECT_REF }}
+      E2E_TEST_USER_PASSWORD: ${{ secrets.E2E_TEST_USER_PASSWORD }}
       NEXT_PUBLIC_TEST_MODE: "true"
       # 统一测试开关：/api/test/session、/api/test/create-post-with-media 依赖
       PLAYWRIGHT_TEST_MODE: "true"
@@ -250,6 +255,9 @@ jobs:
 
       - name: Install dependencies (locked)
         run: pnpm install --frozen-lockfile
+
+      - name: Verify dedicated E2E environment
+        run: bash scripts/ci/assert-dedicated-e2e-env.sh
 
       - name: Build application (required for pnpm start)
         run: pnpm build

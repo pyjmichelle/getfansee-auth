@@ -225,14 +225,13 @@ async function createTestUsers() {
   }
 
   console.log("✅ 测试账号创建完成！\n");
-  console.log("📋 测试账号信息：\n");
+  console.log("📋 测试账号：\n");
   testUsers.forEach((user) => {
     console.log(`   邮箱: ${user.email}`);
-    console.log(`   密码: ${user.password}`);
     console.log(`   角色: ${user.role}`);
     console.log("");
   });
-  console.log("⚠️  注意：这些账号的邮箱已自动确认，可以直接登录");
+  console.log("⚠️  密码仅从 E2E_TEST_USER_PASSWORD 读取，不会写入日志。");
 }
 
 createTestUsers()
@@ -242,11 +241,5 @@ createTestUsers()
   })
   .catch((err) => {
     console.error("❌ 脚本执行失败:", err);
-    // In CI, don't fail if users already exist
-    if (process.env.CI === "true") {
-      console.warn("⚠️  Continuing in CI mode despite errors...");
-      process.exit(0);
-    } else {
-      process.exit(1);
-    }
+    process.exit(1);
   });
