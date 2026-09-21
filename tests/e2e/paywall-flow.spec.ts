@@ -12,9 +12,7 @@ const timestamp = Date.now();
 const random = Math.random().toString(36).slice(2, 8);
 const uniqueSuffix = `${timestamp}-${random}`;
 const fanEmail = `e2e-fan-${uniqueSuffix}@example.com`;
-const fanPassword = "TestPassword123!";
 const creatorEmail = `e2e-creator-${uniqueSuffix}@example.com`;
-const creatorPassword = "CreatorPassword123!";
 
 import {
   clearStorage,
@@ -26,8 +24,12 @@ import {
   seedPaidSubscribeFixture,
   signInUser,
   signUpUser,
+  TEST_PASSWORD,
   waitForPageLoad,
 } from "./shared/helpers";
+
+const fanPassword = TEST_PASSWORD;
+const creatorPassword = TEST_PASSWORD;
 
 test.describe("Paywall Flow E2E", () => {
   test.beforeEach(async ({ page }) => {

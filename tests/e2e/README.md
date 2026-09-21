@@ -27,7 +27,7 @@ CI 已统一设置 `PLAYWRIGHT_TEST_MODE` 与 `E2E`，上述路由在 CI 中均�
 
 - **QA Gate（gate-ui / gate-deadclick）**：使用 **文件会话**。步骤「Create test sessions」运行 `pnpm test:session:auto:all`，通过浏览器打开 `/auth` 登录并导出 storageState 到 `artifacts/agent-browser-full/sessions/fan.json` 与 `creator.json`。gate-ui / gate-deadclick 读取这些文件做已登录态检查。账号与下方「固定测试账号」一致。
 - **E2E**：使用 **服务端会话**。测试中调用 `POST /api/test/session` 传入 `{ email, password }`，服务端用 `getSupabaseRouteHandlerClient()` 执行 `signInWithPassword` 并写 cookie，不再注入 cookie/localStorage。可用固定测试账号或 `getTestCredentials()` 等动态账号。
-- **固定测试账号（与 create-test-users 一致）**：`test-fan@example.com` / `test-creator@example.com`，密码 `TestPassword123!`。CI 先执行「Create test users (if needed)」再「Create test sessions」，保证 QA gate 的 sessions 与 E2E 使用的账号一致。
+- **固定测试账号（与 create-test-users 一致）**：`test-fan@example.com` / `test-creator@example.com`，密码从 `E2E_TEST_USER_PASSWORD` 读取，不写入代码或日志。CI 先执行「Create test users (if needed)」再「Create test sessions」，保证 QA gate 的 sessions 与 E2E 使用的账号一致。
 
 ## 测试结构
 
@@ -167,7 +167,7 @@ pnpm exec playwright test --reporter=html
 ## 测试数据管理
 
 - 测试使用时间戳和随机后缀生成唯一邮箱（`e2e-{prefix}-{timestamp}-{random}@example.com`）
-- 测试密码统一为 `TestPassword123!`
+- 测试密码统一由 `E2E_TEST_USER_PASSWORD` 注入
 - 每个测试前会自动清除 cookies 和 localStorage
 
 ## 注意事项

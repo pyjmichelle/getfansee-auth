@@ -5,6 +5,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import type { Page } from "@playwright/test";
+import { TEST_PASSWORD } from "./helpers";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -138,7 +139,7 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
 
   // 1. 创建 Creator
   const creatorEmail = `e2e-creator-${uniqueSuffix}@example.com`;
-  const creatorPassword = "TestPassword123!";
+  const creatorPassword = TEST_PASSWORD;
   const creatorDisplayName = `Test Creator ${uniqueSuffix}`;
 
   let creatorUserId: string | undefined;
@@ -239,7 +240,7 @@ export async function setupTestFixtures(): Promise<TestFixtures> {
 
   // 2. 创建 Fan（带钱包余额）
   const fanEmail = `e2e-fan-${uniqueSuffix}@example.com`;
-  const fanPassword = "TestPassword123!";
+  const fanPassword = TEST_PASSWORD;
 
   let fanUserId: string | undefined;
   try {
