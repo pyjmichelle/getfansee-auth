@@ -1,4 +1,8 @@
 #!/usr/bin/env tsx
+import {
+  assertDedicatedTestProject,
+  assertLocalTestTarget,
+} from "../utils/assert-test-environment";
 /**
  * Bootstrap Authentication Sessions
  *
@@ -11,7 +15,9 @@ import * as fs from "fs";
 import * as path from "path";
 import { getBaseUrl } from "../_shared/env";
 
+assertDedicatedTestProject(process.env.NEXT_PUBLIC_SUPABASE_URL);
 const BASE_URL = getBaseUrl();
+assertLocalTestTarget(BASE_URL);
 const SESSIONS_DIR = path.join(process.cwd(), "artifacts", "agent-browser-full", "sessions");
 const TEST_PASSWORD = process.env.E2E_TEST_USER_PASSWORD;
 

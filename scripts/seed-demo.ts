@@ -1,3 +1,4 @@
+import { assertDedicatedTestProject } from "./utils/assert-test-environment";
 /**
  * Seed demo data for Money & Access MVP
  *
@@ -70,6 +71,8 @@ if (!supabaseUrl || !anonKey) {
 }
 
 // Use service role if available, otherwise use anon (will be limited by RLS)
+assertDedicatedTestProject(supabaseUrl);
+
 const supabase = serviceKey
   ? createClient(supabaseUrl, serviceKey)
   : createClient(supabaseUrl, anonKey);

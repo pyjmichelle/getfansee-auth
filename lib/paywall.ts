@@ -132,6 +132,7 @@ export async function listSubscribers(creatorId: string): Promise<
       .select(
         `
         id,
+        ${subscriptionUserColumn},
         status,
         starts_at,
         current_period_end,
@@ -295,7 +296,7 @@ export async function isActiveSubscriber(
       .select("id")
       .eq(subscriptionUserColumn, fanId)
       .eq("creator_id", creatorId)
-      .eq("status", "active")
+      .in("status", ["active", "canceled"])
       .gt("current_period_end", new Date().toISOString())
       .maybeSingle();
 
@@ -332,7 +333,13 @@ export async function unlockPost(
   idempotencyKey?: string,
   explicitUserId?: string,
   geo?: GeoContext | null
-): Promise<{ success: boolean; error?: string; balance_after_cents?: number }> {
+): Promise<{
+  success: boolean;
+  error?: string;
+  balance_after_cents?: number;
+  amount_cents?: number;
+  idempotent?: boolean;
+}> {
   try {
     // 优先使用路由层已验证的 userId，回退到通用获取（兼容直接调用场景）
     let userId: string;
@@ -351,7 +358,7 @@ export async function unlockPost(
     // 1. Fetch post info (price_cents + visibility + creator_id)
     const { data: post, error: postError } = await admin
       .from("posts")
-      .select("id, price_cents, visibility, creator_id")
+      .select("id, price_cents, visibility, creator_id, review_status, deleted_at")
       .eq("id", postId)
       .single();
 
@@ -360,6 +367,9 @@ export async function unlockPost(
       return { success: false, error: "Post not found" };
     }
 
+    if (post.deleted_at != null || post.review_status !== "approved") {
+      return { success: false, error: "Post is not available for purchase" };
+    }
     if (post.visibility !== "ppv") {
       return { success: false, error: "Post is not PPV" };
     }
@@ -372,7 +382,13 @@ export async function unlockPost(
     }
 
     // 2. Idempotency key
-    const iKey = idempotencyKey ?? `ppv_${userId}_${postId}`;
+    // Scope untrusted retry tokens to the authenticated buyer and content.
+    // SQL repeats this isolation and checks that retries refer to live orders.
+    const nonce = idempotencyKey ?? "default";
+    if (nonce.length === 0 || nonce.length > 200) {
+      return { success: false, error: "Invalid idempotency key" };
+    }
+    const iKey = `ppv_${userId}_${postId}_${nonce}`;
 
     // 3. Charge and grant, atomically.
     const spend = await spendWalletOnPpv({
@@ -395,6 +411,8 @@ export async function unlockPost(
     return {
       success: true,
       balance_after_cents: spend.balanceAfterCents,
+      amount_cents: spend.grossAmountCents,
+      idempotent: spend.idempotent,
     };
   } catch (err: unknown) {
     console.error("[paywall] unlockPost exception:", err);
@@ -550,7 +568,7 @@ export async function getMyPaywallState(userId: string): Promise<PaywallState | 
       .from("subscriptions")
       .select("creator_id")
       .eq(subscriptionUserColumn, userId)
-      .eq("status", "active")
+      .in("status", ["active", "canceled"])
       .gt("current_period_end", new Date().toISOString());
 
     if (subError) {
@@ -608,7 +626,7 @@ export async function batchCheckSubscriptions(
       .from("subscriptions")
       .select("creator_id")
       .eq(subscriptionUserColumn, fanId)
-      .eq("status", "active")
+      .in("status", ["active", "canceled"])
       .gt("current_period_end", now)
       .in("creator_id", creatorIds);
 

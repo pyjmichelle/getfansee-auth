@@ -50,6 +50,8 @@ export default function WalletPage() {
   const auth = useAuth();
   const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === "true";
   const [isLoading, setIsLoading] = useState(true);
+  const [walletError, setWalletError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   // 测试模式下预填 mock 数据，避免异步加载延迟导致截图为空
   const [availableBalance, setAvailableBalance] = useState<number>(0);
   const [pendingBalance, setPendingBalance] = useState<number>(0);
@@ -112,6 +114,7 @@ export default function WalletPage() {
     const loadData = async () => {
       try {
         setIsLoading(true);
+        setWalletError(false);
         if (!auth.authenticated || !auth.user) {
           if (isTestMode) {
             setCurrentUser({
@@ -187,8 +190,9 @@ export default function WalletPage() {
               return;
             }
 
-            setTransactions(transactionsData);
+            setWalletError(true);
           } catch (loadErr) {
+            if (mounted) setWalletError(true);
             console.error("[wallet] background load error:", loadErr);
           }
         })();
@@ -202,7 +206,7 @@ export default function WalletPage() {
     return () => {
       mounted = false;
     };
-  }, [router, isTestMode, auth.authenticated, auth.user, auth.profile]);
+  }, [router, reloadKey, isTestMode, auth.authenticated, auth.user, auth.profile]);
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -313,10 +317,8 @@ export default function WalletPage() {
     }
   };
 
-  const getTransactionType = (type: string): "recharge" | "expense" => {
-    if (type === "deposit") return "recharge";
-    return "expense";
-  };
+  const getTransactionType = (transaction: Transaction): "recharge" | "expense" =>
+    transaction.amount_cents >= 0 ? "recharge" : "expense";
 
   const getTransactionDescription = (transaction: Transaction): string => {
     if (transaction.type === "deposit") {
@@ -337,26 +339,35 @@ export default function WalletPage() {
     return transaction.type;
   };
 
-  // Calculate monthly spending
+  // The API returns recent transactions, not a full monthly account statement.
   const now = new Date();
+  const recentMonthlyExpenses = transactions.filter((transaction) => {
+    const date = new Date(transaction.created_at);
+    return (
+      transaction.amount_cents < 0 &&
+      transaction.status === "completed" &&
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear()
+    );
+  });
   const monthlySpending =
-    transactions
-      .filter((t) => {
-        if (t.type === "deposit") return false;
-        const date = new Date(t.created_at);
-        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-      })
-      .reduce((sum, t) => sum + Math.abs(t.amount_cents), 0) / 100;
+    recentMonthlyExpenses.reduce(
+      (sum, transaction) => sum + Math.abs(transaction.amount_cents),
+      0
+    ) / 100;
 
-  // Filter transactions
-  const filteredTransactions = transactions.filter((t) => {
+  const filteredTransactions = transactions.filter((transaction) => {
     if (filterType === "all") return true;
-    if (filterType === "added") return t.type === "deposit";
-    return t.type !== "deposit";
+    if (filterType === "added") return transaction.amount_cents >= 0;
+    return transaction.amount_cents < 0;
   });
 
-  const activeSubsCount = transactions.filter((t) => t.type === "subscription").length;
-  const unlockCount = transactions.filter((t) => t.type === "ppv_purchase").length;
+  const activeSubsCount = recentMonthlyExpenses.filter(
+    (transaction) => transaction.type === "subscription"
+  ).length;
+  const unlockCount = recentMonthlyExpenses.filter(
+    (transaction) => transaction.type === "ppv_purchase"
+  ).length;
   const animatedBalance = useCountUp(availableBalance, { duration: 900, decimals: 2 });
   const animatedPending = useCountUp(pendingBalance, { duration: 900, decimals: 2 });
   const animatedMonthlySpending = useCountUp(monthlySpending, { duration: 900, decimals: 2 });
@@ -382,6 +393,19 @@ export default function WalletPage() {
   return (
     <PageShell user={currentUser} notificationCount={0} maxWidth="6xl">
       <div data-testid="wallet-page">
+        {walletError && (
+          <div
+            role="alert"
+            className="card-block p-4 mb-4 flex flex-wrap items-center justify-between gap-3"
+          >
+            <p className="text-small text-text-secondary">
+              Could not load your wallet. The displayed balance may be out of date.
+            </p>
+            <Button variant="outline" onClick={() => setReloadKey((key) => key + 1)}>
+              Try again
+            </Button>
+          </div>
+        )}
         {/* Hero Balance Card — role-aware: creators see withdrawable + pending
             earnings first (F-005); Add Funds becomes a secondary action since
             "top up to avoid missing drops" doesn't apply to a creator's own wallet. */}
@@ -527,12 +551,12 @@ export default function WalletPage() {
                       <div className="flex items-start gap-4 flex-1">
                         <div
                           className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                            getTransactionType(transaction.type) === "recharge"
+                            getTransactionType(transaction) === "recharge"
                               ? "bg-success/10"
                               : "bg-brand-primary-alpha-10"
                           }`}
                         >
-                          {getTransactionType(transaction.type) === "recharge" ? (
+                          {getTransactionType(transaction) === "recharge" ? (
                             <ArrowDown className="w-5 h-5 text-success" />
                           ) : (
                             <ArrowUp className="w-5 h-5 text-wine-text" />
@@ -552,16 +576,18 @@ export default function WalletPage() {
                       <div className="text-right">
                         <div
                           className={`text-h4 font-bold ${
-                            getTransactionType(transaction.type) === "recharge"
+                            getTransactionType(transaction) === "recharge"
                               ? "text-success"
                               : "text-text-primary"
                           }`}
                         >
-                          {getTransactionType(transaction.type) === "recharge" ? "+" : "-"}$
-                          {(transaction.amount_cents / 100).toFixed(2)}
+                          {getTransactionType(transaction) === "recharge" ? "+" : "-"}$
+                          {(Math.abs(transaction.amount_cents) / 100).toFixed(2)}
                         </div>
                         <div className="text-tiny text-text-tertiary capitalize flex items-center gap-1 justify-end">
-                          <CheckCircle className="w-3 h-3 text-success" />
+                          {transaction.status === "completed" && (
+                            <CheckCircle className="w-3 h-3 text-success" />
+                          )}
                           {transaction.status}
                         </div>
                       </div>
@@ -621,7 +647,9 @@ export default function WalletPage() {
           <aside className="w-full lg:w-72 lg:shrink-0">
             <div className="sticky top-24 space-y-4">
               <div className="card-block p-5">
-                <h2 className="text-small font-semibold text-text-primary mb-4">This Month</h2>
+                <h2 className="text-small font-semibold text-text-primary mb-4">
+                  Recent Activity This Month
+                </h2>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-small text-text-tertiary flex items-center gap-2">
@@ -635,7 +663,7 @@ export default function WalletPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-small text-text-tertiary flex items-center gap-2">
                       <Calendar className="w-3.5 h-3.5 text-wine-text" />
-                      Active Subs
+                      Subscription purchases
                     </span>
                     <span className="font-bold text-wine-text">{activeSubsCount}</span>
                   </div>

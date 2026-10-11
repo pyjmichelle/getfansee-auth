@@ -16,6 +16,69 @@ import { getVisitorCountry, isCountryBlocked } from "./geo-utils";
 import { batchCheckSubscriptions, batchCheckPurchases } from "./paywall";
 import type { Post, PostVisibility } from "./types";
 
+/** Only safe metadata may cross a server/client boundary for locked content. */
+export function sanitizePostForViewer<
+  T extends {
+    content?: unknown;
+    media_url?: unknown;
+    media?: unknown;
+    is_locked?: unknown;
+  },
+>(post: T, canView: boolean): T {
+  if (canView) return { ...post, is_locked: false };
+  return {
+    ...post,
+    content: "",
+    media_url: null,
+    is_locked: true,
+    preview_enabled: false,
+    // An original video URL is never a preview: client playback limits can be bypassed.
+    media: Array.isArray(post.media)
+      ? post.media.map((media) => ({
+          id: media.id,
+          media_type: media.media_type,
+          file_name: media.file_name,
+          file_size: media.file_size,
+          sort_order: media.sort_order,
+          media_url: "",
+          preview_url: undefined,
+          watermarked_path: null,
+          is_locked: true,
+        }))
+      : undefined,
+  };
+}
+
+export async function getPostAccessMap(
+  posts: Array<{ id: string; creator_id?: string; visibility?: string }>,
+  userId: string | null
+): Promise<Map<string, boolean>> {
+  const gated = posts.filter((post) => post.creator_id !== userId && post.visibility !== "free");
+  const [subscriptions, purchases] = await Promise.all([
+    batchCheckSubscriptions(userId, [
+      ...new Set(
+        gated
+          .filter((post) => post.visibility === "subscribers")
+          .map((post) => post.creator_id)
+          .filter((id): id is string => !!id)
+      ),
+    ]),
+    batchCheckPurchases(
+      userId,
+      gated.filter((post) => post.visibility === "ppv").map((post) => post.id)
+    ),
+  ]);
+  return new Map(
+    posts.map((post) => [
+      post.id,
+      (!!userId && post.creator_id === userId) ||
+        post.visibility === "free" ||
+        (post.visibility === "subscribers" && !!subscriptions.get(post.creator_id ?? "")) ||
+        (post.visibility === "ppv" && !!purchases.get(post.id)),
+    ])
+  );
+}
+
 // 重新导出类型供其他模块使用
 export type { Post, PostVisibility };
 
@@ -158,6 +221,7 @@ export async function listCreatorPosts(
     // Use admin client to bypass RLS — creator profile pages must show all
     // posts (with lock overlays) even to fans who haven't subscribed/purchased.
     const supabase = getSupabaseAdminClient();
+    const user = await getCurrentUser();
     // 如果没有提供访客国家，尝试从 headers 获取
     if (visitorCountry === undefined) {
       visitorCountry = await getVisitorCountry();
@@ -176,21 +240,8 @@ export async function listCreatorPosts(
       // Removed debug console.log - vercel-react-best-practices
 
       if (profileError) {
-        // 如果是 "PGRST116" 错误（无法转换为单个 JSON 对象），可能是 RLS 阻止了查询
-        if (
-          profileError.code === "PGRST116" ||
-          profileError.message?.includes("row-level security")
-        ) {
-          console.warn(
-            `[posts] listCreatorPosts: RLS may be blocking query for creator ${creatorId}. Please execute migrations/016_geo_blocking_rls_fix.sql`
-          );
-        } else {
-          console.warn(
-            `[posts] listCreatorPosts: Cannot fetch blocked_countries for creator ${creatorId}. Error: ${profileError.message}`
-          );
-        }
-        // 如果无法查询 blocked_countries（可能是 RLS 限制），继续查询 posts
-        // 注意：这需要执行 migrations/016_geo_blocking_rls_fix.sql 来修复
+        console.error("[posts] Cannot verify creator geographic restrictions", profileError);
+        return [];
       } else if (profileData) {
         const blockedCountries = profileData.blocked_countries;
         if (blockedCountries && Array.isArray(blockedCountries) && blockedCountries.length > 0) {
@@ -213,12 +264,13 @@ export async function listCreatorPosts(
     }
 
     // 查询 posts（过滤已删除的，不再需要 JOIN profiles，因为我们已经单独查询了）
-    const { data, error } = await supabase
+    let postsQuery = supabase
       .from("posts")
       .select("*")
       .eq("creator_id", creatorId)
-      .is("deleted_at", null) // 只查询未删除的帖子
-      .order("created_at", { ascending: false });
+      .is("deleted_at", null);
+    if (user?.id !== creatorId) postsQuery = postsQuery.eq("review_status", "approved");
+    const { data, error } = await postsQuery.order("created_at", { ascending: false });
 
     if (error) {
       console.error("[posts] listCreatorPosts error:", error);
@@ -277,7 +329,8 @@ export async function listCreatorPosts(
       });
     }
 
-    return posts;
+    const access = await getPostAccessMap(posts, user?.id ?? null);
+    return posts.map((post) => sanitizePostForViewer(post, access.get(post.id) === true));
   } catch (err) {
     console.error("[posts] listCreatorPosts exception:", err);
     return [];
@@ -388,6 +441,8 @@ export async function listFeed(
         created_at
       `
       )
+      .is("deleted_at", null)
+      .eq("review_status", "approved")
       .order("created_at", { ascending: false })
       .range(offset, offset + limit * 2 - 1); // 获取更多，因为可能被地理屏蔽过滤掉一些
 
@@ -420,13 +475,17 @@ export async function listFeed(
       blocked_countries: string[] | null;
       is_verified: boolean | null;
     }
-    const { data: creatorProfiles } =
+    const { data: creatorProfiles, error: creatorProfilesError } =
       creatorIds.length > 0
         ? await adminSupabase
             .from("public_creator_profiles")
             .select("id, display_name, avatar_url, blocked_countries, is_verified")
             .in("id", creatorIds)
-        : { data: [] as CreatorProfileRow[] };
+        : { data: [] as CreatorProfileRow[], error: null };
+    if (visitorCountry && creatorProfilesError) {
+      console.error("[posts] Cannot verify feed geographic restrictions", creatorProfilesError);
+      return [];
+    }
     const creatorProfileMap = new Map(
       ((creatorProfiles || []) as CreatorProfileRow[]).map((profile) => [profile.id, profile])
     );
@@ -457,79 +516,7 @@ export async function listFeed(
     // 批量检查权限（订阅和购买状态）- 使用批量查询避免 N+1 问题
     // 注意：这些函数已在文件顶部导入，因为 listFeed 只在服务端使用
     const postIds = filteredData.map((p) => p.id);
-    const canViewMap = new Map<string, boolean>();
-
-    if (userId) {
-      // 先处理不需要查询的 posts（creator 本人和免费内容）
-      const postsToCheck: Array<{
-        postId: string;
-        creatorId: string;
-        visibility: string;
-        priceCents: number;
-      }> = [];
-
-      filteredData.forEach((post: PostWithProfile) => {
-        const postId = post.id;
-        const creatorId = post.creator_id;
-        const visibility = post.visibility || "free";
-        const priceCents = post.price_cents || 0;
-
-        // Creator 本人永远可见
-        if (creatorId === userId) {
-          canViewMap.set(postId, true);
-          return;
-        }
-
-        // 免费内容永远可见
-        if (visibility === "free") {
-          canViewMap.set(postId, true);
-          return;
-        }
-
-        // 需要检查的 posts
-        postsToCheck.push({ postId, creatorId, visibility, priceCents });
-      });
-
-      // 批量查询订阅和购买状态（避免 N+1 查询）
-      if (postsToCheck.length > 0) {
-        // 收集需要检查的 creator IDs 和 post IDs
-        const creatorIdsToCheck = Array.from(
-          new Set(
-            postsToCheck
-              .filter((p) => p.visibility === "subscribers" || p.priceCents === 0)
-              .map((p) => p.creatorId)
-          )
-        );
-        const postIdsToCheck = postsToCheck
-          .filter((p) => p.visibility === "ppv" && p.priceCents > 0)
-          .map((p) => p.postId);
-
-        // 并行执行批量查询
-        const [subscriptionMap, purchaseMap] = await Promise.all([
-          batchCheckSubscriptions(userId, creatorIdsToCheck),
-          batchCheckPurchases(userId, postIdsToCheck),
-        ]);
-
-        // 根据查询结果设置可见性
-        postsToCheck.forEach(({ postId, creatorId, visibility, priceCents }) => {
-          if (visibility === "subscribers" || priceCents === 0) {
-            // 订阅者专享：检查订阅状态
-            canViewMap.set(postId, subscriptionMap.get(creatorId) || false);
-          } else if (visibility === "ppv" && priceCents > 0) {
-            // PPV：检查购买状态
-            canViewMap.set(postId, purchaseMap.get(postId) || false);
-          } else {
-            canViewMap.set(postId, false);
-          }
-        });
-      }
-    } else {
-      // 未登录用户：只有免费内容可见
-      for (const post of filteredData) {
-        const visibility = post.visibility || "free";
-        canViewMap.set(post.id, visibility === "free");
-      }
-    }
+    const canViewMap = await getPostAccessMap(filteredData, userId);
 
     // Which of these posts has the current user already liked? Without this,
     // the like button always renders unliked on load even after a real
@@ -606,17 +593,11 @@ export async function listFeed(
         (post as Post).media = mediaList.map((m) => {
           const isLocked = !canView && post.visibility !== "free";
 
-          // 如果未购买且是视频，返回预览 URL（原始 URL，前端控制 10 秒）
-          // 如果未购买且是图片，不返回原始 URL（前端显示锁定遮罩）
           return {
             id: m.id,
-            media_url:
-              isLocked && m.media_type === "video" ? m.media_url : isLocked ? "" : m.media_url, // 图片锁定时不返回 URL
-            preview_url:
-              isLocked && m.media_type === "video" && post.preview_enabled
-                ? m.media_url
-                : undefined, // 视频预览 URL
-            watermarked_path: m.watermarked_path,
+            media_url: isLocked ? "" : m.media_url,
+            preview_url: undefined,
+            watermarked_path: isLocked ? null : m.watermarked_path,
             media_type: m.media_type,
             file_name: m.file_name,
             file_size: m.file_size,
@@ -627,7 +608,7 @@ export async function listFeed(
       });
     }
 
-    return posts;
+    return posts.map((post) => sanitizePostForViewer(post, canViewMap.get(post.id) === true));
   } catch (err) {
     console.error("[posts] listFeed exception:", err);
     return [];

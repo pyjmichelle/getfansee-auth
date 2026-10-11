@@ -3,122 +3,53 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/authz";
 import { jsonError } from "@/lib/http-errors";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
+import { isLocalDevelopmentOrTest } from "@/lib/test-environment";
 
-type RechargePayload = {
-  amount: number; // 美元金额
-};
-
-/**
- * Mock recharge is a TEST/DEV-ONLY facility (used by E2E suites).
- * During the Pre-Payment Alpha there is no real fiat top-up path, so this
- * endpoint is hard-disabled in production to avoid presenting a fake
- * payment flow to real users.
- */
-function isMockRechargeAllowed(): boolean {
-  return (
-    process.env.E2E === "1" ||
-    process.env.PLAYWRIGHT_TEST_MODE === "true" ||
-    process.env.NODE_ENV === "development"
-  );
-}
-
+/** Test-only funding: balance and deposit record commit in one transaction. */
 export async function POST(request: NextRequest) {
   try {
-    if (!isMockRechargeAllowed()) {
+    if (!isLocalDevelopmentOrTest()) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Wallet top-ups are not available during the Alpha. Coming soon.",
-        },
+        { success: false, error: "Mock top-ups are unavailable." },
         { status: 403 }
       );
     }
-
-    // 路由层显式鉴权（验证用户身份，后续使用 admin client 避免 auth.uid() 问题）
     const { user } = await requireUser();
-
-    const body = (await request.json()) as RechargePayload;
-    const { amount } = body;
-
-    if (!amount || amount <= 0) {
-      return NextResponse.json({ success: false, error: "Invalid amount" }, { status: 400 });
+    const body = await request.json().catch(() => null);
+    const amount = body?.amount;
+    const amountCents = typeof amount === "number" ? Math.round(amount * 100) : NaN;
+    if (
+      !Number.isFinite(amount) ||
+      !Number.isSafeInteger(amountCents) ||
+      amountCents < 1 ||
+      amountCents > 50_000
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Amount must be between $0.01 and $500." },
+        { status: 400 }
+      );
     }
-
-    // Use admin client to bypass auth.uid() requirement in recharge_wallet RPC.
-    // The user has already been authenticated by requireUser() above.
-    // The admin client has full trust to call SECURITY DEFINER functions.
-    const adminSupabase = getSupabaseAdminClient();
-    const amountCents = Math.round(amount * 100);
-    // 幂等键：优先取请求头，否则生成新 UUID
-    const idempotencyKey = request.headers.get("Idempotency-Key") ?? randomUUID();
-
-    // Direct atomic wallet update using admin client:
-    // 1. Idempotency check (prevent duplicate charges)
-    const { data: existingTx } = await adminSupabase
-      .from("transactions")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("type", "deposit")
-      .eq("status", "completed")
-      .contains("metadata", { idempotency_key: idempotencyKey })
-      .maybeSingle();
-
-    if (existingTx) {
-      // Idempotent response: return current balance
-      const { data: wallet } = await adminSupabase
-        .from("wallet_accounts")
-        .select("available_balance_cents")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      return NextResponse.json({
-        success: true,
-        balance: (wallet?.available_balance_cents ?? 0) / 100,
-        idempotent: true,
-      });
+    const nonce = request.headers.get("Idempotency-Key") ?? randomUUID();
+    if (!nonce.trim() || nonce.length > 200) {
+      return NextResponse.json(
+        { success: false, error: "Invalid idempotency key" },
+        { status: 400 }
+      );
     }
-
-    // 2. Insert deposit transaction
-    const { error: txError } = await adminSupabase.from("transactions").insert({
-      user_id: user.id,
-      type: "deposit",
-      amount_cents: amountCents,
-      status: "completed",
-      metadata: {
-        payment_method: "mock",
-        idempotency_key: idempotencyKey,
-      },
+    const { data, error } = await getSupabaseAdminClient().rpc("recharge_wallet", {
+      p_user_id: user.id,
+      p_amount_cents: amountCents,
+      p_idempotency_key: `mock_${user.id}_${nonce}`,
     });
-
-    if (txError) {
-      console.error("[api/wallet/recharge] insert transaction error:", txError);
+    if (error || data?.success !== true) {
       return NextResponse.json({ success: false, error: "Recharge failed" }, { status: 500 });
     }
-
-    const { data: incrementData, error: walletError } = await adminSupabase.rpc(
-      "increment_wallet_available",
-      {
-        p_user_id: user.id,
-        p_cents: amountCents,
-      }
-    );
-
-    if (walletError) {
-      console.error("[api/wallet/recharge] increment wallet error:", walletError);
-      return NextResponse.json({ success: false, error: "Recharge failed" }, { status: 500 });
-    }
-
-    const increment = (
-      typeof incrementData === "string" ? JSON.parse(incrementData) : (incrementData ?? {})
-    ) as { success?: boolean; balance_cents?: number };
-    if (increment.success !== true) {
-      return NextResponse.json({ success: false, error: "Recharge failed" }, { status: 500 });
-    }
-
     return NextResponse.json({
       success: true,
-      balance: (increment.balance_cents ?? amountCents) / 100,
+      balance: data.balance_cents / 100,
+      idempotent: data.idempotent === true,
     });
-  } catch (err: unknown) {
-    return jsonError(err);
+  } catch (error) {
+    return jsonError(error);
   }
 }

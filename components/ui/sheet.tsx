@@ -100,7 +100,7 @@ function SheetContent({
         <SheetPrimitive.Close
           className={cn(
             "absolute top-4 right-4",
-            "size-6 rounded-[var(--radius-xs)]",
+            "size-11 rounded-[var(--radius-xs)]",
             "flex items-center justify-center",
             "text-text-muted hover:text-text-primary hover:bg-white/10",
             "transition-colors duration-150",

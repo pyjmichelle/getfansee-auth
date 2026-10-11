@@ -1,3 +1,5 @@
+import { arePaymentsLive } from "@/lib/payments-live";
+import { getRequestJurisdiction } from "@/lib/compliance/request-geo";
 import { NextRequest, NextResponse } from "next/server";
 import {
   stripe,
@@ -26,7 +28,7 @@ type CheckoutPayload = {
  */
 export async function POST(request: NextRequest) {
   try {
-    if (!isStripeFiatEnabled()) {
+    if (!isStripeFiatEnabled() || !arePaymentsLive()) {
       return NextResponse.json(
         { success: false, error: "Card top-up is not available." },
         { status: 503 }
@@ -41,6 +43,12 @@ export async function POST(request: NextRequest) {
     }
 
     const { user } = await requireUser();
+    if (!getRequestJurisdiction(request.headers).paymentsAllowed) {
+      return NextResponse.json(
+        { success: false, error: "Payments are not available in your region yet." },
+        { status: 403 }
+      );
+    }
     const body = (await request.json()) as CheckoutPayload;
     const { amountUsd } = body;
 

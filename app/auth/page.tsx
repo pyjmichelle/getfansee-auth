@@ -1,4 +1,5 @@
 import AuthPageClient from "./AuthPageClient";
+import { isExplicitTestEnvironment } from "@/lib/test-environment";
 
 type AuthPageProps = {
   searchParams: Promise<{
@@ -30,6 +31,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
   return (
     <AuthPageClient
       initialMode={normalizedMode}
+      testMode={isExplicitTestEnvironment()}
       isInvited={isInvited}
       refName={refName}
       redirectTo={redirectTo}

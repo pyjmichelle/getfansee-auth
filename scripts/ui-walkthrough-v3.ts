@@ -1,3 +1,9 @@
+import { assertDedicatedTestProject } from "./utils/assert-test-environment";
+function requireTestPassword(): string {
+  const password = process.env.E2E_TEST_USER_PASSWORD;
+  if (!password) throw new Error("E2E_TEST_USER_PASSWORD is required.");
+  return password;
+}
 /**
  * UI 走查脚本 v3 — 通过 /api/test/session 正确注入 session
  * 运行: pnpm tsx scripts/ui-walkthrough-v3.ts
@@ -21,6 +27,7 @@ if (!SUPABASE_URL || !SERVICE_KEY) {
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
+assertDedicatedTestProject(SUPABASE_URL);
 const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
@@ -30,7 +37,7 @@ const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
 async function createUser(role: "fan" | "creator") {
   const ts = Date.now();
   const email = `wk3-${role}-${ts}@example.com`;
-  const password = "WalkThrough2026!";
+  const password = requireTestPassword();
   const { data, error } = await admin.auth.admin.createUser({
     email,
     password,
@@ -296,9 +303,9 @@ async function main() {
 
     const mbPage = await mbCtx.newPage();
 
-    const fanPages = FAN_PAGES.filter(([, n]) => n !== "auth").map(
-      ([url, name]) => [url, name] as const
-    );
+    const fanPages: Array<readonly [string, string]> = FAN_PAGES.filter(
+      ([, n]) => n !== "auth"
+    ).map(([url, name]) => [url, name] as const);
     if (targets.creatorId) {
       fanPages.push([`/creator/${targets.creatorId}`, "creator-profile"]);
     }
@@ -385,7 +392,7 @@ async function main() {
       ["/dmca", "dmca"],
     ] as const;
 
-    const pcDynamicPages = [...pcPages];
+    const pcDynamicPages: Array<readonly [string, string]> = [...pcPages];
     if (targets.creatorId) {
       pcDynamicPages.push([`/creator/${targets.creatorId}`, "creator-profile"]);
     }

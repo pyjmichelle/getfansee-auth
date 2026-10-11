@@ -1,3 +1,4 @@
+import { assertDedicatedTestProject } from "./utils/assert-test-environment";
 /**
  * 直接调用 createPost 函数进行调试
  * 使用 Service Role Key 绕过 RLS
@@ -12,6 +13,7 @@ if (!supabaseUrl || !supabaseServiceKey) {
   process.exit(1);
 }
 
+assertDedicatedTestProject(supabaseUrl);
 const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,

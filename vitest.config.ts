@@ -4,7 +4,10 @@ import path from "path";
 export default defineConfig({
   test: {
     environment: "node",
-    include: ["tests/unit/**/*.test.ts", "tests/integration/**/*.test.ts"],
+    include:
+      process.env.VITEST_UNIT_ONLY === "true"
+        ? ["tests/unit/**/*.test.ts"]
+        : ["tests/unit/**/*.test.ts", "tests/integration/**/*.test.ts"],
     exclude: ["node_modules", "dist", ".next"],
     coverage: {
       provider: "v8",

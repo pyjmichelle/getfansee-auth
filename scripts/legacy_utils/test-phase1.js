@@ -12,7 +12,12 @@
  *   2. 已执行 migrations/007_phase1_posts.sql
  */
 
-const { createClient } = require('@supabase/supabase-js')
+const { createClient: createUnsafeClient } = require('@supabase/supabase-js')
+const { assertDedicatedTestProject, requireTestPassword } = require('../utils/assert-test-environment.cjs')
+function createClient(url, ...args) {
+  assertDedicatedTestProject(url)
+  return createUnsafeClient(url, ...args)
+}
 const { readFileSync } = require('fs')
 const { join } = require('path')
 
@@ -376,7 +381,7 @@ async function testRegisterAndLogin(anonClient) {
   log('\n📝 测试 3: 注册新用户并登录', 'blue')
   
   const testEmail = `phase1-test-${Date.now()}@example.com`
-  const testPassword = 'TestPassword123!'
+  const testPassword = requireTestPassword()
   
   try {
     const { data: signUpData, error: signUpError } = await anonClient.auth.signUp({

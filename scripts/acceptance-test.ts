@@ -1,3 +1,9 @@
+import { assertDedicatedTestProject, assertLocalTestTarget } from "./utils/assert-test-environment";
+function requireTestPassword(): string {
+  const password = process.env.E2E_TEST_USER_PASSWORD;
+  if (!password) throw new Error("E2E_TEST_USER_PASSWORD is required.");
+  return password;
+}
 /**
  * MVP 验收测试脚本
  *
@@ -15,6 +21,7 @@ import { createClient } from "@supabase/supabase-js";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
+assertLocalTestTarget(BASE_URL);
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
   console.error("❌ Missing environment variables:");
@@ -23,6 +30,7 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
   process.exit(1);
 }
 
+assertDedicatedTestProject(SUPABASE_URL);
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
@@ -67,7 +75,7 @@ async function runAcceptanceTest(round: number): Promise<TestResult> {
     const creatorEmail = `acceptance-creator-${timestamp}@test.com`;
     const { data: creatorAuth, error: creatorError } = await supabase.auth.admin.createUser({
       email: creatorEmail,
-      password: "TestPassword123!",
+      password: requireTestPassword(),
       email_confirm: true,
     });
 
@@ -120,7 +128,7 @@ async function runAcceptanceTest(round: number): Promise<TestResult> {
     const fanEmail = `acceptance-fan-${timestamp}@test.com`;
     const { data: fanAuth, error: fanError } = await supabase.auth.admin.createUser({
       email: fanEmail,
-      password: "TestPassword123!",
+      password: requireTestPassword(),
       email_confirm: true,
     });
 

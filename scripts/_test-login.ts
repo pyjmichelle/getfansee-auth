@@ -1,4 +1,10 @@
 #!/usr/bin/env tsx
+import { assertDedicatedTestProject } from "./utils/assert-test-environment";
+function requireTestPassword(): string {
+  const password = process.env.E2E_TEST_USER_PASSWORD;
+  if (!password) throw new Error("E2E_TEST_USER_PASSWORD is required.");
+  return password;
+}
 /**
  * Test Supabase Login Directly
  */
@@ -25,6 +31,7 @@ if (fs.existsSync(envLocalPath)) {
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
+assertDedicatedTestProject(SUPABASE_URL);
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 async function testLogin() {
@@ -33,7 +40,7 @@ async function testLogin() {
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email: "test-fan@example.com",
-    password: "TestPassword123!",
+    password: requireTestPassword(),
   });
 
   if (error) {

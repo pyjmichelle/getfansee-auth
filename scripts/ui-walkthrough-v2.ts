@@ -1,3 +1,9 @@
+import { assertDedicatedTestProject } from "./utils/assert-test-environment";
+function requireTestPassword(): string {
+  const password = process.env.E2E_TEST_USER_PASSWORD;
+  if (!password) throw new Error("E2E_TEST_USER_PASSWORD is required.");
+  return password;
+}
 /**
  * UI 走查脚本 v2 — 登录后完整截图
  * 使用 Supabase Admin API 创建测试用户，Playwright 注入 session，覆盖全部页面
@@ -20,6 +26,7 @@ const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 // 确保截图目录存在
 fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
 
+assertDedicatedTestProject(SUPABASE_URL);
 const adminClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
@@ -34,7 +41,7 @@ interface TestUser {
 async function createTestUser(role: "fan" | "creator", suffix: string): Promise<TestUser> {
   const ts = Date.now();
   const email = `ui-walkthrough-${role}-${suffix}-${ts}@example.com`;
-  const password = "WalkThrough2026!";
+  const password = requireTestPassword();
 
   const { data, error } = await adminClient.auth.admin.createUser({
     email,
@@ -73,7 +80,8 @@ async function injectSession(page: import("playwright").Page, email: string, pas
   // Use the Supabase JS SDK directly via page.evaluate
   await page.evaluate(
     async ({ url, key, e, p }) => {
-      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+      const browserModuleUrl = "https://esm.sh/@supabase/supabase-js@2";
+      const { createClient } = await import(browserModuleUrl);
       const sb = createClient(url, key);
       const { error } = await sb.auth.signInWithPassword({
         email: e,

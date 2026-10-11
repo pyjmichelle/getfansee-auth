@@ -8,6 +8,17 @@ history_migration="migrations/060_preserve_financial_history.sql"
 test -f "$migration" || { echo "ERROR: financial security migration is missing"; exit 1; }
 test -f "$history_migration" || { echo "ERROR: financial history migration is missing"; exit 1; }
 
+for followup in \
+  061_payment_intent_integrity \
+  062_kyc_and_profile_authorization \
+  063_atomic_mock_recharge \
+  064_withdrawal_earned_balance; do
+  test -f "migrations/${followup}.sql" || {
+    echo "ERROR: required follow-up migration is missing: ${followup}"
+    exit 1
+  }
+done
+
 if rg -n 'priceCents\?:' app/api/unlock/route.ts >/dev/null; then
   echo "ERROR: /api/unlock must not accept a client-supplied price"
   exit 1

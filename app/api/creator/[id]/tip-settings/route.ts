@@ -1,3 +1,4 @@
+import { resolvePlatformFeeBps } from "@/lib/constants/fees";
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { DEFAULT_TIP_SETTINGS, type CreatorTipSettings, type TipSupporter } from "@/lib/tips";
@@ -20,13 +21,32 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
     const admin = getSupabaseAdminClient();
 
-    const { data: row } = await admin
+    const { data: creator, error: creatorError } = await admin
+      .from("profiles")
+      .select("role, commission_free_until")
+      .eq("id", id)
+      .maybeSingle();
+    if (creatorError)
+      return NextResponse.json(
+        { success: false, error: "Tip settings unavailable" },
+        { status: 503 }
+      );
+    if (creator?.role !== "creator")
+      return NextResponse.json({ success: false, error: "Creator not found" }, { status: 404 });
+    const feeBps = resolvePlatformFeeBps({ commissionFreeUntil: creator.commission_free_until });
+    const { data: row, error: settingsError } = await admin
       .from("creator_tip_settings")
       .select(
         "enabled, unit_label, unit_emoji, preset_amounts_cents, thank_you_message, goal_enabled, goal_title, goal_target_cents, goal_started_at, show_supporters"
       )
       .eq("creator_id", id)
       .maybeSingle();
+
+    if (settingsError)
+      return NextResponse.json(
+        { success: false, error: "Tip settings unavailable" },
+        { status: 503 }
+      );
 
     // No row → treat as default-enabled with defaults.
     const settings: CreatorTipSettings = row ? (row as CreatorTipSettings) : DEFAULT_TIP_SETTINGS;
@@ -35,6 +55,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({
         success: true,
         settings: { ...settings },
+        fee_bps: feeBps,
         goal: null,
         supporters: [],
       });
@@ -61,7 +82,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     if (settings.show_supporters) {
       const { data: recentTips } = await admin
         .from("tips")
-        .select("fan_id, amount_cents, message, created_at")
+        .select("fan_id, amount_cents, created_at")
         .eq("creator_id", id)
         .order("created_at", { ascending: false })
         .limit(SUPPORTER_LIMIT);
@@ -80,14 +101,15 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
             display_name: (p?.display_name as string) || "Supporter",
             avatar_url: (p?.avatar_url as string) || null,
             amount_cents: t.amount_cents as number,
-            message: (t.message as string) || null,
+            // Tip messages are creator-visible, never public supporter content.
+            message: null,
             created_at: t.created_at as string,
           };
         });
       }
     }
 
-    return NextResponse.json({ success: true, settings, goal, supporters });
+    return NextResponse.json({ success: true, settings, fee_bps: feeBps, goal, supporters });
   } catch (err: unknown) {
     console.error("[creator tip-settings] GET error", err);
     return NextResponse.json(

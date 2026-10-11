@@ -133,7 +133,7 @@ export default function CreatorProfilePage() {
     price: number;
     title?: string;
   } | null>(null);
-  const [subscriptionPrice, setSubscriptionPrice] = useState(9.99);
+  const [subscriptionPrice, setSubscriptionPrice] = useState(0);
   const [postViewStates, setPostViewStates] = useState<Map<string, boolean>>(new Map());
   const [activeTab, setActiveTab] = useState<"posts" | "about">("posts");
   const [selectedFilter, setSelectedFilter] = useState("All");
@@ -290,10 +290,8 @@ export default function CreatorProfilePage() {
           external_links: creator.external_links ?? [],
           tags: creator.tags ?? [],
         });
-        // Subscription price (cents → dollars); default 9.99 if not set
-        if (creator.subscription_price_cents && creator.subscription_price_cents > 0) {
-          setSubscriptionPrice(creator.subscription_price_cents / 100);
-        }
+        // Show the server price; never invent a paid plan for an unset price.
+        setSubscriptionPrice((creator.subscription_price_cents ?? 0) / 100);
         setSubscribersCount(creator.subscribers_count || creator.subscriber_count || 0);
       } catch (err) {
         console.error("[creator] loadData error", err);
@@ -326,28 +324,10 @@ export default function CreatorProfilePage() {
 
   // Called by PaywallModal.onSuccess after user confirms
   const confirmSubscribe = async () => {
-    setIsSubscribing(true);
-    try {
-      const response = await fetch("/api/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ creatorId }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        setIsSubscribed(true);
-        toast.success(`Subscribed to ${creatorProfile?.display_name || "creator"}!`);
-        await reloadPosts();
-      } else {
-        toast.error(data.error || "Subscription failed. Please try again.");
-        throw new Error(data.error || "Subscription failed");
-      }
-    } catch (err) {
-      console.error("[creator] subscribe error", err);
-      throw err;
-    } finally {
-      setIsSubscribing(false);
-    }
+    // PaywallModal already completed the purchase. Refresh only; never charge again.
+    setIsSubscribed(true);
+    toast.success(`Subscribed to ${creatorProfile?.display_name || "creator"}!`);
+    await reloadPosts();
   };
 
   const handleCancelSubscription = async () => {
@@ -359,11 +339,14 @@ export default function CreatorProfilePage() {
         body: JSON.stringify({ creatorId }),
       });
       const data = await response.json();
-      if (data.success) {
-        setIsSubscribed(false);
+      if (response.ok && data.success) {
+        toast.success("Subscription canceled. Your paid access remains until the period ends.");
         await reloadPosts();
+      } else {
+        toast.error(data.error || "Could not cancel your subscription. Please try again.");
       }
     } catch (err) {
+      toast.error("Could not cancel your subscription. Please try again.");
       console.error("[creator] cancelSubscription error", err);
     } finally {
       setIsSubscribing(false);
@@ -620,14 +603,16 @@ export default function CreatorProfilePage() {
               ) : (
                 <Button
                   onClick={handleSubscribe}
-                  disabled={isSubscribing}
+                  disabled={isSubscribing || (WALLET_PATH_ACTIVE && subscriptionPrice <= 0)}
                   className="rounded-full px-5 gap-1.5 active:scale-[0.98]"
                   data-testid="subscribe-button"
                   aria-label="Subscribe to this creator"
                 >
                   <Plus size={14} />
                   {WALLET_PATH_ACTIVE
-                    ? `Subscribe for ${formatUsd(Math.round(subscriptionPrice * 100))}/month`
+                    ? subscriptionPrice > 0
+                      ? `Subscribe for ${formatUsd(Math.round(subscriptionPrice * 100))} / 30 days`
+                      : "No paid subscription"
                     : "View Options"}
                 </Button>
               )}
@@ -949,7 +934,7 @@ export default function CreatorProfilePage() {
           ) : (
             <Button
               onClick={handleSubscribe}
-              disabled={isSubscribing}
+              disabled={isSubscribing || (WALLET_PATH_ACTIVE && subscriptionPrice <= 0)}
               className="w-full rounded-xl min-h-[52px] font-bold active:scale-[0.98]"
               data-testid="subscribe-button"
               aria-label="Subscribe to this creator"
@@ -957,7 +942,9 @@ export default function CreatorProfilePage() {
               {isSubscribing
                 ? "Processing…"
                 : WALLET_PATH_ACTIVE
-                  ? `Subscribe for ${formatUsd(Math.round(subscriptionPrice * 100))}/mo`
+                  ? subscriptionPrice > 0
+                    ? `Subscribe for ${formatUsd(Math.round(subscriptionPrice * 100))} / 30 days`
+                    : "No paid subscription"
                   : "View Options"}
             </Button>
           )}

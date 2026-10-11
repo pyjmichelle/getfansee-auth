@@ -1,4 +1,10 @@
 #!/usr/bin/env tsx
+import { assertDedicatedTestProject } from "./utils/assert-test-environment";
+function requireTestPassword(): string {
+  const password = process.env.E2E_TEST_USER_PASSWORD;
+  if (!password) throw new Error("E2E_TEST_USER_PASSWORD is required.");
+  return password;
+}
 /**
  * Verify the NEW session route logic: local JWT claim validation
  * Simulates exactly what the route does with real Supabase tokens.
@@ -78,6 +84,7 @@ async function main() {
 
   console.log("=== Verify Session Route: Local JWT Validation ===\n");
 
+  assertDedicatedTestProject(url);
   const admin = createClient(url, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
@@ -89,7 +96,7 @@ async function main() {
   const tempEmail = `verify-session-${Date.now()}@example.test`;
   const { data: tempUserData } = await admin.auth.admin.createUser({
     email: tempEmail,
-    password: "TempVerify123!",
+    password: requireTestPassword(),
     email_confirm: true,
   });
   const tempUser = tempUserData?.user;
@@ -102,7 +109,7 @@ async function main() {
   console.log("--- Test 1: Fresh sign-in token ---");
   const { data: s1 } = await anonClient.auth.signInWithPassword({
     email: tempEmail,
-    password: "TempVerify123!",
+    password: requireTestPassword(),
   });
   const token1 = s1.session?.access_token;
   if (!token1) {
@@ -121,7 +128,7 @@ async function main() {
   await anonClient.auth.signOut();
   const { data: s2 } = await anonClient.auth.signInWithPassword({
     email: tempEmail,
-    password: "TempVerify123!",
+    password: requireTestPassword(),
   });
   const token2 = s2.session?.access_token;
   if (!token2) {

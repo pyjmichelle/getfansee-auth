@@ -6,6 +6,17 @@ DECLARE
   v_bad_fk record;
   v_restrictive_fk_count integer;
 BEGIN
+  IF has_table_privilege('authenticated', 'public.creator_verifications', 'INSERT')
+     OR has_table_privilege('authenticated', 'public.creator_verifications', 'UPDATE')
+     OR has_table_privilege('anon', 'public.creator_verifications', 'INSERT') THEN
+    RAISE EXCEPTION 'KYC decisions remain browser-writable; apply migration 062';
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger WHERE tgrelid = 'public.posts'::regclass
+      AND tgname = 'protect_post_moderation_fields' AND tgenabled <> 'D'
+  ) THEN
+    RAISE EXCEPTION 'post moderation-field protection is missing';
+  END IF;
   IF EXISTS (
     SELECT 1
     FROM pg_policies
@@ -43,7 +54,7 @@ BEGIN
         'reverse_consumption_order', 'refund_unspent_balance',
         'reconciliation_report', 'revenue_report', 'nexus_report',
         'increment_wallet_available', 'request_withdrawal',
-        'decide_withdrawal', 'recharge_wallet', 'unlock_ppv',
+        'decide_withdrawal', 'creator_earned_balances', 'recharge_wallet', 'unlock_ppv',
         'rpc_purchase_post'
       ])
   LOOP

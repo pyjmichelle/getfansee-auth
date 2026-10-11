@@ -1,3 +1,9 @@
+import { assertDedicatedTestProject } from "./utils/assert-test-environment";
+function requireTestPassword(): string {
+  const password = process.env.E2E_TEST_USER_PASSWORD;
+  if (!password) throw new Error("E2E_TEST_USER_PASSWORD is required.");
+  return password;
+}
 /**
  * 填充 Feed 假数据脚本
  *
@@ -66,6 +72,7 @@ if (!supabaseUrl || !serviceKey) {
   process.exit(1);
 }
 
+assertDedicatedTestProject(supabaseUrl);
 const supabase = createClient(supabaseUrl, serviceKey);
 
 // 假数据：Creator 信息（使用 ui-avatars.com，更可靠）
@@ -345,44 +352,32 @@ async function seedFeedData() {
     const creatorIds: string[] = [];
 
     for (const creatorInfo of demoCreators) {
-      // 检查是否已存在同名 creator
-      const { data: existing } = await supabase
-        .from("creators")
-        .select("id")
-        .eq("display_name", creatorInfo.display_name)
-        .limit(1)
-        .maybeSingle();
-
-      if (existing) {
-        console.log(`✅ Creator 已存在: ${creatorInfo.display_name} (${existing.id})`);
-        creatorIds.push(existing.id);
-        // 更新 creator 信息（确保 bio 和 avatar 是最新的）
-        await supabase
-          .from("creators")
-          .update({
-            bio: creatorInfo.bio,
-            avatar_url: creatorInfo.avatar_url,
-          })
-          .eq("id", existing.id);
-        // 同时更新 profiles 表的 avatar_url（因为 listFeed 从 profiles 获取）
-        await supabase
-          .from("profiles")
-          .update({
-            avatar_url: creatorInfo.avatar_url,
-          })
-          .eq("id", existing.id);
+      // Fixture identity is scoped to an exact email and trusted app metadata.
+      // Public display names must never identify accounts that a seed may overwrite.
+      const slug = creatorInfo.display_name.toLowerCase().replace(/\s+/g, "-");
+      const email = `seed-feed-${slug}@example.com`;
+      let existingUser: { id: string; app_metadata: Record<string, unknown> } | undefined;
+      for (let page = 1; ; page += 1) {
+        const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 200 });
+        if (error) throw error;
+        existingUser = data.users.find((user) => user.email?.toLowerCase() === email);
+        if (existingUser || data.users.length < 200) break;
+      }
+      if (existingUser) {
+        if (existingUser.app_metadata.fixture !== "seed-feed-data") {
+          throw new Error("Refusing to overwrite an account without the seed fixture marker.");
+        }
+        creatorIds.push(existingUser.id);
         continue;
       }
 
-      // 创建新用户作为 creator
-      const timestamp = Date.now();
-      const email = `demo-${creatorInfo.display_name.toLowerCase().replace(/\s+/g, "-")}-${timestamp}@example.com`;
-      const password = "DemoPassword123!";
+      const password = requireTestPassword();
 
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email,
         password,
         email_confirm: true,
+        app_metadata: { fixture: "seed-feed-data" },
       });
 
       if (authError || !authData?.user) {

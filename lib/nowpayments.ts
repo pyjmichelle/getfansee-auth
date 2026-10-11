@@ -59,6 +59,7 @@ export async function createNowPaymentsInvoice(params: {
 
   const res = await fetch(`${getNowPaymentsApiBase()}/invoice`, {
     method: "POST",
+    signal: AbortSignal.timeout(15_000),
     headers: {
       "x-api-key": apiKey,
       "Content-Type": "application/json",
@@ -75,8 +76,7 @@ export async function createNowPaymentsInvoice(params: {
   });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`NowPayments invoice creation failed (${res.status}): ${text}`);
+    throw new Error(`NowPayments invoice creation failed (${res.status})`);
   }
 
   return (await res.json()) as NowPaymentsInvoice;

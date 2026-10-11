@@ -20,8 +20,11 @@ credentials in a public environment or reuse the production project for QA.
 
 ## 2. Apply database containment
 
-Apply migrations `059_financial_security_lockdown.sql` and
-`060_preserve_financial_history.sql` to the E2E project first, then production.
+Apply migrations `059` through `064` in numeric order to the E2E project first,
+then production after the release gate. The follow-up migrations cover payment
+intent binding, KYC/profile/moderation authorization, atomic mock recharge, and
+withdrawals capped by earned liabilities. Writing these files does not deploy
+them: until they are applied, the live database does not have these protections.
 Use the normal migration mechanism and preserve its audit log.
 
 Run the read-only live check after each deployment:
@@ -69,3 +72,24 @@ Merge only after CI passes against the dedicated E2E project and the live
 database posture check succeeds. Real-money flags remain disabled until the
 payment provider, reconciliation, refund, tax, KYC and payout operating paths
 have owners and have passed a small-value controlled rehearsal.
+
+## 6. Deferred backend work and validation limits
+
+Complete the code review and local checks before changing hosted configuration.
+Then provision the dedicated test project/secrets, apply the migrations there,
+and run authenticated multi-user E2E, RLS and concurrent payment/withdrawal tests.
+Offline SQL checks validate migration logic on a minimal PostgreSQL-compatible
+schema; they do not prove the complete deployed schema or multi-connection locks.
+
+Personal funding and creator earnings still share a wallet account. Migration
+064 conservatively subtracts unreversed personal spending from withdrawable
+earnings and caps the result by available wallet funds. It prevents topping up
+from increasing the earned withdrawal cap, but can understate earnings when
+personal spending used deposited funds. Separate account liabilities and a
+reconciled historical migration remain required before live payouts.
+
+Revoke previously exposed sessions and review storage policies and old signed
+media URLs: removing URLs from current responses cannot revoke an existing URL.
+Verify production identity variables (`VERCEL_ENV`/`APP_ENV`), geography, age/KYC
+callbacks, payment webhook authenticity/replay, settlement/refund schedules and
+ledger reconciliation on the isolated project before enabling real payments.

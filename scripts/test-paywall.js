@@ -12,7 +12,12 @@
  *   2. 已执行 migrations/013_money_access_mvp.sql
  */
 
-const { createClient } = require('@supabase/supabase-js')
+const { createClient: createUnsafeClient } = require('@supabase/supabase-js')
+const { assertDedicatedTestProject, requireTestPassword } = require('./utils/assert-test-environment.cjs')
+function createClient(url, ...args) {
+  assertDedicatedTestProject(url)
+  return createUnsafeClient(url, ...args)
+}
 const { readFileSync } = require('fs')
 const { join } = require('path')
 
@@ -133,7 +138,7 @@ async function testRegisterAndLogin(supabase) {
   
   const timestamp = Date.now()
   const testEmail = `test-paywall-${timestamp}@example.com`
-  const testPassword = 'TestPassword123!'
+  const testPassword = requireTestPassword()
   
   try {
     // 注册
@@ -189,7 +194,7 @@ async function testCreateCreatorAndPost() {
     // 创建 Creator 用户
     const timestamp = Date.now()
     const creatorEmail = `creator-paywall-${timestamp}@example.com`
-    const creatorPassword = 'CreatorPassword123!'
+    const creatorPassword = requireTestPassword()
     
     const { data: creatorSignUp, error: creatorSignUpError } = await creatorSupabase.auth.signUp({
       email: creatorEmail,

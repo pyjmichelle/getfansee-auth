@@ -62,15 +62,22 @@ export async function getCreatorWalletBalances(creatorId: string): Promise<{
   pendingCents: number;
 }> {
   const admin = getSupabaseAdminClient();
-  const { data } = await admin
-    .from("wallet_accounts")
-    .select("available_balance_cents, pending_balance_cents")
-    .eq("user_id", creatorId)
-    .maybeSingle();
-
+  // The ledger establishes earned liability; the shared wallet also contains
+  // personal funded balance, which must never appear as withdrawable earnings.
+  // Personal purchases conservatively reduce eligible earnings even when they
+  // were funded by deposits; a subsequent top-up cannot reset that deduction.
+  // Resolve both in one database snapshot without pagination truncation.
+  const { data, error } = await admin.rpc("creator_earned_balances", {
+    p_creator_id: creatorId,
+  });
+  if (error) {
+    console.error("[payouts] earned balance lookup failed:", error);
+    return { availableCents: 0, pendingCents: 0 };
+  }
+  const earned = data as { available_cents?: number; pending_cents?: number } | null;
   return {
-    availableCents: data?.available_balance_cents ?? 0,
-    pendingCents: data?.pending_balance_cents ?? 0,
+    availableCents: earned?.available_cents ?? 0,
+    pendingCents: earned?.pending_cents ?? 0,
   };
 }
 

@@ -117,12 +117,17 @@ export async function getCreator(creatorId: string): Promise<Creator | null> {
     if (!error && data) {
       // creators table doesn't carry public badge/category fields — fetch from profiles
       const [{ data: pv }, extras] = await Promise.all([
-        supabase.from("profiles").select("is_verified").eq("id", creatorId).maybeSingle(),
+        supabase
+          .from("profiles")
+          .select("is_verified, subscription_price_cents")
+          .eq("id", creatorId)
+          .maybeSingle(),
         getCreatorPublicExtras(creatorId),
       ]);
       return {
         ...data,
         is_verified: pv?.is_verified ?? false,
+        subscription_price_cents: pv?.subscription_price_cents ?? 0,
         is_founding_creator: extras.is_founding_creator,
         category: extras.category,
         external_links: extras.external_links,
@@ -162,6 +167,7 @@ export async function getCreator(creatorId: string): Promise<Creator | null> {
       bio: profile.bio ?? undefined,
       created_at: profile.created_at,
       is_verified: profile.is_verified ?? false,
+      subscription_price_cents: profile.subscription_price_cents ?? 0,
       is_founding_creator: extras.is_founding_creator,
       category: extras.category,
       external_links: extras.external_links,

@@ -1,3 +1,4 @@
+import { assertDedicatedTestProject } from "./utils/assert-test-environment";
 /**
  * 创建测试账号脚本
  *
@@ -81,6 +82,7 @@ if (!allowedProjectRef || allowedProjectRef !== actualProjectRef) {
   process.exit(1);
 }
 
+assertDedicatedTestProject(supabaseUrl);
 const supabase = createClient(supabaseUrl, serviceKey);
 
 // 测试账号配置

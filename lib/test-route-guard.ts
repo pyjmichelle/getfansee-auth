@@ -1,9 +1,10 @@
+import { isExplicitTestEnvironment } from "./test-environment";
 import type { NextRequest } from "next/server";
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "0.0.0.0"]);
 
 function getHost(request: NextRequest): string {
-  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "";
+  const host = request.headers.get("host") ?? "";
   return host.split(":")[0].toLowerCase();
 }
 
@@ -18,7 +19,7 @@ function hasValidSecret(request: NextRequest): boolean {
     // No secret configured: permit when an explicit test-env flag is set.
     // Real production never has E2E=1 / PLAYWRIGHT_TEST_MODE=true, so this
     // stays safe even when NODE_ENV="production" (e.g. `pnpm start` in CI).
-    const isTestEnv = process.env.E2E === "1" || process.env.PLAYWRIGHT_TEST_MODE === "true";
+    const isTestEnv = isExplicitTestEnvironment();
     return isTestEnv;
   }
   const provided = request.headers.get("x-test-secret");
@@ -26,7 +27,7 @@ function hasValidSecret(request: NextRequest): boolean {
 }
 
 export function canAccessTestRoute(request: NextRequest): boolean {
-  const isTestEnv = process.env.E2E === "1" || process.env.PLAYWRIGHT_TEST_MODE === "true";
+  const isTestEnv = isExplicitTestEnvironment();
 
   // Block test routes unless explicitly in test/E2E mode.
   // NOTE: NODE_ENV is "production" when CI runs `pnpm start` after `pnpm build`.

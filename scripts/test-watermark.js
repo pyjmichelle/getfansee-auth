@@ -8,7 +8,12 @@
  *   pnpm test:watermark
  */
 
-const { createClient } = require('@supabase/supabase-js')
+const { createClient: createUnsafeClient } = require('@supabase/supabase-js')
+const { assertDedicatedTestProject, requireTestPassword } = require('./utils/assert-test-environment.cjs')
+function createClient(url, ...args) {
+  assertDedicatedTestProject(url)
+  return createUnsafeClient(url, ...args)
+}
 const { readFileSync } = require('fs')
 const { join } = require('path')
 
@@ -149,7 +154,7 @@ async function main() {
     info('Test 1: 创建 Creator 用户')
     const timestamp = Date.now()
     const email = `test-watermark-${timestamp}@example.com`
-    const password = 'TestPassword123!'
+    const password = requireTestPassword()
 
     const { data: signUpData, error: signUpError } = await anonClient.auth.signUp({
       email,

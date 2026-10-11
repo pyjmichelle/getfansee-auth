@@ -1,4 +1,10 @@
 #!/usr/bin/env tsx
+import { assertDedicatedTestProject, assertLocalTestTarget } from "./utils/assert-test-environment";
+function requireTestPassword(): string {
+  const password = process.env.E2E_TEST_USER_PASSWORD;
+  if (!password) throw new Error("E2E_TEST_USER_PASSWORD is required.");
+  return password;
+}
 /**
  * Regression API Test — verifies all bug fixes WITHOUT a browser.
  * Tests the server-side logic directly using real Supabase calls.
@@ -43,6 +49,7 @@ if (!SUPABASE_URL || !SERVICE_KEY || !ANON_KEY) {
   process.exit(1);
 }
 
+assertDedicatedTestProject(SUPABASE_URL);
 const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
@@ -92,7 +99,7 @@ async function main() {
 
   // ── Create a throw-away test user ──────────────────────────────────────────
   const tempEmail = `regression-${Date.now()}@example.test`;
-  const tempPassword = "Regression123!";
+  const tempPassword = requireTestPassword();
   let tempUserId = "";
 
   const { data: createData, error: createErr } = await admin.auth.admin.createUser({

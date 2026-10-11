@@ -1,3 +1,4 @@
+import { isLocalDevelopmentOrTest } from "./test-environment";
 /**
  * Stripe server-side client
  * Used for creating checkout sessions and processing webhooks.
@@ -40,7 +41,7 @@ export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || "";
  * for the shape the fix has to take.
  */
 export function isStripeFiatEnabled(): boolean {
-  return process.env.STRIPE_FIAT_ENABLED === "true";
+  return isLocalDevelopmentOrTest() && process.env.STRIPE_FIAT_ENABLED === "true";
 }
 
 /** Minimum and maximum wallet top-up amounts in USD */

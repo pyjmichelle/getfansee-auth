@@ -99,6 +99,8 @@ export function CreatorPayoutPanel() {
       setDestination("");
       setLabel("");
       await reload();
+    } catch {
+      toast.error("Could not save the payout method. Please try again.");
     } finally {
       setSavingMethod(false);
     }
@@ -140,6 +142,10 @@ export function CreatorPayoutPanel() {
       withdrawIntentRef.current = "";
       setAmountUsd("");
       await reload();
+    } catch {
+      toast.error(
+        "Could not confirm the withdrawal. Retry safely with the same amount and method."
+      );
     } finally {
       setSubmitting(false);
     }

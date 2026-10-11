@@ -1,3 +1,5 @@
+import { isTestPaymentsOverride } from "@/lib/payments-live";
+import { resolveJurisdiction } from "@/lib/compliance/jurisdictions";
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-server";
@@ -31,11 +33,27 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       );
     }
+    if (
+      !isTestPaymentsOverride() &&
+      !resolveJurisdiction(getRequestGeo(request.headers)).paymentsAllowed
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Payments are not available in your region yet." },
+        { status: 403 }
+      );
+    }
 
-    const { creatorId } = (await request.json()) as SubscribePayload;
+    const payload = (await request.json().catch(() => null)) as SubscribePayload | null;
+    const creatorId = payload?.creatorId;
 
-    if (!creatorId) {
-      return NextResponse.json({ success: false, error: "creatorId is required" }, { status: 400 });
+    if (
+      typeof creatorId !== "string" ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(creatorId)
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Valid creatorId is required" },
+        { status: 400 }
+      );
     }
 
     const user = await getCurrentUser();
@@ -46,13 +64,22 @@ export async function POST(request: NextRequest) {
     const admin = getSupabaseAdminClient();
 
     // Price is authoritative on the creator profile. Ignore any client quote.
-    const { data: creatorProfile } = await admin
+    const { data: creatorProfile, error: creatorError } = await admin
       .from("profiles")
-      .select("display_name, subscription_price_cents")
+      .select("display_name, subscription_price_cents, role")
       .eq("id", creatorId)
       .maybeSingle();
 
-    const subscriptionPriceCents = creatorProfile?.subscription_price_cents ?? 0;
+    if (creatorError) {
+      return NextResponse.json(
+        { success: false, error: "Could not verify creator" },
+        { status: 500 }
+      );
+    }
+    if (!creatorProfile || creatorProfile.role !== "creator") {
+      return NextResponse.json({ success: false, error: "Creator not found" }, { status: 404 });
+    }
+    let subscriptionPriceCents = creatorProfile?.subscription_price_cents ?? 0;
     const creatorName = creatorProfile?.display_name || "Creator";
     let currentPeriodEnd: string | null = null;
 
@@ -99,6 +126,7 @@ export async function POST(request: NextRequest) {
       if (spend.alreadySubscribed) {
         return NextResponse.json({ success: true, alreadySubscribed: true });
       }
+      subscriptionPriceCents = spend.grossAmountCents;
       currentPeriodEnd = spend.currentPeriodEnd ?? null;
     } else {
       return NextResponse.json(

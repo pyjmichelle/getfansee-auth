@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getCurrentUser } from "@/lib/auth-server";
-import { resolveSubscriptionUserColumn } from "@/lib/subscriptions";
+import { getVisitorCountry, isCountryBlocked } from "@/lib/geo-utils";
+import { getPostAccessMap, sanitizePostForViewer } from "@/lib/posts";
 import { MOCK_POSTS, MOCK_CREATORS } from "@/lib/mock-data";
 
 function getMockPostById(postId: string) {
@@ -41,7 +41,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         .from("posts")
         .select(
           `
-          *,
+          id, creator_id, title, content, media_url, visibility, price_cents,
+          preview_enabled, watermark_enabled, likes_count, created_at, review_status,
           creator:profiles!posts_creator_id_fkey(
             id,
             display_name,
@@ -50,6 +51,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         `
         )
         .eq("id", postId)
+        .is("deleted_at", null)
         .single();
 
       if (!postError && data) {
@@ -76,46 +78,45 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     if (usedMockFallback) {
       const canView = post.visibility === "free";
-      const safePost = canView ? post : { ...post, content: null, media_url: null };
+      const safePost = sanitizePostForViewer(post, canView);
       return NextResponse.json({ success: true, post: safePost, canView, isMock: true });
     }
 
-    const supabase = await createClient();
-    let canView = false;
-
-    if (post.creator_id === user.id) {
-      canView = true;
-    } else if (post.visibility === "free") {
-      canView = true;
-    } else if (post.visibility === "subscribers") {
-      const subscriptionUserColumn = await resolveSubscriptionUserColumn(supabase);
-      const { data: subscription } = await supabase
-        .from("subscriptions")
-        .select("id")
-        .eq(subscriptionUserColumn, user.id)
-        .eq("creator_id", post.creator_id as string)
-        .eq("status", "active")
-        .single();
-
-      canView = !!subscription;
-    } else if (post.visibility === "ppv") {
-      const { data: purchase } = await supabase
-        .from("purchases")
-        .select("id")
-        .eq("fan_id", user.id)
-        .eq("post_id", postId)
-        .single();
-
-      canView = !!purchase;
+    // Admin reads must enforce moderation separately from paid entitlement.
+    if (post.creator_id !== user.id && post.review_status !== "approved") {
+      return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
     }
-
-    const safePost = canView
-      ? post
-      : {
-          ...post,
-          content: null,
-          media_url: null,
-        };
+    if (post.creator_id !== user.id) {
+      const country = await getVisitorCountry();
+      if (country) {
+        const { data: creator, error: creatorError } = await getSupabaseAdminClient()
+          .from("public_creator_profiles")
+          .select("blocked_countries")
+          .eq("id", post.creator_id as string)
+          .single();
+        if (creatorError || !creator) {
+          return NextResponse.json(
+            { success: false, error: "Service temporarily unavailable" },
+            { status: 503 }
+          );
+        }
+        if (isCountryBlocked(creator.blocked_countries, country)) {
+          return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
+        }
+      }
+    }
+    const access = await getPostAccessMap(
+      [
+        {
+          id: postId,
+          creator_id: post.creator_id as string,
+          visibility: post.visibility as string,
+        },
+      ],
+      user.id
+    );
+    const canView = access.get(postId) === true;
+    const safePost = sanitizePostForViewer(post, canView);
 
     return NextResponse.json({
       success: true,

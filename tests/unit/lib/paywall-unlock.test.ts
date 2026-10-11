@@ -30,12 +30,16 @@ describe("unlockPost authoritative quote", () => {
         id: "post-1",
         price_cents: 2500,
         visibility: "ppv",
+        review_status: "approved",
+        deleted_at: null,
         creator_id: "creator-1",
       },
       error: null,
     });
     spendWalletOnPpv.mockResolvedValue({
       success: true,
+      idempotent: false,
+      grossAmountCents: 2500,
       balanceAfterCents: 7500,
     });
   });
@@ -46,6 +50,8 @@ describe("unlockPost authoritative quote", () => {
     await expect(unlockPost("post-1", "idem-1", "fan-1")).resolves.toEqual({
       success: true,
       balance_after_cents: 7500,
+      amount_cents: 2500,
+      idempotent: false,
     });
 
     expect(spendWalletOnPpv).toHaveBeenCalledWith(
@@ -54,8 +60,28 @@ describe("unlockPost authoritative quote", () => {
         postId: "post-1",
         creatorId: "creator-1",
         priceCents: 2500,
-        idempotencyKey: "idem-1",
+        idempotencyKey: "ppv_fan-1_post-1_idem-1",
       })
     );
+  });
+  it("does not debit for a deleted or unapproved post", async () => {
+    const { unlockPost } = await import("@/lib/paywall");
+    for (const restricted of [
+      { review_status: "rejected", deleted_at: null },
+      { review_status: "approved", deleted_at: "2026-10-01" },
+    ]) {
+      single.mockResolvedValue({
+        data: {
+          id: "post-1",
+          visibility: "ppv",
+          price_cents: 2500,
+          creator_id: "creator-1",
+          ...restricted,
+        },
+        error: null,
+      });
+      expect((await unlockPost("post-1", "retry-1", "fan-1")).success).toBe(false);
+    }
+    expect(spendWalletOnPpv).not.toHaveBeenCalled();
   });
 });
