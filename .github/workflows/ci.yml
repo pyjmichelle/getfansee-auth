@@ -15,6 +15,36 @@ env:
   PNPM_VERSION: "10"
 
 jobs:
+  native-sql-tests:
+    name: PostgreSQL concurrency (isolated)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install isolated PostgreSQL test driver
+        run: npm install --prefix "$RUNNER_TEMP/native-sql-runtime" --ignore-scripts pg@8.16.3
+      - name: Validate split accounts and concurrent monetary writes
+        env:
+          SQL_NATIVE_DATABASE_URL: postgresql://postgres@127.0.0.1:5432/postgres
+        run: |
+          export SQL_NATIVE_PG_MODULE="$RUNNER_TEMP/native-sql-runtime/node_modules/pg/lib/index.js"
+          node tests/sql/wallet-split.mjs
+
   # ============================================
   # Stage 1: Code Quality
   # ============================================
@@ -74,6 +104,7 @@ jobs:
           export PGLITE_MODULE="$RUNNER_TEMP/sql-test-runtime/node_modules/@electric-sql/pglite/dist/index.js"
           node tests/sql/payment-integrity.mjs
           node tests/sql/security-migrations.mjs
+          node tests/sql/wallet-split.mjs
 
   # ============================================
   # Stage 2: Build Verification (must pass before QA gate / E2E)
@@ -374,13 +405,14 @@ jobs:
   quality-gate:
     name: Quality Gate
     runs-on: ubuntu-latest
-    needs: [lint-and-type-check, unit-tests, build, qa-gate, e2e-tests]
+    needs: [lint-and-type-check, unit-tests, native-sql-tests, build, qa-gate, e2e-tests]
     timeout-minutes: 5
     steps:
       - name: Summary
         run: |
           echo "✅ Lint & Type Check: Passed"
           echo "✅ Unit Tests (offline): Passed"
+          echo "✅ Isolated PostgreSQL concurrency: Passed"
           echo "✅ Build: Passed"
           echo "✅ QA Gate (ui+deadclick): Passed"
           echo "✅ E2E (Chromium): Passed"

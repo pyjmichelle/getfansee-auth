@@ -26,6 +26,7 @@ export async function GET() {
       methods,
       availableCents: wallet.availableCents,
       pendingCents: wallet.pendingCents,
+      debtCents: wallet.debtCents,
     });
   } catch (err: unknown) {
     return jsonError(err);

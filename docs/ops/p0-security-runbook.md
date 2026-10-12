@@ -20,8 +20,10 @@ credentials in a public environment or reuse the production project for QA.
 
 ## 2. Apply database containment
 
-Apply migrations `059` through `064` in numeric order to the E2E project first,
-then production after the release gate. The follow-up migrations cover payment
+Apply migrations `059` through `065` in numeric order to the E2E project first,
+then production after the release gate. Migration 065 additionally requires
+the maintenance window and opening-data review in `funded-earned-account-split.md`.
+The follow-up migrations cover payment
 intent binding, KYC/profile/moderation authorization, atomic mock recharge, and
 withdrawals capped by earned liabilities. Writing these files does not deploy
 them: until they are applied, the live database does not have these protections.
@@ -81,12 +83,11 @@ and run authenticated multi-user E2E, RLS and concurrent payment/withdrawal test
 Offline SQL checks validate migration logic on a minimal PostgreSQL-compatible
 schema; they do not prove the complete deployed schema or multi-connection locks.
 
-Personal funding and creator earnings still share a wallet account. Migration
-064 conservatively subtracts unreversed personal spending from withdrawable
-earnings and caps the result by available wallet funds. It prevents topping up
-from increasing the earned withdrawal cap, but can understate earnings when
-personal spending used deposited funds. Separate account liabilities and a
-reconciled historical migration remain required before live payouts.
+Migration 064 contains shared-wallet risks conservatively. Migration 065
+replaces that containment with funded-only wallets and ledger-only earnings;
+it refuses unreconciled or ambiguous historical opening data. Until 065 is
+applied and validated, the hosted system still has the shared account model.
+Its code and offline tests alone are not a completed historical migration.
 
 Revoke previously exposed sessions and review storage policies and old signed
 media URLs: removing URLs from current responses cannot revoke an existing URL.

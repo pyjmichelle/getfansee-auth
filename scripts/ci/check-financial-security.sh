@@ -12,7 +12,8 @@ for followup in \
   061_payment_intent_integrity \
   062_kyc_and_profile_authorization \
   063_atomic_mock_recharge \
-  064_withdrawal_earned_balance; do
+  064_withdrawal_earned_balance \
+  065_separate_funded_and_earned_balances; do
   test -f "migrations/${followup}.sql" || {
     echo "ERROR: required follow-up migration is missing: ${followup}"
     exit 1

@@ -6,6 +6,24 @@ DECLARE
   v_bad_fk record;
   v_restrictive_fk_count integer;
 BEGIN
+  IF to_regclass('public.wallet_account_split_audit') IS NULL THEN
+    RAISE EXCEPTION 'funded/earned split is not applied; requires migration 065';
+  END IF;
+  IF EXISTS (SELECT 1 FROM pg_proc WHERE pronamespace='public'::regnamespace
+              AND proname='rpc_get_wallet_balance' AND prosecdef) THEN
+    RAISE EXCEPTION 'wallet read helper still bypasses caller RLS';
+  END IF;
+  IF EXISTS (SELECT 1 FROM pg_proc WHERE pronamespace='public'::regnamespace
+              AND proname IN ('unlock_ppv','rpc_purchase_post')
+              AND has_function_privilege('service_role',oid,'EXECUTE')) THEN
+    RAISE EXCEPTION 'obsolete purchase writers are still callable';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='public.wallet_accounts'::regclass
+                 AND conname='funded_balance_nonnegative' AND convalidated)
+     OR NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='public.wallet_accounts'::regclass
+                 AND conname='funded_wallet_has_no_earned_pending' AND convalidated) THEN
+    RAISE EXCEPTION 'funded-wallet separation constraints are missing';
+  END IF;
   IF has_table_privilege('authenticated', 'public.creator_verifications', 'INSERT')
      OR has_table_privilege('authenticated', 'public.creator_verifications', 'UPDATE')
      OR has_table_privilege('anon', 'public.creator_verifications', 'INSERT') THEN

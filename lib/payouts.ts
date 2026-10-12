@@ -3,8 +3,8 @@
  *
  * Money leaves the platform only after an admin records the off-platform
  * transfer. The request itself is atomic in `request_withdrawal`: the wallet
- * debit and the negative ledger row commit together so two concurrent requests
- * cannot overdraw. Approving must not move the ledger row out of `available`
+ * reservation and request commit together so two concurrent requests cannot
+ * overdraw earned liability. Approving must not move the row out of `available`
  * — see migrations/056.
  */
 
@@ -60,24 +60,28 @@ export function isValidPayoutRail(value: unknown): value is PayoutRail {
 export async function getCreatorWalletBalances(creatorId: string): Promise<{
   availableCents: number;
   pendingCents: number;
+  debtCents: number;
 }> {
   const admin = getSupabaseAdminClient();
-  // The ledger establishes earned liability; the shared wallet also contains
-  // personal funded balance, which must never appear as withdrawable earnings.
-  // Personal purchases conservatively reduce eligible earnings even when they
-  // were funded by deposits; a subsequent top-up cannot reset that deduction.
-  // Resolve both in one database snapshot without pagination truncation.
+  // The creator ledger is the earned account. Funded spending wallets are
+  // separate; deposits and personal purchases cannot change earned eligibility.
+  // Resolve pending/available/debt in one snapshot without pagination truncation.
   const { data, error } = await admin.rpc("creator_earned_balances", {
     p_creator_id: creatorId,
   });
   if (error) {
     console.error("[payouts] earned balance lookup failed:", error);
-    return { availableCents: 0, pendingCents: 0 };
+    return { availableCents: 0, pendingCents: 0, debtCents: 0 };
   }
-  const earned = data as { available_cents?: number; pending_cents?: number } | null;
+  const earned = data as {
+    available_cents?: number;
+    pending_cents?: number;
+    debt_cents?: number;
+  } | null;
   return {
     availableCents: earned?.available_cents ?? 0,
     pendingCents: earned?.pending_cents ?? 0,
+    debtCents: earned?.debt_cents ?? 0,
   };
 }
 

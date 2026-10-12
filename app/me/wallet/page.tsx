@@ -54,7 +54,6 @@ export default function WalletPage() {
   const [reloadKey, setReloadKey] = useState(0);
   // 测试模式下预填 mock 数据，避免异步加载延迟导致截图为空
   const [availableBalance, setAvailableBalance] = useState<number>(0);
-  const [pendingBalance, setPendingBalance] = useState<number>(0);
   const [transactions, setTransactions] = useState<Transaction[]>(
     isTestMode
       ? [
@@ -152,7 +151,6 @@ export default function WalletPage() {
 
             if (balanceData !== null && balanceData.available !== undefined) {
               setAvailableBalance(balanceData.available);
-              setPendingBalance(balanceData.pending ?? 0);
               setTransactions(transactionsData);
               return;
             }
@@ -224,7 +222,6 @@ export default function WalletPage() {
           getWalletBalance(currentUserId).then((balanceData) => {
             if (balanceData !== null && balanceData.available !== undefined) {
               setAvailableBalance(balanceData.available);
-              setPendingBalance(balanceData.pending ?? 0);
             }
           });
         }
@@ -369,7 +366,6 @@ export default function WalletPage() {
     (transaction) => transaction.type === "ppv_purchase"
   ).length;
   const animatedBalance = useCountUp(availableBalance, { duration: 900, decimals: 2 });
-  const animatedPending = useCountUp(pendingBalance, { duration: 900, decimals: 2 });
   const animatedMonthlySpending = useCountUp(monthlySpending, { duration: 900, decimals: 2 });
   const animatedUnlocks = useCountUp(unlockCount, { duration: 800, decimals: 0 });
   const isCreator = currentUser?.role === "creator";
@@ -406,9 +402,7 @@ export default function WalletPage() {
             </Button>
           </div>
         )}
-        {/* Hero Balance Card — role-aware: creators see withdrawable + pending
-            earnings first (F-005); Add Funds becomes a secondary action since
-            "top up to avoid missing drops" doesn't apply to a creator's own wallet. */}
+        {/* Funded spending balance; creator earnings live in the payout panel. */}
         <div
           className="card-block bg-gradient-subtle p-6 md:p-8 relative overflow-hidden mb-6"
           data-testid="wallet-balance-section"
@@ -416,7 +410,7 @@ export default function WalletPage() {
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div className="flex-1">
               <div className="text-text-tertiary mb-2 font-semibold text-small">
-                {isCreator ? "Available to Withdraw" : "Available Balance"}
+                Spending Balance
               </div>
               <div
                 className="text-h1 font-bold text-text-primary mb-1"
@@ -424,21 +418,13 @@ export default function WalletPage() {
               >
                 ${animatedBalance.toFixed(2)}
               </div>
-              {isCreator ? (
-                <p className="text-small text-text-secondary mb-4">
-                  ${animatedPending.toFixed(2)} pending clearance
-                </p>
-              ) : (
-                // Closed-loop disclosure at the point of use, not only buried
-                // in the Terms — the restriction is only defensible if the fan
-                // sees it where the balance lives. See Terms §5 "Fan Wallet".
-                <p className="text-small text-text-secondary mb-4">
-                  Spendable on GetFanSee only — not withdrawable or transferable.{" "}
-                  <Link href="/terms#payments" className="underline hover:no-underline">
-                    Details
-                  </Link>
-                </p>
-              )}
+              <p className="text-small text-text-secondary mb-4">
+                Spendable on GetFanSee only — not withdrawable or transferable.{" "}
+                <Link href="/terms#payments" className="underline hover:no-underline">
+                  Details
+                </Link>
+                {isCreator && " Your creator earnings are managed separately in payouts."}
+              </p>
               <div className="flex flex-wrap gap-3 mt-4">
                 {isCreator ? (
                   <>
