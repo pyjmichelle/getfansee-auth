@@ -17,6 +17,8 @@ if [[ "$DATABASE_URL" != *"$DB_POSTURE_PROJECT_REF"* ]]; then
   exit 1
 fi
 
+node scripts/ci/assert-e2e-database-url.mjs
+
 psql "$DATABASE_URL" \
   --no-psqlrc \
   --set=ON_ERROR_STOP=1 \
