@@ -378,6 +378,11 @@ async function createTestPost(
     media_url: mediaUrl,
     preview_enabled: visibility === "ppv",
     watermark_enabled: visibility === "ppv",
+    // These records are test fixtures, not creator submissions waiting for
+    // moderation. The service-role client is the only actor allowed to set
+    // moderation fields, matching the production authorization boundary.
+    review_status: "approved",
+    reviewed_at: new Date().toISOString(),
   };
 
   // 只在 PPV 时添加 price_cents
