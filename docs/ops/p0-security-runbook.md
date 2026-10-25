@@ -20,7 +20,7 @@ credentials in a public environment or reuse the production project for QA.
 
 ## 2. Apply database containment
 
-Apply migrations `059` through `065` in numeric order to the E2E project first,
+Apply migrations `059` through `069` in numeric order to the E2E project first,
 then production after the release gate. Migration 065 additionally requires
 the maintenance window and opening-data review in `funded-earned-account-split.md`.
 The follow-up migrations cover payment
@@ -28,6 +28,11 @@ intent binding, KYC/profile/moderation authorization, atomic mock recharge, and
 withdrawals capped by earned liabilities. Writing these files does not deploy
 them: until they are applied, the live database does not have these protections.
 Use the normal migration mechanism and preserve its audit log.
+
+The existing staging project was initialized on 2026-10-25 with a reviewed
+empty-schema baseline and follow-up migrations. See `staging-validation-2026-10-25.md`
+for actual state, validation and remaining credential setup. Do not replay the
+historical numbered files over that initialized schema.
 
 Run the read-only live check after each deployment:
 

@@ -13,7 +13,11 @@ for followup in \
   062_kyc_and_profile_authorization \
   063_atomic_mock_recharge \
   064_withdrawal_earned_balance \
-  065_separate_funded_and_earned_balances; do
+  065_separate_funded_and_earned_balances \
+  066_complete_profile_schema \
+  067_harden_function_owner_defaults \
+  068_restrict_maintenance_functions \
+  069_protect_private_profile_reads; do
   test -f "migrations/${followup}.sql" || {
     echo "ERROR: required follow-up migration is missing: ${followup}"
     exit 1

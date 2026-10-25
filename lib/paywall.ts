@@ -169,7 +169,7 @@ export async function listSubscribers(creatorId: string): Promise<
     const { data: profiles } =
       subscriberIds.length > 0
         ? await supabase
-            .from("profiles")
+            .from("public_profile_labels")
             .select("id, display_name, avatar_url")
             .in("id", subscriberIds)
         : { data: [] };

@@ -59,7 +59,7 @@ export async function getPostComments(
 
     if (userIds.length > 0) {
       const { data: profiles } = await supabase
-        .from("profiles")
+        .from("public_profile_labels")
         .select("id, display_name, avatar_url")
         .in("id", userIds);
       for (const p of profiles || []) {
@@ -145,7 +145,7 @@ export async function createComment(
     }
 
     const { data: profileRow } = await supabase
-      .from("profiles")
+      .from("public_profile_labels")
       .select("display_name, avatar_url")
       .eq("id", userId)
       .single();

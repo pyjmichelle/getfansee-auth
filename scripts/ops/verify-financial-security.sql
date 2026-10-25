@@ -5,7 +5,16 @@ DECLARE
   v_proc record;
   v_bad_fk record;
   v_restrictive_fk_count integer;
+  v_function_owner oid;
 BEGIN
+  IF has_table_privilege('anon','public.profiles','SELECT') OR EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='profiles'
+      AND cmd IN ('SELECT','ALL') AND policyname<>'profiles_select_private_own'
+  ) THEN
+    RAISE EXCEPTION 'private profile reads remain exposed; requires migration 069';
+  END IF;
+  SELECT proowner INTO v_function_owner FROM pg_proc
+    WHERE oid = 'public.spend_wallet(uuid,uuid,text,bigint,integer,text,text,uuid,text,text,timestamp with time zone)'::regprocedure;
   IF to_regclass('public.wallet_account_split_audit') IS NULL THEN
     RAISE EXCEPTION 'funded/earned split is not applied; requires migration 065';
   END IF;
@@ -149,20 +158,27 @@ BEGIN
     JOIN pg_namespace n ON n.oid = d.defaclnamespace
     WHERE n.nspname = 'public'
       AND d.defaclobjtype = 'f'
+      AND d.defaclrole = v_function_owner
   ) THEN
     RAISE EXCEPTION 'no hardened default function ACL exists for public schema';
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM pg_default_acl WHERE defaclrole=v_function_owner
+                 AND defaclobjtype='f' AND defaclnamespace=0) THEN
+    RAISE EXCEPTION 'global PUBLIC function defaults are not hardened for the application owner';
   END IF;
 
   IF EXISTS (
     SELECT 1
     FROM pg_default_acl d
-    JOIN pg_namespace n ON n.oid = d.defaclnamespace
+    LEFT JOIN pg_namespace n ON n.oid = d.defaclnamespace
     CROSS JOIN LATERAL aclexplode(d.defaclacl) acl
-    LEFT JOIN pg_roles r ON r.oid = acl.grantee
-    WHERE n.nspname = 'public'
+    WHERE (n.nspname = 'public' OR d.defaclnamespace=0)
+      AND d.defaclrole = v_function_owner
       AND d.defaclobjtype = 'f'
       AND acl.privilege_type = 'EXECUTE'
-      AND (acl.grantee = 0 OR r.rolname IN ('anon', 'authenticated'))
+      AND CASE WHEN acl.grantee=0 THEN true ELSE
+        pg_has_role('anon',acl.grantee,'USAGE') OR pg_has_role('authenticated',acl.grantee,'USAGE') END
   ) THEN
     RAISE EXCEPTION 'future public-schema functions still default to browser-callable EXECUTE';
   END IF;

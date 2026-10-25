@@ -44,6 +44,7 @@ jobs:
         run: |
           export SQL_NATIVE_PG_MODULE="$RUNNER_TEMP/native-sql-runtime/node_modules/pg/lib/index.js"
           node tests/sql/wallet-split.mjs
+          node tests/sql/full-schema.mjs
 
   # ============================================
   # Stage 1: Code Quality
@@ -105,6 +106,7 @@ jobs:
           node tests/sql/payment-integrity.mjs
           node tests/sql/security-migrations.mjs
           node tests/sql/wallet-split.mjs
+          node tests/sql/full-schema.mjs
 
   # ============================================
   # Stage 2: Build Verification (must pass before QA gate / E2E)
