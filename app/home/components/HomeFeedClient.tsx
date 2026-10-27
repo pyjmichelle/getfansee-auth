@@ -148,6 +148,7 @@ function PostCard({
   return (
     <article
       data-testid="post-card"
+      data-post-id={post.id}
       className="glass-card rounded-[var(--radius-lg)] overflow-hidden mb-4"
     >
       {/* Header */}

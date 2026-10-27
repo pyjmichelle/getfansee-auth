@@ -151,9 +151,12 @@ test.describe("Paywall Flow E2E", () => {
 
       await page.goto(`${BASE_URL}/home`, { waitUntil: "domcontentloaded", timeout: 30000 });
       await waitForPageLoad(page);
-      await page.waitForSelector(`text=${content}`, { timeout: 15000 });
+      // Locked post bodies are intentionally removed from the feed payload, so
+      // locate the exact fixture by its non-sensitive ID instead of leaked text.
+      const fixtureCard = page.locator(`[data-testid="post-card"][data-post-id="${postId}"]`);
+      await expect(fixtureCard).toBeVisible({ timeout: 15000 });
 
-      const lockedContent = page.getByTestId("post-locked-preview").first();
+      const lockedContent = fixtureCard.getByTestId("post-locked-preview");
       await expect(lockedContent).toBeVisible({ timeout: 15000 });
       // Scroll the locked overlay into view so child elements are fully rendered
       await lockedContent.scrollIntoViewIfNeeded();
