@@ -276,10 +276,12 @@ async function withAdminRetries<T>(
   throw lastError;
 }
 
-/**
- * 生成测试密码
- */
-export const TEST_PASSWORD = "TestPassword123!";
+/** E2E credentials are injected by CI/local secrets, never committed. */
+const configuredTestPassword = process.env.E2E_TEST_USER_PASSWORD;
+if (!configuredTestPassword) {
+  throw new Error("E2E_TEST_USER_PASSWORD is required for E2E tests.");
+}
+export const TEST_PASSWORD: string = configuredTestPassword;
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;

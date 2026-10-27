@@ -1,3 +1,5 @@
+import { arePaymentsLive } from "@/lib/payments-live";
+import { getRequestJurisdiction } from "@/lib/compliance/request-geo";
 /**
  * POST /api/payments/nowpayments/create-invoice
  *
@@ -23,7 +25,7 @@ const SITE_URL =
 
 export async function POST(request: NextRequest) {
   try {
-    if (!isNowPaymentsEnabled()) {
+    if (!isNowPaymentsEnabled() || !arePaymentsLive()) {
       return NextResponse.json(
         { success: false, error: "Crypto top-ups are not available yet." },
         { status: 503 }
@@ -31,6 +33,12 @@ export async function POST(request: NextRequest) {
     }
 
     const { user } = await requireUser();
+    if (!getRequestJurisdiction(request.headers).paymentsAllowed) {
+      return NextResponse.json(
+        { success: false, error: "Payments are not available in your region yet." },
+        { status: 403 }
+      );
+    }
 
     let body: { amount?: unknown };
     try {
@@ -39,7 +47,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Invalid JSON body" }, { status: 400 });
     }
 
-    const amount = Number(body.amount);
+    const amount = Number(body?.amount);
     if (!NOWPAYMENTS_TOPUP_PRESETS_USD.includes(amount as 20 | 50 | 100)) {
       return NextResponse.json(
         {

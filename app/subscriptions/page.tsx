@@ -252,6 +252,10 @@ export default function SubscriptionsPage() {
     });
   };
 
+  const hasPaidAccess = (subscription: Subscription) =>
+    ["active", "canceled"].includes(subscription.status) &&
+    new Date(subscription.current_period_end).getTime() > Date.now();
+
   const getRenewsIn = (endDate: string) => {
     const end = new Date(endDate);
     const now = new Date();
@@ -259,25 +263,23 @@ export default function SubscriptionsPage() {
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
 
     if (days < 0) return "Expired";
-    if (days === 0) return "Renews today";
-    if (days === 1) return "Renews tomorrow";
-    return `Renews in ${days} days`;
+    if (days === 0) return "Ends today";
+    if (days === 1) return "Ends tomorrow";
+    return `Ends in ${days} days`;
   };
 
-  const activeCount = subscriptions.filter((s) => s.status === "active").length;
+  const activeCount = subscriptions.filter(hasPaidAccess).length;
   const expiringCount = subscriptions.filter((s) => {
-    if (s.status !== "active") return false;
+    if (!hasPaidAccess(s)) return false;
     const diff = new Date(s.current_period_end).getTime() - Date.now();
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
     return days <= 7 && days >= 0;
   }).length;
-  const monthlyCost = subscriptions
-    .filter((s) => s.status === "active")
-    .reduce((sum, s) => {
-      const priceCents = s.price_cents ?? s.creator?.subscription_price_cents ?? 0;
-      return sum + priceCents / 100;
-    }, 0);
-  const animatedSupportCount = useCountUp(subscriptions.length, { duration: 900, decimals: 0 });
+  const monthlyCost = subscriptions.filter(hasPaidAccess).reduce((sum, s) => {
+    const priceCents = s.price_cents ?? s.creator?.subscription_price_cents ?? 0;
+    return sum + priceCents / 100;
+  }, 0);
+  const animatedSupportCount = useCountUp(activeCount, { duration: 900, decimals: 0 });
   const animatedMonthlyCost = useCountUp(monthlyCost, { duration: 900, decimals: 2 });
 
   if (loadError) {
@@ -326,7 +328,7 @@ export default function SubscriptionsPage() {
         <p className="text-text-secondary text-small md:text-body-lg mb-4">
           Manage and optimize your creator subscriptions.
         </p>
-        <Link href="/home">
+        <Link href="/creators">
           <Button
             variant="subscribe-gradient"
             className="text-white shadow-glow hover-bold active:scale-[0.97]"
@@ -371,7 +373,7 @@ export default function SubscriptionsPage() {
                         avatarUrl={subscription.creator?.avatar_url}
                         size="md"
                         subtitle={
-                          subscription.status === "active"
+                          hasPaidAccess(subscription)
                             ? getRenewsIn(subscription.current_period_end)
                             : "Expired"
                         }
@@ -393,25 +395,31 @@ export default function SubscriptionsPage() {
                             : ""
                         }
                       >
-                        {subscription.status === "active" ? "Active" : "Canceled"}
+                        {hasPaidAccess(subscription)
+                          ? subscription.cancelled_at || subscription.status === "canceled"
+                            ? "Canceled · access remains"
+                            : "Active"
+                          : "Expired"}
                       </Badge>
-                      {subscription.status === "active" && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-text-tertiary hover:text-error hover:bg-error/10 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-error"
-                          onClick={() => setCancellingSubscriptionId(subscription.id)}
-                        >
-                          Cancel
-                        </Button>
-                      )}
+                      {hasPaidAccess(subscription) &&
+                        !subscription.cancelled_at &&
+                        subscription.status !== "canceled" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-text-tertiary hover:text-error hover:bg-error/10 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-error"
+                            onClick={() => setCancellingSubscriptionId(subscription.id)}
+                          >
+                            Cancel
+                          </Button>
+                        )}
                     </div>
                   </div>
 
-                  {subscription.status === "active" && (
+                  {hasPaidAccess(subscription) && (
                     <div className="mt-3 pt-3 border-t border-border-subtle">
                       <p className="text-tiny text-text-quaternary">
-                        Subscribed since {formatDate(subscription.created_at)} • Renews on{" "}
+                        Subscribed since {formatDate(subscription.created_at)} • Access ends on{" "}
                         {formatDate(subscription.current_period_end)}
                       </p>
                     </div>
@@ -448,7 +456,7 @@ export default function SubscriptionsPage() {
                 </div>
                 <div className="h-px bg-border-base" />
                 <div className="flex items-center justify-between">
-                  <span className="text-small text-text-tertiary">Monthly Cost</span>
+                  <span className="text-small text-text-tertiary">Paid period total</span>
                   <span className="font-bold text-text-primary">
                     ${animatedMonthlyCost.toFixed(2)}
                   </span>

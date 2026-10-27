@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import {
@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { PLATFORM_TIP_FEE_BPS, computeTipPlatformFeeCents } from "@/lib/constants/fees";
+import { PLATFORM_TIP_FEE_BPS, computePlatformFeeCents } from "@/lib/constants/fees";
 import { DEFAULT_TIP_SETTINGS, type CreatorTipSettings } from "@/lib/tips";
 import { useMediaQuery } from "@/hooks/use-mobile";
 import { formatUsd } from "@/lib/format";
@@ -35,14 +35,12 @@ interface TipModalProps {
   /** Current fan wallet balance in cents — optional; shown for UX */
   balanceCents?: number;
   /** Called after a tip is successfully sent (e.g. to refresh goal/supporters). */
-  onSuccess?: () => void;
+  onSuccess?: () => void | Promise<void>;
 }
 
 function generateNonce() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
-
-const FEE_PERCENT = (PLATFORM_TIP_FEE_BPS / 100).toString();
 
 export function TipModal({
   open,
@@ -57,7 +55,11 @@ export function TipModal({
   const [customAmountStr, setCustomAmountStr] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [nonce, setNonce] = useState(generateNonce);
+  const intentRef = useRef<Record<string, unknown> | null>(null);
+  const inFlightRef = useRef(false);
+  const [retryPending, setRetryPending] = useState(false);
+  const [feeBps, setFeeBps] = useState(PLATFORM_TIP_FEE_BPS);
+  const feePercent = (feeBps / 100).toString();
   const [settings, setSettings] = useState<CreatorTipSettings>(DEFAULT_TIP_SETTINGS);
 
   // This modal is rendered persistently on some pages (creator/[id], posts/[id])
@@ -69,7 +71,7 @@ export function TipModal({
   // open, and reset the form so a stale amount/message doesn't linger.
   useEffect(() => {
     if (!open) return;
-    setNonce(generateNonce());
+    if (intentRef.current) return;
     setSelectedPreset(null);
     setCustomAmountStr("");
     setMessage("");
@@ -83,6 +85,8 @@ export function TipModal({
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
+    setSettings(DEFAULT_TIP_SETTINGS);
+    setFeeBps(PLATFORM_TIP_FEE_BPS);
     (async () => {
       try {
         const res = await fetch(`/api/creator/${creatorId}/tip-settings`);
@@ -90,6 +94,8 @@ export function TipModal({
         const data = await res.json();
         if (!cancelled && data?.settings) {
           setSettings(data.settings as CreatorTipSettings);
+          if (Number.isInteger(data.fee_bps) && data.fee_bps >= 0 && data.fee_bps <= 10000)
+            setFeeBps(data.fee_bps);
         }
       } catch {
         // fall back to defaults silently
@@ -125,7 +131,7 @@ export function TipModal({
     !isInsufficient;
 
   const feeCents =
-    resolvedAmountCents !== null ? computeTipPlatformFeeCents(resolvedAmountCents) : 0;
+    resolvedAmountCents !== null ? computePlatformFeeCents(resolvedAmountCents, feeBps) : 0;
 
   const handlePreset = (cents: number) => {
     setSelectedPreset(cents);
@@ -138,17 +144,21 @@ export function TipModal({
   };
 
   const handleSubmit = async () => {
-    if (!isValid || resolvedAmountCents === null) return;
+    if (inFlightRef.current || (!intentRef.current && (!isValid || resolvedAmountCents === null)))
+      return;
+    inFlightRef.current = true;
     setLoading(true);
 
     try {
-      const body: Record<string, unknown> = {
+      const body: Record<string, unknown> = intentRef.current ?? {
         creatorId,
         amountCents: resolvedAmountCents,
-        clientNonce: nonce,
+        clientNonce: generateNonce(),
+        ...(postId ? { postId } : {}),
+        ...(message.trim() ? { message: message.trim().slice(0, 140) } : {}),
       };
-      if (postId) body.postId = postId;
-      if (message.trim()) body.message = message.trim().slice(0, 140);
+      // Preserve the exact request after an ambiguous network/server failure.
+      intentRef.current = body;
 
       const res = await fetch("/api/tip", {
         method: "POST",
@@ -162,24 +172,45 @@ export function TipModal({
         thank_you_message?: string | null;
       };
 
-      if (data.success) {
-        const amountDisplay = `$${(resolvedAmountCents / 100).toFixed(2)}`;
+      if (res.ok && data.success) {
+        intentRef.current = null;
+        setRetryPending(false);
+        const amountDisplay = formatUsd(body.amountCents as number);
         const thanks =
           data.thank_you_message?.trim() ||
           `Thank you for supporting ${creatorName ?? "this creator"}!`;
         toast.success(`Tip sent! ${amountDisplay} — ${thanks}`);
-        onSuccess?.();
+        try {
+          await onSuccess?.();
+        } catch (refreshError) {
+          console.error("[TipModal] Tip confirmed, refresh failed:", refreshError);
+        }
         onOpenChange(false);
       } else if (res.status === 402) {
+        intentRef.current = null;
+        setRetryPending(false);
         toast.error("Insufficient balance. Please add funds to your wallet.");
       } else {
+        if (res.status < 500) {
+          intentRef.current = null;
+          setRetryPending(false);
+        } else {
+          setRetryPending(true);
+        }
         toast.error(data.error ?? "Tip failed. Please try again.");
       }
     } catch {
-      toast.error("Network error. Please try again.");
+      setRetryPending(true);
+      toast.error("Could not confirm the tip. Retry to check the same payment safely.");
     } finally {
+      inFlightRef.current = false;
       setLoading(false);
     }
+  };
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (inFlightRef.current) return;
+    onOpenChange(nextOpen);
   };
 
   const titleContent = (
@@ -193,7 +224,7 @@ export function TipModal({
   const descriptionText = (
     <>
       A tip is a voluntary thank-you — not a purchase of any content, service, or reward. Tips are
-      final and non-refundable. The platform retains a {FEE_PERCENT}% service fee; the rest goes to
+      final and non-refundable. The platform retains a {feePercent}% service fee; the rest goes to
       the creator&apos;s pending balance.
     </>
   );
@@ -216,6 +247,8 @@ export function TipModal({
               key={cents}
               type="button"
               onClick={() => handlePreset(cents)}
+              disabled={loading || retryPending}
+              aria-pressed={selectedPreset === cents}
               className={cn(
                 "min-h-11 rounded-xl py-2.5 text-small font-semibold border transition-colors duration-100 active:scale-[0.98]",
                 selectedPreset === cents
@@ -237,7 +270,8 @@ export function TipModal({
             type="number"
             min="1"
             max="500"
-            step="1"
+            step="0.01"
+            disabled={loading || retryPending}
             placeholder="Custom amount"
             value={customAmountStr}
             onChange={(e) => handleCustomChange(e.target.value)}
@@ -266,6 +300,7 @@ export function TipModal({
           value={message}
           onChange={(e) => setMessage(e.target.value.slice(0, 140))}
           rows={2}
+          disabled={loading || retryPending}
           className="resize-none text-small"
           aria-label="Optional message for the creator"
         />
@@ -279,7 +314,7 @@ export function TipModal({
               <span>{formatUsd(resolvedAmountCents)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Platform service fee ({FEE_PERCENT}%)</span>
+              <span>Estimated service fee ({feePercent}%)</span>
               <span>-{formatUsd(feeCents)}</span>
             </div>
             <div className="flex justify-between text-text-secondary font-medium">
@@ -294,23 +329,33 @@ export function TipModal({
           <p className="text-tiny text-text-muted">Wallet balance: {formatUsd(balanceCents)}</p>
         )}
 
+        {retryPending && (
+          <p role="status" className="text-small text-text-secondary">
+            Payment status is unconfirmed. Retry uses the same amount and message and will not
+            charge twice.
+          </p>
+        )}
         {/* Actions */}
         <div className="flex gap-2 pt-1">
           <Button
             variant="outline"
             className="flex-1"
-            onClick={() => onOpenChange(false)}
+            onClick={() => handleOpenChange(false)}
             disabled={loading}
           >
             Cancel
           </Button>
           <Button
             className="flex-1 min-h-[44px]"
-            disabled={!isValid || loading}
+            disabled={(!isValid && !retryPending) || loading}
             loading={loading}
             onClick={handleSubmit}
           >
-            {resolvedAmountCents ? `Tip ${formatUsd(resolvedAmountCents)}` : "Tip"}
+            {retryPending
+              ? "Check / retry tip"
+              : resolvedAmountCents
+                ? `Tip ${formatUsd(resolvedAmountCents)}`
+                : "Tip"}
           </Button>
         </div>
       </div>
@@ -319,7 +364,7 @@ export function TipModal({
 
   if (isMobile) {
     return (
-      <Sheet open={open} onOpenChange={onOpenChange}>
+      <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent side="bottom" className="max-h-[90dvh] overflow-y-auto px-4">
           <SheetHeader className="px-0">
             <SheetTitle className="flex items-center gap-2">{titleContent}</SheetTitle>
@@ -332,7 +377,7 @@ export function TipModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         className="w-full max-w-sm sm:max-w-md rounded-2xl"
         aria-labelledby="tip-modal-title"

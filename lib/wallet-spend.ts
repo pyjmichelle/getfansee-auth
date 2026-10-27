@@ -45,6 +45,7 @@ export type SpendWalletResult =
       idempotent: boolean;
       consumptionOrderId: string | null;
       balanceAfterCents: number;
+      grossAmountCents: number;
       platformFeeCents: number;
       creatorNetCents: number;
       /** Set by the PPV wrapper — the row that grants access. */
@@ -66,6 +67,7 @@ interface SpendRpcResult {
   consumption_order_id?: string;
   balance_after_cents?: number;
   balance_cents?: number;
+  gross_amount_cents?: number;
   platform_fee_cents?: number;
   creator_net_cents?: number;
   purchase_id?: string;
@@ -127,6 +129,7 @@ function interpretSpendRpc(
     idempotent: result.idempotent === true,
     consumptionOrderId: result.consumption_order_id ?? null,
     balanceAfterCents: result.balance_after_cents ?? 0,
+    grossAmountCents: result.gross_amount_cents ?? grossCents,
     platformFeeCents: result.platform_fee_cents ?? fallbackFee,
     creatorNetCents: result.creator_net_cents ?? grossCents - fallbackFee,
     purchaseId: result.purchase_id ?? null,

@@ -1,4 +1,8 @@
 #!/usr/bin/env tsx
+import {
+  assertDedicatedTestProject,
+  assertLocalTestTarget,
+} from "../utils/assert-test-environment";
 /**
  * Auto Login - Automated Session Export
  *
@@ -27,22 +31,29 @@ if (fs.existsSync(envLocalPath)) {
   });
 }
 
+assertDedicatedTestProject(process.env.NEXT_PUBLIC_SUPABASE_URL);
 const BASE_URL = getBaseUrl();
+assertLocalTestTarget(BASE_URL);
 const ROLE = process.env.ROLE || "fan";
 const HEADED = process.env.HEADED === "true";
+const TEST_PASSWORD = process.env.E2E_TEST_USER_PASSWORD;
 const SESSIONS_DIR = path.join(process.cwd(), "artifacts", "agent-browser-full", "sessions");
+
+if (!TEST_PASSWORD) {
+  throw new Error("E2E_TEST_USER_PASSWORD is required for automated login.");
+}
 
 const TEST_ACCOUNTS = {
   fan: {
     email: "test-fan@example.com",
-    password: "TestPassword123!",
+    password: TEST_PASSWORD,
     userId: "dec562f2-a534-42a0-91f7-a5b8dbcf9305",
     testPage: "/home",
     name: "Fan",
   },
   creator: {
     email: "test-creator@example.com",
-    password: "TestPassword123!",
+    password: TEST_PASSWORD,
     userId: "77deaaa3-0c60-417d-ac8d-152ec291f674",
     testPage: "/creator/studio",
     name: "Creator",
@@ -100,26 +111,6 @@ async function autoLogin(role: "fan" | "creator") {
       consoleErrors.push(error.message);
       console.log(`   [Page Error] ${error.message}`);
     });
-    page.on("requestfailed", (request) => {
-      const url = request.url();
-      if (url.includes("/auth/v1/") || url.includes("supabase")) {
-        console.warn(`   [Request Failed] ${request.method()} ${url}`);
-        console.warn(`   → ${request.failure()?.errorText || "unknown error"}`);
-      }
-    });
-    page.on("response", (response) => {
-      const url = response.url();
-      if (url.includes("/auth/v1/token")) {
-        console.log(`   [Auth Response] ${response.status()} ${url}`);
-      }
-    });
-    page.on("request", (request) => {
-      const url = request.url();
-      if (url.includes("/auth/v1/") || url.includes("supabase")) {
-        console.log(`   [Auth Request] ${request.method()} ${url}`);
-      }
-    });
-
     // Navigate to auth page
     console.log(`\n→ Opening ${BASE_URL}/auth`);
     await page.goto(`${BASE_URL}/auth`, {
@@ -128,21 +119,6 @@ async function autoLogin(role: "fan" | "creator") {
     });
 
     console.log("\n🔑 Attempting automated login...");
-
-    // #region agent log
-    fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        location: "auto-login.ts:START",
-        message: "开始登录",
-        data: { url: page.url(), role: ROLE },
-        timestamp: Date.now(),
-        sessionId: "debug-session",
-        hypothesisId: "START",
-      }),
-    }).catch(() => {});
-    // #endregion
 
     // Check for age gate first
     console.log("   → Checking for age gate...");
@@ -159,20 +135,6 @@ async function autoLogin(role: "fan" | "creator") {
         .first()
         .click();
       await page.waitForTimeout(1500);
-      // #region agent log
-      fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          location: "auto-login.ts:AGE_GATE",
-          message: "Age gate accepted",
-          data: { hadAgeGate: true },
-          timestamp: Date.now(),
-          sessionId: "debug-session",
-          hypothesisId: "A",
-        }),
-      }).catch(() => {});
-      // #endregion
     } else {
       console.log("   → No age gate present");
     }
@@ -189,20 +151,6 @@ async function autoLogin(role: "fan" | "creator") {
         await loginTab.click();
         await page.waitForTimeout(500);
         console.log("   → Clicked login tab");
-        // #region agent log
-        fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            location: "auto-login.ts:TAB",
-            message: "Login tab clicked",
-            data: {},
-            timestamp: Date.now(),
-            sessionId: "debug-session",
-            hypothesisId: "D",
-          }),
-        }).catch(() => {});
-        // #endregion
       } else {
         console.log("   → Login tab not visible");
       }
@@ -215,39 +163,11 @@ async function autoLogin(role: "fan" | "creator") {
     const emailInput = page.getByTestId("auth-email");
     await emailInput.waitFor({ state: "visible", timeout: 10000 });
     await emailInput.fill(account.email);
-    // #region agent log
-    fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        location: "auto-login.ts:EMAIL",
-        message: "Email filled",
-        data: { email: account.email },
-        timestamp: Date.now(),
-        sessionId: "debug-session",
-        hypothesisId: "B",
-      }),
-    }).catch(() => {});
-    // #endregion
 
     console.log("   → Filling password...");
     const passwordInput = page.getByTestId("auth-password");
     await passwordInput.waitFor({ state: "visible", timeout: 10000 });
     await passwordInput.fill(account.password);
-    // #region agent log
-    fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        location: "auto-login.ts:PASSWORD",
-        message: "Password filled",
-        data: { passwordLength: account.password.length },
-        timestamp: Date.now(),
-        sessionId: "debug-session",
-        hypothesisId: "B",
-      }),
-    }).catch(() => {});
-    // #endregion
 
     await page.waitForTimeout(500);
 
@@ -255,20 +175,6 @@ async function autoLogin(role: "fan" | "creator") {
     console.log("   → Submitting login form...");
     const submitButton = page.getByTestId("auth-submit");
     await submitButton.click();
-    // #region agent log
-    fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        location: "auto-login.ts:SUBMIT",
-        message: "Submit clicked",
-        data: {},
-        timestamp: Date.now(),
-        sessionId: "debug-session",
-        hypothesisId: "B",
-      }),
-    }).catch(() => {});
-    // #endregion
 
     console.log("   → Waiting for login response...");
 
@@ -307,35 +213,17 @@ async function autoLogin(role: "fan" | "creator") {
         const currentUrl = page.url();
         if (!currentUrl.includes("/auth")) {
           loginOutcome = "navigated";
-          console.log(`   [CI Mode] Navigation succeeded after retry: ${currentUrl}`);
+          console.log(
+            `   [CI Mode] Navigation succeeded after retry: ${new URL(currentUrl).pathname}`
+          );
         }
       }
     }
 
     // Check current state after submission
-    const urlAfterSubmit = page.url();
-    const bodyText = await page.textContent("body").catch(() => "");
-    // #region agent log
-    fetch("http://127.0.0.1:7243/ingest/68e3b8f5-5423-4da0-8d81-7693c6fde45d", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        location: "auto-login.ts:AFTER_SUBMIT",
-        message: "After submit state",
-        data: {
-          url: urlAfterSubmit,
-          hasError: bodyText.includes("error") || bodyText.includes("Error"),
-          hasInvalid: bodyText.includes("Invalid") || bodyText.includes("incorrect"),
-        },
-        timestamp: Date.now(),
-        sessionId: "debug-session",
-        hypothesisId: "C",
-      }),
-    }).catch(() => {});
-    // #endregion
 
     const currentUrl = page.url();
-    console.log(`   → Current URL: ${currentUrl}`);
+    console.log(`   → Current URL: ${new URL(currentUrl).pathname}`);
 
     const errorAlertText = await errorAlert.textContent().catch(() => null);
     if (errorAlertText) {
@@ -345,7 +233,7 @@ async function autoLogin(role: "fan" | "creator") {
 
     if (currentUrl.includes("/auth")) {
       console.error("\n❌ Login failed - still on auth page");
-      console.error(`   URL: ${currentUrl}`);
+      console.error(`   URL: ${new URL(currentUrl).pathname}`);
       console.error(`   Outcome: ${loginOutcome}`);
       if (authTokenStatus !== null) {
         console.error(`   Auth token status: ${authTokenStatus}`);
@@ -439,7 +327,7 @@ async function autoLogin(role: "fan" | "creator") {
     await page.waitForTimeout(3000);
 
     const finalUrl = page.url();
-    console.log(`   Final URL: ${finalUrl}`);
+    console.log(`   Final page: ${new URL(finalUrl).pathname}`);
 
     // Check if we got redirected back to auth
     if (finalUrl.includes("/auth")) {
@@ -455,7 +343,7 @@ async function autoLogin(role: "fan" | "creator") {
       if (process.env.CI === "true") {
         console.error(`\n   🔍 CI Environment Debug Info:`);
         console.error(`   - Expected page: ${account.testPage}`);
-        console.error(`   - Actual URL: ${finalUrl}`);
+        console.error(`   - Actual URL: ${new URL(finalUrl).pathname}`);
         console.error(`   - This may indicate:`);
         console.error(`     1. Session cookies are invalid`);
         console.error(`     2. User profile is missing or incorrect role`);
@@ -488,7 +376,7 @@ async function autoLogin(role: "fan" | "creator") {
     console.log("\n📊 Session Info:");
     console.log(`   Cookies: ${cookieCount}`);
     console.log(`   Origins: ${originCount}`);
-    console.log(`   Final URL: ${finalUrl}`);
+    console.log(`   Final page: ${new URL(finalUrl).pathname}`);
 
     console.log("\n" + "=".repeat(60));
     console.log("✅ SUCCESS");

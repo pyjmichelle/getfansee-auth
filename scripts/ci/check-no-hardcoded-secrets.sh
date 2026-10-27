@@ -1,41 +1,35 @@
-#!/bin/bash
-#
-# CI gate: block committed real secret values (Supabase personal access
-# tokens, Supabase JWTs). Deliberately does NOT allowlist docs/ or scripts/ —
-# a 2026-07-26 incident had a real SUPABASE_SERVICE_ROLE_KEY committed in
-# markdown docs and a walkthrough script, both exempt from the
-# check-no-service-role-leaks.sh variable-name scan.
-#
-# Secrets belong in .env.local / GitHub Secrets only — never in repo files.
-#
-set -e
+#!/usr/bin/env bash
+# Scan tracked files, including environment files and generated artifacts.
+# Print paths only: diagnostics must never repeat a discovered credential.
+set -euo pipefail
 
-if ! command -v rg &>/dev/null; then
-  echo "ripgrep (rg) required"
-  exit 1
-fi
+python3 - <<'PY'
+import pathlib
+import re
+import subprocess
+import sys
 
-EXCLUDES=(--glob '!.env*' --glob '!node_modules/**' --glob '!.next/**' --glob '!pnpm-lock.yaml')
-
-echo "Checking for hardcoded Supabase personal access tokens (sbp_*)..."
-TOKEN_LEAKS="$(rg -n 'sbp_[a-f0-9]{20,}' "${EXCLUDES[@]}" . 2>/dev/null || true)"
-
-echo "Checking for hardcoded Supabase project JWTs (service_role/anon)..."
-# Matches the fixed header+iss-claim prefix of every real Supabase JWT:
-# base64("{"alg":"HS256","typ":"JWT"}").base64("{"iss":"supabase"...).
-JWT_LEAKS="$(rg -n 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZSI[A-Za-z0-9_-]{30,}' "${EXCLUDES[@]}" . 2>/dev/null || true)"
-
-LEAKS="$TOKEN_LEAKS
-$JWT_LEAKS"
-LEAKS="$(echo "$LEAKS" | sed '/^$/d')"
-
-if [ -n "$LEAKS" ]; then
-  echo ""
-  echo "ERROR: Real secret value(s) found committed outside .env files:"
-  echo "$LEAKS"
-  echo ""
-  echo "Remove the value, use a placeholder instead, and rotate the secret in Supabase Dashboard."
-  exit 1
-fi
-
-echo "OK: no hardcoded Supabase tokens/JWTs in tracked source"
+patterns = [
+    re.compile(r'sbp_[a-f0-9]{20,}'),
+    re.compile(r'eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}'),
+    re.compile(r'"(?:access_token|refresh_token)"\s*:\s*"[^"\s]{20,}"'),
+]
+files = subprocess.check_output(['git', 'ls-files', '-z']).split(b'\0')
+leaks = []
+for raw_path in files:
+    if not raw_path:
+        continue
+    path = pathlib.Path(raw_path.decode())
+    if not path.is_file():
+        continue
+    contents = path.read_text(errors='replace')
+    if any(pattern.search(contents) for pattern in patterns):
+        leaks.append(str(path))
+if leaks:
+    print('ERROR: possible committed credentials found in:')
+    for path in leaks:
+        print(path)
+    print('Remove credentials and rotate any exposed secrets.')
+    sys.exit(1)
+print('OK: no committed Supabase credentials or browser session tokens.')
+PY

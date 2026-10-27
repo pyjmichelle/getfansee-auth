@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createPost, type PostVisibility } from "@/lib/posts";
 import { canAccessTestRoute } from "@/lib/test-route-guard";
+import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
 /**
  * E2E 专用：用稳定媒体 URL 创建 post，不依赖真实上传。
@@ -34,6 +35,19 @@ export async function POST(request: NextRequest) {
   });
 
   if (result.success) {
+    // createPost intentionally creates a pending moderation record. This route
+    // exists only inside the guarded E2E runtime, so approve its fixture with
+    // the same privileged boundary used by the real moderation backend.
+    const { error: approvalError } = await getSupabaseAdminClient()
+      .from("posts")
+      .update({ review_status: "approved", reviewed_at: new Date().toISOString() })
+      .eq("id", result.postId);
+    if (approvalError) {
+      return NextResponse.json(
+        { success: false, error: "Failed to approve E2E post fixture" },
+        { status: 500 }
+      );
+    }
     return NextResponse.json({ success: true, postId: result.postId });
   }
   return NextResponse.json({ success: false, error: result.error }, { status: 500 });

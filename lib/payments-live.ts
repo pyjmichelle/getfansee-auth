@@ -1,3 +1,5 @@
+import { isLocalDevelopmentOrTest } from "./test-environment";
+
 /**
  * Single source of truth for whether in-app money movement is actually open.
  *
@@ -9,12 +11,7 @@
  */
 
 export function isTestPaymentsOverride(): boolean {
-  return (
-    process.env.E2E === "1" ||
-    process.env.PLAYWRIGHT_TEST_MODE === "true" ||
-    process.env.NEXT_PUBLIC_TEST_MODE === "true" ||
-    process.env.NODE_ENV === "development"
-  );
+  return isLocalDevelopmentOrTest();
 }
 
 export function isPayramConfigured(): boolean {

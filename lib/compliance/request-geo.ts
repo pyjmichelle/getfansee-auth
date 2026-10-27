@@ -1,3 +1,4 @@
+import { isLocalDevelopmentOrTest } from "../test-environment";
 /**
  * Request-scoped geo resolution with a test-only override.
  *
@@ -15,12 +16,7 @@ export const TEST_GEO_COUNTRY_HEADER = "x-gfs-test-country";
 export const TEST_GEO_REGION_HEADER = "x-gfs-test-region";
 
 function isGeoOverrideAllowed(): boolean {
-  return (
-    process.env.E2E === "1" ||
-    process.env.PLAYWRIGHT_TEST_MODE === "true" ||
-    process.env.NEXT_PUBLIC_TEST_MODE === "true" ||
-    process.env.NODE_ENV === "development"
-  );
+  return isLocalDevelopmentOrTest();
 }
 
 export function getRequestGeo(headers: Headers): GeoContext {

@@ -160,6 +160,7 @@ export async function createPayramPayment(params: {
 }): Promise<PayramCreatePaymentResponse> {
   const res = await fetch(`${getBaseUrl()}/api/v1/payment`, {
     method: "POST",
+    signal: AbortSignal.timeout(15_000),
     headers: {
       "Content-Type": "application/json",
       "API-Key": getApiKey(),
@@ -175,8 +176,7 @@ export async function createPayramPayment(params: {
   });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`PayRam payment creation failed (${res.status}): ${text}`);
+    throw new Error(`PayRam payment creation failed (${res.status})`);
   }
 
   const data = (await res.json()) as PayramCreatePaymentResponse;

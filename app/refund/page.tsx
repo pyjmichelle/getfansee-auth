@@ -32,7 +32,8 @@ export default function RefundPage() {
         <section>
           <h2 className="text-h2 mb-4">2. Cancelling a Subscription</h2>
           <p className="text-text-secondary">
-            You may cancel any active subscription at any time, directly from your account:
+            Subscription purchases do not renew automatically in the current MVP. You can review
+            each 30-day access period from your account:
           </p>
           <ol className="list-decimal pl-6 text-text-secondary space-y-2 mt-3">
             <li>
@@ -42,14 +43,12 @@ export default function RefundPage() {
               </Link>
               .
             </li>
-            <li>
-              Find the subscription you wish to cancel and click <strong>Cancel</strong>.
-            </li>
-            <li>Confirm the cancellation in the dialog that appears.</li>
+            <li>Find the creator access period you want to review.</li>
+            <li>Check the displayed access end date.</li>
           </ol>
           <p className="text-text-secondary mt-4">
-            Your access continues until the end of the current billing period. You will not be
-            charged again after cancellation. There are no cancellation fees.
+            Access ends automatically at the end of the purchased period. No renewal charge is
+            scheduled and there are no cancellation fees.
           </p>
         </section>
 
@@ -67,8 +66,8 @@ export default function RefundPage() {
               <strong>Technical error:</strong> A platform error resulted in an incorrect charge.
             </li>
             <li>
-              <strong>Billing after cancellation:</strong> You were charged after successfully
-              cancelling your subscription.
+              <strong>Incorrect wallet debit:</strong> The amount deducted did not match the price
+              shown when you confirmed the purchase.
             </li>
           </ul>
           <p className="text-text-secondary mt-4">
@@ -217,11 +216,11 @@ export default function RefundPage() {
         </section>
 
         <section>
-          <h2 className="text-h2 mb-4">8. What Will Appear on Your Statement</h2>
+          <h2 className="text-h2 mb-4">8. Wallet Funding Statement Details</h2>
           <p className="text-text-secondary">
-            Charges from GetFanSee will appear on your bank or credit card statement as{" "}
-            <strong>GETFANSEE.COM</strong>. If you do not recognise a charge, please contact us
-            before disputing it with your bank.
+            Wallet funding is processed by a payment partner. The partner will display the final
+            amount, fees and card statement descriptor before confirmation. If you do not recognise
+            a charge, please contact us before disputing it with your bank.
           </p>
         </section>
 

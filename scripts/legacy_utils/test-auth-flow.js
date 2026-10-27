@@ -12,7 +12,12 @@
  *   2. 已执行 migrations/004_fix_profiles_final.sql
  */
 
-const { createClient } = require('@supabase/supabase-js')
+const { createClient: createUnsafeClient } = require('@supabase/supabase-js')
+const { assertDedicatedTestProject, requireTestPassword } = require('../utils/assert-test-environment.cjs')
+function createClient(url, ...args) {
+  assertDedicatedTestProject(url)
+  return createUnsafeClient(url, ...args)
+}
 const { readFileSync } = require('fs')
 const { join } = require('path')
 
@@ -315,7 +320,7 @@ async function testProfilesInsertAndQuery(serviceClient, supabaseUrl, serviceRol
   log('\n🔍 测试 2: Schema 验收 - 插入和查询 profiles（使用 SERVICE_ROLE_KEY）', 'blue')
   
   const testEmail = `schema-test-${Date.now()}@example.com`
-  const testPassword = 'TestPassword123!'
+  const testPassword = requireTestPassword()
   let testUserId = null
   
   try {
@@ -535,7 +540,7 @@ async function testSignUp(anonClient) {
   log('\n📝 测试 3: 测试注册功能（使用 ANON_KEY）', 'blue')
   
   const testEmail = `test-${Date.now()}@example.com`
-  const testPassword = 'TestPassword123!'
+  const testPassword = requireTestPassword()
   
   try {
     const { data, error } = await anonClient.auth.signUp({

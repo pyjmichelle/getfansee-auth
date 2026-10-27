@@ -1,4 +1,10 @@
 #!/usr/bin/env tsx
+import { assertDedicatedTestProject, assertLocalTestTarget } from "./utils/assert-test-environment";
+function requireTestPassword(): string {
+  const password = process.env.E2E_TEST_USER_PASSWORD;
+  if (!password) throw new Error("E2E_TEST_USER_PASSWORD is required.");
+  return password;
+}
 /**
  * KYC Flow Verification Script
  *
@@ -54,6 +60,7 @@ const SERVICE_KEY = localEnv.SUPABASE_SERVICE_ROLE_KEY;
 const ANON_KEY = localEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const WEBHOOK_SECRET = localEnv.DIDIT_WEBHOOK_SECRET;
 const BASE_URL = getBaseUrl();
+assertLocalTestTarget(BASE_URL);
 
 if (!SUPABASE_URL || !SERVICE_KEY || !ANON_KEY) {
   console.error("❌  Missing env vars in .env.local (SUPABASE_URL, SERVICE_KEY, ANON_KEY)");
@@ -62,6 +69,7 @@ if (!SUPABASE_URL || !SERVICE_KEY || !ANON_KEY) {
 
 const projectRef = new URL(SUPABASE_URL).hostname.split(".")[0];
 
+assertDedicatedTestProject(SUPABASE_URL);
 const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
@@ -87,7 +95,7 @@ function skip(label: string, detail?: string) {
 
 // ── Test User Management ───────────────────────────────────
 const TEST_EMAIL = `kyc-test-${Date.now()}@getfansee-test.local`;
-const TEST_PASSWORD = "TestKyc123!";
+const TEST_PASSWORD = requireTestPassword();
 let testUserId: string | null = null;
 let authCookies: string = "";
 let migrationApplied = false;

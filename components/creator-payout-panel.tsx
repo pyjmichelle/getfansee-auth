@@ -31,6 +31,7 @@ export function CreatorPayoutPanel() {
   const [paymentsLive, setPaymentsLive] = useState(false);
   const [minimumCents, setMinimumCents] = useState(2000);
   const [availableCents, setAvailableCents] = useState(0);
+  const [debtCents, setDebtCents] = useState(0);
   const [methods, setMethods] = useState<PayoutMethod[]>([]);
   const [withdrawals, setWithdrawals] = useState<WithdrawalRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,6 +55,7 @@ export function CreatorPayoutPanel() {
       setPaymentsLive(data.paymentsLive === true);
       setMinimumCents(data.minimumCents ?? 2000);
       setAvailableCents(data.availableCents ?? 0);
+      setDebtCents(data.debtCents ?? 0);
       const nextMethods = (data.methods ?? []) as PayoutMethod[];
       setMethods(nextMethods);
       setMethodId(
@@ -99,6 +101,8 @@ export function CreatorPayoutPanel() {
       setDestination("");
       setLabel("");
       await reload();
+    } catch {
+      toast.error("Could not save the payout method. Please try again.");
     } finally {
       setSavingMethod(false);
     }
@@ -140,6 +144,10 @@ export function CreatorPayoutPanel() {
       withdrawIntentRef.current = "";
       setAmountUsd("");
       await reload();
+    } catch {
+      toast.error(
+        "Could not confirm the withdrawal. Retry safely with the same amount and method."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -167,10 +175,16 @@ export function CreatorPayoutPanel() {
     <div className="space-y-6" data-testid="creator-payout-panel">
       <div>
         <p className="text-small text-text-secondary mb-3">
-          Wallet available:{" "}
+          Earnings available:{" "}
           <strong className="text-text-primary">{formatUsd(availableCents)}</strong>. Minimum
           withdrawal {formatUsd(minimumCents)}. Transfers are reviewed and sent off-platform.
         </p>
+        {debtCents > 0 && (
+          <p role="status" className="text-small text-text-secondary mb-3">
+            {formatUsd(debtCents)} in refunded earnings will be deducted from future earnings. Your
+            spending balance is separate.
+          </p>
+        )}
         <div className="grid gap-3 sm:grid-cols-[1fr_auto] items-end">
           <div>
             <Label htmlFor="withdraw-amount">Amount (USD)</Label>

@@ -17,11 +17,11 @@ interface FAQItem {
 
 const billingFAQ: FAQItem[] = [
   {
-    q: "What will appear on my bank or credit card statement?",
+    q: "How will wallet funding appear on my card statement?",
     a: (
       <>
-        Charges from GetFanSee appear on your statement as{" "}
-        <strong className="text-text-primary">GETFANSEE.COM</strong>. If you see a charge you don't
+        Wallet funding is handled by a payment partner. The final amount, provider fees and
+        statement descriptor are displayed before confirmation. If you see a charge you don&apos;t
         recognise, please{" "}
         <Link href="/support" className="text-wine-text underline hover:no-underline">
           contact support
@@ -34,10 +34,9 @@ const billingFAQ: FAQItem[] = [
     q: "How do subscriptions work?",
     a: (
       <>
-        Subscriptions are billed on a recurring monthly basis from the date you subscribe. You get
-        access to all of a creator's subscriber-only content for 30 days. The charge recurs
-        automatically unless you cancel. You can see all active subscriptions and their next renewal
-        dates on your{" "}
+        A subscription purchase grants access to a creator&apos;s subscriber-only content for 30
+        days. The current MVP does not renew automatically. You can see active access periods and
+        their end dates on your{" "}
         <Link href="/subscriptions" className="text-wine-text underline hover:no-underline">
           Subscriptions page
         </Link>
@@ -57,35 +56,34 @@ const billingFAQ: FAQItem[] = [
         <Link href="/me/wallet" className="text-wine-text underline hover:no-underline">
           Wallet page
         </Link>{" "}
-        and choose a recharge amount ($10, $25, $50, $100, or $200). Larger recharges include a
-        bonus credit.
+        and choose an available funding amount. During Beta, the planned fixed tiers are $20, $50
+        and $100. The payment provider will show its fees before confirmation.
       </>
     ),
   },
   {
     q: "Will I receive a receipt for my purchases?",
-    a: "Yes. After every subscription or PPV purchase, we automatically send an order confirmation email to your registered address. The email includes the amount charged, what you purchased, the billing descriptor (GETFANSEE.COM), and a link to manage your subscription.",
+    a: "Yes. After every completed subscription or PPV purchase, we send an order confirmation email to your registered address. It includes the amount deducted from your GetFanSee wallet and what you purchased.",
   },
 ];
 
 const cancellationFAQ: FAQItem[] = [
   {
-    q: "How do I cancel a subscription?",
+    q: "Do I need to cancel a subscription?",
     a: (
       <>
-        Log in and go to your{" "}
+        No recurring charge is scheduled in the current MVP. Your access ends automatically after 30
+        days. You can review the end date on your{" "}
         <Link href="/subscriptions" className="text-wine-text underline hover:no-underline">
           Subscriptions page
         </Link>
-        . Find the subscription you want to cancel and click the <strong>Cancel</strong> button.
-        Confirm in the dialog. Cancellation takes effect at the end of your current billing period —
-        you keep access until then. There are no cancellation fees.
+        .
       </>
     ),
   },
   {
     q: "What happens after I cancel?",
-    a: "Your access to the creator's content continues until the end of the billing period you've already paid for. After that, you will no longer be charged and will lose subscriber-only access.",
+    a: "Your access continues until the end of the 30-day period you purchased. No automatic renewal charge is made.",
   },
   {
     q: "Can I resubscribe after cancelling?",

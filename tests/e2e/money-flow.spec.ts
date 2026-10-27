@@ -21,6 +21,7 @@ import {
   safeClick,
   signInUser,
   signUpUser,
+  TEST_PASSWORD,
   waitForPageLoad,
 } from "./shared/helpers";
 
@@ -110,7 +111,7 @@ test.describe("Money Flow - 护城河测试", () => {
     const timestamp = Date.now();
     const random = Math.random().toString(36).slice(2, 8);
     const poorFanEmail = `e2e-poor-fan-${timestamp}-${random}@example.com`;
-    const poorFanPassword = "TestPassword123!";
+    const poorFanPassword = TEST_PASSWORD;
 
     // 2. 注册新用户（余额为 0）
     await signUpUser(page, poorFanEmail, poorFanPassword, "fan");

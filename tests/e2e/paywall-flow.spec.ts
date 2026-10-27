@@ -12,9 +12,7 @@ const timestamp = Date.now();
 const random = Math.random().toString(36).slice(2, 8);
 const uniqueSuffix = `${timestamp}-${random}`;
 const fanEmail = `e2e-fan-${uniqueSuffix}@example.com`;
-const fanPassword = "TestPassword123!";
 const creatorEmail = `e2e-creator-${uniqueSuffix}@example.com`;
-const creatorPassword = "CreatorPassword123!";
 
 import {
   clearStorage,
@@ -26,8 +24,12 @@ import {
   seedPaidSubscribeFixture,
   signInUser,
   signUpUser,
+  TEST_PASSWORD,
   waitForPageLoad,
 } from "./shared/helpers";
+
+const fanPassword = TEST_PASSWORD;
+const creatorPassword = TEST_PASSWORD;
 
 test.describe("Paywall Flow E2E", () => {
   test.beforeEach(async ({ page }) => {
@@ -149,9 +151,12 @@ test.describe("Paywall Flow E2E", () => {
 
       await page.goto(`${BASE_URL}/home`, { waitUntil: "domcontentloaded", timeout: 30000 });
       await waitForPageLoad(page);
-      await page.waitForSelector(`text=${content}`, { timeout: 15000 });
+      // Locked post bodies are intentionally removed from the feed payload, so
+      // locate the exact fixture by its non-sensitive ID instead of leaked text.
+      const fixtureCard = page.locator(`[data-testid="post-card"][data-post-id="${postId}"]`);
+      await expect(fixtureCard).toBeVisible({ timeout: 15000 });
 
-      const lockedContent = page.getByTestId("post-locked-preview").first();
+      const lockedContent = fixtureCard.getByTestId("post-locked-preview");
       await expect(lockedContent).toBeVisible({ timeout: 15000 });
       // Scroll the locked overlay into view so child elements are fully rendered
       await lockedContent.scrollIntoViewIfNeeded();

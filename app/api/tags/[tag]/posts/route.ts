@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-server";
 import { createClient } from "@/lib/supabase-server";
+import { getPublicCreatorLabels } from "@/lib/public-profiles";
 import { getMockPostsByTag, MOCK_TAGS, shouldUseMockData } from "@/lib/mock-data";
 
 /**
@@ -74,18 +75,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const postIds = postTags.map((pt) => pt.post_id);
 
-    // Get posts with creator info
+    // Posts remain subject to viewer RLS; creator labels use the safe projection.
     const { data: posts, error: postsError } = await supabase
       .from("posts")
       .select(
-        `
-        *,
-        creator:profiles!posts_creator_id_fkey (
-          id,
-          display_name,
-          avatar_url
-        )
-      `
+        "id, creator_id, title, content, media_url, visibility, price_cents, likes_count, created_at"
       )
       .in("id", postIds)
       .order("created_at", { ascending: false });
@@ -95,10 +89,19 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ success: false, error: "Failed to fetch posts" }, { status: 500 });
     }
 
+    const creators = await getPublicCreatorLabels(
+      supabase,
+      (posts ?? []).map((post) => post.creator_id)
+    );
     return NextResponse.json({
       success: true,
       tag: tagData,
-      posts: posts || [],
+      posts: (posts ?? [])
+        .filter((post) => creators.has(post.creator_id))
+        .map((post) => ({
+          ...post,
+          creator: creators.get(post.creator_id),
+        })),
     });
   } catch (err: unknown) {
     console.error("[api/tags/[tag]/posts] Exception:", err);

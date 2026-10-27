@@ -1,3 +1,4 @@
+import { assertDedicatedTestProject } from "./utils/assert-test-environment";
 import { createClient } from "@supabase/supabase-js";
 
 // 从环境变量读取（运行时通过 source .env.local 加载）
@@ -10,6 +11,7 @@ if (!supabaseUrl || !supabaseServiceKey) {
   process.exit(1);
 }
 
+assertDedicatedTestProject(supabaseUrl);
 const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,

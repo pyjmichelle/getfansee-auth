@@ -148,6 +148,7 @@ function PostCard({
   return (
     <article
       data-testid="post-card"
+      data-post-id={post.id}
       className="glass-card rounded-[var(--radius-lg)] overflow-hidden mb-4"
     >
       {/* Header */}
@@ -776,7 +777,7 @@ export function HomeFeedClient({
             paywallPost.visibility === "subscribers"
               ? [
                   "Full access to all exclusive posts",
-                  "Direct messaging with the creator",
+                  "Access to the creator's subscriber-only posts",
                   "Early access to new content",
                   "Cancel anytime",
                 ]

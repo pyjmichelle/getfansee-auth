@@ -55,6 +55,14 @@ describe("arePaymentsLive", () => {
     expect(isPayramCheckoutOpen()).toBe(false);
   });
 
+  it("does not treat NEXT_PUBLIC_TEST_MODE as permission to move money", () => {
+    productionFlags();
+    process.env.NEXT_PUBLIC_TEST_MODE = "true";
+    delete process.env.NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED;
+    delete process.env.PAYRAM_ENABLED;
+    expect(arePaymentsLive()).toBe(false);
+  });
+
   it("stays closed in production when only PayRam is configured", () => {
     productionFlags();
     process.env.NEXT_PUBLIC_CRYPTO_TOPUP_ENABLED = "false";

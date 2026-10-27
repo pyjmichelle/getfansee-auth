@@ -12,7 +12,12 @@
  *   2. 已执行 migrations/010_visibility_pricing.sql
  */
 
-const { createClient } = require('@supabase/supabase-js')
+const { createClient: createUnsafeClient } = require('@supabase/supabase-js')
+const { assertDedicatedTestProject, requireTestPassword } = require('./utils/assert-test-environment.cjs')
+function createClient(url, ...args) {
+  assertDedicatedTestProject(url)
+  return createUnsafeClient(url, ...args)
+}
 const { readFileSync } = require('fs')
 const { join } = require('path')
 
@@ -397,9 +402,9 @@ async function main() {
   
   const timestamp = Date.now()
   const fanEmail = `test-visibility-fan-${timestamp}@example.com`
-  const fanPassword = 'TestPassword123!'
+  const fanPassword = requireTestPassword()
   const creatorEmail = `test-visibility-creator-${timestamp}@example.com`
-  const creatorPassword = 'CreatorPassword123!'
+  const creatorPassword = requireTestPassword()
   
   let fanUser = null
   let creatorUser = null

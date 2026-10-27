@@ -1,3 +1,5 @@
+import { isTestPaymentsOverride } from "@/lib/payments-live";
+import { resolveJurisdiction } from "@/lib/compliance/jurisdictions";
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/authz";
@@ -13,7 +15,6 @@ const SITE_URL =
 
 type UnlockPayload = {
   postId?: string;
-  priceCents?: number;
 };
 
 export async function POST(request: NextRequest) {
@@ -29,27 +30,48 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       );
     }
+    if (
+      !isTestPaymentsOverride() &&
+      !resolveJurisdiction(getRequestGeo(request.headers)).paymentsAllowed
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Payments are not available in your region yet." },
+        { status: 403 }
+      );
+    }
 
     // 路由层显式鉴权：未登录直接 401，不依赖下层隐式判断
     const { user } = await requireUser();
 
-    const { postId, priceCents } = (await request.json()) as UnlockPayload;
+    const payload = (await request.json().catch(() => null)) as UnlockPayload | null;
+    const postId = payload?.postId;
 
-    if (!postId) {
-      return NextResponse.json({ success: false, error: "postId is required" }, { status: 400 });
+    if (
+      typeof postId !== "string" ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(postId)
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Valid postId is required" },
+        { status: 400 }
+      );
     }
 
     const idempotencyKey = request.headers.get("Idempotency-Key") ?? randomUUID();
+    if (idempotencyKey.length === 0 || idempotencyKey.length > 200) {
+      return NextResponse.json(
+        { success: false, error: "Invalid idempotency key" },
+        { status: 400 }
+      );
+    }
     // 将已验证的 userId 显式传入，避免下层重复获取 session 的竞态
     const result = await unlockPost(
       postId,
-      priceCents,
       idempotencyKey,
       user.id,
       getRequestGeo(request.headers)
     );
 
-    if (result.success) {
+    if (result.success && !result.idempotent) {
       // Send PPV receipt email (non-blocking)
       try {
         const admin = getSupabaseAdminClient();
@@ -71,7 +93,7 @@ export async function POST(request: NextRequest) {
         } | null;
         const creatorName = post?.profiles?.display_name || "Creator";
         const contentTitle = post?.title || "Premium Content";
-        const resolvedPrice = priceCents ?? post?.price_cents ?? 0;
+        const resolvedPrice = result.amount_cents ?? post?.price_cents ?? 0;
 
         await sendPPVConfirmation({
           toEmail: user.email,

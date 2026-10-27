@@ -12,7 +12,12 @@
  *   2. 已执行 migrations/006_creator_onboarding.sql
  */
 
-const { createClient } = require('@supabase/supabase-js')
+const { createClient: createUnsafeClient } = require('@supabase/supabase-js')
+const { assertDedicatedTestProject, requireTestPassword } = require('./utils/assert-test-environment.cjs')
+function createClient(url, ...args) {
+  assertDedicatedTestProject(url)
+  return createUnsafeClient(url, ...args)
+}
 const { readFileSync } = require('fs')
 const { join } = require('path')
 
@@ -202,7 +207,7 @@ async function testRegisterAndLogin(supabase) {
   log('\n📝 测试 1: 注册新用户并登录', 'blue')
   
   const testEmail = `role-test-${Date.now()}@example.com`
-  const testPassword = 'TestPassword123!'
+  const testPassword = requireTestPassword()
   
   try {
     // 注册

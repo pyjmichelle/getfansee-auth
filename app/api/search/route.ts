@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/authz";
 import { getSupabaseRouteHandlerClient } from "@/lib/supabase-route";
+import { getPublicCreatorLabels } from "@/lib/public-profiles";
 import { searchMockCreators, getMockPostsWithCreators, shouldUseMockData } from "@/lib/mock-data";
 
 /**
@@ -83,11 +84,7 @@ export async function GET(request: NextRequest) {
           visibility,
           price_cents,
           likes_count,
-          created_at,
-          profiles:creator_id (
-            display_name,
-            avatar_url
-          )
+          created_at
         `
             )
             .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
@@ -115,7 +112,20 @@ export async function GET(request: NextRequest) {
         console.error("[api/search] Posts search error:", postsResult.error);
         results.posts = [];
       } else {
-        results.posts = postsResult?.data || [];
+        const rows = postsResult?.data || [];
+        const creators = await getPublicCreatorLabels(
+          supabase,
+          rows.map((post) => post.creator_id)
+        );
+        results.posts = rows
+          .filter((post) => creators.has(post.creator_id))
+          .map((post) => ({
+            ...post,
+            profiles: {
+              display_name: creators.get(post.creator_id)?.display_name ?? undefined,
+              avatar_url: creators.get(post.creator_id)?.avatar_url ?? undefined,
+            },
+          }));
       }
 
       // If no results and mock data enabled, use mock posts

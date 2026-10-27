@@ -18,6 +18,7 @@ import { TrustStrip } from "@/components/trust-strip";
 
 type AuthPageClientProps = {
   initialMode?: "login" | "signup";
+  testMode?: boolean;
   isInvited?: boolean;
   refName?: string;
   /** Deep-link target from middleware's `?redirect=`; falls back to /home. */
@@ -70,12 +71,13 @@ const getErrorMessage = (error: unknown, fallback = "Internal server error") =>
 
 export default function AuthPageClient({
   initialMode = "login",
+  testMode = false,
   isInvited = false,
   refName,
   redirectTo,
 }: AuthPageClientProps) {
   const supabase = getSupabaseBrowserClient();
-  const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === "true";
+  const isTestMode = testMode;
   const postAuthTarget = sanitizeRedirectTarget(redirectTo);
 
   const [loginEmail, setLoginEmail] = useState("");
@@ -106,9 +108,9 @@ export default function AuthPageClient({
   }, []);
 
   useEffect(() => {
-    setActiveTab(initialMode);
+    setActiveTab(isInvited ? "signup" : initialMode);
     resetAuthState();
-  }, [initialMode, resetAuthState]);
+  }, [initialMode, isInvited, resetAuthState]);
 
   useEffect(() => {
     try {

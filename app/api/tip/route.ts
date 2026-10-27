@@ -1,3 +1,5 @@
+import { isTestPaymentsOverride } from "@/lib/payments-live";
+import { resolveJurisdiction } from "@/lib/compliance/jurisdictions";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
@@ -45,6 +47,15 @@ export async function POST(request: NextRequest) {
           success: false,
           error: "Tipping is not available during the Alpha. Coming soon.",
         },
+        { status: 403 }
+      );
+    }
+    if (
+      !isTestPaymentsOverride() &&
+      !resolveJurisdiction(getRequestGeo(request.headers)).paymentsAllowed
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Payments are not available in your region yet." },
         { status: 403 }
       );
     }
@@ -108,7 +119,11 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    if (typeof clientNonce !== "string" || clientNonce.trim().length === 0) {
+    if (
+      typeof clientNonce !== "string" ||
+      clientNonce.trim().length === 0 ||
+      clientNonce.length > 200
+    ) {
       return NextResponse.json(
         { success: false, error: "clientNonce is required" },
         { status: 400 }
@@ -119,13 +134,60 @@ export async function POST(request: NextRequest) {
 
     const admin = getSupabaseAdminClient();
 
+    // Never route earnings to an arbitrary auth user or attach them to another
+    // creator's post. The RPC repeats these checks inside the transaction.
+    const { data: creator, error: creatorError } = await admin
+      .from("profiles")
+      .select("role")
+      .eq("id", creatorId)
+      .maybeSingle();
+    if (creatorError) {
+      return NextResponse.json(
+        { success: false, error: "Could not verify creator" },
+        { status: 500 }
+      );
+    }
+    if (creator?.role !== "creator") {
+      return NextResponse.json({ success: false, error: "Creator not found" }, { status: 404 });
+    }
+    if (postId) {
+      const { data: post, error: postError } = await admin
+        .from("posts")
+        .select("creator_id, review_status, deleted_at")
+        .eq("id", postId)
+        .maybeSingle();
+      if (postError) {
+        return NextResponse.json(
+          { success: false, error: "Could not verify post" },
+          { status: 500 }
+        );
+      }
+      if (
+        !post ||
+        post.creator_id !== creatorId ||
+        post.review_status !== "approved" ||
+        post.deleted_at != null
+      ) {
+        return NextResponse.json(
+          { success: false, error: "Post does not belong to this creator" },
+          { status: 400 }
+        );
+      }
+    }
+
     // 2b. Creator tip settings (optional row — absent means defaults / enabled)
-    const { data: tipSettings } = await admin
+    const { data: tipSettings, error: settingsError } = await admin
       .from("creator_tip_settings")
       .select("enabled, thank_you_message")
       .eq("creator_id", creatorId)
       .maybeSingle();
 
+    if (settingsError) {
+      return NextResponse.json(
+        { success: false, error: "Could not verify tip settings" },
+        { status: 500 }
+      );
+    }
     if (tipSettings && tipSettings.enabled === false) {
       return NextResponse.json(
         { success: false, error: "This creator is not accepting tips" },

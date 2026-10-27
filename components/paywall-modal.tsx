@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Lock, Check, X, CreditCard, Loader2, ExternalLink } from "@/lib/icons";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -48,6 +48,7 @@ function useCreatorExternalLinks(creatorId: string | undefined, open: boolean) {
   useEffect(() => {
     if (!open || !creatorId || WALLET_PATH_ACTIVE) return;
     let mounted = true;
+    setLinks([]);
     fetch(`/api/creator/${creatorId}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((json) => {
@@ -79,6 +80,7 @@ export function PaywallModal({
   const [paymentState, setPaymentState] = useState<"idle" | "processing" | "success" | "error">(
     "idle"
   );
+  const paymentInFlight = useRef(false);
   const [balance, setBalance] = useState<number | null>(null);
   const [isBalanceLoading, setIsBalanceLoading] = useState(false);
   const [balanceError, setBalanceError] = useState<string | null>(null);
@@ -104,7 +106,7 @@ export function PaywallModal({
     let mounted = true;
 
     const fetchBalance = async () => {
-      if (!open || type !== "ppv") {
+      if (!open || !WALLET_PATH_ACTIVE) {
         setBalance(null);
         setBalanceError(null);
         return;
@@ -147,8 +149,7 @@ export function PaywallModal({
     };
   }, [open, type, price]);
 
-  const insufficientBalance =
-    type === "ppv" && !isBalanceLoading && balance !== null && balance < price;
+  const insufficientBalance = !isBalanceLoading && balance !== null && balance < price;
 
   const handleRetryBalance = async () => {
     setBalanceError(null);
@@ -169,6 +170,8 @@ export function PaywallModal({
   };
 
   const handlePayment = async () => {
+    if (paymentInFlight.current) return;
+    paymentInFlight.current = true;
     setPaymentError(null);
     setPaymentState("processing");
 
@@ -195,18 +198,22 @@ export function PaywallModal({
         const response = await fetch("/api/unlock", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ postId, priceCents: price * 100 }),
+          body: JSON.stringify({ postId }),
         });
         const result = await response.json();
 
-        if (result.success) {
+        if (response.ok && result.success) {
           Analytics.contentUnlocked(postId, "ppv", Math.round(price * 100));
           setPaymentState("success");
-          setTimeout(async () => {
+          // Keep the confirmed state visible before refreshing/closing the parent view.
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+          // A refresh failure must never invite a second payment after a confirmed purchase.
+          try {
             await onSuccess();
-            onOpenChange(false);
-            setPaymentState("idle");
-          }, 1500);
+          } catch (refreshError) {
+            console.error("[PaywallModal] Purchase confirmed, refresh failed:", refreshError);
+          }
+          onOpenChange(false);
         } else {
           setPaymentState("error");
           setPaymentError(result.error || "Payment failed. Please try again.");
@@ -228,17 +235,21 @@ export function PaywallModal({
         });
         const data = await response.json();
 
-        if (data.success) {
+        if (response.ok && data.success) {
           Analytics.subscriptionStarted(creatorId, Math.round(price * 100));
           if (postId) {
             Analytics.contentUnlocked(postId, "subscription", Math.round(price * 100));
           }
           setPaymentState("success");
-          setTimeout(async () => {
+          // Keep the confirmed state visible before refreshing/closing the parent view.
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+          // A refresh failure must never invite a second payment after a confirmed purchase.
+          try {
             await onSuccess();
-            onOpenChange(false);
-            setPaymentState("idle");
-          }, 1500);
+          } catch (refreshError) {
+            console.error("[PaywallModal] Purchase confirmed, refresh failed:", refreshError);
+          }
+          onOpenChange(false);
         } else {
           setPaymentState("error");
           setPaymentError(data.error || "Subscription failed. Please try again.");
@@ -248,8 +259,17 @@ export function PaywallModal({
       console.error("[PaywallModal] Payment error:", err);
       setPaymentError(err instanceof Error ? err.message : "Payment failed. Please try again.");
       setPaymentState("error");
+    } finally {
+      paymentInFlight.current = false;
     }
   };
+
+  useEffect(() => {
+    if (open && !paymentInFlight.current) {
+      setPaymentState("idle");
+      setPaymentError(null);
+    }
+  }, [open, postId, creatorId, type]);
 
   const handleRetry = () => {
     setPaymentError(null);
@@ -257,9 +277,9 @@ export function PaywallModal({
   };
 
   const handleClose = () => {
-    if (paymentState !== "processing") {
+    if (!paymentInFlight.current && paymentState !== "processing") {
       onOpenChange(false);
-      setTimeout(() => setPaymentState("idle"), 300);
+      setPaymentState("idle");
     }
   };
 
@@ -447,7 +467,9 @@ export function PaywallModal({
               )}
             </div>
             {type === "subscribe" && (
-              <p className="text-tiny text-text-muted">Billed {billingPeriod}ly · Cancel anytime</p>
+              <p className="text-tiny text-text-muted">
+                One payment for {billingPeriod === "month" ? "30 days" : "one year"} of access
+              </p>
             )}
           </div>
 
@@ -477,12 +499,10 @@ export function PaywallModal({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-tiny font-semibold text-text-primary leading-tight">
-                  {type === "subscribe" ? "Charged to your account" : "GetFanSee Wallet"}
+                  GetFanSee Wallet
                 </p>
                 <p className="text-tiny text-text-muted leading-tight">
-                  {type === "subscribe"
-                    ? "Billed monthly · Cancel anytime"
-                    : "Balance will be deducted at checkout"}
+                  Balance will be deducted at checkout
                 </p>
               </div>
             </div>
@@ -507,14 +527,14 @@ export function PaywallModal({
               )}
             </div>
             <p className="text-center text-[10px] text-text-disabled mt-2">
-              Statement will show:{" "}
-              <span className="font-semibold text-text-quaternary">GETFANSEE.COM</span>
+              Purchases use your GetFanSee wallet balance. Wallet funding details are shown before
+              checkout.
             </p>
           </div>
 
           {/* Actions */}
           <div className="flex flex-col gap-2 pt-2">
-            {type === "ppv" && (
+            {WALLET_PATH_ACTIVE && (
               <div className="text-center text-tiny text-text-muted mb-1">
                 {isBalanceLoading ? (
                   <span
@@ -579,7 +599,7 @@ export function PaywallModal({
                   e.preventDefault();
                   if (
                     paymentState === "idle" &&
-                    !(type === "ppv" && (isBalanceLoading || insufficientBalance))
+                    !(isBalanceLoading || insufficientBalance || balanceError !== null)
                   ) {
                     handlePayment();
                   }
@@ -587,7 +607,9 @@ export function PaywallModal({
               }}
               disabled={
                 paymentState !== "idle" ||
-                (type === "ppv" && (isBalanceLoading || insufficientBalance))
+                isBalanceLoading ||
+                insufficientBalance ||
+                balanceError !== null
               }
               aria-label={
                 type === "subscribe"
@@ -681,7 +703,12 @@ export function PaywallModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) handleClose();
+      }}
+    >
       <DialogContent
         className="sm:max-w-[400px] p-5"
         showCloseButton={paymentState !== "processing"}

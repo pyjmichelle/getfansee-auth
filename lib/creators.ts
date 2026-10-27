@@ -45,7 +45,7 @@ async function getCreatorPublicExtras(creatorId: string): Promise<{
       .order("created_at", { ascending: true }),
     supabase.from("creator_tags").select("tags(name)").eq("creator_id", creatorId),
     supabase
-      .from("profiles")
+      .from("public_creator_profiles")
       .select("is_founding_creator, category")
       .eq("id", creatorId)
       .maybeSingle(),
@@ -81,7 +81,7 @@ export async function listCreators(): Promise<Creator[] | null> {
   try {
     const supabase = await getSupabaseUniversalClient();
     const { data, error } = await supabase
-      .from("creators")
+      .from("public_creator_profiles")
       .select("*")
       .order("created_at", { ascending: false });
 
@@ -117,12 +117,18 @@ export async function getCreator(creatorId: string): Promise<Creator | null> {
     if (!error && data) {
       // creators table doesn't carry public badge/category fields — fetch from profiles
       const [{ data: pv }, extras] = await Promise.all([
-        supabase.from("profiles").select("is_verified").eq("id", creatorId).maybeSingle(),
+        supabase
+          .from("public_creator_profiles")
+          .select("is_verified, subscription_price_cents")
+          .eq("id", creatorId)
+          .maybeSingle(),
         getCreatorPublicExtras(creatorId),
       ]);
+      if (!pv) return null;
       return {
         ...data,
         is_verified: pv?.is_verified ?? false,
+        subscription_price_cents: pv?.subscription_price_cents ?? 0,
         is_founding_creator: extras.is_founding_creator,
         category: extras.category,
         external_links: extras.external_links,
@@ -136,7 +142,7 @@ export async function getCreator(creatorId: string): Promise<Creator | null> {
 
     // Fallback: query profiles for any user with role='creator'
     const { data: profile, error: profileError } = await supabase
-      .from("profiles")
+      .from("public_creator_profiles")
       .select(
         "id, display_name, avatar_url, bio, created_at, subscription_price_cents, is_verified"
       )
@@ -162,6 +168,7 @@ export async function getCreator(creatorId: string): Promise<Creator | null> {
       bio: profile.bio ?? undefined,
       created_at: profile.created_at,
       is_verified: profile.is_verified ?? false,
+      subscription_price_cents: profile.subscription_price_cents ?? 0,
       is_founding_creator: extras.is_founding_creator,
       category: extras.category,
       external_links: extras.external_links,

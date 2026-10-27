@@ -46,6 +46,23 @@ test.describe("冒烟测试 - API 健康检查", () => {
 });
 
 test.describe("冒烟测试 - 认证流程", () => {
+  test("邀请注册状态在 hydration 后保持，且无 hydration 错误", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto(`${BASE_URL}/auth?invited=1&ref_name=Smoke`);
+    await page.locator('input[type="email"]').first().fill("qa@example.test");
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+        })
+    );
+    await expect(page.getByTestId("auth-tab-signup")).toHaveAttribute("data-state", "active");
+    expect(
+      errors.filter((message) => /hydration|Minified React error #418/i.test(message))
+    ).toEqual([]);
+  });
+
   test("登录表单渲染正确", async ({ page }) => {
     await page.goto(`${BASE_URL}/auth`);
 

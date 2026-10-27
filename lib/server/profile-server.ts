@@ -1,6 +1,8 @@
 import "server-only";
 
 import { cache } from "react";
+import { getCurrentUser } from "./auth-server";
+import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 import { getSupabaseServerClient } from "./supabase-server";
 
 /**
@@ -10,15 +12,28 @@ import { getSupabaseServerClient } from "./supabase-server";
 
 export async function setRoleCreator(userId: string): Promise<boolean> {
   try {
-    const supabase = await getSupabaseServerClient();
-    const { error } = await supabase.from("profiles").update({ role: "creator" }).eq("id", userId);
+    const user = await getCurrentUser();
+    if (!user || user.id !== userId) return false;
+    const supabase = getSupabaseAdminClient();
+    const { data: verification, error: verificationError } = await supabase
+      .from("creator_verifications")
+      .select("status")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (verificationError || verification?.status !== "approved") return false;
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({ role: "creator" })
+      .eq("id", userId)
+      .select("id")
+      .maybeSingle();
 
     if (error) {
       console.error("[profile-server] setRoleCreator error:", error);
       return false;
     }
 
-    return true;
+    return Boolean(data);
   } catch (err) {
     console.error("[profile-server] setRoleCreator exception:", err);
     return false;

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const queryBuilder = {
   select: vi.fn().mockReturnThis(),
   eq: vi.fn().mockReturnThis(),
+  in: vi.fn().mockReturnThis(),
   gt: vi.fn().mockReturnThis(),
   limit: vi.fn().mockResolvedValue({ data: [{ user_id: "u1" }], error: null }),
   maybeSingle: vi.fn(),

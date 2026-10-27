@@ -1,3 +1,9 @@
+import { assertDedicatedTestProject } from "./utils/assert-test-environment";
+function requireTestPassword(): string {
+  const password = process.env.E2E_TEST_USER_PASSWORD;
+  if (!password) throw new Error("E2E_TEST_USER_PASSWORD is required.");
+  return password;
+}
 /**
  * 测试 P0 关键 Bug 修复
  * 1. 钱包充值功能
@@ -15,11 +21,12 @@ if (!supabaseUrl || !supabaseKey) {
   process.exit(1);
 }
 
+assertDedicatedTestProject(supabaseUrl);
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // 测试账号
 const TEST_FAN_EMAIL = "test-fan@example.com";
-const TEST_FAN_PASSWORD = "test123456";
+const TEST_FAN_PASSWORD = requireTestPassword();
 
 async function testWalletRecharge() {
   console.log("\n🧪 测试 1: 钱包充值功能");
